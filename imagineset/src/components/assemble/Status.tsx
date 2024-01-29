@@ -2,7 +2,7 @@
 import { Alert, IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import React, { useEffect, useState } from "react";
-import { addStatus } from "./SingleUpload";
+import { addStatus } from "./fileUpload/SingleUpload";
 
 export default function Status({status} : {status: addStatus}) {
     const [open, setOpen] = useState<boolean>(false)

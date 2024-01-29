@@ -10,6 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import CommentIcon from '@mui/icons-material/Comment';
 import { dccInfo } from './DCCIconBtn';
 import { ListSubheader } from '@mui/material';
+import { genesetLibDCCMap } from './CfdeSearch';
 
 
 export const DCCList = () => {
@@ -24,7 +25,6 @@ export const DCCList = () => {
       } else {
         newChecked.splice(currentIndex, 1);
       }
-  
       setChecked(newChecked);
     };
 
@@ -34,15 +34,14 @@ export const DCCList = () => {
           <ListSubheader>
             Results found
           </ListSubheader>
-        {dccInfo.slice(0, 8).map((dcc, value) => {
+        {Object.values(genesetLibDCCMap).filter((v, i, self) => i == self.indexOf(v)).map((dcc, value) => {
           const labelId = `checkbox-list-label-${value}`;
-  
           return (
             <ListItem
               key={value}
               disablePadding
             >
-              <ListItemButton role={undefined} onClick={handleToggle(value)} dense>
+              <ListItemButton onClick={handleToggle(value)} dense>
                 <ListItemIcon>
                   <Checkbox
                     edge="start"
@@ -52,7 +51,7 @@ export const DCCList = () => {
                     inputProps={{ 'aria-labelledby': labelId }}
                   />
                 </ListItemIcon>
-                <ListItemText id={labelId} primary={dcc.shortName} />
+                <ListItemText id={labelId} primary={dcc} />
               </ListItemButton>
             </ListItem>
           );

@@ -100,6 +100,7 @@ const CustomCard = ({
                     layout='fill'
                     alt=""
                     style={{ padding: "10%", objectFit: "contain" }}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
             </CardMedia>
             <CardContent sx={{ backgroundColor: '#C9D2E9' }}>

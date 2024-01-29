@@ -4,9 +4,9 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import SingleUpload from '@/components/assemble/SingleUpload';
-import MultipleUpload from '@/components/assemble/MultipleUpload';
-import CFDEFetch from '@/components/assemble/CfdeSearch';
+import SingleUpload from '@/components/assemble/fileUpload/SingleUpload';
+import MultipleUpload from '@/components/assemble/fileUpload/MultipleUpload';
+import CFDEFetch from '@/components/assemble/DCCFetch/CfdeSearch';
 import GeneshotSearch from '@/components/assemble/Pubmed';
 
 

@@ -7,9 +7,9 @@ import {
     Typography, useMediaQuery,
     useTheme
 } from "@mui/material";
-import { addToSessionSets, checkValidGenes, loadTxtExample } from "../../app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions ";
 import { useParams, usePathname } from "next/navigation";
-import Status from "./Status";
+import Status from "../Status";
 
 export type addStatus = {
     success?: boolean,

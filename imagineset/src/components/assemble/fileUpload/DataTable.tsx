@@ -12,6 +12,7 @@ import { addToSessionSets, checkValidGenes } from '@/app/assemble/[id]/AssembleF
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { useParams } from 'next/navigation';
 import { addStatus } from './SingleUpload';
+import Status from '../Status';
 
 
 const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
@@ -91,6 +92,7 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
     return rowSelectionModel.map((id) => rows.find((row) => row.id === id))
   }, [rowSelectionModel])
   
+  // TODO: Fix this
   const addSets = React.useCallback(() => {
     selectedRows.forEach((row) => {
       if (row) {
@@ -100,6 +102,7 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
     })
     setStatus({success: true})
   }, [])
+
 
   return (
     <div style={{ height: 400, width: '100%' }}>
@@ -124,6 +127,8 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
         }}
         rowSelectionModel={rowSelectionModel}
       />
+      <Status status={status} />
     </div>
+    
   );
 }

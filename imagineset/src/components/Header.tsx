@@ -15,6 +15,7 @@ import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
 import { Badge } from '@mui/material'
 import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
+import CartDrawer from './CartDrawer'
 
 
 export default async function Header() {
@@ -31,6 +32,20 @@ export default async function Header() {
         }
     })
     const genesetNum = sessionInfo ? sessionInfo.gene_sets.length : 0
+
+    const sessionGenesets = await prisma.pipelineSession.findUnique({
+        where: {
+            id: sessionId
+        },
+        select: {
+            gene_sets: {
+                include: {
+                    genes: true
+                }
+            }
+        }
+    })      
+
     return (
         <Container maxWidth="lg">
             <AppBar position="static" sx={{ color: "#000" }}>
@@ -41,11 +56,8 @@ export default async function Header() {
                         </Grid>
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                                 <button>
-                                    <Badge badgeContent={!(fullUrl.split('/').length < 5) ? genesetNum : 0} color="primary">
-                                        <CollectionsBookmarkIcon color='secondary' />
-                                    </Badge>
-                                </button>
+                                <CartDrawer genesetNum={genesetNum} genesets={sessionGenesets ? sessionGenesets.gene_sets : null}/>
+
                                 <Link href="/sessions">
                                     <Typography variant="nav">MY SESSIONS</Typography>
                                 </Link>

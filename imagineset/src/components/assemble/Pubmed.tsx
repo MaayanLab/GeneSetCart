@@ -170,9 +170,7 @@ export default function GeneshotSearch() {
             <Status status={status} />
           </Grid>
         </Grid>
-
       </Grid>
-
     </Container>
   )
 }

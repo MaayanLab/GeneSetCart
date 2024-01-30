@@ -117,7 +117,7 @@ export default function SingleUpload() {
                 </Grid>
                 <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 6}>
                     <Grid item >
-                        <Typography variant='body1' color='secondary'> {validGenes?.length} genes found</Typography>
+                        <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography>
                         <TextField
                             id="standard-multiline-static"
                             multiline

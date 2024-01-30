@@ -13,37 +13,52 @@ import UserComponent from './misc/LoginComponents/UserComponent'
 import NavBreadcrumbs from './breadcrumbs'
 import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
 import { Badge } from '@mui/material'
+import { headers } from 'next/headers';
+import prisma from '@/lib/prisma'
+
 
 export default async function Header() {
-  const session = await getServerSession(authOptions) 
-  return (
-    <Container maxWidth="lg">
-      <AppBar position="static" sx={{color: "#000"}}>
-        <Toolbar>
-            <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
-              <Grid item>
-                <Logo href={`/`} title="Imagineset"  color="secondary"/>
-              </Grid>
-              <Grid item>
-                <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                   <button>
-                   <Badge badgeContent={0} color="primary">
-                    <CollectionsBookmarkIcon color='secondary'/>
-                    </Badge>
-                    </button> 
-                  <Link href="/sessions">
-                    <Typography variant="nav">MY SESSIONS</Typography>
-                  </Link>
-                  <Link href="/chat">
-                    <Typography variant="nav">CHATBOT</Typography>
-                  </Link>
-                  <UserComponent session={session}/>
-                </Stack>
-              </Grid>
-              <Grid item xs={12}></Grid>
-            </Grid>
-        </Toolbar>
-      </AppBar>
-    </Container>
-  )
+    const session = await getServerSession(authOptions)
+    const headersList = headers();
+    const fullUrl = headersList.get('referer') || "";
+    const sessionId = fullUrl.split('/').slice(-1)[0]
+    const sessionInfo = await prisma.pipelineSession.findUnique({
+        where: {
+            id: sessionId
+        },
+        select: {
+            gene_sets: true
+        }
+    })
+    const genesetNum = sessionInfo ? sessionInfo.gene_sets.length : 0
+    return (
+        <Container maxWidth="lg">
+            <AppBar position="static" sx={{ color: "#000" }}>
+                <Toolbar>
+                    <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
+                        <Grid item>
+                            <Logo href={`/`} title="Imagineset" color="secondary" />
+                        </Grid>
+                        <Grid item>
+                            <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                                 <button>
+                                    <Badge badgeContent={!(fullUrl.split('/').length < 5) ? genesetNum : 0} color="primary">
+                                        <CollectionsBookmarkIcon color='secondary' />
+                                    </Badge>
+                                </button>
+                                <Link href="/sessions">
+                                    <Typography variant="nav">MY SESSIONS</Typography>
+                                </Link>
+                                <Link href="/chat">
+                                    <Typography variant="nav">CHATBOT</Typography>
+                                </Link>
+                                <UserComponent session={session} />
+                            </Stack>
+                        </Grid>
+                        <Grid item xs={12}></Grid>
+                    </Grid>
+                </Toolbar>
+            </AppBar>
+        </Container>
+    )
 }

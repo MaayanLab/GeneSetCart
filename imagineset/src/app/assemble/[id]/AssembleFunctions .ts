@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import path from 'path'
 import { type GeneSet, type Gene } from '@prisma/client'
+import { revalidatePath } from 'next/cache'
 
 // For Assemble Single Upload
 export async function loadTxtExample() {
@@ -86,6 +87,7 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
         },
     })
 
+    revalidatePath('/')
     return 'success'
 }
 

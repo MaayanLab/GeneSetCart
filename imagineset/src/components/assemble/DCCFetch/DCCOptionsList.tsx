@@ -13,8 +13,7 @@ import { ListSubheader } from '@mui/material';
 import { genesetLibDCCMap } from './CfdeSearch';
 
 
-export const DCCList = () => {
-    const [checked, setChecked] = React.useState([0]);
+export const DCCList = ({dccs, checked, setChecked} : {dccs:string[], checked: number[], setChecked: React.Dispatch<React.SetStateAction<number[]>>}) => {
 
     const handleToggle = (value: number) => () => {
       const currentIndex = checked.indexOf(value);
@@ -27,7 +26,6 @@ export const DCCList = () => {
       }
       setChecked(newChecked);
     };
-
     
     return (
         <List sx={{ maxWidth: 250, bgcolor: 'background.paper', maxHeight: 300, overflow:'scroll' }}>
@@ -40,6 +38,7 @@ export const DCCList = () => {
             <ListItem
               key={value}
               disablePadding
+              disabled={!(dccs.includes(dcc))}
             >
               <ListItemButton onClick={handleToggle(value)} dense>
                 <ListItemIcon>

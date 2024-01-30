@@ -10,9 +10,11 @@ import { searchResultsType } from './CfdeSearch';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { addToSessionSets, checkValidGenes } from '@/app/assemble/[id]/AssembleFunctions ';
 import { useParams } from 'next/navigation';
+import { addStatus } from '../fileUpload/SingleUpload';
 
-export function AddGenesetButton({ resultItem }: {
-    resultItem: searchResultsType
+export function AddGenesetButton({ resultItem, setStatus }: {
+    resultItem: searchResultsType,
+    setStatus: React.Dispatch<React.SetStateAction<addStatus>>
 }) {
     const params = useParams<{ id: string }>()
     const addGeneset = React.useCallback((
@@ -23,7 +25,11 @@ export function AddGenesetButton({ resultItem }: {
                 .then((data) => {
                     const genes = data[resultItem.genesetName]
                     const sessionId = params.id
-                    addToSessionSets(genes, sessionId, resultItem.genesetName, '')
+                    checkValidGenes(genes.toString().substring(1, genes.toString().length).replaceAll(',', '\n'))
+                        .then((validGenes) => {
+                            addToSessionSets(validGenes, sessionId, resultItem.genesetName, '')
+                            .then((result) => setStatus({ success: true }))
+                        })
                 }))
     }, [])
 
@@ -33,12 +39,13 @@ export function AddGenesetButton({ resultItem }: {
         </Button>
     )
 }
+
 export function GenesetDialogBox({ resultItem }: {
     resultItem: searchResultsType
 }) {
     const [open, setOpen] = React.useState(false);
     const [genes, setGenes] = React.useState<string[]>([])
-    const  [validGenes, setValidGenes] = React.useState<string[]>([])
+    const [validGenes, setValidGenes] = React.useState<string[]>([])
     const getGenes = React.useCallback((
         resultItem: searchResultsType,
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -56,7 +63,7 @@ export function GenesetDialogBox({ resultItem }: {
         checkValidGenes(genes.toString().substring(1, genes.toString().length).replaceAll(',', '\n')).then((response) => setValidGenes(response))
     }, [genes])
 
-    
+
 
     const handleClose = () => {
         setOpen(false);

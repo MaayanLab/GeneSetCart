@@ -15,6 +15,8 @@ import { DCCIcons } from "./DCCIconBtn";
 
 import { addToSessionSets, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
 import { AddGenesetButton, GenesetDialogBox } from "./RowGeneset";
+import Status from "../Status";
+import { addStatus } from "../fileUpload/SingleUpload";
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -77,6 +79,9 @@ export const genesetLibDCCMap: { [key: string]: string } = {
   "HuBMAP_ASCTplusB_augmented_2022": 'HuBMAP',
   "MoTrPAC_2023": 'MoTrPAC'
 }
+
+const dccCheckedDisplay = Object.values(genesetLibDCCMap).filter((v, i, self) => i == self.indexOf(v))
+
 export type searchResultsType = {
   dcc: string,
   genesetName: string,
@@ -84,9 +89,21 @@ export type searchResultsType = {
   genes: string[]
 }
 export default function CFDEFetch() {
+  // for checked DCC options 
+  const [checked, setChecked] = React.useState<number[]>(dccCheckedDisplay.map((dcc, i) =>  i));
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [searchResults, setSearchResults] = React.useState<searchResultsType[]>([])
+  const  [status, setStatus] = React.useState<addStatus>({})
+  const searchDCCs = React.useMemo(() => {
+    return searchResults.map((result) => result.dcc).filter((v, i, self) => i == self.indexOf(v))
+}, [searchResults])
+
+  const rows = React.useMemo(() => {return searchResults.filter((result) => (dccCheckedDisplay.filter((dccOption, i) => checked.includes(i)).includes(result.dcc))).slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage,
+  )}, [searchResults, page, rowsPerPage, checked])
+
 
   const handleChangePage = React.useCallback((
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -156,7 +173,7 @@ export default function CFDEFetch() {
         </Grid>
         <Grid container item spacing={2} xs={12}>
           <Grid container item xs={3}>
-            <DCCList />
+            <DCCList dccs={searchDCCs} checked={checked} setChecked={setChecked} />
           </Grid>
           <Grid container item xs={9}>
             <Table sx={{ minWidth: '100%' }}>
@@ -170,16 +187,13 @@ export default function CFDEFetch() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {searchResults.slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage,
-                ).map((resultItem, i) =>
+                {rows.map((resultItem, i) =>
                   <TableRow
-                    key={i}
+                    // key={i}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                    <AddGenesetButton resultItem={resultItem}/>
+                    <AddGenesetButton resultItem={resultItem} setStatus={setStatus}/>
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {resultItem.dcc}
@@ -209,6 +223,7 @@ export default function CFDEFetch() {
           </Grid>
         </Grid>
       </Grid>
+      <Status status={status}/>
     </Container>
   )
 }

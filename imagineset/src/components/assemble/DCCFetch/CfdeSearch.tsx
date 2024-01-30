@@ -12,8 +12,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import * as React from 'react';
 import { DCCList } from "./DCCOptionsList";
 import { DCCIcons } from "./DCCIconBtn";
-
-import { addToSessionSets, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
 import { AddGenesetButton, GenesetDialogBox } from "./RowGeneset";
 import Status from "../Status";
 import { addStatus } from "../fileUpload/SingleUpload";

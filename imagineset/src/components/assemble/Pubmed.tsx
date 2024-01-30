@@ -10,65 +10,71 @@ import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import React from "react";
-import { checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
+import CircularIndeterminate from "../misc/Loading";
+import Status from "./Status";
+import { stat } from "fs";
+import { useParams } from "next/navigation";
+import { addStatus } from "./fileUpload/SingleUpload";
+
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+  border: '1px solid'
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+    },
+  },
+}));
+
+
 
 export default function GeneshotSearch() {
   const theme = useTheme();
+  const params = useParams<{ id: string }>()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [foundGenes, setFoundGenes] = React.useState<string[]>([])
   const [validGenes, setValidGenes] = React.useState<string[]>([])
-
+  const [loading, setLoading] = React.useState(false)
+  const [status, setStatus] = React.useState<addStatus>({})
   React.useEffect(() => {
-    checkValidGenes(foundGenes.toString().substring(1, foundGenes.toString().length).replaceAll(',', '\n')).then((response) => setValidGenes(response))
+    checkValidGenes(foundGenes.toString().replaceAll(',', '\n')).then((response) => setValidGenes(response))
   }, [foundGenes])
-
-  const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
-    },
-    border: '1px solid'
-  }));
-
-  const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    width: '100%',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '20ch',
-        },
-      },
-    },
-  }));
-
 
   const handleSearch = React.useCallback((
     query: string
   ) => {
+    setLoading(true)
     fetch("https://maayanlab.cloud/geneshot/api/search",
       {
         headers: {
@@ -80,11 +86,11 @@ export default function GeneshotSearch() {
       })
       .then((response) => response.json()
         .then((data) => {
+          setLoading(false)
           const genes = Object.keys(data['gene_count'])
           setFoundGenes(genes)
-          console.log(genes)
         }))
-      .catch((res) => { console.log(res) })
+      .catch((res) => { setLoading(false); console.log(res) })
   }, [])
 
   return (
@@ -93,8 +99,42 @@ export default function GeneshotSearch() {
       <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
         Enter a search term to obtain all genes mentioned with that term in publications
       </Typography>
-      <Grid container direction='row' sx={{ p: 2 }} display={isMobile ? 'block' : 'flex'} spacing={1}>
+      <Grid container direction='row' sx={{ p: 2 }} display={isMobile ? 'block' : 'flex'} spacing={1} component={'form'}
+        onSubmit={(evt) => {
+          evt.preventDefault();
+          const formData = new FormData(evt.currentTarget)
+          const genesetName = formData.get('name')?.toString()
+          let description = formData.get('description')?.toString()
+          if (!genesetName) throw new Error('no gene set name')
+          if (!description) description = ''
+          const sessionId = params.id
+          // TODO: add catch here to error status
+          addToSessionSets(validGenes, sessionId, genesetName, description).then((result) => { setStatus({ success: true }) })
+        }
+        }>
         <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} alignItems="center" justifyItems='center'>
+          <Grid item direction='row' container alignItems="center" justifyItems='center'>
+            <Grid item>
+              {loading ? <CircularIndeterminate /> : <></>}
+            </Grid>
+            <Grid item>
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder="Search…"
+                  inputProps={{ 'aria-label': 'search' }}
+                  name='search'
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      handleSearch((event.target as HTMLFormElement).value) 
+                    }
+                  }}
+                />
+              </Search>
+            </Grid>
+          </Grid>
           <Grid item>
             <TextField id="outlined-basic" required label="Gene Set Name" variant="outlined" name='name' />
           </Grid>
@@ -112,18 +152,7 @@ export default function GeneshotSearch() {
           </Grid>
         </Grid>
         <Grid direction='column' item container spacing={2} alignItems="center" justifyItems='center' xs={isMobile ? 12 : 6}>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              name='search'
-              onKeyDown={(event) => { if (event.key === 'Enter') { handleSearch((event.target as HTMLFormElement).value) } }}
-            />
-          </Search>
-          <Typography variant='body1' color='secondary' sx={{mt:2}}> {foundGenes.length} genes found</Typography>
+          <Typography variant='body1' color='secondary' sx={{ mt: 2 }}> {foundGenes.length} genes found</Typography>
           <Typography variant='body1' color='secondary'> {validGenes.length} valid genes found</Typography>
           <TextField
             id="standard-multiline-static"
@@ -133,11 +162,15 @@ export default function GeneshotSearch() {
             value={validGenes.toString().substring(1, validGenes.toString().length).replaceAll(',', '\n')}
           />
           <Grid item>
-            <Button variant='outlined' color="secondary">
+            <Button variant='outlined' color="secondary" type='submit'>
               ADD TO SETS
             </Button>
           </Grid>
+          <Grid item>
+            <Status status={status} />
+          </Grid>
         </Grid>
+
       </Grid>
 
     </Container>

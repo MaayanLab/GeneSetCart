@@ -8,7 +8,7 @@ import {
     useTheme
 } from "@mui/material";
 import { addToSessionSets, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions ";
-import { useParams, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import Status from "../Status";
 
 export type addStatus = {

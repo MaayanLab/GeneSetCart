@@ -25,7 +25,7 @@ export function AddGenesetButton({ resultItem, setStatus }: {
                 .then((data) => {
                     const genes = data[resultItem.genesetName]
                     const sessionId = params.id
-                    checkValidGenes(genes.toString().substring(1, genes.toString().length).replaceAll(',', '\n'))
+                    checkValidGenes(genes.toString().replaceAll(',', '\n'))
                         .then((validGenes) => {
                             addToSessionSets(validGenes, sessionId, resultItem.genesetName, '')
                             .then((result) => setStatus({ success: true }))
@@ -60,7 +60,7 @@ export function GenesetDialogBox({ resultItem }: {
     }, [])
 
     React.useEffect(() => {
-        checkValidGenes(genes.toString().substring(1, genes.toString().length).replaceAll(',', '\n')).then((response) => setValidGenes(response))
+        checkValidGenes(genes.toString().replaceAll(',', '\n')).then((response) => setValidGenes(response))
     }, [genes])
 
 

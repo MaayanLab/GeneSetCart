@@ -8,7 +8,7 @@ import { Container } from '@mui/material';
 
 export default function ColorToggleButton() {
     const pathname = usePathname()
-    const [menuItem, setMenuItem] = React.useState(pathname);
+    const [menuItem, setMenuItem] = React.useState(pathname.split('/').slice(0, 2).join('/'));
     const handleChange = (
         event: React.MouseEvent<HTMLElement>,
         newItem: string,
@@ -19,13 +19,13 @@ export default function ColorToggleButton() {
     return (
         <ToggleButtonGroup
             color="secondary"
-            value={menuItem}
+            value={menuItem.split('/').slice(0, 2).join('/')}
             exclusive
             onChange={handleChange}
             aria-label="Platform"
             fullWidth
         >
-            <ToggleButton value="/assemble/[id]" href="/assemble/[id]">
+            <ToggleButton value="/assemble" href="/assemble/[id]">
                 <Typography variant="nav" align='center'>ASSEMBLE</Typography>
             </ToggleButton>
             <ToggleButton value="/augment" href="/augment">

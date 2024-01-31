@@ -1,7 +1,8 @@
+'use server'
 import Image from 'next/image'
 import Link from 'next/link'
 import { authOptions } from '../app/api/auth/[...nextauth]/route'
-import { getServerSession } from 'next-auth'
+import { Session, getServerSession } from 'next-auth'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Grid from '@mui/material/Grid'
@@ -17,22 +18,7 @@ import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
 
-
-export default async function Header() {
-    const session = await getServerSession(authOptions)
-    const headersList = headers();
-    const fullUrl = headersList.get('referer') || "";
-    const sessionId = fullUrl.split('/').slice(-1)[0]
-    const sessionInfo = await prisma.pipelineSession.findUnique({
-        where: {
-            id: sessionId
-        },
-        select: {
-            gene_sets: true
-        }
-    })
-    const genesetNum = sessionInfo ? sessionInfo.gene_sets.length : 0
-
+export async function getGenesets(sessionId: string) {
     const sessionGenesets = await prisma.pipelineSession.findUnique({
         where: {
             id: sessionId
@@ -44,8 +30,13 @@ export default async function Header() {
                 }
             }
         }
-    })      
+    })    
 
+    return sessionGenesets ? sessionGenesets.gene_sets : []
+}
+
+export default async function Header() {
+    const session = await getServerSession(authOptions)
     return (
         <Container maxWidth="lg">
             <AppBar position="static" sx={{ color: "#000" }}>
@@ -56,7 +47,7 @@ export default async function Header() {
                         </Grid>
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                                <CartDrawer genesetNum={genesetNum} genesets={sessionGenesets ? sessionGenesets.gene_sets : null}/>
+                                <CartDrawer />
 
                                 <Link href="/sessions">
                                     <Typography variant="nav">MY SESSIONS</Typography>

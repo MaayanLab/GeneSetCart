@@ -11,6 +11,7 @@ import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { addToSessionSets, checkValidGenes } from '@/app/assemble/[id]/AssembleFunctions ';
 import { useParams } from 'next/navigation';
 import { addStatus } from '../fileUpload/SingleUpload';
+import { copyToClipboard } from '../fileUpload/DataTable';
 
 export function AddGenesetButton({ resultItem, setStatus }: {
     resultItem: searchResultsType,
@@ -89,12 +90,12 @@ export function GenesetDialogBox({ resultItem }: {
                             multiline
                             rows={10}
                             placeholder="Paste gene symbols here"
-                            value={genes.toString().substring(1, genes.toString().length).replaceAll(',', '\n')}
+                            value={genes.toString().replaceAll(',', '\n')}
                             disabled
                         />
                     </Grid>
                     <Grid item sx={{ mt: 2 }}>
-                        <Button variant='contained' color='primary'>
+                        <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(genes.toString().replaceAll(',', '\n'))}>
                             COPY TO CLIPBOARD
                         </Button>
                     </Grid>

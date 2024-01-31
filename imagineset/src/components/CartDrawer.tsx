@@ -4,21 +4,27 @@ import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
-import { Accordion, AccordionDetails, AccordionSummary, Collapse, Grid, ListItem, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Chip, Collapse, Grid, ListItem, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, styled } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
 import { Badge } from '@mui/material'
 import { type GeneSet } from '@prisma/client';
+import { copyToClipboard } from './assemble/fileUpload/DataTable';
+import { useParams, usePathname, useRouter } from 'next/navigation';
+import { getGenesets } from './Header';
+
 
 
 export function CollapsibleButton({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
     return (
         <Button variant='outlined' color="secondary" onClick={() => setOpen(!open)}>
-            {open ? <Typography>Close</Typography> : <Typography>View Genes</Typography>}
+            {open ? <Typography variant='body2'>Close</Typography> : <Typography variant='body2'>View Genes</Typography>}
         </Button>
     );
 }
 
+
+  
 const GenesetInfo = ({ geneset }: {
     geneset: ({
         genes: {
@@ -41,7 +47,7 @@ const GenesetInfo = ({ geneset }: {
                         </Grid>
                         <Grid item>
                             <Typography sx={{ fontSize: 12, color: 'gray' }}>
-                                Added: {geneset.createdAt.toUTCString()}
+                            {'Added: ' + geneset.createdAt.toUTCString()}
                             </Typography>
                         </Grid>
                     </Grid>
@@ -71,7 +77,7 @@ const GenesetInfo = ({ geneset }: {
                                             />
                                         </Grid>
                                         <Grid item sx={{ mt: 2 }}>
-                                            <Button variant='contained' color='primary'>
+                                            <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(geneset.genes.map((gene) => gene.gene_symbol).toString().replaceAll(',', '\n'))}>
                                                 COPY TO CLIPBOARD
                                             </Button>
                                         </Grid>
@@ -122,18 +128,23 @@ const DrawerInfo = ({ genesets }: {
 };
 
 
-export default function CartDrawer({ genesetNum, genesets }: {
-    genesetNum: number, genesets: ({
+export default function CartDrawer() {
+    const [sessionGeneset, setSessionGenesets] = React.useState<({
         genes: {
             id: string;
             gene_symbol: string;
             synonyms: string;
             description: string | null;
         }[];
-    } & GeneSet)[] | null
-}) {
+    } & GeneSet)[]>([])
+    const params = useParams<{ id: string }>()
+    React.useEffect(()=> {
+        getGenesets(params.id)
+        .then((result) => {setSessionGenesets(result)})
+    })
+    
+    
     const [state, setState] = React.useState(false);
-
     const toggleDrawer =
         (open: boolean) =>
             (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -151,7 +162,7 @@ export default function CartDrawer({ genesetNum, genesets }: {
     return (
         <div>
             <Button onClick={toggleDrawer(true)}>
-                <Badge badgeContent={genesetNum.toString()} color="primary">
+                <Badge badgeContent={sessionGeneset.length.toString()} color="primary">
                     <CollectionsBookmarkIcon color='secondary' />
                 </Badge>
             </Button>
@@ -160,7 +171,7 @@ export default function CartDrawer({ genesetNum, genesets }: {
                 open={state}
                 onClose={toggleDrawer(false)}
             >
-                <DrawerInfo genesets={genesets} />
+                <DrawerInfo genesets={sessionGeneset} />
             </Drawer>
         </div>
     );

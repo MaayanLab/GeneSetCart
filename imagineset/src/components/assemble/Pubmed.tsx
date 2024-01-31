@@ -99,7 +99,8 @@ export default function GeneshotSearch() {
       <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
         Enter a search term to obtain all genes mentioned with that term in publications
       </Typography>
-      <Grid container direction='row' sx={{ p: 2 }} display={isMobile ? 'block' : 'flex'} spacing={1} component={'form'}
+      {/* container sx={{ p: 2 }} display={isMobile ? 'block' : 'flex'} spacing={1} alignItems="center" justifyContent="center" component={'form'} */}
+      <Grid container sx={{ p: 2 }} alignItems="center" justifyContent="center" display={isMobile ? 'block' : 'flex'} spacing={1} component={'form'}
         onSubmit={(evt) => {
           evt.preventDefault();
           const formData = new FormData(evt.currentTarget)
@@ -112,7 +113,7 @@ export default function GeneshotSearch() {
           addToSessionSets(validGenes, sessionId, genesetName, description).then((result) => { setStatus({ success: true }) })
         }
         }>
-        <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} alignItems="center" justifyItems='center'>
+        <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center'>
           <Grid item direction='row' container alignItems="center" justifyItems='center'>
             <Grid item>
               {loading ? <CircularIndeterminate /> : <></>}

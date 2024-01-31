@@ -64,7 +64,7 @@ export default function SingleUpload() {
                 Upload a single .txt, .csv or .tsv file containing gene symbols, each on new line OR paste your gene set in
                 the text box below
             </Typography>
-            <Grid container sx={{ p: 2 }} display={isMobile ? 'block' : 'flex'} spacing={1} alignItems="center" justifyContent="center" component={'form'}
+            <Grid container sx={{ p: 2 }} display={isMobile ? 'block' : 'flex'} spacing={1} justifyContent="center" component={'form'}
                 onSubmit={(evt) => {
                     evt.preventDefault();
                     const formData = new FormData(evt.currentTarget)
@@ -78,7 +78,22 @@ export default function SingleUpload() {
                     
                 }
                 }>
-                <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center'>
+                <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center' alignItems={'center'} justifyContent={'center'}>
+                    <Grid item>
+                        <TextField id="outlined-basic" required label="Gene Set Name" variant="outlined" name='name' />
+                    </Grid>
+                    <Grid item>
+                        <TextField
+                            id="outlined-basic"
+                            label="Description"
+                            variant="outlined"
+                            name='description'
+                            rows={4}
+                            multiline
+                            placeholder="Gene Set Description (optional)"
+
+                        />
+                    </Grid>
                     <Grid item>
                         <Button
                             variant="contained"
@@ -98,21 +113,6 @@ export default function SingleUpload() {
                                 onChange={(event) => { readFile(event) }}
                             />
                         </Button>
-                    </Grid>
-                    <Grid item>
-                        <TextField id="outlined-basic" required label="Gene Set Name" variant="outlined" name='name' />
-                    </Grid>
-                    <Grid item>
-                        <TextField
-                            id="outlined-basic"
-                            label="Description"
-                            variant="outlined"
-                            name='description'
-                            rows={4}
-                            multiline
-                            placeholder="Gene Set Description (optional)"
-
-                        />
                     </Grid>
                 </Grid>
                 <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 6}>

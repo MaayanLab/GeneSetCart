@@ -1,12 +1,10 @@
 import ColorToggleButton from "@/components/misc/SectionToggle";
-import VerticalTabs from "./AssembleOptions";
 import Container from "@mui/material/Container";
 
-export default async function AssemblePage({ params }: { params: { id: string } }){
+export default async function AugmentPage({ params }: { params: { id: string } }){
     return (
         <Container>
         <ColorToggleButton sessionId={params.id}/>
-        <VerticalTabs />
         </Container>
     )
 }

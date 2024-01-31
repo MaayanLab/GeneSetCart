@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography'
 import { usePathname } from 'next/navigation'
 import { Container } from '@mui/material';
 
-export default function ColorToggleButton() {
+export default function ColorToggleButton({sessionId}: {sessionId: string}) {
     const pathname = usePathname()
     const [menuItem, setMenuItem] = React.useState(pathname.split('/').slice(0, 2).join('/'));
     const handleChange = (
@@ -25,10 +25,10 @@ export default function ColorToggleButton() {
             aria-label="Platform"
             fullWidth
         >
-            <ToggleButton value="/assemble" href="/assemble/[id]">
+            <ToggleButton value="/assemble" href={`/assemble/${sessionId}`}>
                 <Typography variant="nav" align='center'>ASSEMBLE</Typography>
             </ToggleButton>
-            <ToggleButton value="/augment" href="/augment">
+            <ToggleButton value="/augment" href={`/augment/${sessionId}`}>
                 <Typography variant="nav" align='center'>AUGMENT</Typography>
             </ToggleButton>
             <ToggleButton value="/combine" href="/combine">

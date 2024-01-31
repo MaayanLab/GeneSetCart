@@ -4,6 +4,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from '../../../../lib/prisma'
 import GitHubProvider from "next-auth/providers/github";
+import { revalidatePath } from 'next/cache';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!
@@ -32,19 +33,9 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     }, 
-//     // session({ session, token}) {
-//     //     // session.accessToken = token.accessToken
-//     //     const id = token.sub ?? token.id
-//     //     if (typeof id !== 'string') throw new Error('Missing user id')
-//     //     return { ...session, user: { ...(session.user ?? {}), id: token.id ? token.id.toString() : token.sub?.toString(), }, };
-//     //   },
       async session({ session, token, user }) {
-        // Send properties to the client, like an access_token and user id from a provider.
-        // session.accessToken = token.accessToken
-        // session.user.id = token.id
         const newSession = { ...session, user: { ...(session.user ?? {}), id: user.id ? user.id.toString() : token.sub?.toString(), }, };
         return newSession
-        // return session
       }
   }
 }

@@ -1,3 +1,4 @@
+'use client'
 import * as React from 'react';
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from '@mui/x-data-grid';
 import { GMTGenesetInfo } from './MultipleUpload';
@@ -13,6 +14,10 @@ import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { useParams } from 'next/navigation';
 import { addStatus } from './SingleUpload';
 import Status from '../Status';
+
+export function copyToClipboard(genesString: string) {
+  navigator.clipboard.writeText(genesString);
+}
 
 
 const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
@@ -64,7 +69,7 @@ const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
             />
           </Grid>
           <Grid item sx={{ mt: 2 }}>
-            <Button variant='contained' color='primary'>
+            <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(params.row.genes.toString().replaceAll(',', '\n'))}>
               COPY TO CLIPBOARD
             </Button>
           </Grid>

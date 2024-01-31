@@ -17,9 +17,34 @@ import { Badge } from '@mui/material'
 import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
+import { revalidatePath } from 'next/cache'
 
 export async function getGenesets(sessionId: string) {
-    const sessionGenesets = await prisma.pipelineSession.findUnique({
+    if (sessionId) {
+        const sessionGenesets = await prisma.pipelineSession.findUnique({
+            where: {
+                id: sessionId
+            },
+            select: {
+                gene_sets: {
+                    include: {
+                        genes: true
+                    }
+                }
+            }
+        })    
+        return sessionGenesets ? sessionGenesets.gene_sets : []
+    }
+    else {return []}
+
+}
+
+export default async function Header() {
+    const session = await getServerSession(authOptions)
+    const headersList = headers();
+    const fullUrl = headersList.get('referer') || "";
+    const sessionId = fullUrl.split('/').slice(-1)[0]
+    const sessionInfo = await prisma.pipelineSession.findUnique({
         where: {
             id: sessionId
         },
@@ -30,13 +55,8 @@ export async function getGenesets(sessionId: string) {
                 }
             }
         }
-    })    
+    })  
 
-    return sessionGenesets ? sessionGenesets.gene_sets : []
-}
-
-export default async function Header() {
-    const session = await getServerSession(authOptions)
     return (
         <Container maxWidth="lg">
             <AppBar position="static" sx={{ color: "#000" }}>
@@ -47,7 +67,7 @@ export default async function Header() {
                         </Grid>
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                                <CartDrawer />
+                                <CartDrawer sessionInfo={sessionInfo}/>
 
                                 <Link href="/sessions">
                                     <Typography variant="nav">MY SESSIONS</Typography>

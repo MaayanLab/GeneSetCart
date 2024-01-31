@@ -12,7 +12,7 @@ import maayanLabLogo from '@/public/img/otherLogos/maayanlabLogo.png'
 
 export default async function Footer() {
     return (
-        <Paper sx={{ background: "#336699", color: "#FFF", padding: 2, paddingTop: 5, borderRadius: 0, paddingBottom: 5 }}>
+        <Paper sx={{ background: "#336699", color: "#FFF", padding: 2, paddingTop: 5, borderRadius: 0, paddingBottom: 5}}>
             <Container maxWidth="lg">
                 <Grid container justifyContent={"space-around"}>
                     <Grid item>

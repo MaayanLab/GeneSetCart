@@ -50,10 +50,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     padding: theme.spacing(1, 1, 1, 0),
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    [theme.breakpoints.up('sm')]: {
-      width: '12ch',
-    },
+    // transition: theme.transitions.create('width'),
+    // [theme.breakpoints.up('sm')]: {
+    //   width: '12ch',
+    // },
   },
 }));
 
@@ -113,29 +113,30 @@ export default function GeneshotSearch() {
           addToSessionSets(validGenes, sessionId, genesetName, description).then((result) => { setStatus({ success: true }) })
         }
         }>
-        <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center'>
-          <Grid item direction='row' container alignItems="center" justifyItems='center'>
-            <Grid item>
-              {loading ? <CircularIndeterminate /> : <></>}
-            </Grid>
-            <Grid item>
-              <Search>
-                <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search…"
-                  inputProps={{ 'aria-label': 'search' }}
-                  name='search'
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      handleSearch((event.target as HTMLFormElement).value) 
-                    }
-                  }}
-                />
-              </Search>
-            </Grid>
+        <Grid item direction='row' container alignItems="center" justifyItems='center'>
+          <Grid item>
+            {loading ? <CircularIndeterminate /> : <></>}
           </Grid>
+          <Grid item  xs={12}>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+                name='search'
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    handleSearch((event.target as HTMLFormElement).value)
+                  }
+                }}
+              />
+            </Search>
+          </Grid>
+        </Grid>
+        <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center'>
+
           <Grid item>
             <TextField id="outlined-basic" required label="Gene Set Name" variant="outlined" name='name' />
           </Grid>
@@ -153,7 +154,7 @@ export default function GeneshotSearch() {
           </Grid>
         </Grid>
         <Grid direction='column' item container spacing={2} alignItems="center" justifyItems='center' xs={isMobile ? 12 : 6}>
-          <Typography variant='body1' color='secondary' sx={{ mt: 2 }}> {foundGenes.length} genes found</Typography>
+          <Typography variant='body1' color='secondary' sx={{ mt: 2 }}> {foundGenes.length} genes</Typography>
           <Typography variant='body1' color='secondary'> {validGenes.length} valid genes found</Typography>
           <TextField
             id="standard-multiline-static"

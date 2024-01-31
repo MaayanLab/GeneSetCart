@@ -8,6 +8,7 @@ export type GMTGenesetInfo = {
     genesetName: string, 
     genes: string []
 }
+
 export default function MultipleUpload() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))

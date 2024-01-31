@@ -31,7 +31,6 @@ export default async function RootLayout({
             </Grid>
             <Grid item className="flex grow">
               <Background background="#E7F3F5">
-                <NavBreadcrumbs />
                 {children}
               </Background>
             </Grid>

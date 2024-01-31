@@ -128,7 +128,15 @@ const DrawerInfo = ({ genesets }: {
 };
 
 
-export default function CartDrawer() {
+export default function CartDrawer({sessionInfo}: {sessionInfo: {
+    gene_sets: ({
+        genes: {
+            id: string;
+            gene_symbol: string;
+            synonyms: string;
+            description: string | null;
+        }[];
+    } & GeneSet)[]} | null }) {
     const [sessionGeneset, setSessionGenesets] = React.useState<({
         genes: {
             id: string;
@@ -137,11 +145,12 @@ export default function CartDrawer() {
             description: string | null;
         }[];
     } & GeneSet)[]>([])
+
     const params = useParams<{ id: string }>()
     React.useEffect(()=> {
         getGenesets(params.id)
         .then((result) => {setSessionGenesets(result)})
-    })
+    }, [sessionInfo])
     
     
     const [state, setState] = React.useState(false);

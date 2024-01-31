@@ -9,7 +9,7 @@ import {
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
-import { addToSessionSets, checkValidGenes } from '@/app/assemble/[id]/AssembleFunctions ';
+import { addMultipleSetsToSession, addToSessionSets, checkValidGenes } from '@/app/assemble/[id]/AssembleFunctions ';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { useParams } from 'next/navigation';
 import { addStatus } from './SingleUpload';
@@ -23,10 +23,9 @@ export function copyToClipboard(genesString: string) {
 const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
   const [open, setOpen] = React.useState(false);
   const [validGenes, setValidGenes] = React.useState<string[]>([])
-
   React.useEffect(() => {
     checkValidGenes(params.row.genes.toString().replaceAll(',', '\n'))
-      .then((result) => setValidGenes(result))
+      .then((result) => setValidGenes(result) )
   }, [params.row.genes])
 
 
@@ -55,8 +54,8 @@ const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
         <DialogTitle>{params.row.genesetName}</DialogTitle>
         <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
           <Grid item>
-            <Typography variant='body1' color='secondary'> {params.row.genes.length} genes found</Typography>
-            <Typography variant='body1' color='secondary'> {validGenes.length} valid genes</Typography>
+            <Typography variant='body1' color='secondary'> {params.row.genes.length} genes</Typography>
+            <Typography variant='body1' color='secondary'> {validGenes.length} valid genes found</Typography>
           </Grid>
           <Grid item>
             <TextField
@@ -93,20 +92,12 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
   const [rowSelectionModel, setRowSelectionModel] =
   React.useState<GridRowSelectionModel>([]);
 
-  const selectedRows = React.useMemo(() => {
-    return rowSelectionModel.map((id) => rows.find((row) => row.id === id))
-  }, [rowSelectionModel])
+  const [selectedRows, setSelectedRows] = React.useState<(GMTGenesetInfo | undefined)[]>([])
   
-  // TODO: Fix this
   const addSets = React.useCallback(() => {
-    selectedRows.forEach((row) => {
-      if (row) {
-        checkValidGenes(row.genes.toString().replaceAll(',', '\n') )
-        .then((result) =>  addToSessionSets(result, params.id, row.genesetName, ''))
-      }
-    })
-    setStatus({success: true})
-  }, [])
+    addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id)
+    .then((results) => setStatus({success: true}))
+  }, [selectedRows])
 
 
   return (
@@ -129,6 +120,7 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
         }}
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setRowSelectionModel(newRowSelectionModel);
+          setSelectedRows(newRowSelectionModel.map((id) => rows.find((row) => row.id === id)))
         }}
         rowSelectionModel={rowSelectionModel}
       />

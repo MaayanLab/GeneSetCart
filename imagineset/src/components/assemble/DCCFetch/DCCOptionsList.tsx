@@ -28,7 +28,7 @@ export const DCCList = ({dccs, checked, setChecked} : {dccs:string[], checked: n
     };
     
     return (
-        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', maxHeight: 300, overflow:'scroll' }}>
+        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow:'scroll' }}>
           <ListSubheader>
             Results found
           </ListSubheader>

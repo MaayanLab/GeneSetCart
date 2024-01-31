@@ -4,7 +4,7 @@ import Container from "@mui/material/Container";
 
 export default async function AssemblePage({ params }: { params: { id: string } }){
     return (
-        <Container>
+        <Container sx={{mb:4}}>
         <ColorToggleButton sessionId={params.id}/>
         <VerticalTabs />
         </Container>

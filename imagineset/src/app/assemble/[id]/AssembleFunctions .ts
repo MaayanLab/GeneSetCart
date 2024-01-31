@@ -40,7 +40,7 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
         }
     })));
 
-    const geneObjectIds = geneObjects.map((geneObject) => {return ({id : geneObject?.id})})
+    const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
     // get user
     const session = await getServerSession(authOptions)
     if (!session) return redirect("/auth/signin?callbackUrl=/")
@@ -53,8 +53,8 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
 
     // get sers that are already in session 
     const sessionOldSets = await prisma.pipelineSession.findUnique({
-        where:{
-            id:sessionId, 
+        where: {
+            id: sessionId,
             user_id: user.id
         },
         select: {
@@ -70,11 +70,11 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
             session_id: sessionId,
             genes: {
                 connect: geneObjectIds,
-              },
+            },
         }
     })
 
-    
+
     const updatedSession = await prisma.pipelineSession.update({
         where: {
             id: sessionId,
@@ -83,10 +83,28 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
         data: {
             gene_sets: {
                 set: [...oldSetsArray, newGeneset],
-              },
+            },
         },
     })
 
     revalidatePath('/')
     return 'success'
 }
+
+type GMTGenesetInfo = {
+    id: number,
+    genesetName: string,
+    genes: string[]
+}
+
+
+export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string) {
+    for (const row of rows) {
+        if (row) {
+            const validGenes = await checkValidGenes(row.genes.toString().replaceAll(',', '\n'))
+            const added = await addToSessionSets(validGenes, sessionId, row.genesetName, '')
+        }
+    }
+    return 'done'
+}
+

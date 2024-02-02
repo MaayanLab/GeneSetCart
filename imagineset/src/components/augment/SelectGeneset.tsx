@@ -7,13 +7,12 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Button, Grid, TextField, Typography } from '@mui/material';
 import { Gene, GeneSet } from '@prisma/client';
-import { text } from 'stream/consumers';
 import FormLabel from '@mui/material/FormLabel';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import Checkbox from '@mui/material/Checkbox';
-import { getGeneshotPredGenes } from '@/app/augment/[id]/AugmentFunctions';
+import { getGeneshotPredGenes, getPPIGenes } from '@/app/augment/[id]/AugmentFunctions';
 import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
 import CircularIndeterminate from '../misc/Loading';
 
@@ -96,6 +95,19 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
         }
     }, [originalGenes])
 
+    const ppiAugment =  React.useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        setLoading(true)
+        if (originalGenes) {
+            getPPIGenes(originalGenes)
+            .then((response) => {
+                console.log(response)
+                setAugmentedGenes(response)
+                setGenesetName('Augmented ' + selected)
+                setLoading(false)
+            })
+        }
+    }, [originalGenes])
+
     React.useEffect(() => {
         if (includeOriginal){
             setTextAreaGenes(Array.from(new Set(augmentedGenes.slice(0, maxAddGenes).concat(originalGenes))))
@@ -118,7 +130,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                 </div>
                 <Grid container direction='row' sx={{ mt: 3 }} justifyItems={'center'} justifyContent={'center'}>
                     <Grid item xs={12} container justifyContent={'center'}>
-                        <Button variant="outlined" color='secondary' sx={{ m: 1 }}> PPI </Button>
+                        <Button variant="outlined" color='secondary' sx={{ m: 1 }} onClick={ppiAugment}> PPI </Button>
                         <Button variant="outlined" color='secondary' sx={{ m: 1 }} onClick={(event) => geneshotAugment(event, 'coexpression')}> CO-EXPRESSION </Button>
                         <Button variant="outlined" color='secondary' sx={{ m: 1 }} onClick={(event) => geneshotAugment(event, 'generif')}> LITERATURE CO-MENTIONS </Button>
                         {loading && <CircularIndeterminate />}

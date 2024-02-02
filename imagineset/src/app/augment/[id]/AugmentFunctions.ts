@@ -25,34 +25,46 @@ export async function getGeneshotPredGenes(gene_list: string[], augmentWith: str
 
 }
 
+export async function getPPIGenes(gene_list: string[]) {
+const payload = {
+    'geneset' : gene_list, 
+             'biogrid': true,
+             'bioplex': true, 
+             'string': true,
+             'iid': true, 
+             'ht' : true,
+             'ci' : 0.85,
+             'pred' : true,
+             'ortho' : true,
+             }
 
+const response = await fetch('https://g2nkg.dev.maayanlab.cloud/api/knowledge_graph/ppi_kg', {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+});
 
-export async function getCoExpressionGenes(gene_list: string[]) {
-
+let ppiGenes : string[] = []
+if (response.status === 200) {
+    const responseJson = await response.json()
+    // loop through edges for PPI network
+    
+    responseJson.forEach((networkItem: { data: { kind: string; properties: { target_label: any; source_label: any; }; }; }) => {
+        if  (networkItem.data.kind === 'Relation') {
+            const possibleGene1= networkItem.data.properties.target_label
+            const possibleGene2= networkItem.data.properties.source_label
+            console.log(possibleGene1)
+            if ((!gene_list.includes(possibleGene1)) && (!ppiGenes.includes(possibleGene1))){
+                ppiGenes.push(possibleGene1)
+            }
+            if ((!gene_list.includes(possibleGene2)) && (!ppiGenes.includes(possibleGene2))){
+                ppiGenes.push(possibleGene2)
+            }
+        } 
+    })
 }
-
-export async function getCoMentionGenes(gene_list: string[]) {
-
+// TODO: check valid genes before returning
+return ppiGenes
 }
-
-// def geneshot_pred_genes(augment_with, gene_list):
-//     GENESHOT_URL = 'https://maayanlab.cloud/geneshot/api/associate'
-//     payload = {
-//     "gene_list": gene_list, 
-//     "similarity": augment_with
-//     }
-//     response = requests.post(GENESHOT_URL, json=payload)
-
-//     data = json.loads(response.text)
-//     association_data = data['association']
-//     top_associated = []
-//     for gene in list(association_data.keys()): 
-//         top_associated.append({'gene': gene, 'simScore': association_data[gene]['simScore']})
-//     sorted_list = sorted(top_associated, key=lambda x: x['simScore'], reverse=True)  
-//     final_list = []
-//     for gene_info in sorted_list:
-//         final_list.append(gene_info['gene'])  
-//     for gene in gene_list:
-//         if gene in final_list:
-//             final_list.remove(gene)    
-//     return final_list

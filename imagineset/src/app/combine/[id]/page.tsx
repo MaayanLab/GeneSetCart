@@ -1,8 +1,9 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import GenesetSelect, { AugmentLayout } from "@/components/augment/SelectGeneset";
+import { CombineLayout } from "@/components/combine/CombineLayout";
+import { GeneSetCards } from "@/components/combine/GeneSetCard";
 import ColorToggleButton from "@/components/misc/SectionToggle";
 import prisma from "@/lib/prisma";
-import { TextField, Typography } from "@mui/material";
+import { Grid, TextField, Typography } from "@mui/material";
 import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
@@ -29,15 +30,17 @@ export default async function AugmentPage({ params }: { params: { id: string } }
             }
         }
     })
+
+
     return (
         <Container>
             <ColorToggleButton sessionId={params.id} />
             <Container>
-                <Typography variant="h3" color="secondary.dark" className='p-5'>AUGMENT YOUR GENE SETS</Typography>
+                <Typography variant="h3" color="secondary.dark" className='p-5'>COMBINE YOUR GENE SETS</Typography>
                 <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                    Augment your gene sets with co-expressed and co-mentioned genes
+                    Combine your gene sets using set operations (intersect, union, consensus or subtraction)
                 </Typography>
-                    <AugmentLayout sessionGenesets={sessionInfo} sessionId={params.id}/>
+                <CombineLayout sessionInfo={sessionInfo}/>
             </Container>
         </Container>
     )

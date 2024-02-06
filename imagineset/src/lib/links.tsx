@@ -6,7 +6,7 @@ import { signIn, signOut } from 'next-auth/react'
 
 export function SignInLink({ children }: React.PropsWithChildren<{}>) {
   return <Link
-    href="/auth/signin"
+    href="/api/auth/signin"
     onClick={evt => {
       evt.preventDefault()
       signIn()
@@ -15,7 +15,7 @@ export function SignInLink({ children }: React.PropsWithChildren<{}>) {
 
 export function SignOutLink({ children }: React.PropsWithChildren<{}>) {
   return <Link
-    href="/auth/signout"
+    href="/api/auth/signout"
     onClick={evt => {
       evt.preventDefault()
       signOut()

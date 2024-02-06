@@ -55,7 +55,6 @@ if (response.status === 200) {
         if  (networkItem.data.kind === 'Relation') {
             const possibleGene1= networkItem.data.properties.target_label
             const possibleGene2= networkItem.data.properties.source_label
-            console.log(possibleGene1)
             if ((!gene_list.includes(possibleGene1)) && (!ppiGenes.includes(possibleGene1))){
                 ppiGenes.push(possibleGene1)
             }
@@ -65,6 +64,7 @@ if (response.status === 200) {
         } 
     })
 }
-// TODO: check valid genes before returning
-return ppiGenes
+
+const validGenes = await checkValidGenes(ppiGenes.toString().replaceAll(',', '\n'))
+    return validGenes
 }

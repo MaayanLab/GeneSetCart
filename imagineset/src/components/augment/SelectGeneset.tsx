@@ -15,6 +15,8 @@ import Checkbox from '@mui/material/Checkbox';
 import { getGeneshotPredGenes, getPPIGenes } from '@/app/augment/[id]/AugmentFunctions';
 import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
 import CircularIndeterminate from '../misc/Loading';
+import Status from '../assemble/Status';
+import { addStatus } from '../assemble/fileUpload/SingleUpload';
 
 export default function GenesetSelect({ sessionGenesets, selected, setSelected }: {
     sessionGenesets: {
@@ -69,6 +71,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
     const [maxAddGenes, setMaxAddGenes] = React.useState(200)
     const [genesetName, setGenesetName] = React.useState('') 
     const [loading, setLoading] = React.useState(false)
+    const  [status, setStatus] = React.useState<addStatus>({})
 
     React.useEffect(() => {
         if (sessionGenesets) {
@@ -118,6 +121,8 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
 
     const handleAddToSets = React.useCallback(() => {
         addToSessionSets(textAreaGenes, sessionId, genesetName, '')
+        .then((response) => setStatus({success:true}))
+        .catch((error) => setStatus({error:{selected:true, message:'Error adding gene set to list. Please try again'} }))
     }, [textAreaGenes, genesetName])
 
     return (
@@ -176,6 +181,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                                         const newMaxAddGenes = parseInt(event.target.value)
                                         setMaxAddGenes(newMaxAddGenes)
                                     }}
+                                    fullWidth
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -187,12 +193,17 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                                     name='geneset-name'
                                     value={genesetName}
                                     onChange={(event) => {setGenesetName(event.target.value)}}
+                                    fullWidth
                                 />
                             </Grid>
                             <Grid item xs={12}>
+                                <div className='flex justify-center'>
                                 <Button variant="contained" color='tertiary' onClick={handleAddToSets}>ADD TO SETS</Button>
+                                </div>
                             </Grid>
-
+                            <Grid item xs={12} sx={{mt: 2}}>
+                            <Status status={status}/>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Grid>

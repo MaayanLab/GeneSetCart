@@ -31,13 +31,13 @@ export default function ColorToggleButton({sessionId}: {sessionId: string}) {
             <ToggleButton value="/augment" href={`/augment/${sessionId}`}>
                 <Typography variant="nav" align='center'>AUGMENT</Typography>
             </ToggleButton>
-            <ToggleButton value="/combine" href="/combine">
+            <ToggleButton value="/combine" href={`/combine/${sessionId}`}>
                 <Typography variant="nav" align='center'>COMBINE</Typography>
             </ToggleButton>
-            <ToggleButton value="/visualize" href="/visualize">
+            <ToggleButton value="/visualize" href={`/visualize/${sessionId}`}>
                 <Typography variant="nav" align='center'>VISUALIZE</Typography>
             </ToggleButton>
-            <ToggleButton value="/analyze" href="/analyze">
+            <ToggleButton value="/analyze" href={`/analyze/${sessionId}`}>
                 <Typography variant="nav" align='center'>ANALYZE</Typography>
             </ToggleButton>
         </ToggleButtonGroup>

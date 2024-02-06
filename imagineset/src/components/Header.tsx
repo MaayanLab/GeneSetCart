@@ -11,13 +11,9 @@ import Stack from '@mui/material/Stack'
 import Container from '@mui/material/Container'
 import { Logo } from './styled/Logo'
 import UserComponent from './misc/LoginComponents/UserComponent'
-import NavBreadcrumbs from './breadcrumbs'
-import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
-import { Badge } from '@mui/material'
 import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
-import { revalidatePath } from 'next/cache'
 
 export async function getGenesets(sessionId: string) {
     if (sessionId) {
@@ -36,10 +32,10 @@ export async function getGenesets(sessionId: string) {
         return sessionGenesets ? sessionGenesets.gene_sets : []
     }
     else {return []}
-
 }
 
 export default async function Header() {
+    // add user authentication in header for cart drawer here
     const session = await getServerSession(authOptions)
     const headersList = headers();
     const fullUrl = headersList.get('referer') || "";
@@ -56,7 +52,6 @@ export default async function Header() {
             }
         }
     })  
-
     return (
         <Container maxWidth="lg">
             <AppBar position="static" sx={{ color: "#000" }}>

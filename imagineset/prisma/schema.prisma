@@ -75,7 +75,7 @@ model GeneSet {
   session     PipelineSession @relation(fields: [session_id], references: [id])
   session_id  String
   genes       Gene[]
-  createdAt   DateTime       @default(now())
+  createdAt   DateTime        @default(now())
 
   @@map("gene_lists")
 }

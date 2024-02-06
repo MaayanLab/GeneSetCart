@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation'
 import path from 'path'
 import { type GeneSet, type Gene } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
+import { searchResultsType } from '@/components/assemble/DCCFetch/DCCUpload'
 
 // For Assemble Single Upload
 export async function loadTxtExample() {
@@ -51,7 +52,7 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
     })
     if (user === null) return redirect("/auth/signin?callbackUrl=/")
 
-    // get sers that are already in session 
+    // get sets that are already in session 
     const sessionOldSets = await prisma.pipelineSession.findUnique({
         where: {
             id: sessionId,
@@ -103,6 +104,19 @@ export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined
         if (row) {
             const validGenes = await checkValidGenes(row.genes.toString().replaceAll(',', '\n'))
             const added = await addToSessionSets(validGenes, sessionId, row.genesetName, '')
+        }
+    }
+    return 'done'
+}
+
+export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[], sessionId: string) {
+    for (const row of rows) {
+        if (row) {
+            const response = await fetch('https://maayanlab.cloud/Enrichr/geneSetLibrary?' + new URLSearchParams(`libraryName=${row.libraryName}&term=${row.genesetName}&mode=json`))
+            const data = await response.json()
+            const genes = data[row.genesetName]
+            const validGenes = await checkValidGenes(genes.toString().replaceAll(',', '\n'))
+            const added = addToSessionSets(validGenes, sessionId, row.genesetName, '')
         }
     }
     return 'done'

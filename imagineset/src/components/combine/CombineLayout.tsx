@@ -1,7 +1,7 @@
 'use client'
 
 import { Grid } from "@mui/material"
-import { GeneSetCards } from "./GeneSetCard"
+import {SelectGenesetsCard } from "./GeneSetCard"
 import { type Gene, type GeneSet } from "@prisma/client";
 import React from "react";
 
@@ -11,11 +11,13 @@ export function CombineLayout({sessionInfo}: {sessionInfo: {
     } & GeneSet)[];
 } | null}) {
 
-    const [selectedSets, setSelectedSets] = React.useState([])
+    const [selectedSets, setSelectedSets] = React.useState<({
+        genes: Gene[];
+    } & GeneSet)[]>([])
     return (
         <Grid container direction='row'>
         <Grid item xs={12}>
-            <GeneSetCards sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} />
+            <SelectGenesetsCard sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} selectedSets={selectedSets} setSelectedSets={setSelectedSets}/>
         </Grid>
         <Grid item xs={12}>
             ghg w

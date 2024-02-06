@@ -7,36 +7,36 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import { FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Stack, CardHeader } from "@mui/material";
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
-export function GeneSetCard({ sessionGeneSets }: {
+export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedSets }: {
     sessionGeneSets: ({
         genes: Gene[];
-    } & GeneSet)[]
+    } & GeneSet)[], selectedSets: ({
+        genes: Gene[];
+    } & GeneSet)[], setSelectedSets: React.Dispatch<React.SetStateAction<({
+        genes: Gene[];
+    } & GeneSet)[]>>
 }) {
+
+    const [numSelectOptions, setNumSelectOptions] = React.useState(1)
+
     return (
         <Box sx={{ maxWidth: 275 }}>
             <Card variant="outlined">
+                <CardHeader
+                    title="Select Sets to Combine"
+                />
                 <CardContent>
-                    <GenesetSelect sessionGenesets={sessionGeneSets} />
-                    <Typography variant='body1' color='secondary'> 0 valid genes found</Typography>
-                            <TextField
-                                id="standard-multiline-static"
-                                multiline
-                                rows={5}
-                                disabled
-                                value=''
-                            />
+                    <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} />
+                    <Button onClick={() =>{setNumSelectOptions(oldNum => oldNum + 1)}}><AddCircleIcon /></Button>
                 </CardContent>
-                <CardActions>
-                    <Button size="small" color="secondary">Remove</Button>
-                </CardActions>
             </Card>
         </Box>
     )
-
 }
-
 
 function GenesetSelect({ sessionGenesets }: {
     sessionGenesets: ({
@@ -50,40 +50,47 @@ function GenesetSelect({ sessionGenesets }: {
     };
 
     return (
-        <Box sx={{ minWidth: 120 }}>
-            <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label" sx={{ fontSize: 16 }} color='secondary'>Gene Set</InputLabel>
-                <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={selected}
-                    label="Gene Set"
-                    onChange={handleChange}
-                    color='secondary'
-                >
-                    {sessionGenesets.map((geneset, i) => {
-                        return <MenuItem key={i} value={geneset.name}>{geneset.name}</MenuItem>
-                    })}
-                </Select>
-            </FormControl>
-        </Box>
+        <Grid container direction={'row'}>
+            <Grid item xs={10}>
+                <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label" sx={{ fontSize: 16 }} color='secondary'>Gene Set</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={selected}
+                        label="Gene Set"
+                        onChange={handleChange}
+                        color='secondary'
+                    >
+                        {sessionGenesets.map((geneset, i) => {
+                            return <MenuItem key={i} value={geneset.name}>{geneset.name}</MenuItem>
+                        })}
+                    </Select>
+                </FormControl>
+            </Grid>
+            <Grid item xs={2}>
+                <Button><RemoveCircleIcon /></Button>
+            </Grid>
+        </Grid>
     );
 }
 
 
-export function GeneSetCards ({ sessionGeneSets }: {
+
+export function SelectedGenesetList({ sessionGeneSets, numSelectOptions }: {
     sessionGeneSets: ({
         genes: Gene[];
-    } & GeneSet)[]
+    } & GeneSet)[],
+    numSelectOptions: number
 }) {
 
-    const [cardsCount, setCardCount] = React.useState(1)
-
-    let cardCountArray = [];
-    for (var i = 0; i < cardsCount; i++) {
-      cardCountArray.push(i);
+    let dropDownCountArray = [];
+    for (var i = 0; i < numSelectOptions; i++) {
+        dropDownCountArray.push(i);
     }
     return (
-        cardCountArray.map((i) => <GeneSetCard sessionGeneSets={sessionGeneSets} />)
+        <Stack spacing={2}>
+            {dropDownCountArray.map((i) => <GenesetSelect sessionGenesets={sessionGeneSets} />)}
+        </Stack>
     )
 }

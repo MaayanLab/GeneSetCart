@@ -6,8 +6,8 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SingleUpload from '@/components/assemble/fileUpload/SingleUpload';
 import MultipleUpload from '@/components/assemble/fileUpload/MultipleUpload';
-import CFDEFetch from '@/components/assemble/DCCFetch/CfdeSearch';
 import GeneshotSearch from '@/components/assemble/Pubmed';
+import { DCCPage } from '@/components/assemble/DCCFetch/DCCUpload';
 
 
 interface TabPanelProps {
@@ -76,7 +76,7 @@ export default function VerticalTabs() {
         <MultipleUpload />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <CFDEFetch />
+        <DCCPage />
       </TabPanel>
       <TabPanel value={value} index={3}>
         <GeneshotSearch />

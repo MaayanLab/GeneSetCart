@@ -173,7 +173,6 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                                     hiddenLabel
                                     label="Max number of additional genes"
                                     sx={{ fontSize: 16 }}
-                                    variant="filled"
                                     color='secondary'
                                     name='max-Add'
                                     value={maxAddGenes}
@@ -188,7 +187,6 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                                 <TextField
                                     label="Gene Set Name"
                                     sx={{ fontSize: 16 }}
-                                    variant="filled"
                                     color='secondary'
                                     name='geneset-name'
                                     value={genesetName}

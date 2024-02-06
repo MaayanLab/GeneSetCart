@@ -23,14 +23,15 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
 
     const [numSelectOptions, setNumSelectOptions] = React.useState(1)
 
+
     return (
-        <Box sx={{ maxWidth: 275 }}>
-            <Card variant="outlined">
+        <Box sx={{ maxWidth: 400 }}>
+            <Card variant="outlined" sx={{minHeight: 400, maxHeight: 400, overflowY: 'scroll'}}>
                 <CardHeader
                     title="Select Sets to Combine"
                 />
                 <CardContent>
-                    <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} />
+                    <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} selectedSets={selectedSets} setSelectedSets={setSelectedSets} setNumSelectOptions={setNumSelectOptions}/>
                     <Button onClick={() =>{setNumSelectOptions(oldNum => oldNum + 1)}}><AddCircleIcon /></Button>
                 </CardContent>
             </Card>
@@ -38,15 +39,70 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
     )
 }
 
-function GenesetSelect({ sessionGenesets }: {
+
+
+
+export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, setNumSelectOptions, selectedSets, setSelectedSets  }: {
+    sessionGeneSets: ({
+        genes: Gene[];
+    } & GeneSet)[],
+    numSelectOptions: number,
+    setNumSelectOptions: React.Dispatch<React.SetStateAction<number>>
+    selectedSets: ({
+        genes: Gene[];
+    } & GeneSet)[], setSelectedSets: React.Dispatch<React.SetStateAction<({
+        genes: Gene[];
+    } & GeneSet)[]>>
+}) {
+
+    let dropDownCountArray = [];
+    for (var i = 0; i < numSelectOptions; i++) {
+        dropDownCountArray.push(i);
+    }
+    return (
+        <Stack spacing={2}>
+            {dropDownCountArray.map((i) => <GenesetSelectDropDown key={i} sessionGenesets={sessionGeneSets} selectedSets={selectedSets} setSelectedSets={setSelectedSets}  setNumSelectOptions={setNumSelectOptions} index={i}/>)}
+        </Stack>
+    )
+}
+
+
+function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets, setNumSelectOptions, index }: {
     sessionGenesets: ({
         genes: Gene[];
-    } & GeneSet)[]
+    } & GeneSet)[], 
+    selectedSets: ({
+        genes: Gene[];
+    } & GeneSet)[], setSelectedSets: React.Dispatch<React.SetStateAction<({
+        genes: Gene[];
+    } & GeneSet)[]>>, 
+    setNumSelectOptions: React.Dispatch<React.SetStateAction<number>>, 
+    index: number
 }) {
 
     const [selected, setSelected] = React.useState('')
     const handleChange = (event: SelectChangeEvent) => {
+        const newSelected = event.target.value
+        const selectedGeneset = sessionGenesets.find((geneset) => geneset.name === newSelected)
+        if (selectedGeneset ) {
+            const newSelectedArray = [...selectedSets]
+            newSelectedArray[index] = selectedGeneset
+            setSelectedSets(newSelectedArray)
+        }
         setSelected(event.target.value as string);
+    };
+
+    const removeDropDown = (event:  React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const selectedGeneset = sessionGenesets.find((geneset) => geneset.name === selected)
+        if (selectedGeneset ) {
+            const selectedCopy = [...selectedSets]
+            const index = selectedCopy.indexOf(selectedGeneset);
+            if (index > -1) { 
+                selectedCopy.splice(index, 1); 
+            }
+            setSelectedSets(selectedCopy)
+            setSelected('')
+        }
     };
 
     return (
@@ -69,28 +125,8 @@ function GenesetSelect({ sessionGenesets }: {
                 </FormControl>
             </Grid>
             <Grid item xs={2}>
-                <Button><RemoveCircleIcon /></Button>
+                <Button onClick={(event) => removeDropDown(event)}><RemoveCircleIcon /></Button>
             </Grid>
         </Grid>
     );
-}
-
-
-
-export function SelectedGenesetList({ sessionGeneSets, numSelectOptions }: {
-    sessionGeneSets: ({
-        genes: Gene[];
-    } & GeneSet)[],
-    numSelectOptions: number
-}) {
-
-    let dropDownCountArray = [];
-    for (var i = 0; i < numSelectOptions; i++) {
-        dropDownCountArray.push(i);
-    }
-    return (
-        <Stack spacing={2}>
-            {dropDownCountArray.map((i) => <GenesetSelect sessionGenesets={sessionGeneSets} />)}
-        </Stack>
-    )
 }

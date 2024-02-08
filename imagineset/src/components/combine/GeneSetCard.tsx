@@ -29,6 +29,8 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
             <Card variant="outlined" sx={{minHeight: 400, maxHeight: 400, overflowY: 'scroll'}}>
                 <CardHeader
                     title="Select Sets to Combine"
+                    titleTypographyProps={{color:'secondary.dark', fontSize: 18 }}
+                    style={{ textAlign: 'center' }}
                 />
                 <CardContent>
                     <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} selectedSets={selectedSets} setSelectedSets={setSelectedSets} setNumSelectOptions={setNumSelectOptions}/>

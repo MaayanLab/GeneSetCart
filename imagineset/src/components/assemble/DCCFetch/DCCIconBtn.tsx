@@ -20,10 +20,6 @@ import idgimg from '@/public/img/DCCImg/IDG.png'
 import kidsfirstimg from '@/public/img/DCCImg/Kids First.png'
 import motrpacimg from '@/public/img/DCCImg/MoTrPAC.png'
 
-const dccs: { [key: string]: string } = {  
-
-}
-
 
 type dccsInfoType = {
     shortName: string;
@@ -97,7 +93,7 @@ const CustomCard = ({
             >
                 <Image
                     src={image}
-                    layout='fill'
+                    fill
                     alt=""
                     style={{ padding: "10%", objectFit: "contain" }}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

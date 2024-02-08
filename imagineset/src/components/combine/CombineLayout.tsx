@@ -100,6 +100,8 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                 <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll' }}>
                     <CardHeader
                         title="Select Set Operation to Combine"
+                        titleTypographyProps={{color:'secondary.dark', fontSize: 18 }}
+                        style={{ textAlign: 'center' }}
                     />
                     <CardContent>
                         <Stack direction={'column'} spacing={3}>
@@ -126,10 +128,12 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                     <CardHeader
                         title="Generated Set"
                         subheader={generatedSetName}
+                        titleTypographyProps={{color:'secondary.dark', fontSize: 18 }}
+                        style={{ textAlign: 'center' }}
                     />
                     <CardContent>
                         <Stack direction={'column'} spacing={2}>
-                            <Typography variant='body1' color='secondary'> {displayedGenes.length} valid genes found</Typography>
+                            <Typography variant='body1' color='secondary' style={{ textAlign: 'center' }}> {displayedGenes.length} valid genes found</Typography>
                             <TextField
                                 id="standard-multiline-static"
                                 multiline

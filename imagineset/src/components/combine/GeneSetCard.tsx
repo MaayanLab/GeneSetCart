@@ -32,7 +32,9 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
                 />
                 <CardContent>
                     <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} selectedSets={selectedSets} setSelectedSets={setSelectedSets} setNumSelectOptions={setNumSelectOptions}/>
-                    <Button onClick={() =>{setNumSelectOptions(oldNum => oldNum + 1)}}><AddCircleIcon /></Button>
+                    <div className="flex justify-center">
+                    <Button onClick={() =>{setNumSelectOptions(oldNum => oldNum + 1)}} color="tertiary"><AddCircleIcon /></Button>
+                    </div>
                 </CardContent>
             </Card>
         </Box>
@@ -125,7 +127,7 @@ function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets,
                 </FormControl>
             </Grid>
             <Grid item xs={2}>
-                <Button onClick={(event) => removeDropDown(event)}><RemoveCircleIcon /></Button>
+                <Button onClick={(event) => removeDropDown(event)} color="tertiary"><RemoveCircleIcon /></Button>
             </Grid>
         </Grid>
     );

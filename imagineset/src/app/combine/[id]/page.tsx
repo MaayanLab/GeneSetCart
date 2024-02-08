@@ -1,6 +1,5 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { CombineLayout } from "@/components/combine/CombineLayout";
-import { GeneSetCards } from "@/components/combine/GeneSetCard";
 import ColorToggleButton from "@/components/misc/SectionToggle";
 import prisma from "@/lib/prisma";
 import { Grid, TextField, Typography } from "@mui/material";
@@ -35,12 +34,12 @@ export default async function AugmentPage({ params }: { params: { id: string } }
     return (
         <Container>
             <ColorToggleButton sessionId={params.id} />
-            <Container>
+            <Container sx={{mb: 5}}>
                 <Typography variant="h3" color="secondary.dark" className='p-5'>COMBINE YOUR GENE SETS</Typography>
                 <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                     Combine your gene sets using set operations (intersect, union, consensus or subtraction)
                 </Typography>
-                <CombineLayout sessionInfo={sessionInfo}/>
+                <CombineLayout sessionInfo={sessionInfo} sessionId={params.id}/>
             </Container>
         </Container>
     )

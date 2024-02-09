@@ -26,7 +26,7 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
 
     return (
         <Box sx={{ maxWidth: 400 }}>
-            <Card variant="outlined" sx={{minHeight: 400, maxHeight: 400, overflowY: 'scroll'}}>
+            <Card variant="outlined" sx={{minHeight: 400, maxHeight: 500, overflowY: 'scroll'}}>
                 <CardHeader
                     title="Select Sets to Combine"
                     titleTypographyProps={{color:'secondary.dark', fontSize: 18 }}

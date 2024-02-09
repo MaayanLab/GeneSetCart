@@ -15,6 +15,8 @@ import heatmapIcon from '@/public/img/otherLogos/visualizeIcon.png'
 import umapIcon from '@/public/img/otherLogos/umapIcon.png'
 import Image from 'next/image';
 import { Heatmap } from './PlotComponents/Heatmap/Heatmap';
+import { VennPlot } from './PlotComponents/Venn/Venn';
+import { Upset } from './PlotComponents/UpSet/Upset';
 
 
 function jaccard_similarity(set1: string[], set2: string[]) {
@@ -96,7 +98,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             <Grid item xs={9}>
                 <Stack direction='column' spacing={2}>
                     <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }}>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('Venn')}>
                             <Image
                                 src={vennIcon}
                                 fill
@@ -137,17 +139,19 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         </Button>
                     </Stack>
-                    <Box sx={{ border: 2, borderColor: "#81A1C1", borderRadius: 2, minHeight: 400 }}>
+                    <Box sx={{ boxShadow: 2, borderRadius: 2, minHeight: 400 }}>
                         <Stack direction='column' sx={{ p: 0 }}>
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
                                 <Typography variant='h5' style={{ textAlign: 'center', marginTop: 1 }} >Visualization Area</Typography>
                                 {/* <Button variant="contained" color="primary" onClick={downloadSVG}>Save as SVG</Button> */}
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
-                                <div className='flex justify-center'>
+                                <div className='flex justify-center' id="venn">
                                     {visualization === 'Heatmap' && <Heatmap data={data} width={300} height={300} />}
+                                    {visualization === 'Venn' && <VennPlot selectedSets={selectedSets}/> }
+                                    {visualization === 'UpSet' && <Upset selectedSets={selectedSets}/> }
                                 </div>
-
+                                
                             </Box>
                         </Stack>
                     </Box>
@@ -181,7 +185,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked }: {
         setChecked(newChecked);
     };
     return (
-        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', border: 1, borderColor: "#81A1C1", borderRadius: 2 }}>
+        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', border: 1, borderColor: "#81A1C1", borderRadius: 2, minHeight: 400, maxHeight: 400  }}>
             <ListSubheader>
                 My Gene Sets
             </ListSubheader>
@@ -204,7 +208,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked }: {
                                     inputProps={{ 'aria-labelledby': labelId }}
                                 />
                             </ListItemIcon>
-                            <ListItemText id={labelId} primary={geneset.name} primaryTypographyProps={{ fontSize: 12 }} />
+                            <ListItemText id={labelId} primary={geneset.name} primaryTypographyProps={{ fontSize: 14 }} />
                         </ListItemButton>
                     </ListItem>
                 );

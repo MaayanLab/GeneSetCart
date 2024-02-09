@@ -6,7 +6,7 @@ import { Renderer } from "./Renderer";
 import { ColorLegend } from "./ColorLegend";
 import { COLOR_LEGEND_HEIGHT, THRESHOLDS } from "./Constants";
 
-
+// code extracted from https://www.react-graph-gallery.com/heatmap
 export type HeatmapProps = {
     width: number;
     height: number;

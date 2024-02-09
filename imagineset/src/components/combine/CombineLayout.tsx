@@ -97,7 +97,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
         <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'}>
             <SelectGenesetsCard sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
             <Box sx={{ minWidth: 100 }}>
-                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll' }}>
+                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 500, overflowY: 'scroll' }}>
                     <CardHeader
                         title="Select Set Operation to Combine"
                         titleTypographyProps={{color:'secondary.dark', fontSize: 18 }}
@@ -123,7 +123,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                     </CardContent>
                 </Card>
             </Box>
-            <Box sx={{ maxWidth: 400 }}>
+            <Box sx={{ maxWidth: 500 }}>
                 <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll' }}>
                     <CardHeader
                         title="Generated Set"
@@ -141,7 +141,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                                 disabled
                                 value={displayedGenes.toString().replaceAll(',', '\n')}
                             />
-                            <Stack direction={'row'} spacing={2}>
+                            <Stack direction={'row'} spacing={2} justifyContent={'center'}>
                                 <Button variant='outlined' color="secondary" onClick={(event) => copyToClipboard(displayedGenes.toString().replaceAll(',', '\n'))}>
                                     COPY
                                 </Button>

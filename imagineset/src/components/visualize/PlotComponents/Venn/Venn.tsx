@@ -1,6 +1,6 @@
 // extracted from react
 import { type Gene, type GeneSet } from "@prisma/client";
-import { VennDiagram, VennArc, VennSeries, Gradient, VennLabel } from "reaviz";
+import { VennDiagram, VennArc, VennSeries, Gradient, VennLabel, VennOuterLabel } from "reaviz";
 import React from "react";
 
 export type VennProps = {
@@ -47,7 +47,6 @@ function calculateIntersections(possibleSubsets: ({
         const intersectionCount = genes.length
         intersectionDict.push({key: possibleSubset.map((subset) => subset.name), data: intersectionCount})
     }
-    console.log(intersectionDict)
     return intersectionDict
 }
 
@@ -66,6 +65,12 @@ export function VennPlot({ selectedSets }: {
         return getIntersections
     }, [selectedSets])
     return (
-        <VennDiagram height={450} width={450} data={vennData} series={<VennSeries colorScheme="cybertron" arc={<VennArc strokeWidth={3} gradient={<Gradient />} />} label={<VennLabel labelType="key" showAll={false} />} />} />
+        <VennDiagram 
+        height={450} 
+        width={450} 
+        data={vennData} 
+        series={<VennSeries colorScheme="cybertron" arc={<VennArc strokeWidth={3} gradient={<Gradient />} />} 
+        label={<VennLabel labelType={'value'} showAll={true} fill={'#000000'} />} outerLabel={<VennOuterLabel />} />} 
+        />
     )
 }

@@ -148,8 +148,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     <input type="color" id="head" name="head" value="#e66465" />
                                 </div> */}
                             </Box>
-                            <Box sx={{ justifyContent: 'center' }}>
-                                <div className='flex justify-center' id="venn">
+                            <Box sx={{ justifyContent: 'center'}}>
+                                <div className='flex justify-center' id="venn" style={{backgroundColor:'#FFFFFF'}}>
                                     {visualization === 'Heatmap' && <Heatmap data={data} width={300} height={300} />}
                                     {visualization === 'Venn' && <VennPlot selectedSets={selectedSets} />}
                                     {visualization === 'SuperVenn' && <SuperVenn selectedSets={selectedSets}/> }

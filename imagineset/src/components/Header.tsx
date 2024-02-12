@@ -58,7 +58,7 @@ export default async function Header() {
                 <Toolbar>
                     <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
                         <Grid item>
-                            <Logo href={`/`} title="Get-Gene Set-Go" color="secondary" />
+                            <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" />
                         </Grid>
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>

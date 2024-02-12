@@ -16,7 +16,8 @@ import umapIcon from '@/public/img/otherLogos/umapIcon.png'
 import Image from 'next/image';
 import { Heatmap } from './PlotComponents/Heatmap/Heatmap';
 import { VennPlot } from './PlotComponents/Venn/Venn';
-import { Upset } from './PlotComponents/UpSet/Upset';
+import { UpsetPlotV2 } from './PlotComponents/UpSet/Upset';
+import { SuperVenn } from './PlotComponents/SuperVenn/SuperVenn';
 
 
 function jaccard_similarity(set1: string[], set2: string[]) {
@@ -67,7 +68,6 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     } | null,
     sessionId: string
 }) {
-    const visualizationOptions = 'Heatmap' || 'SuperVenn' || 'UpSet'
     const [checked, setChecked] = React.useState<number[]>(sessionInfo ? sessionInfo.gene_sets.map((geneset, i) => i) : []);
     const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked])
     const [visualization, setVisualization] = React.useState('')
@@ -106,7 +106,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 style={{ padding: "10%", objectFit: "contain" }}
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         </Button>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('SuperVenn')}>
                             <Image
                                 src={superVennIcon}
                                 fill
@@ -114,7 +114,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 style={{ padding: "10%", objectFit: "contain" }}
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         </Button>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}  onClick={(event) => setVisualization('UpSet')}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('UpSet')}>
                             <Image
                                 src={upsetplotIcon}
                                 fill
@@ -144,14 +144,18 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
                                 <Typography variant='h5' style={{ textAlign: 'center', marginTop: 1 }} >Visualization Area</Typography>
                                 {/* <Button variant="contained" color="primary" onClick={downloadSVG}>Save as SVG</Button> */}
+                                {/* <div>
+                                    <input type="color" id="head" name="head" value="#e66465" />
+                                </div> */}
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
                                 <div className='flex justify-center' id="venn">
                                     {visualization === 'Heatmap' && <Heatmap data={data} width={300} height={300} />}
-                                    {visualization === 'Venn' && <VennPlot selectedSets={selectedSets}/> }
-                                    {visualization === 'UpSet' && <Upset selectedSets={selectedSets}/> }
+                                    {visualization === 'Venn' && <VennPlot selectedSets={selectedSets} />}
+                                    {visualization === 'SuperVenn' && <SuperVenn selectedSets={selectedSets}/> }
+                                    {visualization === 'UpSet' && <UpsetPlotV2 selectedSets={selectedSets} />}
                                 </div>
-                                
+
                             </Box>
                         </Stack>
                     </Box>
@@ -185,7 +189,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked }: {
         setChecked(newChecked);
     };
     return (
-        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', border: 1, borderColor: "#81A1C1", borderRadius: 2, minHeight: 400, maxHeight: 400  }}>
+        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 400, boxShadow: 2 }}>
             <ListSubheader>
                 My Gene Sets
             </ListSubheader>

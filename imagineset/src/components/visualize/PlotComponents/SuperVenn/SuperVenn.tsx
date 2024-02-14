@@ -3,6 +3,7 @@ import { CircularProgress } from '@mui/material';
 import { Gene, GeneSet } from '@prisma/client';
 import dynamic from 'next/dynamic'
 import React from 'react';
+import { alphabet } from '../../VisualizeLayout';
 const ReactSupervenn = dynamic(() => import('react-supervenn'), { ssr: false })
 
 const hyposet_url = 'https://hyposet.maayanlab.cloud'
@@ -17,7 +18,7 @@ export function SuperVenn({ selectedSets }: {
 
     const inputProps = {
         sets: selectedSets?.map((geneset) => geneset.genes.map((gene) => gene.id)),
-        set_annotations: selectedSets?.map((geneset) => geneset.name),
+        set_annotations: selectedSets?.map((geneset, i) => alphabet[i]),
         widths_minmax_ratio: 0.1,
         rotate_col_annotations: true,
     }
@@ -36,7 +37,7 @@ export function SuperVenn({ selectedSets }: {
 console.log(props)
     return (
         <div className='flex w-full p-1 justify-center'>
-        {loading && <CircularProgress />}
+        {loading && <CircularProgress color='secondary' />}
         {!loading && <ReactSupervenn
             sets={[]} set_annotations={[]} chunks={[]} composition_array={[]} effective_min_width_for_annotation={0} col_widths={[]} n_items={0} ycounts={[]} rotate_col_annotations={false} color_by={'row'} color_cycle={[]} alternating_background={false} {...props} />}
         </div>

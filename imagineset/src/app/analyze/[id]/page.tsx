@@ -14,7 +14,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Gene, GeneSet } from "@prisma/client";
-import { AnalysisBtns, CollapsibleArrow, DeleteBtn, ViewGenesBtn } from "@/components/analyze/ViewGenesBtn";
+import {DeleteBtn, SplitButton, ViewGenesBtn } from "@/components/analyze/ViewGenesBtn";
 
 export default async function AnalyzePage({ params }: { params: { id: string } }) {
     const session = await getServerSession(authOptions)
@@ -68,11 +68,11 @@ export function GenesetsTable({ sessionInfo }: {
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Gene Set</TableCell>
-                        <TableCell align="right">Description</TableCell>
-                        <TableCell align="right">Genes</TableCell>
-                        <TableCell align="right">Analysis Links</TableCell>
-                        <TableCell align="right"></TableCell>
+                        <TableCell align="center">Gene Set</TableCell>
+                        <TableCell align="center">Description</TableCell>
+                        <TableCell align="center">Genes</TableCell>
+                        <TableCell align="center">Analysis Links</TableCell>
+                        <TableCell align="center"></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -95,7 +95,7 @@ export function GenesetsTable({ sessionInfo }: {
                             </TableCell>
                             <TableCell align="right">{row.description}</TableCell>
                             <TableCell align="right"><ViewGenesBtn row={row} /></TableCell>
-                            <TableCell align="right"><AnalysisBtns /></TableCell>
+                            <TableCell align="right"><SplitButton row={row}/></TableCell>
                             <TableCell align="right"><DeleteBtn /></TableCell>
                         </TableRow>
                     ))}

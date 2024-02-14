@@ -18,7 +18,8 @@ import { Heatmap } from './PlotComponents/Heatmap/Heatmap';
 import { VennPlot } from './PlotComponents/Venn/Venn';
 import { UpsetPlotV2 } from './PlotComponents/UpSet/Upset';
 import { SuperVenn } from './PlotComponents/SuperVenn/SuperVenn';
-
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 function jaccard_similarity(set1: string[], set2: string[]) {
     const union = Array.from(new Set([...set1, ...set2]))
@@ -29,7 +30,7 @@ function jaccard_similarity(set1: string[], set2: string[]) {
     return intersection.length / union.length
 }
 
-const alphabet = [
+export const alphabet = [
     "A",
     "B",
     "C",
@@ -142,11 +143,13 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                     <Box sx={{ boxShadow: 2, borderRadius: 2, minHeight: 400 }}>
                         <Stack direction='column' sx={{ p: 0 }}>
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
-                                <Typography variant='h5' style={{ textAlign: 'center', marginTop: 1 }} >Visualization Area</Typography>
-                                {/* <Button variant="contained" color="primary" onClick={downloadSVG}>Save as SVG</Button> */}
-                                {/* <div>
-                                    <input type="color" id="head" name="head" value="#e66465" />
-                                </div> */}
+                                {/* <Typography variant='h3' style={{ textAlign: 'center', padding: 5 }} color={'secondary.dark'}>VISUALIZATION</Typography> */}
+                                <Stack direction='row' spacing={2} sx={{justifyContent:'center', padding:2}}>
+                                    <Button variant='outlined' color='secondary' sx={{borderRadius:2}}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{borderRadius:2}}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{borderRadius:2}}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{borderRadius:2}}><VisibilityIcon />&nbsp;<Typography > Legend</Typography></Button>
+                                </Stack>
                             </Box>
                             <Box sx={{ justifyContent: 'center'}}>
                                 <div className='flex justify-center' id="venn" style={{backgroundColor:'#FFFFFF'}}>
@@ -189,7 +192,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked }: {
         setChecked(newChecked);
     };
     return (
-        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 400, boxShadow: 2 }}>
+        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2 }}>
             <ListSubheader>
                 My Gene Sets
             </ListSubheader>

@@ -75,8 +75,8 @@ export const Renderer = ({
               stroke={"white"}
               onMouseEnter={(e) => {
                 setHoveredCell({
-                  xLabel: "group " + d.x,
-                  yLabel: "group " + d.y,
+                  xLabel: "Gene Set " + d.x,
+                  yLabel: "Gene Set " + d.y,
                   xPos: x + xScale.bandwidth() + MARGIN.left,
                   yPos: y + xScale.bandwidth() / 2 + MARGIN.top,
                   value: Math.round(d.value * 100) / 100,
@@ -102,8 +102,8 @@ export const Renderer = ({
         stroke={"white"}
         onMouseEnter={(e) => {
           setHoveredCell({
-            xLabel: "group " + d.x,
-            yLabel: "group " + d.y,
+            xLabel: "Gene set " + d.x,
+            yLabel: "Gene set " + d.y,
             xPos: x + xScale.bandwidth() + MARGIN.left,
             yPos: y + xScale.bandwidth() / 2 + MARGIN.top,
             value: Math.round(d.value * 100) / 100,

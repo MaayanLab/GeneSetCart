@@ -4,6 +4,7 @@ import React from "react"
 import { UpsetInteractionData } from "./UpsetTooltip";
 import { UpsetTooltip } from "./UpsetTooltip";
 import { Gene, GeneSet } from "@prisma/client";
+import { alphabet } from "../../VisualizeLayout";
 
 type UpsetData = {
     name: string,
@@ -18,6 +19,7 @@ type SoloIntersectionType = {
 }
 
 
+// Upset plot code adapted from https://github.com/chuntul/d3-upset
 const formatIntersectionData = (data: UpsetData) => {
     // compiling solo set data - how many values per set
     const soloSets: SoloIntersectionType[] = [];
@@ -126,7 +128,7 @@ export function UpsetPlotV2({ selectedSets }: {
             return {data, soloSets};
         }
 
-        const setData = selectedSets.map((geneset) =>  {return {name: geneset.name, values: geneset.genes.map((gene) => gene.gene_symbol)}})
+        const setData = selectedSets.map((geneset, i) =>  {return {name: alphabet[i], values: geneset.genes.map((gene) => gene.gene_symbol)}})
 
         // calculating intersections WITHOUT solo sets
         const { intersections, soloSets } = formatIntersectionData(setData);
@@ -147,11 +149,11 @@ export function UpsetPlotV2({ selectedSets }: {
     const margin = {
         top: 20,
         right: 0,
-        bottom: 300,
-        left: 200,
+        bottom: 350,
+        left: 50,
     };
     const width = 60 * data.length;
-    const height = 400;
+    const height = 450;
 
     // The bounds (=area inside the axis) is calculated by substracting the margins
     const boundsWidth = width - margin.right - margin.left;
@@ -169,13 +171,6 @@ export function UpsetPlotV2({ selectedSets }: {
         .scaleLinear()
         .range([boundsHeight, 0])
         .domain([0, d3.max(nums) as number])
-
-    // set axes for graph
-    // const xAxis = d3.axisBottom(xrange)
-    //     // .scale(xrange)
-    //     .tickPadding(2)
-    //     .tickFormat((d, i) => data[i].setName)
-    //     .tickValues(d3.range(data.length));
 
     // left yaxis
     const range = yrange.range();

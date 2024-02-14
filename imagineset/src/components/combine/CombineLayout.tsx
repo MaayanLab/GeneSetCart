@@ -99,7 +99,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
             <Box sx={{ minWidth: 100 }}>
                 <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 500, overflowY: 'scroll' }}>
                     <CardHeader
-                        title="Select Set Operation to Combine"
+                        title="Select Set Operation"
                         titleTypographyProps={{color:'secondary.dark', fontSize: 18 }}
                         style={{ textAlign: 'center' }}
                     />

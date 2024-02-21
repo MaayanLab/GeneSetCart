@@ -24,8 +24,10 @@ const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
   const [open, setOpen] = React.useState(false);
   const [validGenes, setValidGenes] = React.useState<string[]>([])
   React.useEffect(() => {
-    checkValidGenes(params.row.genes.toString().replaceAll(',', '\n'))
-      .then((result) => setValidGenes(result) )
+    fetch('https://maayanlab.cloud/Enrichr/geneSetLibrary?' + new URLSearchParams(`libraryName=${params.row.libraryName}&term=${params.row.genesetName}&mode=json`))
+    .then((response) => response.json())
+    .then((responsejson) => checkValidGenes(responsejson[params.row.genesetName].toString().replaceAll(',', '\n'))
+    .then((result) => setValidGenes(result) ))
   }, [params.row.genes])
 
 
@@ -45,7 +47,7 @@ const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
         size="small"
         style={{ marginLeft: 16 }}
         onClick={(event) => { event.stopPropagation(); handleOpen() }}>
-        <VisibilityIcon />
+        <VisibilityIcon /> &nbsp;
         Genes
       </Button>
       <Dialog
@@ -54,7 +56,7 @@ const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
         <DialogTitle>{params.row.genesetName}</DialogTitle>
         <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
           <Grid item>
-            <Typography variant='body1' color='secondary'> {params.row.genes.length} genes</Typography>
+            {/* <Typography variant='body1' color='secondary'> {params.row.genes.length} genes</Typography> */}
             <Typography variant='body1' color='secondary'> {validGenes.length} valid genes found</Typography>
           </Grid>
           <Grid item>
@@ -63,7 +65,7 @@ const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
               multiline
               rows={10}
               placeholder="Paste gene symbols here"
-              value={params.row.genes.toString().replaceAll(',', '\n')}
+              value={validGenes.toString().replaceAll(',', '\n')}
               disabled
             />
           </Grid>
@@ -99,7 +101,6 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
     addMultipleSetsCFDE(selectedRows ? selectedRows : [], params.id)
     .then((results) => setStatus({success: true}))
   }, [selectedRows])
-
 
   return (
     <div style={{ height: 400, width: '100%' }}>

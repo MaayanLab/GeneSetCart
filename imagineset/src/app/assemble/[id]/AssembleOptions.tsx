@@ -68,6 +68,7 @@ export default function VerticalTabs() {
         <Tab label=" Upload .gmt" {...a11yProps(1)} />
         <Tab label="Search CFDE DCC Gene Sets" {...a11yProps(2)} />
         <Tab label="Search Gene Sets from Pubmed" {...a11yProps(3)} />
+        <Tab label="Cross CFDE Gene Set Libraries" {...a11yProps(4)} />
       </Tabs>
       <TabPanel value={value} index={0} >
         <SingleUpload />
@@ -79,6 +80,9 @@ export default function VerticalTabs() {
         <DCCPage />
       </TabPanel>
       <TabPanel value={value} index={3}>
+        <GeneshotSearch />
+      </TabPanel>
+      <TabPanel value={value} index={4}>
         <GeneshotSearch />
       </TabPanel>
     </Box>

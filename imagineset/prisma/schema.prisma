@@ -64,7 +64,7 @@ model Gene {
   synonyms    String
   description String?
   genesets    GeneSet[]
-  cfde_genesets CFDEGeneSet[]
+  // cfde_genesets CFDEGeneSet[]
 
   @@map("genes")
 }

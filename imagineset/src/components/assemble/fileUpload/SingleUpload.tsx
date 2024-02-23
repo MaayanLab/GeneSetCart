@@ -61,7 +61,7 @@ export default function SingleUpload() {
         <Container>
             <Typography variant="h3" color="secondary.dark" className='p-5'>UPLOAD SINGLE GENE SET</Typography>
             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                Upload a single .txt, .csv or .tsv file containing gene symbols, each on new line OR paste your gene set in
+                Upload a single .txt file containing gene symbols, each on new line OR paste your gene set in
                 the text box below
             </Typography>
             <Grid container sx={{ p: 2 }} display={isMobile ? 'block' : 'flex'} spacing={1} justifyContent="center" component={'form'}

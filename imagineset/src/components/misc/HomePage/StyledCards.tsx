@@ -13,12 +13,16 @@ import Image from "next/image";
 export default function StyledCard() {
 
     const Item = styled(Paper)(() => ({
-        backgroundColor: '#cee1f5',
+        // backgroundColor: '#cee1f5',
         padding: 8,
         textAlign: 'center',
-        color: 'black',
+        // color: 'black',
         minHeight: '12vw',
         minWidth: '3vw',
+        border: 'solid',
+        borderRadius: 4, 
+        borderColor: '#a7c4e4',
+        // boxShadow: 'none'
     }));
 
     return (

@@ -14,6 +14,7 @@ import UserComponent from './misc/LoginComponents/UserComponent'
 import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
+import { revalidatePath } from 'next/cache'
 
 export async function getGenesets(sessionId: string) {
     if (sessionId) {
@@ -32,6 +33,16 @@ export async function getGenesets(sessionId: string) {
         return sessionGenesets ? sessionGenesets.gene_sets : []
     }
     else {return []}
+}
+
+export async function deleteGenesetByID(genesetID: string) {
+    const deleteGeneset = await prisma.geneSet.delete({
+        where: {
+          id: genesetID,
+        },
+      })
+    revalidatePath('/')
+    return 'deleted'
 }
 
 export default async function Header() {
@@ -63,7 +74,9 @@ export default async function Header() {
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                 <CartDrawer sessionInfo={sessionInfo}/>
-
+                                <Link href={`/gmt-cross/${sessionId}`}>
+                                    <Typography variant="nav">CFDE GMT CROSSING</Typography>
+                                </Link>
                                 <Link href="/sessions">
                                     <Typography variant="nav">MY SESSIONS</Typography>
                                 </Link>

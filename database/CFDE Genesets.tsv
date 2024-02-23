@@ -1,0 +1,10 @@
+DCC	Library 	Link	Hypothesis template
+Glygen	Glygen Glycosylated Proteins	https://cfde-drc.s3.amazonaws.com/GlyGen/XMT/2022-12-13/GlyGen_XMT_2022-12-13_GlyGen_Glycosylated_Proteins_2022.gmt	
+GTEx	GTEx Tissue-Specific Aging Signatures	https://cfde-drc.s3.amazonaws.com/GTEx/XMT/2022-06-06/GTEx_XMT_2022-06-06_GTEx_Aging_Signatures_2021.gmt	
+GTEx	GTEx Tissue Gene Expression Profiles	https://cfde-drc.s3.amazonaws.com/GTEx/XMT/2023-03-10/GTEx_XMT_2023-03-10_GTEx_Tissues_V8_2023.gmt 	
+IDG	IDG Drug Targets	https://cfde-drc.s3.amazonaws.com/IDG/XMT/2022-12-13/IDG_XMT_2022-12-13_IDG_Drug_Targets_2022.gmt	
+KOMP2	KOMP2 Mouse Phenotypes	https://cfde-drc.s3.amazonaws.com/KOMP2/XMT/2022-12-13/KOMP2_XMT_2022-12-13_KOMP2_Mouse_Phenotypes_2022.gmt 	
+LINCS	LINCS L1000 CMAP Chemical Pertubation Consensus Signatures	https://cfde-drc.s3.amazonaws.com/LINCS/XMT/2022-12-13/LINCS_XMT_2022-12-13_LINCS_L1000_Chem_Pert_Consensus_Sigs.gmt 	
+LINCS	LINCS L1000 CMAP CRISPR Knockout Consensus Signatures	https://cfde-drc.s3.amazonaws.com/LINCS/XMT/2022-12-13/LINCS_XMT_2022-12-13_LINCS_L1000_CRISPR_KO_Consensus_Sigs.gmt 	
+MoTrPAC	MoTrPAC Rat Endurance Exercise Training	https://cfde-drc.s3.amazonaws.com/MoTrPAC/XMT/2023-09-29/MoTrPAC_XMT_2023-09-29_MoTrPAC_Rat_Exercise_Sigs_2023.gmt 	
+Metabolomics	Metabolomics Gene-Metabolite Associations	https://cfde-drc.s3.amazonaws.com/MW/XMT/2022-12-13/MW_XMT_2022-12-13_Metabolomics_Workbench_Metabolites_2022.gmt 	

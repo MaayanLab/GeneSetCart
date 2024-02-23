@@ -64,6 +64,7 @@ model Gene {
   synonyms    String
   description String?
   genesets    GeneSet[]
+  cfde_genesets CFDEGeneSet[]
 
   @@map("genes")
 }
@@ -76,6 +77,7 @@ model GeneSet {
   session_id  String
   genes       Gene[]
   createdAt   DateTime        @default(now())
+  
 
   @@map("gene_lists")
 }
@@ -90,3 +92,13 @@ model PipelineSession {
 
   @@map("user_sessions")
 }
+
+// model CFDEGeneSet {
+//   id          String          @id @default(cuid())
+//   name        String
+//   library     String
+//   description String?
+//   genes       Gene[]
+
+//   @@map("cfde_genesets")
+// }

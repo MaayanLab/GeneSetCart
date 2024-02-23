@@ -1,6 +1,6 @@
 'use client'
 import React from "react";
-import { Box, Button, Container, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, Container, FormControl, Grid, InputLabel, MenuItem, Select, Stack, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import DataTable from "./DataTable";
 
 export type GMTGenesetInfo = {
@@ -44,8 +44,9 @@ export default function MultipleUpload() {
             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                 Upload a .gmt file containing your gene sets
             </Typography>
+            <div style={{ height: 600, width: '100%'}}>
             <DataTable rows={gmtGenesets}/>
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-2">
             <Button
                 variant="contained"
                 component="label"
@@ -59,6 +60,7 @@ export default function MultipleUpload() {
                     onChange={readGMTFile}
                 />
             </Button>
+            </div>
             </div>
 
         </Container>

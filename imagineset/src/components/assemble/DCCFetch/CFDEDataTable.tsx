@@ -97,6 +97,7 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
   const [selectedRows, setSelectedRows] = React.useState<(searchResultsType | undefined)[]>([])
   
   const addSets = React.useCallback(() => {
+    setStatus({loading: true})
     addMultipleSetsCFDE(selectedRows ? selectedRows : [], params.id)
     .then((results) => setStatus({success: true}))
   }, [selectedRows])

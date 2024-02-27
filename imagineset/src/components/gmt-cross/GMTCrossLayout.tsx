@@ -4,7 +4,7 @@ import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import { CrossPairs, PairsData } from "@/app/gmt-cross/[id]/GMTCrossFunctions";
+import { CrossPairs, PairsData } from "@/app/gmt-cross/GMTCrossFunctions";
 import CircularIndeterminate from "../misc/Loading";
 import { copyToClipboard } from "../assemble/DCCFetch/CFDEDataTable";
 

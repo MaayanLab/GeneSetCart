@@ -38,7 +38,7 @@ export default function Status({status} : {status: addStatus}) {
                     >
                         <CloseIcon fontSize="inherit" />
                     </IconButton>
-                } sx={{fontSize:14}}>Loading...</Alert>}
+                } sx={{fontSize:14}}>Adding gene sets to your session list...</Alert>}
             {open && status.success && <Alert onClose={() => { }}
                 action={
                     <IconButton

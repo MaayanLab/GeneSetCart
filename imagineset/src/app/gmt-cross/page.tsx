@@ -6,28 +6,16 @@ import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-export default async function AugmentPage({ params }: { params: { id: string } }) {
+export default async function AugmentPage() {
     const session = await getServerSession(authOptions)
-    if (!session) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`)
+    if (!session) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/`)
     const user = await prisma.user.findUnique({
         where: {
             id: session?.user.id
         }
     })
-    if (user === null) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`)
+    if (user === null) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/`)
 
-    const sessionInfo = await prisma.pipelineSession.findUnique({
-        where: {
-            id: params.id
-        },
-        select: {
-            gene_sets: {
-                include: {
-                    genes: true
-                }
-            }
-        }
-    })
     return (
         <Container>
             {/* <ColorToggleButton sessionId={params.id} /> */}

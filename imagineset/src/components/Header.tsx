@@ -15,7 +15,6 @@ import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
 import { revalidatePath } from 'next/cache'
-
 export async function getGenesets(sessionId: string) {
     if (sessionId) {
         const sessionGenesets = await prisma.pipelineSession.findUnique({
@@ -29,18 +28,18 @@ export async function getGenesets(sessionId: string) {
                     }
                 }
             }
-        })    
+        })
         return sessionGenesets ? sessionGenesets.gene_sets : []
     }
-    else {return []}
+    else { return [] }
 }
 
 export async function deleteGenesetByID(genesetID: string) {
     const deleteGeneset = await prisma.geneSet.delete({
         where: {
-          id: genesetID,
+            id: genesetID,
         },
-      })
+    })
     revalidatePath('/')
     return 'deleted'
 }
@@ -62,7 +61,8 @@ export default async function Header() {
                 }
             }
         }
-    })  
+    })
+
     return (
         <Container maxWidth="lg">
             <AppBar position="static" sx={{ color: "#000" }}>
@@ -73,8 +73,8 @@ export default async function Header() {
                         </Grid>
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                                <CartDrawer sessionInfo={sessionInfo}/>
-                                <Link href={`/gmt-cross/${sessionId}`}>
+                                <CartDrawer sessionInfo={sessionInfo} />
+                                <Link href={`/gmt-cross`}>
                                     <Typography variant="nav">CFDE GMT CROSSING</Typography>
                                 </Link>
                                 <Link href="/sessions">

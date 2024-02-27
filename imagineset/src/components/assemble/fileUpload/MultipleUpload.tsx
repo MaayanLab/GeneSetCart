@@ -44,9 +44,7 @@ export default function MultipleUpload() {
             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                 Upload a .gmt file containing your gene sets
             </Typography>
-            <div style={{ height: 600, width: '100%'}}>
-            <DataTable rows={gmtGenesets}/>
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center">
             <Button
                 variant="contained"
                 component="label"
@@ -61,6 +59,8 @@ export default function MultipleUpload() {
                 />
             </Button>
             </div>
+            <div style={{ height: 600, width: '100%'}} className="mt-2">
+            <DataTable rows={gmtGenesets}/>
             </div>
 
         </Container>

@@ -85,6 +85,7 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
             gene_sets: {
                 set: [...oldSetsArray, newGeneset],
             },
+            lastModified: new Date()
         },
     })
 

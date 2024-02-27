@@ -126,7 +126,7 @@ const DrawerInfo = ({ genesets }: {
             <Table sx={{ p: 2 }}>
                 <TableBody>
                     {genesets?.map((geneset) =>
-                        <GenesetInfo geneset={geneset} />
+                        <GenesetInfo key={geneset.id} geneset={geneset} />
                     )}
 
                 </TableBody>

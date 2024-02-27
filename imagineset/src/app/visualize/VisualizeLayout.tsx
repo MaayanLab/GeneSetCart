@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import { ListSubheader, Grid, Container, Stack, Button, Typography, Box } from '@mui/material';
+import { ListSubheader, Grid, Container, Stack, Button, Typography, Box, Tooltip } from '@mui/material';
 import { type Gene, type GeneSet } from '@prisma/client';
 import vennIcon from '@/public/img/otherLogos/VennDagramIcon.png'
 import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
@@ -14,10 +14,10 @@ import upsetplotIcon from '@/public/img/otherLogos/upsetplotIcon.png'
 import heatmapIcon from '@/public/img/otherLogos/visualizeIcon.png'
 import umapIcon from '@/public/img/otherLogos/umapIcon.png'
 import Image from 'next/image';
-import { Heatmap } from './PlotComponents/Heatmap/Heatmap';
-import { VennPlot } from './PlotComponents/Venn/Venn';
-import { UpsetPlotV2 } from './PlotComponents/UpSet/Upset';
-import { SuperVenn } from './PlotComponents/SuperVenn/SuperVenn';
+import { Heatmap } from '../../components/visualize/PlotComponents/Heatmap/Heatmap';
+import { VennPlot } from '../../components/visualize/PlotComponents/Venn/Venn';
+import { UpsetPlotV2 } from '../../components/visualize/PlotComponents/UpSet/Upset';
+import { SuperVenn } from '../../components/visualize/PlotComponents/SuperVenn/SuperVenn';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
@@ -72,15 +72,30 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [checked, setChecked] = React.useState<number[]>(sessionInfo ? sessionInfo.gene_sets.map((geneset, i) => i) : []);
     const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked])
     const [visualization, setVisualization] = React.useState('')
-    const data = React.useMemo(() => {
+
+
+    const legendSelectedSets = React.useMemo(() => {
         if (selectedSets) {
             const dataArrays = selectedSets.map((geneset, i) => {
+                const newSet = { ...geneset, 'alphabet': '' }
+                newSet['alphabet'] = alphabet[i]
+                return newSet
+            })
+            return dataArrays
+        } else {
+            return []
+        }
+    }, [selectedSets])
+
+    const data = React.useMemo(() => {
+        if (legendSelectedSets) {
+            const dataArrays = legendSelectedSets.map((geneset, i) => {
                 let genesetRow: { x: string; y: string; value: number }[] = []
-                for (let [n, innerLoop] of selectedSets.entries()) {
-                    const x = geneset.name
-                    const y = innerLoop.name
+                for (let [n, innerLoop] of legendSelectedSets.entries()) {
+                    const x = geneset.alphabet
+                    const y = innerLoop.alphabet
                     const xyJaccard = (x !== y) ? jaccard_similarity(geneset.genes.map((gene) => gene.gene_symbol), innerLoop.genes.map((gene) => gene.gene_symbol)) : 0
-                    genesetRow.push({ x: alphabet[i], y: alphabet[n], value: xyJaccard })
+                    genesetRow.push({ x: x, y: y, value: xyJaccard })
                 }
                 return genesetRow
             })
@@ -88,13 +103,26 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
         } else {
             return []
         }
-    }, [selectedSets])
+    }, [legendSelectedSets]);
+
+    const download = React.useCallback((filename: string, text: string) => {
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }, [])
 
 
     return (
         <Grid container direction='row' spacing={1}>
             <Grid item xs={3}>
-                <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} />
+                <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
             </Grid>
             <Grid item xs={9}>
                 <Stack direction='column' spacing={2}>
@@ -144,19 +172,30 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                         <Stack direction='column' sx={{ p: 0 }}>
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
                                 {/* <Typography variant='h3' style={{ textAlign: 'center', padding: 5 }} color={'secondary.dark'}>VISUALIZATION</Typography> */}
-                                <Stack direction='row' spacing={2} sx={{justifyContent:'center', padding:2}}>
-                                    <Button variant='outlined' color='secondary' sx={{borderRadius:2}}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{borderRadius:2}}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{borderRadius:2}}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{borderRadius:2}}><VisibilityIcon />&nbsp;<Typography > Legend</Typography></Button>
+                                <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { download('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
+                                    <Tooltip
+                                        title={
+                                            <React.Fragment>
+                                                <Typography color="inherit">Legend:</Typography>
+                                                 <Typography color="inherit" variant='body2'>
+                                                 {legendSelectedSets.map((item)=> item.alphabet + ': ' + item.name+ '\n')}
+                                                 </Typography>
+                                            </React.Fragment>
+                                        }>
+                                        <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}><VisibilityIcon />&nbsp;<Typography > Legend</Typography></Button>
+
+                                    </Tooltip>
                                 </Stack>
                             </Box>
-                            <Box sx={{ justifyContent: 'center'}}>
-                                <div className='flex justify-center' id="venn" style={{backgroundColor:'#FFFFFF'}}>
+                            <Box sx={{ justifyContent: 'center' }}>
+                                <div className='flex justify-center' id="venn" style={{ backgroundColor: '#FFFFFF' }}>
                                     {visualization === 'Heatmap' && <Heatmap data={data} width={300} height={300} />}
-                                    {visualization === 'Venn' && <VennPlot selectedSets={selectedSets} />}
-                                    {visualization === 'SuperVenn' && <SuperVenn selectedSets={selectedSets}/> }
-                                    {visualization === 'UpSet' && <UpsetPlotV2 selectedSets={selectedSets} />}
+                                    {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets} />}
+                                    {visualization === 'SuperVenn' && <SuperVenn selectedSets={legendSelectedSets} />}
+                                    {visualization === 'UpSet' && <UpsetPlotV2 selectedSets={legendSelectedSets} />}
                                 </div>
 
                             </Box>
@@ -170,7 +209,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     )
 }
 
-export function GeneSetOptionsList({ sessionInfo, checked, setChecked }: {
+export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }: {
     sessionInfo: {
         gene_sets: ({
             genes: Gene[];
@@ -178,6 +217,15 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked }: {
     } | null,
     checked: number[],
     setChecked: React.Dispatch<React.SetStateAction<number[]>>
+    legend: {
+        alphabet: string;
+        genes: Gene[];
+        id: string;
+        name: string;
+        description: string | null;
+        session_id: string;
+        createdAt: Date;
+    }[]
 }) {
 
     const handleToggle = (value: number) => () => {
@@ -191,6 +239,8 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked }: {
         }
         setChecked(newChecked);
     };
+
+    const legendIds = legend.map((item) => item.id)
     return (
         <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2 }}>
             <ListSubheader>
@@ -198,6 +248,29 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked }: {
             </ListSubheader>
             {sessionInfo?.gene_sets.map((geneset, i) => {
                 const labelId = `checkbox-list-label-${i}`;
+                if (legendIds.includes(geneset.id)) {
+                    return (
+                        <ListItem
+                            key={i}
+                            disablePadding
+                        >
+                            <ListItemButton
+                                onClick={handleToggle(i)}
+                                dense>
+                                <ListItemIcon>
+                                    <Checkbox
+                                        edge="start"
+                                        checked={checked.indexOf(i) !== -1}
+                                        tabIndex={-1}
+                                        disableRipple
+                                        inputProps={{ 'aria-labelledby': labelId }}
+                                    />
+                                </ListItemIcon>
+                                <ListItemText id={labelId} primary={legend[legendIds.indexOf(geneset.id)].alphabet + ': ' + geneset.name} primaryTypographyProps={{ fontSize: 14 }} />
+                            </ListItemButton>
+                        </ListItem>
+                    );
+                }
                 return (
                     <ListItem
                         key={i}

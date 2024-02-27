@@ -1,5 +1,5 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import GenesetSelect, { AugmentLayout } from "@/components/augment/SelectGeneset";
+import GenesetSelect, { AugmentLayout } from "@/app/augment/[id]/SelectGeneset";
 import ColorToggleButton from "@/components/misc/SectionToggle";
 import prisma from "@/lib/prisma";
 import { TextField, Typography } from "@mui/material";

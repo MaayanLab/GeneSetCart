@@ -4,10 +4,10 @@ import { SelectGenesetsCard } from "./GeneSetCard"
 import { type Gene, type GeneSet } from "@prisma/client";
 import React from "react";
 import { Card, Box, CardContent, Divider, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Stack, CardHeader, Button, Typography } from "@mui/material";
-import Status from "../assemble/Status";
-import { copyToClipboard } from "../assemble/DCCFetch/CFDEDataTable";
+import Status from "../../../components/assemble/Status";
+import { copyToClipboard } from "../../../components/assemble/DCCFetch/CFDEDataTable";
 import { addToSessionSets } from "@/app/assemble/[id]/AssembleFunctions ";
-import { addStatus } from "../assemble/fileUpload/SingleUpload";
+import { addStatus } from "../../../components/assemble/fileUpload/SingleUpload";
 
 export function CombineLayout({ sessionInfo, sessionId }: {
     sessionInfo: {

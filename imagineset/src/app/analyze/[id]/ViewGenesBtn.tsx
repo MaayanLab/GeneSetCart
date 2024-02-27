@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import React from "react";
-import { copyToClipboard } from "../assemble/fileUpload/DataTable";
+import { copyToClipboard } from "../../../components/assemble/fileUpload/DataTable";
 import { GeneSet, Gene } from "@prisma/client";
 import Image from "next/image";
 import ButtonGroup from '@mui/material/ButtonGroup';
@@ -25,6 +25,7 @@ import kea3Logo from "@/public/img/otherLogos/KEA3Logo.png"
 import chea3logo from "@/public/img/otherLogos/chea3Logo.png"
 import sigcomLincsLogo from "@/public/img/otherLogos/sigcomLincsLogo.svg"
 import { getEnrichrShortId, getRummageneLink, getRummageoLink, getSigComLINCSId } from "@/app/analyze/[id]/AnalyzeFunctions";
+import { deleteGenesetByID } from "@/components/Header";
 
 
 
@@ -73,9 +74,17 @@ export const ViewGenesBtn = ({ row }: {
 
 
 
-export const DeleteBtn = () => {
+export const DeleteBtn = ({row}: {row: {
+    genes: Gene[];
+} & {
+    id: string;
+    name: string;
+    description: string | null;
+    session_id: string;
+    createdAt: Date;
+}}) => {
     return (
-        <Button variant='outlined' color='secondary' sx={{ borderRadius: 1 }}>
+        <Button variant='outlined' color='secondary' sx={{ borderRadius: 1 }} onClick={() => deleteGenesetByID(row.id).then(() => console.log('deleted'))}>
             <DeleteIcon />
         </Button>
     )

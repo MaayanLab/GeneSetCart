@@ -4,9 +4,10 @@ import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import { CrossPairs, PairsData } from "@/app/gmt-cross/GMTCrossFunctions";
-import CircularIndeterminate from "../misc/Loading";
-import { copyToClipboard } from "../assemble/DCCFetch/CFDEDataTable";
+import { CrossPairs, PairsData, fetchCrossPairs } from "@/app/gmt-cross/GMTCrossFunctions";
+import CircularIndeterminate from "../../components/misc/Loading";
+import { copyToClipboard } from "../../components/assemble/DCCFetch/CFDEDataTable";
+import { CFDECrossPair } from "@prisma/client";
 
 type GMTGeneSet = {
     name: string
@@ -47,23 +48,23 @@ const renderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
                 size="small"
                 style={{ marginLeft: 16, textDecoration: 'underline' }}
                 onClick={(event) => { event.stopPropagation(); handleOpen() }}>
-                {params.row.overlappingGenes.length}
+                {params.row.n_overlap}
             </Button>
             <Dialog
                 onClose={handleClose}
                 open={open}>
-                <DialogTitle>{params.row.genesetName}</DialogTitle>
+                <DialogTitle>{params.row.geneset_1 + '∩' + params.row.geneset_2}</DialogTitle>
                 <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
                     <Grid item>
                         {/* <Typography variant='body1' color='secondary'> {params.row.genes.length} genes</Typography> */}
-                        <Typography variant='body1' color='secondary'> {params.row.overlappingGenes.length} genes found</Typography>
+                        <Typography variant='body1' color='secondary'> {params.row.n_overlap} genes found</Typography>
                     </Grid>
                     <Grid item>
                         <TextField
                             id="standard-multiline-static"
                             multiline
                             rows={10}
-                            value={params.row.overlappingGenes.toString().replaceAll(',', '\n')}
+                            value={params.row.overlap.toString().replaceAll(',', '\n').replaceAll("'", '')}
                             disabled
                         />
                     </Grid>
@@ -81,7 +82,7 @@ const renderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
 
 const columns: GridColDef[] = [
     {
-        field: 'geneset1',
+        field: 'geneset_1',
         headerName: 'Geneset 1',
         //   width: 150,
         flex: 1,
@@ -89,7 +90,7 @@ const columns: GridColDef[] = [
         minWidth: 150
     },
     {
-        field: 'geneset2',
+        field: 'geneset_2',
         headerName: 'Geneset 2',
         //   width: 150,
         flex: 1,
@@ -102,17 +103,23 @@ const columns: GridColDef[] = [
         //   width: 110,
         flex: 0.6,
         editable: true,
-        minWidth: 100
+        minWidth: 100,
+        renderCell: (params) => {
+            return (params.value.toExponential(2));
+        },
     },
     {
-        field: 'jIndex',
-        headerName: 'Jaccard Index',
+        field: 'odds_ratio',
+        headerName: 'Odds Ratio',
         flex: 0.6,
         minWidth: 100,
+        renderCell: (params) => {
+            return (params.value.toFixed(4));
+        },
         //   width: 160,
     },
     {
-        field: 'overlappingGenes',
+        field: 'overlap',
         headerName: 'Overlapping Genes',
         flex: 0.6,
         minWidth: 100,
@@ -122,16 +129,17 @@ const columns: GridColDef[] = [
 ];
 
 export function GMTCrossLayout() {
-    const [rows, setRows] = React.useState<PairsData[]>([])
+    const [rows, setRows] = React.useState<CFDECrossPair[]>([])
     const [selectedLibs, setSelectedLibs] = React.useState<string[]>([])
     const [loading, setLoading] = React.useState(false)
 
     const getCrossData = React.useCallback(() => {
         setLoading(true)
         if (selectedLibs.length === 2) {
-            const libName1 = Object.keys(CFDELibraryOptions)[Object.values(CFDELibraryOptions).indexOf(selectedLibs[0])]
-            const libName2 = Object.keys(CFDELibraryOptions)[Object.values(CFDELibraryOptions).indexOf(selectedLibs[1])]
-            CrossPairs(libName1, libName2).then((result) => { setLoading(false); setRows(result) }).catch((err) => setLoading(false))
+            // const libName1 = Object.keys(CFDELibraryOptions)[Object.values(CFDELibraryOptions).indexOf(selectedLibs[0])]
+            // const libName2 = Object.keys(CFDELibraryOptions)[Object.values(CFDELibraryOptions).indexOf(selectedLibs[1])]
+            // CrossPairs(libName1, libName2).then((result) => { setLoading(false); setRows(result) }).catch((err) => setLoading(false))
+            fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => { setLoading(false); console.log(result); setRows(result) }).catch((err) => setLoading(false))
         }
     }, [selectedLibs])
 

@@ -1,7 +1,7 @@
 'use server'
 // import { factorial } from "mathjs"
-import Big from 'big.js';
 import pmf from "@stdlib/stats-base-dists-hypergeometric-pmf"
+import prisma from '@/lib/prisma';
 
 type EnrichrGeneResult = {
     gene: string,
@@ -41,14 +41,6 @@ function jaccard_similarity(set1: string[], set2: string[]) {
     }
 }
 
-function calculateFactorial(number: Big.Big) {
-    let n = number.toNumber()
-    let fact = Big(1)
-    for (let i = 2; i <= n; i++) {
-        fact = fact.times(Big(i));
-    }
-    return fact;
-}
 
 
 function formatNumber(number: number) {
@@ -108,4 +100,38 @@ export async function CrossPairs(libName1: string, libName2: string) {
         }
     }
     return pairsData
+}
+
+const libMap : {[key: string]: string} = {
+    'LINCS L1000 CMAP Chemical Pertubation Consensus Signatures': 'LINCS_L1000_Chem_Pert_Consensus_Sigs',
+    'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures': 'LINCS_L1000_CRISPR_KO_Consensus_Sigs',
+    'GTEx Tissue Gene Expression Profiles': 'GTEx_Tissues',
+    'GTEx Tissue-Specific Aging Signatures': 'GTEx_Aging_Sigs',
+    'Metabolomics Gene-Metabolite Associations': 'Metabolomics_Workbench_Metabolites',
+    'IDG Drug Targets': 'IDG_Drug_Targets',
+    'Glygen Glycosylated Proteins': 'GlyGen_Glycosylated_Proteins',
+    'KOMP2 Mouse Phenotypes': 'KOMP2_Mouse_Phenotypes',
+    // "HuBMAP_ASCTplusB_augmented_2022": 'HuBMAP Anatomical Structures, Cell Types, and Biomarkers (ASCT+B)',
+    'MoTrPAC Rat Endurance Exercise Training': 'MoTrPAC'
+}
+
+
+export async function fetchCrossPairs(lib1: string, lib2: string) {
+    console.log(lib1, lib2)
+    const rows = await prisma.cFDECrossPair.findMany({
+        where: {
+            lib_1: libMap[lib1], 
+            lib_2: libMap[lib2]
+        }
+    });
+    if (rows.length === 0) {
+        const rows = await prisma.cFDECrossPair.findMany({
+            where: {
+                lib_1: libMap[lib2], 
+                lib_2: libMap[lib1]
+            }
+        })
+        return rows
+    }
+    return rows
 }

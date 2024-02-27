@@ -14,9 +14,9 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Checkbox from '@mui/material/Checkbox';
 import { getGeneshotPredGenes, getPPIGenes } from '@/app/augment/[id]/AugmentFunctions';
 import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
-import CircularIndeterminate from '../misc/Loading';
-import Status from '../assemble/Status';
-import { addStatus } from '../assemble/fileUpload/SingleUpload';
+import CircularIndeterminate from '../../../components/misc/Loading';
+import Status from '../../../components/assemble/Status';
+import { addStatus } from '../../../components/assemble/fileUpload/SingleUpload';
 
 export default function GenesetSelect({ sessionGenesets, selected, setSelected }: {
     sessionGenesets: {

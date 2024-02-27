@@ -11,9 +11,11 @@ export type VennProps = {
 
 //adapted from  https://stackoverflow.com/questions/42773836/how-to-find-all-subsets-of-a-set-in-javascript-powerset-of-array
 function getAllSubsets(array: ({
+    alphabet: string;
     genes: Gene[];
 } & GeneSet)[]) {
     const subsets: ({
+        alphabet: string;
         genes: Gene[];
     } & GeneSet)[][] = [[]];
     for (const el of array) {
@@ -26,6 +28,7 @@ function getAllSubsets(array: ({
 }
 
 function calculateIntersections(possibleSubsets: ({
+    alphabet: string;
     genes: Gene[];
 } & GeneSet)[][]) {
     let intersectionDict :  VennProps[] = []
@@ -45,7 +48,7 @@ function calculateIntersections(possibleSubsets: ({
     
         const genes = Object.keys(occurrences).filter((gene) => occurrences[gene] === subsetLength)
         const intersectionCount = genes.length
-        intersectionDict.push({key: possibleSubset.map((subset) => subset.name), data: intersectionCount})
+        intersectionDict.push({key: possibleSubset.map((subset) => subset.alphabet), data: intersectionCount})
     }
     return intersectionDict
 }
@@ -53,6 +56,7 @@ function calculateIntersections(possibleSubsets: ({
 
 export function VennPlot({ selectedSets }: {
     selectedSets: ({
+        alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined
 }) {
@@ -65,11 +69,12 @@ export function VennPlot({ selectedSets }: {
         return getIntersections
     }, [selectedSets])
     return (
-        <VennDiagram 
+        <VennDiagram  id="test-chart"
+        type="starEuler"
         height={450} 
         width={450} 
         data={vennData} 
-        series={<VennSeries colorScheme="cybertron" arc={<VennArc strokeWidth={3} gradient={<Gradient />} />} 
+        series={<VennSeries colorScheme="cybertron" arc={<VennArc strokeWidth={3} gradient={<Gradient />} animated={false}/>} 
         label={<VennLabel labelType={'value'} showAll={true} fill={'#000000'} />} outerLabel={<VennOuterLabel />} />} 
         />
     )

@@ -93,6 +93,19 @@ model PipelineSession {
   @@map("user_sessions")
 }
 
+model CFDECrossPair {
+  id           String    @id @default(cuid())
+  lib_1        String
+  lib_2         String
+  geneset_1    String
+  geneset_2     String
+  odds_ratio    Float
+  pvalue        Float
+  n_overlap     Int
+  overlap       String[]
+
+@@map("cfde_cross_pair")
+}
 // model CFDEGeneSet {
 //   id          String          @id @default(cuid())
 //   name        String

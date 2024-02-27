@@ -22,6 +22,7 @@ export type InteractionData = {
 };
 
 export const Heatmap = ({ width, height, data }: HeatmapProps) => {
+    
     const [hoveredCell, setHoveredCell] = React.useState<InteractionData | null>(null);
 
     // Color scale is computed here bc it must be passed to both the renderer and the legend

@@ -3,13 +3,13 @@ import { CircularProgress } from '@mui/material';
 import { Gene, GeneSet } from '@prisma/client';
 import dynamic from 'next/dynamic'
 import React from 'react';
-import { alphabet } from '../../VisualizeLayout';
 const ReactSupervenn = dynamic(() => import('react-supervenn'), { ssr: false })
 
 const hyposet_url = 'https://hyposet.maayanlab.cloud'
 
 export function SuperVenn({ selectedSets }: {
     selectedSets: ({
+        alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined
 }) {
@@ -18,7 +18,7 @@ export function SuperVenn({ selectedSets }: {
 
     const inputProps = {
         sets: selectedSets?.map((geneset) => geneset.genes.map((gene) => gene.id)),
-        set_annotations: selectedSets?.map((geneset, i) => alphabet[i]),
+        set_annotations: selectedSets?.map((geneset, i) => geneset.alphabet),
         widths_minmax_ratio: 0.1,
         rotate_col_annotations: true,
     }

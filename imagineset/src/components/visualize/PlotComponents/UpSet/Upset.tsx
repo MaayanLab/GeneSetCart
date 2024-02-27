@@ -4,7 +4,6 @@ import React from "react"
 import { UpsetInteractionData } from "./UpsetTooltip";
 import { UpsetTooltip } from "./UpsetTooltip";
 import { Gene, GeneSet } from "@prisma/client";
-import { alphabet } from "../../VisualizeLayout";
 
 type UpsetData = {
     name: string,
@@ -116,6 +115,7 @@ const insertSoloDataOutersect = (intersections: SoloIntersectionType[], soloSets
 
 export function UpsetPlotV2({ selectedSets }: {
     selectedSets: ({
+        alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined
 }) {
@@ -128,7 +128,7 @@ export function UpsetPlotV2({ selectedSets }: {
             return {data, soloSets};
         }
 
-        const setData = selectedSets.map((geneset, i) =>  {return {name: alphabet[i], values: geneset.genes.map((gene) => gene.gene_symbol)}})
+        const setData = selectedSets.map((geneset, i) =>  {return {name: geneset.alphabet, values: geneset.genes.map((gene) => gene.gene_symbol)}})
 
         // calculating intersections WITHOUT solo sets
         const { intersections, soloSets } = formatIntersectionData(setData);

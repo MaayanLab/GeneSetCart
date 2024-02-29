@@ -5,3 +5,5 @@ output/
 .DS_Store
 kub/
 venv
+database/crossed_sets
+database/.ipynb_checkpoints

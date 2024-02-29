@@ -1,4 +1,4 @@
-FROM node
+FROM node:18-alpine AS builder
 WORKDIR /app
 ADD /imagineset/package.json .
 ADD /imagineset/package-lock.json .

@@ -46,7 +46,7 @@ const renderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
             <Button
                 color="tertiary"
                 size="small"
-                style={{ marginLeft: 16, textDecoration: 'underline' }}
+                style={{ textDecoration: 'underline' }}
                 onClick={(event) => { event.stopPropagation(); handleOpen() }}>
                 {params.row.n_overlap}
             </Button>
@@ -79,6 +79,21 @@ const renderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
     )
 }
 
+const renderHypothesisButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
+    return (
+        <React.Fragment>
+            <Button
+                color="tertiary"
+                size="small" 
+                variant="contained"
+                >
+                    GPT-4 Hypotheis
+            </Button>
+        </React.Fragment>
+    )
+}
+
+
 
 const columns: GridColDef[] = [
     {
@@ -99,10 +114,10 @@ const columns: GridColDef[] = [
     },
     {
         field: 'pvalue',
-        headerName: 'p-Value',
+        headerName: 'P-Value',
         //   width: 110,
-        flex: 0.6,
-        editable: true,
+        flex: 0.5,
+        // editable: true,
         minWidth: 100,
         renderCell: (params) => {
             return (params.value.toExponential(2));
@@ -110,8 +125,8 @@ const columns: GridColDef[] = [
     },
     {
         field: 'odds_ratio',
-        headerName: 'Odds Ratio',
-        flex: 0.6,
+        headerName: 'Odds',
+        flex: 0.5,
         minWidth: 100,
         renderCell: (params) => {
             return (params.value.toFixed(4));
@@ -120,10 +135,18 @@ const columns: GridColDef[] = [
     },
     {
         field: 'overlap',
-        headerName: 'Overlapping Genes',
-        flex: 0.6,
+        headerName: 'Overlap',
+        flex: 0.3,
         minWidth: 100,
         renderCell: renderOverlapButton
+        // width: 160,
+    },
+    {
+        field: 'hypothesis',
+        headerName: '',
+        flex: 0.5,
+        minWidth: 100,
+        renderCell: renderHypothesisButton
         // width: 160,
     },
 ];
@@ -170,6 +193,7 @@ export function GMTCrossLayout() {
                         },
                     }}
                     pageSizeOptions={[5, 10]}
+                    disableRowSelectionOnClick
                     sx={{
                         '.MuiDataGrid-columnHeader': {
                             backgroundColor: '#C9D2E9',

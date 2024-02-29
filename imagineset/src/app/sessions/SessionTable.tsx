@@ -40,7 +40,7 @@ export default function SessionTable({sessions}: {sessions:  ({
         <Table sx={{ p: 2 }}>
         <TableBody>
             {displayedRows.map((session) =>
-                <SessionRow session={session} />
+                <SessionRow key={session.id} session={session} />
             )}
         </TableBody>
         <TableFooter>

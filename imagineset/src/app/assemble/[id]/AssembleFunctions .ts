@@ -117,7 +117,7 @@ export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[
             const data = await response.json()
             const genes = data[row.genesetName]
             const validGenes = await checkValidGenes(genes.toString().replaceAll(',', '\n'))
-            const added = addToSessionSets(validGenes, sessionId, row.genesetName, '')
+            const added = addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '')
         }
     }
     return 'done'

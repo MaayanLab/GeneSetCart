@@ -43,9 +43,9 @@ const renderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
         variant="contained"
         color="tertiary"
         size="small"
-        style={{ marginLeft: 16 }}
+        // style={{ marginLeft: 16 }}
         onClick={(event) => { event.stopPropagation(); handleOpen() }}>
-        <VisibilityIcon />
+        <VisibilityIcon /> &nbsp;
         Genes
       </Button>
       <Dialog

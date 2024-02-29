@@ -73,7 +73,7 @@ model GeneSet {
   id          String          @id @default(cuid())
   name        String
   description String?
-  session     PipelineSession @relation(fields: [session_id], references: [id])
+  session     PipelineSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
   session_id  String
   genes       Gene[]
   createdAt   DateTime        @default(now())

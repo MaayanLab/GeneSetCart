@@ -1,7 +1,7 @@
 FROM node
 WORKDIR /app
-ADD package.json /imagineset
-ADD package-lock.json /imagineset
+ADD /imagineset/package.json .
+ADD /imagineset/package-lock.json .
 RUN npm i
 ADD . .
 RUN npx prisma generate

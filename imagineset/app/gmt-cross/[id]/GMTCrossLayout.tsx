@@ -1,33 +1,13 @@
 'use client'
-import { Button, Dialog, DialogTitle, Grid, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogTitle, Grid, LinearProgress, Stack, TextField, Typography } from "@mui/material";
 import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import { CrossPairs, PairsData, fetchCrossPairs } from "@/app/gmt-cross/GMTCrossFunctions";
-import CircularIndeterminate from "../../components/misc/Loading";
-import { copyToClipboard } from "../../components/assemble/DCCFetch/CFDEDataTable";
+import { fetchCrossPairs, generateHypothesis } from "@/app/gmt-cross/[id]/GMTCrossFunctions";
+import CircularIndeterminate from "@/components/misc/Loading";
+import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
-
-type GMTGeneSet = {
-    name: string
-    library: string
-    genes: string[]
-    header: string
-}
-
-const GeneSetHeaderMap: { [key: string]: string } = {
-    "LINCS_L1000_Chem_Pert_Consensus_Sigs": "Pertubation ",
-    "LINCS_L1000_CRISPR_KO_Consensus_Sigs": 'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures',
-    "GTEx_Tissues_V8_2023": 'GTEx Tissue Gene Expression Profiles',
-    "GTEx_Aging_Signatures_2021": 'GTEx Tissue-Specific Aging Signatures',
-    "Metabolomics_Workbench_Metabolites_2022": 'Metabolomics Gene-Metabolite Associations',
-    "IDG_Drug_Targets_2022": 'IDG Drug Targets',
-    "GlyGen_Glycosylated_Proteins_2022": 'Glygen Glycosylated Proteins',
-    "KOMP2_Mouse_Phenotypes_2022": 'KOMP2 Mouse Phenotypes',
-    // "HuBMAP_ASCTplusB_augmented_2022": 'HuBMAP Anatomical Structures, Cell Types, and Biomarkers (ASCT+B)',
-    "MoTrPAC_2023": 'MoTrPAC Rat Endurance Exercise Training'
-}
 
 
 const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
@@ -79,82 +59,16 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
     )
 }
 
-const renderHypothesisButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
-    return (
-        <React.Fragment>
-            <Button
-                color="tertiary"
-                size="small" 
-                variant="contained"
-                >
-                    GPT-4 Hypotheis
-            </Button>
-        </React.Fragment>
-    )
-}
 
 
 
-const columns: GridColDef[] = [
-    {
-        field: 'geneset_1',
-        headerName: 'Geneset 1',
-        //   width: 150,
-        flex: 1,
-        editable: true,
-        minWidth: 150
-    },
-    {
-        field: 'geneset_2',
-        headerName: 'Geneset 2',
-        //   width: 150,
-        flex: 1,
-        editable: true,
-        minWidth: 150
-    },
-    {
-        field: 'pvalue',
-        headerName: 'P-Value',
-        //   width: 110,
-        flex: 0.5,
-        // editable: true,
-        minWidth: 100,
-        renderCell: (params) => {
-            return (params.value.toExponential(2));
-        },
-    },
-    {
-        field: 'odds_ratio',
-        headerName: 'Odds',
-        flex: 0.5,
-        minWidth: 100,
-        renderCell: (params) => {
-            return (params.value.toFixed(4));
-        },
-        //   width: 160,
-    },
-    {
-        field: 'overlap',
-        headerName: 'Overlap',
-        flex: 0.3,
-        minWidth: 100,
-        renderCell: RenderOverlapButton
-        // width: 160,
-    },
-    {
-        field: 'hypothesis',
-        headerName: '',
-        flex: 0.5,
-        minWidth: 100,
-        renderCell: renderHypothesisButton
-        // width: 160,
-    },
-];
 
 export function GMTCrossLayout() {
     const [rows, setRows] = React.useState<CFDECrossPair[]>([])
     const [selectedLibs, setSelectedLibs] = React.useState<string[]>([])
     const [loading, setLoading] = React.useState(false)
+    const [hypLoading, setHypLoading] = React.useState(false)
+    const [hypothesis, setHypothesis] = React.useState('')
 
     const getCrossData = React.useCallback(() => {
         setLoading(true)
@@ -162,14 +76,89 @@ export function GMTCrossLayout() {
             // const libName1 = Object.keys(CFDELibraryOptions)[Object.values(CFDELibraryOptions).indexOf(selectedLibs[0])]
             // const libName2 = Object.keys(CFDELibraryOptions)[Object.values(CFDELibraryOptions).indexOf(selectedLibs[1])]
             // CrossPairs(libName1, libName2).then((result) => { setLoading(false); setRows(result) }).catch((err) => setLoading(false))
-            fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => { setLoading(false); console.log(result); setRows(result) }).catch((err) => setLoading(false))
+            fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => { setLoading(false); setRows(result) }).catch((err) => setLoading(false))
         }
     }, [selectedLibs])
 
 
+    const RenderHypothesisButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
+        return (
+            <React.Fragment>
+                <Button
+                    color="tertiary"
+                    size="small"
+                    variant="contained"
+                    onClick={(evt) => {
+                        setHypothesis('')
+                        setHypLoading(true)
+                        generateHypothesis(params.row).then((response) => {setHypLoading(false); if (typeof (response) === 'string') { setHypothesis(response) } }).catch((err) => {setHypLoading(false);})
+                    }}
+                >
+                    GPT-4 Hypothesis
+                </Button>
+            </React.Fragment>
+        )
+    }
+
+    const columns: GridColDef[] = [
+        {
+            field: 'geneset_1',
+            headerName: 'Geneset 1',
+            //   width: 150,
+            flex: 1,
+            editable: true,
+            minWidth: 150
+        },
+        {
+            field: 'geneset_2',
+            headerName: 'Geneset 2',
+            //   width: 150,
+            flex: 1,
+            editable: true,
+            minWidth: 150
+        },
+        {
+            field: 'pvalue',
+            headerName: 'P-Value',
+            //   width: 110,
+            flex: 0.5,
+            // editable: true,
+            minWidth: 100,
+            renderCell: (params) => {
+                return (params.value.toExponential(2));
+            },
+        },
+        {
+            field: 'odds_ratio',
+            headerName: 'Odds',
+            flex: 0.5,
+            minWidth: 100,
+            renderCell: (params) => {
+                return (params.value.toFixed(4));
+            },
+            //   width: 160,
+        },
+        {
+            field: 'overlap',
+            headerName: 'Overlap',
+            flex: 0.3,
+            minWidth: 100,
+            renderCell: RenderOverlapButton
+            // width: 160,
+        },
+        {
+            field: 'hypothesis',
+            headerName: '',
+            flex: 0.5,
+            minWidth: 100,
+            renderCell: RenderHypothesisButton
+            // width: 160,
+        },
+    ];
+
 
     return (
-        <Stack direction="column" spacing={3}>
+        <Stack direction="column" spacing={3} sx={{marginBottom: 3}}>
             <Stack direction='row' spacing={2}>
                 <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} />
                 <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} />
@@ -180,27 +169,37 @@ export function GMTCrossLayout() {
                 </Button>
                 {loading && <CircularIndeterminate />}
             </div>
-            <div style={{ height: 400, width: '100%' }}>
+            {(rows.length > 0) && <div style={{ width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
                     initialState={{
                         pagination: {
-                            paginationModel: { page: 0, pageSize: 5 },
+                            paginationModel: { page: 0, pageSize: 10 },
                         },
                         sorting: {
-                            sortModel: [{ field: 'jIndex', sort: 'desc' }],
+                            sortModel: [{ field: 'pvalue', sort: 'asc' }],
                         },
                     }}
-                    pageSizeOptions={[5, 10]}
+                    pageSizeOptions={[5, 10, 25]}
                     disableRowSelectionOnClick
+                    checkboxSelection
                     sx={{
                         '.MuiDataGrid-columnHeader': {
                             backgroundColor: '#C9D2E9',
                         },
                     }}
                 />
-            </div>
+            </div>}
+            {hypLoading && <Box sx={{ width: '100%' }}>
+                <LinearProgress color="secondary" />
+            </Box>}
+            {(hypothesis.length > 0) && <TextField
+                multiline
+                value={hypothesis}
+                rows={8}
+                >
+            </TextField>}
         </Stack>
     )
 }

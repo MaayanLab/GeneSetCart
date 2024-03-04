@@ -1,5 +1,5 @@
 import { authOptions } from '@/lib/auth/authOptions'
-import { GMTCrossLayout } from "@/app/gmt-cross/GMTCrossLayout";
+import { GMTCrossLayout } from "./GMTCrossLayout";
 import prisma from "@/lib/prisma";
 import { TextField, Typography } from "@mui/material";
 import Container from "@mui/material/Container";

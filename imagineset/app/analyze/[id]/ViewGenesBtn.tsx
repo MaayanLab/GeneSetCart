@@ -24,6 +24,7 @@ import rummageoLogo from "@/public/img/otherLogos/rummageoLogo.webp"
 import kea3Logo from "@/public/img/otherLogos/KEA3Logo.png"
 import chea3logo from "@/public/img/otherLogos/chea3Logo.png"
 import sigcomLincsLogo from "@/public/img/otherLogos/sigcomLincsLogo.svg"
+import cfdeLogo from "@/public/img/favicon.png" 
 import { getEnrichrShortId, getRummageneLink, getRummageoLink, getSigComLINCSId } from "@/app/analyze/[id]/AnalyzeFunctions";
 import { deleteGenesetByID } from "@/components/Header";
 
@@ -74,15 +75,17 @@ export const ViewGenesBtn = ({ row }: {
 
 
 
-export const DeleteBtn = ({row}: {row: {
-    genes: Gene[];
-} & {
-    id: string;
-    name: string;
-    description: string | null;
-    session_id: string;
-    createdAt: Date;
-}}) => {
+export const DeleteBtn = ({ row }: {
+    row: {
+        genes: Gene[];
+    } & {
+        id: string;
+        name: string;
+        description: string | null;
+        session_id: string;
+        createdAt: Date;
+    }
+}) => {
     return (
         <Button variant='outlined' color='secondary' sx={{ borderRadius: 1 }} onClick={() => deleteGenesetByID(row.id).then(() => console.log('deleted'))}>
             <DeleteIcon />
@@ -123,38 +126,47 @@ function enrich(options: any) {
 
 const options = [<>
     <div>
-        <Image src={enrichrLogo} width={30} alt="enrichr logo"></Image>
-    </div>&nbsp;<Typography sx={{ color: '#8B0000', fontSize: 13 }}>
-        Enrichr
-    </Typography>
-</>, <>
+        <Image src={sigcomLincsLogo} width={30} alt="chea3 logo"></Image>
+    </div>&nbsp;<Typography sx={{ color: "#000000", fontSize: 13 }}>SigCom LINCS</Typography></>,
+    <>
     <div>
-        <Image src={enrichrKgLogo} width={30} alt="enrichr=kg logo"></Image>
-    </div>&nbsp;<Typography sx={{ fontSize: 13 }}>Enrichr-KG</Typography>
-</>, <>
+        <Image src={cfdeLogo} width={30} alt="rummagene logo"></Image>
+    </div>&nbsp;<Typography sx={{ fontSize: 13 }}>CFDE GSE</Typography>
+</>,
+<>
     <div>
         <Image src={rummageneLogo} width={30} alt="rummagene logo"></Image>
     </div>&nbsp;<Typography sx={{ fontSize: 13 }}>Rummagene</Typography>
-</>, 
+</>,
 <>
     <div>
         <Image src={rummageoLogo} width={30} alt="rummagene logo"></Image>
     </div>&nbsp;<Typography sx={{ fontSize: 13 }}>Rummageo</Typography>
-</>, 
-<>                <div className="mx-1">
-    <Image src={kea3Logo} width={20} alt="kea3 logo"></Image>
-</div>&nbsp;<Typography sx={{ fontSize: 13 }}>KEA3</Typography>
-
-</>, <>
+</>,
+<>
+    <div className="mx-1">
+        <Image src={kea3Logo} width={20} alt="kea3 logo"></Image>
+    </div>&nbsp;<Typography sx={{ fontSize: 13 }}>KEA3</Typography>
+</>,
+ <>
     <div>
         <Image src={chea3logo} width={30} alt="chea3 logo"></Image>
-    </div>&nbsp;<Typography sx={{ color: "#000000", fontSize: 13 }}>ChEA3</Typography></>, 
-    <>
+    </div>&nbsp;<Typography sx={{ color: "#000000", fontSize: 13 }}>ChEA3</Typography></>,
+     <>
     <div>
-        <Image src={sigcomLincsLogo} width={30} alt="chea3 logo"></Image>
-    </div>&nbsp;<Typography sx={{ color: "#000000", fontSize: 13 }}>SigCom LINCS</Typography></>];
+        <Image src={enrichrKgLogo} width={30} alt="enrichr=kg logo"></Image>
+    </div>&nbsp;<Typography sx={{ fontSize: 13 }}>Enrichr-KG</Typography>
+</>,
+<>
+    <div>
+        <Image src={enrichrLogo} width={30} alt="enrichr logo"></Image>
+    </div>&nbsp;<Typography sx={{ color: '#8B0000', fontSize: 13 }}>
+        Enrichr
+    </Typography>
+</>
+];
 
-const buttonOptions = ['Enrichr', 'Enrichr-KG', 'Rummagene', 'Rummageo', 'KEA3', 'ChEA3', 'SigCom LINCS']
+const buttonOptions = ['SigCom LINCS', 'CFDE GSE', 'Rummagene', 'Rummageo', 'KEA3', 'ChEA3', 'Enrichr-KG', 'Enrichr']
 
 export function SplitButton({ row }: {
     row: {
@@ -166,11 +178,12 @@ export function SplitButton({ row }: {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
 
     const handleClick = (selectedIndex: number) => {
+        console.log(selectedIndex)
         console.info(`You clicked ${buttonOptions[selectedIndex]}`);
         const selectedButton = buttonOptions[selectedIndex]
         if (selectedButton === 'Enrichr') {
             const genes = row.genes.map((gene) => gene.gene_symbol)
-            enrich({ list: genes?.join('\n') || '', description: row.name})
+            enrich({ list: genes?.join('\n') || '', description: row.name })
             // getEnrichrShortId(row.name, row.genes.map((gene) => gene.gene_symbol)).then((shortId) => console.log(shortId))
         } else if (selectedButton === 'Rummagene') {
             getRummageneLink(row.name, row.genes.map((gene) => gene.gene_symbol)).then((link) => window.open(link, "_blank"))

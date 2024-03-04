@@ -74,7 +74,7 @@ export default async function Header() {
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                 <CartDrawer sessionInfo={sessionInfo} />
-                                <Link href={`/gmt-cross`}>
+                                <Link href={`/gmt-cross/${sessionId}`}>
                                     <Typography variant="nav">CFDE GMT CROSSING</Typography>
                                 </Link>
                                 <Link href="/sessions">

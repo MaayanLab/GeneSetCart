@@ -106,6 +106,15 @@ model CFDECrossPair {
 
 @@map("cfde_cross_pair")
 }
+
+model LibAbstracts {
+  id      String @id @default(cuid())
+  lib     String 
+  abstract  String 
+
+  @@map("lib_abstracts")
+}
+
 // model CFDEGeneSet {
 //   id          String          @id @default(cuid())
 //   name        String

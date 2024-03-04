@@ -94,7 +94,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                 // setTextAreaGenes(Array.from(new Set(response.concat(originalGenes))))
                 setGenesetName('Augmented ' + selected)
                 setLoading(false)
-            })
+            }).catch(() => {setLoading(false); setStatus({error:{selected:true, message:'Augmentation failed. Please try again.'} })})
         }
     }, [originalGenes])
 

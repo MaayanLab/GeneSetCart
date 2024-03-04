@@ -94,7 +94,7 @@ export function GMTCrossLayout() {
                         generateHypothesis(params.row).then((response) => {setHypLoading(false); if (typeof (response) === 'string') { setHypothesis(response) } }).catch((err) => {setHypLoading(false);})
                     }}
                 >
-                    GPT-4 Hypotheis
+                    GPT-4 Hypothesis
                 </Button>
             </React.Fragment>
         )

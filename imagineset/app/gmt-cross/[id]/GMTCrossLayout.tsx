@@ -73,9 +73,6 @@ export function GMTCrossLayout() {
     const getCrossData = React.useCallback(() => {
         setLoading(true)
         if (selectedLibs.length === 2) {
-            // const libName1 = Object.keys(CFDELibraryOptions)[Object.values(CFDELibraryOptions).indexOf(selectedLibs[0])]
-            // const libName2 = Object.keys(CFDELibraryOptions)[Object.values(CFDELibraryOptions).indexOf(selectedLibs[1])]
-            // CrossPairs(libName1, libName2).then((result) => { setLoading(false); setRows(result) }).catch((err) => setLoading(false))
             fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => { setLoading(false); setRows(result) }).catch((err) => setLoading(false))
         }
     }, [selectedLibs])
@@ -88,13 +85,16 @@ export function GMTCrossLayout() {
                     color="tertiary"
                     size="small"
                     variant="contained"
+                    sx={{margin: 2}}
                     onClick={(evt) => {
                         setHypothesis('')
                         setHypLoading(true)
                         generateHypothesis(params.row).then((response) => {setHypLoading(false); if (typeof (response) === 'string') { setHypothesis(response) } }).catch((err) => {setHypLoading(false);})
                     }}
                 >
+                    <Typography sx={{fontSize: 10, textWrap: 'wrap'}}>
                     GPT-4 Hypothesis
+                    </Typography>
                 </Button>
             </React.Fragment>
         )

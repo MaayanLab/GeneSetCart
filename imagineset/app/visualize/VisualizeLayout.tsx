@@ -18,6 +18,7 @@ import { Heatmap } from '../../components/visualize/PlotComponents/Heatmap/Heatm
 import { VennPlot } from '../../components/visualize/PlotComponents/Venn/Venn';
 import { UpsetPlotV2 } from '../../components/visualize/PlotComponents/UpSet/Upset';
 import { SuperVenn } from '../../components/visualize/PlotComponents/SuperVenn/SuperVenn';
+import upsetIconAlt from '@/public/img/otherLogos/plotly-upset-alt.png'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
@@ -145,7 +146,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                         </Button>
                         <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('UpSet')}>
                             <Image
-                                src={upsetplotIcon}
+                                src={upsetIconAlt}
                                 fill
                                 alt=""
                                 style={{ padding: "10%", objectFit: "contain" }}

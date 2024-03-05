@@ -13,7 +13,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import Checkbox from '@mui/material/Checkbox';
 import { getGeneshotPredGenes, getPPIGenes } from '@/app/augment/[id]/AugmentFunctions';
-import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
+import { addToSessionSets, checkInSession } from '@/app/assemble/[id]/AssembleFunctions ';
 import CircularIndeterminate from '../../../components/misc/Loading';
 import Status from '../../../components/assemble/Status';
 import { addStatus } from '../../../components/assemble/fileUpload/SingleUpload';
@@ -120,10 +120,19 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
     }, [maxAddGenes, includeOriginal, augmentedGenes])
 
     const handleAddToSets = React.useCallback(() => {
-        addToSessionSets(textAreaGenes, sessionId, genesetName, '')
-        .then((response) => setStatus({success:true}))
-        .catch((error) => setStatus({error:{selected:true, message:'Error adding gene set to list. Please try again'} }))
+        checkInSession(sessionId, genesetName).then((response) => {
+            if (response) {
+                setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+            } else {
+                addToSessionSets(textAreaGenes, sessionId, genesetName, '')
+                .then((response) => setStatus({success:true}))
+                .catch((error) => setStatus({error:{selected:true, message:'Error adding gene set to list. Please try again'} }))            }
+        })  
     }, [textAreaGenes, genesetName])
+
+
+
+
 
     return (
         <div className="flex justify-center">

@@ -6,7 +6,7 @@ import React from "react";
 import { Card, Box, CardContent, Divider, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Stack, CardHeader, Button, Typography } from "@mui/material";
 import Status from "../../../components/assemble/Status";
 import { copyToClipboard } from "../../../components/assemble/DCCFetch/CFDEDataTable";
-import { addToSessionSets } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
 import { addStatus } from "../../../components/assemble/fileUpload/SingleUpload";
 
 export function CombineLayout({ sessionInfo, sessionId }: {
@@ -88,10 +88,18 @@ export function CombineLayout({ sessionInfo, sessionId }: {
     }
 
     const handleAddToSets = React.useCallback(() => {
-        addToSessionSets(displayedGenes, sessionId, generatedSetName, '')
-        .then((response) => setStatus({success:true}))
-        .catch((error) => setStatus({error:{selected:true, message:'Error adding gene set to list. Please try again'} }))
+        checkInSession(sessionId, generatedSetName).then((response) => {
+            if (response) {
+                setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+            } else {
+                addToSessionSets(displayedGenes, sessionId, generatedSetName, '')
+                .then((response) => setStatus({success:true}))
+                .catch((error) => setStatus({error:{selected:true, message:'Error adding gene set to list. Please try again'} }))         }
+        })
     }, [displayedGenes, generatedSetName])
+
+
+
     
     return (
         <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'}>

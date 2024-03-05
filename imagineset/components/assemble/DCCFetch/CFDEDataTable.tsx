@@ -25,9 +25,9 @@ const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
   const [validGenes, setValidGenes] = React.useState<string[]>([])
   React.useEffect(() => {
     fetch('https://maayanlab.cloud/Enrichr/geneSetLibrary?' + new URLSearchParams(`libraryName=${params.row.libraryName}&term=${params.row.genesetName}&mode=json`))
-    .then((response) => response.json())
-    .then((responsejson) => checkValidGenes(responsejson[params.row.genesetName].toString().replaceAll(',', '\n'))
-    .then((result) => setValidGenes(result) ))
+      .then((response) => response.json())
+      .then((responsejson) => checkValidGenes(responsejson[params.row.genesetName].toString().replaceAll(',', '\n'))
+        .then((result) => setValidGenes(result)))
   }, [params.row.genes])
 
 
@@ -92,19 +92,25 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
   const params = useParams<{ id: string }>()
   const [status, setStatus] = React.useState<addStatus>({})
   const [rowSelectionModel, setRowSelectionModel] =
-  React.useState<GridRowSelectionModel>([]);
+    React.useState<GridRowSelectionModel>([]);
 
   const [selectedRows, setSelectedRows] = React.useState<(searchResultsType | undefined)[]>([])
-  
+
   const addSets = React.useCallback(() => {
-    setStatus({loading: true})
+    setStatus({ loading: true })
     addMultipleSetsCFDE(selectedRows ? selectedRows : [], params.id)
-    .then((results) => setStatus({success: true}))
+      .then((results: any) => {
+        if (results.code === 'success') {
+          setStatus({ success: true })
+        } else if (results.code === 'error') {
+          setStatus({ error: { selected: true, message: results.message } })
+        }
+      }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
   }, [selectedRows])
 
   return (
     <div style={{ height: 400, width: '100%' }}>
-      {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon/> Add to List</Button>}
+      {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> Add to List</Button>}
       <DataGrid
         rows={rows}
         columns={columns}
@@ -128,6 +134,6 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
       />
       <Status status={status} />
     </div>
-    
+
   );
 }

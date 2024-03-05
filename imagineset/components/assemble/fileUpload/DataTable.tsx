@@ -96,8 +96,15 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
   
   const addSets = React.useCallback(() => {
     addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id)
-    .then((results) => setStatus({success: true}))
+    .then((results: any) => {
+      if (results.code === 'success') {
+        setStatus({ success: true })
+      } else if (results.code === 'error') {
+        setStatus({ error: { selected: true, message: results.message } })
+      }
+    }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
   }, [selectedRows])
+
 
 
   return (

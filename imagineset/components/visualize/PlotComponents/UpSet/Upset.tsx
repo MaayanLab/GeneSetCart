@@ -355,7 +355,6 @@ export function UpsetPlotV2({ selectedSets }: {
                         {circles}
                         {lines}
                     </g>
-
                 </g>
             </svg>
             <UpsetTooltip interactionData={hoveredCell} width={width} height={height} />

@@ -3,11 +3,11 @@ import React, { useEffect } from "react";
 import {
     Box, Button, Container,
     FormControl, Grid, InputLabel,
-    MenuItem, Select, TextField,
+    MenuItem, Select, Stack, TextField,
     Typography, useMediaQuery,
     useTheme
 } from "@mui/material";
-import { addToSessionSets, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkInSession, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions ";
 import { useParams } from "next/navigation";
 import Status from "../Status";
 
@@ -20,6 +20,7 @@ export type addStatus = {
     },
   }
 
+
 export default function SingleUpload() {
     const theme = useTheme();
     const params = useParams<{ id: string }>()
@@ -28,9 +29,22 @@ export default function SingleUpload() {
     const [validGenes, setValidGenes] = React.useState<string[]>([])
     const  [status, setStatus] = React.useState<addStatus>({})
 
+
     const getExample = () => {
         loadTxtExample().then((response) => setGenes(response));
     }
+
+    const downloadExample = React.useCallback(() => {
+        loadTxtExample().then((response) => {
+            let element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(response));
+            element.setAttribute('download', 'example.txt');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        })
+    }, []) 
 
     const readFile = (event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files
@@ -53,6 +67,7 @@ export default function SingleUpload() {
     }
 
 
+
     useEffect(() => {
         checkValidGenes(genes).then((response) => setValidGenes(response))
     }, [genes])
@@ -73,8 +88,13 @@ export default function SingleUpload() {
                     if (!genesetName) throw new Error('no gene set name')
                     if (!description) description = ''
                     const sessionId = params.id
-                    // TODO: add catch here to error status
-                    addToSessionSets(validGenes, sessionId, genesetName, description).then((result) => {setStatus({success:true})})
+                    checkInSession(sessionId, genesetName).then((response) => {
+                        if (response) {
+                            setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+                        } else {
+                            addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => {setStatus({success:true})}).catch((err) => setStatus({error:{selected:true, message:"Error in adding gene set!"}}))
+                        }
+                    })                   
                     
                 }
                 }>
@@ -95,6 +115,7 @@ export default function SingleUpload() {
                         />
                     </Grid>
                     <Grid item>
+                        <Stack direction='row' spacing={2}>
                         <Button
                             variant="contained"
                             component="label"
@@ -113,6 +134,13 @@ export default function SingleUpload() {
                                 onChange={(event) => { readFile(event) }}
                             />
                         </Button>
+                        <Button 
+                        variant="contained"
+                        onClick={downloadExample}>
+                            Download Example
+                        </Button>
+                        </Stack>
+ 
                     </Grid>
                 </Grid>
                 <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 6}>

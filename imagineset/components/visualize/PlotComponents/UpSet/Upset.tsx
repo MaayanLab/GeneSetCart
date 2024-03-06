@@ -152,7 +152,7 @@ export function UpsetPlotV2({ selectedSets }: {
         bottom: 350,
         left: 50,
     };
-    const width = 60 * data.length;
+    const width = 60 * (data.length + soloSets.length);
     const height = 450;
 
     // The bounds (=area inside the axis) is calculated by substracting the margins
@@ -174,7 +174,7 @@ export function UpsetPlotV2({ selectedSets }: {
 
     // left yaxis
     const range = yrange.range();
-    const pixelsPerTick = 10 // increase spacing between ticks
+    const pixelsPerTick = 20 // increase spacing between ticks
     const lineheight = range[0] - range[1];
     const numberOfTicksTarget = Math.floor(lineheight / pixelsPerTick);
     const ticks = yrange.ticks(numberOfTicksTarget).map((value) => ({
@@ -208,7 +208,7 @@ export function UpsetPlotV2({ selectedSets }: {
             ))}
         </>
 
-    const rad = 13;
+    const rad = 10;
     const bottomAxisrange = xrange.range();
     const bottomAxis =
         <>
@@ -308,7 +308,7 @@ export function UpsetPlotV2({ selectedSets }: {
                 onMouseEnter={(e) => {
                     setHoveredCell({
                         setLabel: d.name,
-                        xPos: 9 + i * (rad * 2.7) + margin.left,
+                        xPos: 9 + i * (rad * 2.7) + margin.left + 100,
                         yPos: boundsHeight + yrange(d.num) + margin.top,
                         value: d.num,
                     });
@@ -367,7 +367,7 @@ export function UpsetPlotV2({ selectedSets }: {
                 <g
                     width={boundsWidth}
                     height={boundsHeight}
-                    transform={`translate(${[margin.left, margin.top].join(",")})`}
+                    transform={`translate(${[0, margin.top].join(",")})`}
                 >
                     <g id='upsetBars'
                         transform={`translate(${100+margin.left},${boundsHeight})`}
@@ -384,7 +384,7 @@ export function UpsetPlotV2({ selectedSets }: {
                     </g>
 
                     <g id='setBars'
-                        transform={`translate(${[margin.left, boundsHeight + 100].join(",")})`}
+                        transform={`translate(${[margin.left, boundsHeight + 95].join(",")})`}
                     >
                             {setBars}
                     </g>

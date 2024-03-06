@@ -84,12 +84,12 @@ const CustomCard = ({
     <Card sx={{
         flexShrink: 0,
         height: '100%',
-        width: '200px',
+        width: '90px',
         margin: 1
     }} >
         <CardActionArea>
             <CardMedia
-                sx={{ position: 'relative', height:'120px' }}
+                sx={{ position: 'relative', height:'90px' }}
             >
                 <Image
                     src={image}
@@ -99,9 +99,9 @@ const CustomCard = ({
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
             </CardMedia>
-            <CardContent sx={{ backgroundColor: '#C9D2E9' }}>
-                <Typography variant={"body2"}>{title}</Typography>
-            </CardContent>
+            {/* <CardContent sx={{ backgroundColor: '#C9D2E9' }}>
+                <Typography variant={"body2"} sx={{fontSize: 10}}>{title}</Typography>
+            </CardContent> */}
         </CardActionArea>
     </Card>
 );

@@ -80,8 +80,8 @@ export default async function Header() {
                                 <Link href="/sessions">
                                     <Typography variant="nav">MY SESSIONS</Typography>
                                 </Link>
-                                <Link href="/chat">
-                                    <Typography variant="nav">CHATBOT</Typography>
+                                <Link href="/use-cases">
+                                    <Typography variant="nav">USE CASES</Typography>
                                 </Link>
                                 <UserComponent session={session} />
                             </Stack>

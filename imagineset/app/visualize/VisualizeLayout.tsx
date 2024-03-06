@@ -6,13 +6,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import { ListSubheader, Grid, Container, Stack, Button, Typography, Box, Tooltip } from '@mui/material';
+import { ListSubheader, Grid, Container, Stack, Button, Typography, Box, Tooltip, TextField } from '@mui/material';
 import { type Gene, type GeneSet } from '@prisma/client';
 import vennIcon from '@/public/img/otherLogos/VennDagramIcon.png'
 import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
-import upsetplotIcon from '@/public/img/otherLogos/upsetplotIcon.png'
 import heatmapIcon from '@/public/img/otherLogos/visualizeIcon.png'
-import umapIcon from '@/public/img/otherLogos/umapIcon.png'
+import umapIcon from '@/public/img/otherLogos/umapPlot2.png'
 import Image from 'next/image';
 import { Heatmap } from '../../components/visualize/PlotComponents/Heatmap/Heatmap';
 import { VennPlot } from '../../components/visualize/PlotComponents/Venn/Venn';
@@ -21,6 +20,7 @@ import { SuperVenn } from '../../components/visualize/PlotComponents/SuperVenn/S
 import upsetIconAlt from '@/public/img/otherLogos/plotly-upset-alt.png'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+
 
 function jaccard_similarity(set1: string[], set2: string[]) {
     const union = Array.from(new Set([...set1, ...set2]))
@@ -73,7 +73,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [checked, setChecked] = React.useState<number[]>(sessionInfo ? sessionInfo.gene_sets.map((geneset, i) => i) : []);
     const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked])
     const [visualization, setVisualization] = React.useState('')
-
+    const [overlap, setOverlap] = React.useState<string[]>([])
 
     const legendSelectedSets = React.useMemo(() => {
         if (selectedSets) {
@@ -91,12 +91,15 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const data = React.useMemo(() => {
         if (legendSelectedSets) {
             const dataArrays = legendSelectedSets.map((geneset, i) => {
-                let genesetRow: { x: string; y: string; value: number }[] = []
+                let genesetRow: { x: string; y: string; value: number, overlap: string[] }[] = []
                 for (let [n, innerLoop] of legendSelectedSets.entries()) {
                     const x = geneset.alphabet
                     const y = innerLoop.alphabet
                     const xyJaccard = (x !== y) ? jaccard_similarity(geneset.genes.map((gene) => gene.gene_symbol), innerLoop.genes.map((gene) => gene.gene_symbol)) : 0
-                    genesetRow.push({ x: x, y: y, value: xyJaccard })
+                    const geneset1 = geneset.genes.map((gene) => gene.gene_symbol)
+                    const geneset2 = innerLoop.genes.map((gene) => gene.gene_symbol)
+                    const overlap = (x !== y) ? geneset1.filter((x) => geneset2.includes(x)) : []
+                    genesetRow.push({ x: x, y: y, value: xyJaccard, overlap: overlap })
                 }
                 return genesetRow
             })
@@ -123,7 +126,25 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     return (
         <Grid container direction='row' spacing={1}>
             <Grid item xs={3}>
-                <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
+                <Stack direction='column' spacing={2}>
+                    <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
+                    <Box sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, height: 200, boxShadow: 2 }}>
+                        <ListSubheader>
+                            Overlap ({overlap.length})
+                        </ListSubheader>
+                        <TextField
+                        multiline
+                        rows={5}
+                        sx={{
+                            "& fieldset": { border: 'none' },
+                          }}
+                          value={overlap.join('\n')}
+                        >
+
+                        </TextField>
+                    </Box>
+                </Stack>
+
             </Grid>
             <Grid item xs={9}>
                 <Stack direction='column' spacing={2}>
@@ -181,9 +202,9 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                         title={
                                             <React.Fragment>
                                                 <Typography color="inherit">Legend:</Typography>
-                                                 <Typography color="inherit" variant='body2'>
-                                                 {legendSelectedSets.map((item)=> item.alphabet + ': ' + item.name+ '\n')}
-                                                 </Typography>
+                                                <Typography color="inherit" variant='body2'>
+                                                    {legendSelectedSets.map((item) => item.alphabet + ': ' + item.name + '\n')}
+                                                </Typography>
                                             </React.Fragment>
                                         }>
                                         <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}><VisibilityIcon />&nbsp;<Typography > Legend</Typography></Button>
@@ -192,13 +213,12 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 </Stack>
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
-                                <div className='flex justify-center' id="venn" style={{ backgroundColor: '#FFFFFF' }}>
-                                    {visualization === 'Heatmap' && <Heatmap data={data} width={300} height={300} />}
+                                <div className='flex justify-center' id="venn" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
+                                    {visualization === 'Heatmap' && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />}
                                     {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets} />}
                                     {visualization === 'SuperVenn' && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {visualization === 'UpSet' && <UpsetPlotV2 selectedSets={legendSelectedSets} />}
                                 </div>
-
                             </Box>
                         </Stack>
                     </Box>
@@ -296,8 +316,4 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
             })}
         </List>
     )
-}
-
-export function VisualizeBox() {
-
 }

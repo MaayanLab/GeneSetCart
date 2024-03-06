@@ -4,7 +4,6 @@ import { Table, TableBody, TextField, Typography } from "@mui/material";
 import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { SessionRow } from "./SessionRow";
 import dynamic from "next/dynamic";
 
 export default async function AugmentPage() {

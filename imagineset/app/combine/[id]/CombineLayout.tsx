@@ -3,11 +3,12 @@
 import { SelectGenesetsCard } from "./GeneSetCard"
 import { type Gene, type GeneSet } from "@prisma/client";
 import React from "react";
-import { Card, Box, CardContent, Divider, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Stack, CardHeader, Button, Typography } from "@mui/material";
+import { Card, Box, CardContent, Divider, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Stack, CardHeader, Button, Typography, Tooltip } from "@mui/material";
 import Status from "../../../components/assemble/Status";
 import { copyToClipboard } from "../../../components/assemble/DCCFetch/CFDEDataTable";
 import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
 import { addStatus } from "../../../components/assemble/fileUpload/SingleUpload";
+import InfoIcon from '@mui/icons-material/Info';
 
 export function CombineLayout({ sessionInfo, sessionId }: {
     sessionInfo: {
@@ -116,10 +117,21 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                             <Button variant='outlined' color='tertiary' onClick={unionAction}>UNION</Button>
                             <Button variant='outlined' color='tertiary' onClick={intersectionAction}>INTERSECTION</Button>
                             <Button variant='outlined' color='tertiary' onClick={consensusAction}>CONSENSUS</Button>
+                            <div>
+                            </div>
                             <TextField
                                 inputProps={{ type: 'number' }}
                                 hiddenLabel
-                                label="Consensus Criteria"
+                                label={
+                                    <Tooltip title='The minimum number of gene sets that a gene has to appear in to be considered a part of the consensus gene set' placement="top">
+                                        <div>
+                                        <span>Consensus Criteria</span> &nbsp;
+                                      <InfoIcon />
+                                        </div>
+                                    </Tooltip>
+
+                                  }
+                                // label=Consensus Criteria"
                                 sx={{ fontSize: 16 }}
                                 color='secondary'
                                 name='max-Add'

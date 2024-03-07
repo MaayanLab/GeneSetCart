@@ -197,7 +197,7 @@ export function GMTCrossLayout() {
             {(hypothesis.length > 0) && <TextField
                 multiline
                 value={hypothesis}
-                rows={15}
+                rows={10}
                 >
             </TextField>}
         </Stack>

@@ -1,14 +1,6 @@
 'use server'
-// import { factorial } from "mathjs"
-import pmf from "@stdlib/stats-base-dists-hypergeometric-pmf"
 import prisma from '@/lib/prisma';
-import OpenAI from "openai";
-
-
-type EnrichrGeneResult = {
-    gene: string,
-    count: number
-}
+import cache from '@/lib/cache';
 
 export type PairsData = {
     id: number,
@@ -20,30 +12,6 @@ export type PairsData = {
 }
 
 
-
-
-function jaccard_similarity(set1: string[], set2: string[]) {
-    const union = Array.from(new Set([...set1, ...set2]))
-    const intersection = set1.filter(function (n) {
-        return set2.indexOf(n) !== -1;
-    });
-    return {
-        'overlap': intersection,
-        'nOverlap': intersection.length,
-        'jIndex': intersection.length / union.length,
-        'union': union
-    }
-}
-
-
-
-function formatNumber(number: number) {
-    if (number.toFixed(4).toString() === '0.0000') {
-        return number.toExponential(2);
-    } else {
-        return number.toFixed(4)
-    }
-}
 
 
 const libMap : {[key: string]: string} = {
@@ -92,27 +60,34 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
     The response should only include the specified abstracts for both gene sets
     `
     try {
-        const openaiKey = process.env.OPENAI_API_KEY
-        if (!openaiKey) throw new Error('no OPENAI_API_KEY')
-        const tagLine = await fetch(`https://api.openai.com/v1/chat/completions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${openaiKey}`,
-            },
-            body: JSON.stringify({
-                model: 'gpt-4',
-                messages: [
-                    { "role": "system", "content": "You are a biologist who attempts parse a term and create a specified abstract based on an abstract template" },
-                    { "role": "user", "content": input }
-                ],
-                // max_tokens: 20,
-                temperature: 0
+        const cachedAbstracts = cache.get( term1+ term2 + abstract1+ abstract2 );
+        if ( cachedAbstracts === undefined ){
+            const openaiKey = process.env.OPENAI_API_KEY
+            if (!openaiKey) throw new Error('no OPENAI_API_KEY')
+            const tagLine = await fetch(`https://api.openai.com/v1/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openaiKey}`,
+                },
+                body: JSON.stringify({
+                    model: 'gpt-4',
+                    messages: [
+                        { "role": "system", "content": "You are a biologist who attempts parse a term and create a specified abstract based on an abstract template" },
+                        { "role": "user", "content": input }
+                    ],
+                    // max_tokens: 20,
+                    temperature: 0
+                })
             })
-        })
-        const tagLineParsed = await tagLine.json()
-        const abstracts: string = tagLineParsed.choices[0].message.content
+            const tagLineParsed = await tagLine.json()
+            const abstracts: string = tagLineParsed.choices[0].message.content
+            const success = cache.set( term1+ term2 + abstract1+ abstract2, abstracts, 10000 )
             return abstracts
+        } else {
+            return cachedAbstracts ? cachedAbstracts : ''
+        }
+
 
     } catch {
         return {
@@ -153,8 +128,11 @@ export async function generateHypothesis(row: any ) {
     was created and the overlapping genes between both gene sets, hypothesize why a high overlap between the gene sets exists.
     Specified Abstracts for gene sets: ${abstracts}
     The overlapping genes are ${overlapGeneSet.toString()}
+    Do not include 'Hypothesis: ' at the beginning of your response
     `
     try {
+        const cachedHypothesis = cache.get( term1+term2 );
+        if ( cachedHypothesis === undefined ){
         const openaiKey = process.env.OPENAI_API_KEY
         if (!openaiKey) throw new Error('no OPENAI_API_KEY')
         const tagLine = await fetch(`https://api.openai.com/v1/chat/completions`, {
@@ -175,8 +153,11 @@ export async function generateHypothesis(row: any ) {
         })
         const tagLineParsed = await tagLine.json()
         const hypothesis: string = tagLineParsed.choices[0].message.content
-            return hypothesis
-
+        const success = cache.set(term1+term2, hypothesis, 10000 )
+        return hypothesis
+    } else {
+        return cachedHypothesis ? cachedHypothesis : ''
+    }
     } catch {
         return {
             response: "The OpenAI endpoint is currently overloaded. Please try again in a few minutes",

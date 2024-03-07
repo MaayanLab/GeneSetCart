@@ -17,7 +17,7 @@ import Status from "./Status";
 import { stat } from "fs";
 import { useParams } from "next/navigation";
 import { addStatus } from "./fileUpload/SingleUpload";
-import { Just_Another_Hand } from "next/font/google";
+import cache from "@/lib/cache";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -77,6 +77,8 @@ export default function GeneshotSearch() {
     query: string
   ) => {
     setLoading(true)
+    const cachedResult: any = cache.get(query);
+    if ( cachedResult === undefined ){
     fetch("https://maayanlab.cloud/geneshot/api/search",
       {
         headers: {
@@ -90,12 +92,16 @@ export default function GeneshotSearch() {
         .then((data) => {
           setLoading(false)
           const genes = Object.keys(data['gene_count'])
+          const success = cache.set(query, genes, 10000 )
           setFoundGenes(genes)
         }))
       .catch((res) => { setLoading(false); console.log(res) })
+    } else {
+      setLoading(false)
+      setFoundGenes(cachedResult ? cachedResult : [])
+    }
   }, [])
 
-  console.log(loading)
   return (
     <Container>
       <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH GENE SETS FROM PUBMED</Typography>

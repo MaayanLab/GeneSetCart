@@ -89,7 +89,6 @@ const Search = styled('div')(({ theme }) => ({
 
 
 export function DCCPage() {
-    const [status, setStatus] = React.useState<addStatus>({})
     const [searchResults, setSearchResults] = React.useState<searchResultsType[]>([])
     const [checked, setChecked] = React.useState<number[]>(dccCheckedDisplay.map((dcc, i) => i));
 
@@ -163,7 +162,7 @@ export function DCCPage() {
             </Grid>
           </Grid>
         </Grid>
-        <Status status={status} />
+        {/* <Status status={status} /> */}
       </Container>
     )
 }

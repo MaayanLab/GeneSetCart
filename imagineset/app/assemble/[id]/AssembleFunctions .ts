@@ -100,26 +100,56 @@ type GMTGenesetInfo = {
 }
 
 
+
 export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string) {
     for (const row of rows) {
         if (row) {
-            const validGenes = await checkValidGenes(row.genes.toString().replaceAll(',', '\n'))
-            const added = await addToSessionSets(validGenes, sessionId, row.genesetName, '')
+            const alreadyExists = await checkInSession(sessionId, row.genesetName)
+            if (alreadyExists) {
+                return { code: 'error', message: `Gene set : ${row.genesetName} already in cart` }
+            } else {
+                const validGenes = await checkValidGenes(row.genes.toString().replaceAll(',', '\n'))
+                const added = await addToSessionSets(validGenes, sessionId, row.genesetName, '')
+            }
+
         }
     }
-    return 'done'
+    return { code: 'success' }
 }
 
 export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[], sessionId: string) {
     for (const row of rows) {
         if (row) {
+            const alreadyExists = await checkInSession(sessionId, row.genesetName + ` (${row.dcc})`)
+            if (alreadyExists) {
+                return { code: 'error', message: `Gene set : ${row.genesetName} + (${row.dcc}) already in cart` }
+            } else {
             const response = await fetch('https://maayanlab.cloud/Enrichr/geneSetLibrary?' + new URLSearchParams(`libraryName=${row.libraryName}&term=${row.genesetName}&mode=json`))
             const data = await response.json()
             const genes = data[row.genesetName]
             const validGenes = await checkValidGenes(genes.toString().replaceAll(',', '\n'))
             const added = addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '')
+            }
         }
     }
-    return 'done'
+    return { code: 'success' }
+}
+
+export async function checkInSession(currentSessionId: string, newGeneSetName: string) {
+    const sessionGenesets = await prisma.pipelineSession.findUnique({
+        where: {
+            id: currentSessionId
+        },
+        select: {
+            gene_sets: true
+        }
+    })
+    if (sessionGenesets) {
+        const genesetNames = sessionGenesets?.gene_sets.map((geneset) => geneset.name)
+        if (genesetNames.includes(newGeneSetName)) {
+            return true
+        }
+    }
+    return false
 }
 

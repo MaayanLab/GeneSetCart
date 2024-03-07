@@ -6,7 +6,7 @@ import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-export default async function AugmentPage() {
+export default async function GMTCross() {
     const session = await getServerSession(authOptions)
     if (!session) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/`)
     const user = await prisma.user.findUnique({

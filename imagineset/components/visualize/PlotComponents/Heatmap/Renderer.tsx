@@ -8,8 +8,9 @@ const MARGIN = { top: 10, right: 10, bottom: 30, left: 30 };
 type RendererProps = {
   width: number;
   height: number;
-  data: { x: string; y: string; value: number }[];
+  data: { x: string; y: string; value: number, overlap: string[] }[];
   setHoveredCell: (hoveredCell: InteractionData | null) => void;
+  setOverlap: React.Dispatch<React.SetStateAction<string[]>>;
   colorScale: d3.ScaleLinear<string, string, never>;
 };
 
@@ -18,7 +19,9 @@ export const Renderer = ({
   width,
   height,
   data,
+  setOverlap,
   setHoveredCell,
+
   colorScale
 }: RendererProps) => {
   // The bounds (=area inside the axis) is calculated by substracting the margins
@@ -80,6 +83,7 @@ export const Renderer = ({
                   xPos: x + xScale.bandwidth() + MARGIN.left,
                   yPos: y + xScale.bandwidth() / 2 + MARGIN.top,
                   value: Math.round(d.value * 100) / 100,
+                  overlap: d.overlap
                 });
               }}
               onMouseLeave={() => setHoveredCell(null)}
@@ -107,9 +111,11 @@ export const Renderer = ({
             xPos: x + xScale.bandwidth() + MARGIN.left,
             yPos: y + xScale.bandwidth() / 2 + MARGIN.top,
             value: Math.round(d.value * 100) / 100,
+            overlap: d.overlap
           });
         }}
         onMouseLeave={() => setHoveredCell(null)}
+        onMouseDown={() => setOverlap(d.overlap)}
         cursor="pointer"
       />
     );

@@ -1,7 +1,8 @@
 'use client'
 import {
+  Box,
   Button, Container,
-  Grid, TextField,
+  Grid, LinearProgress, TextField,
   Typography,
   useMediaQuery,
   useTheme
@@ -10,12 +11,13 @@ import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import React from "react";
-import { addToSessionSets, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkInSession, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
 import CircularIndeterminate from "../misc/Loading";
 import Status from "./Status";
 import { stat } from "fs";
 import { useParams } from "next/navigation";
 import { addStatus } from "./fileUpload/SingleUpload";
+import cache from "@/lib/cache";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -75,6 +77,8 @@ export default function GeneshotSearch() {
     query: string
   ) => {
     setLoading(true)
+    const cachedResult: any = cache.get(query);
+    if ( cachedResult === undefined ){
     fetch("https://maayanlab.cloud/geneshot/api/search",
       {
         headers: {
@@ -88,9 +92,14 @@ export default function GeneshotSearch() {
         .then((data) => {
           setLoading(false)
           const genes = Object.keys(data['gene_count'])
+          const success = cache.set(query, genes, 10000 )
           setFoundGenes(genes)
         }))
       .catch((res) => { setLoading(false); console.log(res) })
+    } else {
+      setLoading(false)
+      setFoundGenes(cachedResult ? cachedResult : [])
+    }
   }, [])
 
   return (
@@ -109,12 +118,17 @@ export default function GeneshotSearch() {
           if (!genesetName) throw new Error('no gene set name')
           if (!description) description = ''
           const sessionId = params.id
-          // TODO: add catch here to error status
-          addToSessionSets(validGenes, sessionId, genesetName, description).then((result) => { setStatus({ success: true }) })
+          checkInSession(sessionId, genesetName).then((response) => {
+            if (response) {
+                setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+            } else {
+                addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => {setStatus({success:true})}).catch((err) => setStatus({error:{selected:true, message:"Error adding gene set!"}}))
+            }
+        })   
         }
         }>
         <Grid item direction='row' container alignItems="center" justifyItems='center'>
-          <Grid item>
+          <Grid item sx={{justifyItems:'center'}}>
             {loading ? <CircularIndeterminate /> : <></>}
           </Grid>
           <Grid item  xs={12}>

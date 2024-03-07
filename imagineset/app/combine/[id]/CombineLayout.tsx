@@ -3,11 +3,19 @@
 import { SelectGenesetsCard } from "./GeneSetCard"
 import { type Gene, type GeneSet } from "@prisma/client";
 import React from "react";
-import { Card, Box, CardContent, Divider, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Stack, CardHeader, Button, Typography } from "@mui/material";
+import { Card, Box, CardContent, Divider, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Stack, CardHeader, Button, Typography, Tooltip } from "@mui/material";
 import Status from "../../../components/assemble/Status";
 import { copyToClipboard } from "../../../components/assemble/DCCFetch/CFDEDataTable";
-import { addToSessionSets } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
 import { addStatus } from "../../../components/assemble/fileUpload/SingleUpload";
+import InfoIcon from '@mui/icons-material/Info';
+
+// const scrollbarStyles = {
+//     width: '8px', // Adjust width as needed
+//     height: '8px', // Adjust height as needed
+//     backgroundColor: 'grey', // Optional: Set background color
+//     borderRadius: '8px', // Optional: Add rounded corners
+//   };
 
 export function CombineLayout({ sessionInfo, sessionId }: {
     sessionInfo: {
@@ -88,10 +96,18 @@ export function CombineLayout({ sessionInfo, sessionId }: {
     }
 
     const handleAddToSets = React.useCallback(() => {
-        addToSessionSets(displayedGenes, sessionId, generatedSetName, '')
-        .then((response) => setStatus({success:true}))
-        .catch((error) => setStatus({error:{selected:true, message:'Error adding gene set to list. Please try again'} }))
+        checkInSession(sessionId, generatedSetName).then((response) => {
+            if (response) {
+                setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+            } else {
+                addToSessionSets(displayedGenes, sessionId, generatedSetName, '')
+                .then((response) => setStatus({success:true}))
+                .catch((error) => setStatus({error:{selected:true, message:'Error adding gene set to list. Please try again'} }))         }
+        })
     }, [displayedGenes, generatedSetName])
+
+
+
     
     return (
         <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'}>
@@ -108,10 +124,21 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                             <Button variant='outlined' color='tertiary' onClick={unionAction}>UNION</Button>
                             <Button variant='outlined' color='tertiary' onClick={intersectionAction}>INTERSECTION</Button>
                             <Button variant='outlined' color='tertiary' onClick={consensusAction}>CONSENSUS</Button>
+                            <div>
+                            </div>
                             <TextField
                                 inputProps={{ type: 'number' }}
                                 hiddenLabel
-                                label="Consensus Criteria"
+                                label={
+                                    <Tooltip title='The minimum number of gene sets that a gene has to appear in to be considered a part of the consensus gene set' placement="top">
+                                        <div>
+                                        <span>Consensus Criteria</span> &nbsp;
+                                      <InfoIcon />
+                                        </div>
+                                    </Tooltip>
+
+                                  }
+                                // label=Consensus Criteria"
                                 sx={{ fontSize: 16 }}
                                 color='secondary'
                                 name='max-Add'
@@ -124,7 +151,8 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                 </Card>
             </Box>
             <Box sx={{ maxWidth: 500 }}>
-                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll' }}>
+                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll', }}> 
+                {/* '&::-webkit-scrollbar': { ...scrollbarStyles } */}
                     <CardHeader
                         title="Generated Set"
                         subheader={generatedSetName}

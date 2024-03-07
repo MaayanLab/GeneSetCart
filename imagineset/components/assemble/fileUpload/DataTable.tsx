@@ -43,7 +43,6 @@ const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
         variant="contained"
         color="tertiary"
         size="small"
-        // style={{ marginLeft: 16 }}
         onClick={(event) => { event.stopPropagation(); handleOpen() }}>
         <VisibilityIcon /> &nbsp;
         Genes
@@ -96,8 +95,15 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
   
   const addSets = React.useCallback(() => {
     addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id)
-    .then((results) => setStatus({success: true}))
+    .then((results: any) => {
+      if (results.code === 'success') {
+        setStatus({ success: true })
+      } else if (results.code === 'error') {
+        setStatus({ error: { selected: true, message: results.message } })
+      }
+    }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
   }, [selectedRows])
+
 
 
   return (

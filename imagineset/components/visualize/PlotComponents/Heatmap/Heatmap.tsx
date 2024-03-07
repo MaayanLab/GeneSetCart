@@ -5,12 +5,14 @@ import { Tooltip } from "./Tooltip";
 import { Renderer } from "./Renderer";
 import { ColorLegend } from "./ColorLegend";
 import { COLOR_LEGEND_HEIGHT, THRESHOLDS } from "./Constants";
+import { setOverlap } from "@upsetjs/react";
 
 // code extracted from https://www.react-graph-gallery.com/heatmap
 export type HeatmapProps = {
     width: number;
     height: number;
-    data: { x: string; y: string; value: number }[];
+    data: { x: string; y: string; value: number, overlap: string[] }[];
+    setOverlap: React.Dispatch<React.SetStateAction<string[]>>
 };
 
 export type InteractionData = {
@@ -19,9 +21,10 @@ export type InteractionData = {
     xPos: number;
     yPos: number;
     value: number;
+    overlap: string[]
 };
 
-export const Heatmap = ({ width, height, data }: HeatmapProps) => {
+export const Heatmap = ({ width, height, data, setOverlap }: HeatmapProps) => {
     
     const [hoveredCell, setHoveredCell] = React.useState<InteractionData | null>(null);
 
@@ -43,6 +46,7 @@ export const Heatmap = ({ width, height, data }: HeatmapProps) => {
                 height={height}
                 data={data}
                 setHoveredCell={setHoveredCell}
+                setOverlap={setOverlap}
                 colorScale={colorScale}
             />
             <Tooltip interactionData={hoveredCell} width={width} height={height} />

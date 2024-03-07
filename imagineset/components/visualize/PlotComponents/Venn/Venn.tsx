@@ -69,21 +69,24 @@ export function VennPlot({ selectedSets }: {
         return getIntersections
     }, [selectedSets])
     return (
-        // <div style={{
-        //     width: '40vw',
-        //     height: '40vh',
-        //     border: 'solid 1px red',
-            
-            
-        //   }}>
+        <div style={{
+            width: '90%',
+            height: '90%',
+            // border: 'solid 1px red',
+            position: 'absolute',
+            justifyContent:'center',
+            alignSelf:'center',
+          }}>
         <VennDiagram  id="test-chart"
         type="starEuler"
-        height={450} 
-        width={450} 
+        // height={400} 
+        // width={450} 
+        margins={[3, 3, 3, 3]}
+        containerClassName= "p-3"
         data={vennData} 
-        series={<VennSeries colorScheme="cybertron" arc={<VennArc strokeWidth={3} gradient={<Gradient />} animated={false}/>} 
+        series={<VennSeries colorScheme="cybertron" arc={<VennArc strokeWidth={3} gradient={<Gradient />}/>} 
         label={<VennLabel labelType={'value'} showAll={true} fill={'#000000'} fontSize={15} />} outerLabel={<VennOuterLabel />} />} 
         />
-        // </div>
+        </div>
     )
 }

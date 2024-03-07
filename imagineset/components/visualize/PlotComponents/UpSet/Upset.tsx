@@ -152,7 +152,7 @@ export function UpsetPlotV2({ selectedSets }: {
         bottom: 350,
         left: 50,
     };
-    const width = 60 * data.length;
+    const width = (30 * data.length) + 100 + 60 + 200;
     const height = 450;
 
     // The bounds (=area inside the axis) is calculated by substracting the margins
@@ -174,7 +174,7 @@ export function UpsetPlotV2({ selectedSets }: {
 
     // left yaxis
     const range = yrange.range();
-    const pixelsPerTick = 10 // increase spacing between ticks
+    const pixelsPerTick = 20 // increase spacing between ticks
     const lineheight = range[0] - range[1];
     const numberOfTicksTarget = Math.floor(lineheight / pixelsPerTick);
     const ticks = yrange.ticks(numberOfTicksTarget).map((value) => ({
@@ -208,7 +208,7 @@ export function UpsetPlotV2({ selectedSets }: {
             ))}
         </>
 
-    const rad = 13;
+    const rad = 10;
     const bottomAxisrange = xrange.range();
     const bottomAxis =
         <>
@@ -250,6 +250,54 @@ export function UpsetPlotV2({ selectedSets }: {
         );
     });
 
+    const soloSetsLengthNums = soloSets.map((x) => x.num);
+
+    // set range for data by domain, and scale by range
+    const xrangeSet = d3.scaleLinear().range([0, 100]).domain([0, d3.max(soloSetsLengthNums) as number])
+    const invertedXrangeSet = d3.scaleLinear()
+    .range([100, 0]) // Reverse the range
+    .domain(xrangeSet.domain()); // Use the same domain as the original scale 
+    const setBars = soloSets.map((d, i) => {
+        return (
+            <rect
+            key={i}
+            r={4}
+            // x={0}
+            y={i * (rad * 2.7)}
+            x={invertedXrangeSet(d.num) + 50} 
+            width={Math.abs(xrangeSet(d.num))} 
+            // width={xrangeSet(d.num)}
+            height={(rad * 2.7) - 9}
+            opacity={1}
+            fill={'#02577b'}
+            // rx={5}
+            stroke={"white"}
+            onMouseEnter={(e) => {
+                setHoveredCell({
+                    setLabel: d.name,
+                    xPos: invertedXrangeSet(d.num) + 50 + margin.left,
+                    yPos: boundsHeight + i * (rad * 2.7) + margin.top + 100,
+                    value: d.num,
+                });
+            }}
+            onMouseLeave={() => setHoveredCell(null)}
+            cursor="pointer"
+        />
+
+        );
+    });
+
+    // const soloBottomAxisrange = invertedXrangeSet.range();
+    // const soloBottomAxis =
+    //     <>
+    //         {/* Main horizontal line */}
+    //         <path
+    //             d={["M", soloBottomAxisrange[0],  200, "L", 9 + (soloSets.length) * (rad * 2.7), 200].join(" ")}
+    //             fill="none"
+    //             stroke="currentColor"
+    //         />
+    //     </>
+
     // bars 
     const bars = data.map((d, i) => {
         const x = xrange(9 + i * (rad * 2.7));
@@ -274,7 +322,7 @@ export function UpsetPlotV2({ selectedSets }: {
                 onMouseEnter={(e) => {
                     setHoveredCell({
                         setLabel: d.name,
-                        xPos: 9 + i * (rad * 2.7) + margin.left,
+                        xPos: 9 + i * (rad * 2.7) + margin.left + 200,
                         yPos: boundsHeight + yrange(d.num) + margin.top,
                         value: d.num,
                     });
@@ -336,7 +384,7 @@ export function UpsetPlotV2({ selectedSets }: {
                     transform={`translate(${[margin.left, margin.top].join(",")})`}
                 >
                     <g id='upsetBars'
-                        transform={`translate(0,${boundsHeight})`}
+                        transform={`translate(${200},${boundsHeight})`}
                     >
                         <g id='chart'
                             transform={'translate(1,0)'}
@@ -348,14 +396,21 @@ export function UpsetPlotV2({ selectedSets }: {
                         {bottomAxis}
 
                     </g>
+
+                    <g id='setBars'
+                        transform={`translate(${[0, boundsHeight + 95].join(",")})`}
+                    >
+                            {setBars}
+                            {/* {soloBottomAxis} */}
+                    </g>
+
                     <g id='upsetCircles'
-                        transform={`translate(${[20, boundsHeight + 100].join(",")})`} // change 100 to another value
+                        transform={`translate(${[220, boundsHeight + 100].join(",")})`} // change 100 to another value
                     >
                         {labels}
                         {circles}
                         {lines}
                     </g>
-
                 </g>
             </svg>
             <UpsetTooltip interactionData={hoveredCell} width={width} height={height} />

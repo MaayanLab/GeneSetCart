@@ -10,6 +10,13 @@ import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFu
 import { addStatus } from "../../../components/assemble/fileUpload/SingleUpload";
 import InfoIcon from '@mui/icons-material/Info';
 
+// const scrollbarStyles = {
+//     width: '8px', // Adjust width as needed
+//     height: '8px', // Adjust height as needed
+//     backgroundColor: 'grey', // Optional: Set background color
+//     borderRadius: '8px', // Optional: Add rounded corners
+//   };
+
 export function CombineLayout({ sessionInfo, sessionId }: {
     sessionInfo: {
         gene_sets: ({
@@ -144,7 +151,8 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                 </Card>
             </Box>
             <Box sx={{ maxWidth: 500 }}>
-                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll' }}>
+                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll', }}> 
+                {/* '&::-webkit-scrollbar': { ...scrollbarStyles } */}
                     <CardHeader
                         title="Generated Set"
                         subheader={generatedSetName}

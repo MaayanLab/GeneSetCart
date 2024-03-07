@@ -275,7 +275,7 @@ export function UpsetPlotV2({ selectedSets }: {
             onMouseEnter={(e) => {
                 setHoveredCell({
                     setLabel: d.name,
-                    xPos: invertedXrangeSet(d.num) + 60 + margin.left,
+                    xPos: invertedXrangeSet(d.num) + 50 + margin.left,
                     yPos: boundsHeight + i * (rad * 2.7) + margin.top + 100,
                     value: d.num,
                 });
@@ -286,6 +286,17 @@ export function UpsetPlotV2({ selectedSets }: {
 
         );
     });
+
+    // const soloBottomAxisrange = invertedXrangeSet.range();
+    // const soloBottomAxis =
+    //     <>
+    //         {/* Main horizontal line */}
+    //         <path
+    //             d={["M", soloBottomAxisrange[0],  200, "L", 9 + (soloSets.length) * (rad * 2.7), 200].join(" ")}
+    //             fill="none"
+    //             stroke="currentColor"
+    //         />
+    //     </>
 
     // bars 
     const bars = data.map((d, i) => {
@@ -311,7 +322,7 @@ export function UpsetPlotV2({ selectedSets }: {
                 onMouseEnter={(e) => {
                     setHoveredCell({
                         setLabel: d.name,
-                        xPos: 9 + i * (rad * 2.7) + margin.left + 100,
+                        xPos: 9 + i * (rad * 2.7) + margin.left + 200,
                         yPos: boundsHeight + yrange(d.num) + margin.top,
                         value: d.num,
                     });
@@ -390,6 +401,7 @@ export function UpsetPlotV2({ selectedSets }: {
                         transform={`translate(${[0, boundsHeight + 95].join(",")})`}
                     >
                             {setBars}
+                            {/* {soloBottomAxis} */}
                     </g>
 
                     <g id='upsetCircles'

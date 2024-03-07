@@ -152,7 +152,7 @@ export function UpsetPlotV2({ selectedSets }: {
         bottom: 350,
         left: 50,
     };
-    const width = 60 * (data.length + soloSets.length);
+    const width = (30 * data.length) + 100 + 60 + 200;
     const height = 450;
 
     // The bounds (=area inside the axis) is calculated by substracting the margins
@@ -250,10 +250,13 @@ export function UpsetPlotV2({ selectedSets }: {
         );
     });
 
-    const xrangeSet = d3.scaleLinear().range([0, 10]).domain([0, data.length])
+    const soloSetsLengthNums = soloSets.map((x) => x.num);
+
+    // set range for data by domain, and scale by range
+    const xrangeSet = d3.scaleLinear().range([0, 100]).domain([0, d3.max(soloSetsLengthNums) as number])
     const invertedXrangeSet = d3.scaleLinear()
-    .range([10, 0]) // Reverse the range
-    .domain(xrangeSet.domain()); // Use the same domain as the original scale
+    .range([100, 0]) // Reverse the range
+    .domain(xrangeSet.domain()); // Use the same domain as the original scale 
     const setBars = soloSets.map((d, i) => {
         return (
             <rect
@@ -261,7 +264,7 @@ export function UpsetPlotV2({ selectedSets }: {
             r={4}
             // x={0}
             y={i * (rad * 2.7)}
-            x={invertedXrangeSet(d.num) + 60} 
+            x={invertedXrangeSet(d.num) + 50} 
             width={Math.abs(xrangeSet(d.num))} 
             // width={xrangeSet(d.num)}
             height={(rad * 2.7) - 9}
@@ -367,10 +370,10 @@ export function UpsetPlotV2({ selectedSets }: {
                 <g
                     width={boundsWidth}
                     height={boundsHeight}
-                    transform={`translate(${[0, margin.top].join(",")})`}
+                    transform={`translate(${[margin.left, margin.top].join(",")})`}
                 >
                     <g id='upsetBars'
-                        transform={`translate(${100+margin.left},${boundsHeight})`}
+                        transform={`translate(${200},${boundsHeight})`}
                     >
                         <g id='chart'
                             transform={'translate(1,0)'}
@@ -384,13 +387,13 @@ export function UpsetPlotV2({ selectedSets }: {
                     </g>
 
                     <g id='setBars'
-                        transform={`translate(${[margin.left, boundsHeight + 95].join(",")})`}
+                        transform={`translate(${[0, boundsHeight + 95].join(",")})`}
                     >
                             {setBars}
                     </g>
 
                     <g id='upsetCircles'
-                        transform={`translate(${[120 + margin.left, boundsHeight + 100].join(",")})`} // change 100 to another value
+                        transform={`translate(${[220, boundsHeight + 100].join(",")})`} // change 100 to another value
                     >
                         {labels}
                         {circles}

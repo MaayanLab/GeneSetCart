@@ -10,12 +10,18 @@ import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFu
 import { addStatus } from "../../../components/assemble/fileUpload/SingleUpload";
 import InfoIcon from '@mui/icons-material/Info';
 
-// const scrollbarStyles = {
-//     width: '8px', // Adjust width as needed
-//     height: '8px', // Adjust height as needed
-//     backgroundColor: 'grey', // Optional: Set background color
-//     borderRadius: '8px', // Optional: Add rounded corners
-//   };
+const scrollbarStyles = {
+    'webkitAppearance': 'none',
+    'width': '10px'
+  };
+
+  const scrollbarThumb = {
+    'borderRadius': '5px',
+    'backgroundColor': 'rgba(0,0,0,.5)',
+    'WebkitBoxShadow': '0 0 1px rgba(255,255,255,.5)'
+  }
+
+  
 
 export function CombineLayout({ sessionInfo, sessionId }: {
     sessionInfo: {
@@ -151,8 +157,10 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                 </Card>
             </Box>
             <Box sx={{ maxWidth: 500 }}>
-                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll', }}> 
-                {/* '&::-webkit-scrollbar': { ...scrollbarStyles } */}
+                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll', 
+                '&::-webkit-scrollbar': { ...scrollbarStyles },
+                '&::-webkit-scrollbar-thumb' : {...scrollbarThumb}
+            }}> 
                     <CardHeader
                         title="Generated Set"
                         subheader={generatedSetName}

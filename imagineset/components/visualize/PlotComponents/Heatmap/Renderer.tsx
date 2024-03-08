@@ -164,7 +164,7 @@ export const Renderer = ({
   });
 
   return (
-    <svg width={width} height={height}>
+    <svg width={width} height={height} id='svg'>
       <g
         width={boundsWidth}
         height={boundsHeight}

@@ -113,13 +113,38 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
         let element = document.createElement('a');
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
         element.setAttribute('download', filename);
-
         element.style.display = 'none';
         document.body.appendChild(element);
-
         element.click();
-
         document.body.removeChild(element);
+    }, [])
+
+    const downloadSVG = React.useCallback(() => {
+        //get svg element.
+        let svg = document.getElementById("svg");
+        console.log(svg)
+        if (svg) {
+            //get svg source.
+            let serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svg);
+            //add name spaces.
+            if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+            }
+            //add xml declaration
+            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+            let element = document.createElement('a');
+            element.setAttribute('href', "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source));
+            element.setAttribute('download', 'visualization');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element)
+        }
+        ;
     }, [])
 
 
@@ -133,12 +158,12 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             Overlap ({overlap.length})
                         </ListSubheader>
                         <TextField
-                        multiline
-                        rows={5}
-                        sx={{
-                            "& fieldset": { border: 'none' },
-                          }}
-                          value={overlap.join('\n')}
+                            multiline
+                            rows={5}
+                            sx={{
+                                "& fieldset": { border: 'none' },
+                            }}
+                            value={overlap.join('\n')}
                         >
 
                         </TextField>
@@ -196,7 +221,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 {/* <Typography variant='h3' style={{ textAlign: 'center', padding: 5 }} color={'secondary.dark'}>VISUALIZATION</Typography> */}
                                 <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadSVG()}}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { download('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
                                     <Tooltip
                                         title={

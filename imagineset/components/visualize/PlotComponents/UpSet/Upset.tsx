@@ -377,7 +377,7 @@ export function UpsetPlotV2({ selectedSets }: {
 
     return (
         <div style={{ position: "relative", overflow: "auto" }} >
-            <svg width={width} height={height}>
+            <svg width={width} height={height} id='svg'>
                 <g
                     width={boundsWidth}
                     height={boundsHeight}

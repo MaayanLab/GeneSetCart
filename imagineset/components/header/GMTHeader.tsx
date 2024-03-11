@@ -15,3 +15,15 @@ export default function GMTHeader() {
     return   <></>
   }
 }
+
+export function CurrentSession() {
+  const currentPage = usePathname();
+  if (currentPage.split('/').length === 3){
+    const sessionId = currentPage.split('/')[2]
+    return   <Link href={`/assemble/${sessionId}`}>
+    <Typography variant="nav"> CURRENT SESSION </Typography>
+  </Link> 
+  } else {
+    return   <></>
+  }
+}

@@ -117,20 +117,20 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
     selectedSets: ({
         alphabet: string;
         genes: Gene[];
-    } & GeneSet)[] | undefined; 
+    } & GeneSet)[] | undefined;
     setOverlap: React.Dispatch<React.SetStateAction<string[]>>;
 
 }) {
     const [hoveredCell, setHoveredCell] = React.useState<UpsetInteractionData | null>(null);
 
-    const {data, soloSets} : { data: SoloIntersectionType[]; soloSets: SoloIntersectionType[]; } = React.useMemo(() => {
+    const { data, soloSets }: { data: SoloIntersectionType[]; soloSets: SoloIntersectionType[]; } = React.useMemo(() => {
         if (!selectedSets) {
-            const data : SoloIntersectionType[] = []
-            const soloSets : SoloIntersectionType[] = []
-            return {data, soloSets};
+            const data: SoloIntersectionType[] = []
+            const soloSets: SoloIntersectionType[] = []
+            return { data, soloSets };
         }
 
-        const setData = selectedSets.map((geneset, i) =>  {return {name: geneset.alphabet, values: geneset.genes.map((gene) => gene.gene_symbol)}})
+        const setData = selectedSets.map((geneset, i) => { return { name: geneset.alphabet, values: geneset.genes.map((gene) => gene.gene_symbol) } })
 
         // calculating intersections WITHOUT solo sets
         const { intersections, soloSets } = formatIntersectionData(setData);
@@ -142,20 +142,20 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         // to include solo sets with only the values that ARE NOT in other sets
         // ie. the outersect of values in the solo sets, call this function
         // export const allData = insertSoloDataOutersect(intersections, soloSets);
-        return {data, soloSets}
+        return { data, soloSets }
     }, [selectedSets])
 
     const allSetNames = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.substr(0, soloSets.length).split('');
 
     // position and dimensions
     const margin = {
-        top: 20,
+        top: 30,
         right: 0,
         bottom: 350,
         left: 50,
     };
     const width = (30 * data.length) + 100 + 60 + 200;
-    const height = 450;
+    const height = 600;
 
     // The bounds (=area inside the axis) is calculated by substracting the margins
     const boundsWidth = width - margin.right - margin.left;
@@ -191,7 +191,18 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 fill="none"
                 stroke="currentColor"
             />
-
+            {/* Axis label*/}
+            <text
+                x={(0 - margin.top ) * 3}
+                y={range[1] - margin.left}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill='black'
+                fontSize={12}
+                transform="rotate(-90)"
+            >
+                Intersection Size
+            </text>
             {/* Ticks and labels */}
             {ticks.map(({ value, yOffset }) => (
                 <g key={value} transform={`translate(0, ${yOffset})`}>
@@ -245,9 +256,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 onMouseLeave={() => setHoveredCell(null)}
                 cursor="pointer"
             >
-                {set.name.length < 25 ? set.name : set.name.slice(0, 25) + '...'}
-
-                {/* {set.setName} */}
+                {set.setName}
             </text>
         );
     });
@@ -256,49 +265,89 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
     // set range for data by domain, and scale by range
     const xrangeSet = d3.scaleLinear().range([0, 100]).domain([0, d3.max(soloSetsLengthNums) as number])
     const invertedXrangeSet = d3.scaleLinear()
-    .range([100, 0]) // Reverse the range
-    .domain(xrangeSet.domain()); // Use the same domain as the original scale 
+        .range([100, 0]) // Reverse the range
+        .domain(xrangeSet.domain()); // Use the same domain as the original scale 
     const setBars = soloSets.map((d, i) => {
+        let fillColor
+        if (d.name == hoveredCell?.setLabel) {
+            fillColor = '#FFC000';
+            
+        } else {
+            fillColor = '#02577b';
+        }
         return (
             <rect
-            key={i}
-            r={4}
-            // x={0}
-            y={i * (rad * 2.7)}
-            x={invertedXrangeSet(d.num) + 50} 
-            width={Math.abs(xrangeSet(d.num))} 
-            // width={xrangeSet(d.num)}
-            height={(rad * 2.7) - 9}
-            opacity={1}
-            fill={'#02577b'}
-            // rx={5}
-            stroke={"white"}
-            onMouseEnter={(e) => {
-                setHoveredCell({
-                    setLabel: d.name,
-                    xPos: invertedXrangeSet(d.num) + 50 + margin.left,
-                    yPos: boundsHeight + i * (rad * 2.7) + margin.top + 100,
-                    value: d.num,
-                });
-            }}
-            onMouseLeave={() => setHoveredCell(null)}
-            cursor="pointer"
-            onMouseDown={() => setOverlap(d.values)}
-        />
+                key={i}
+                r={4}
+                // x={0}
+                y={i * (rad * 2.7)}
+                x={invertedXrangeSet(d.num) + margin.left}
+                width={Math.abs(xrangeSet(d.num))}
+                height={(rad * 2.7) - 9}
+                opacity={1}
+                fill={fillColor}
+                stroke={"white"}
+                onMouseEnter={(e) => {
+                    setHoveredCell({
+                        setLabel: d.name,
+                        xPos: invertedXrangeSet(d.num) + 50 + margin.left,
+                        yPos: boundsHeight + i * (rad * 2.7) + margin.top + 100,
+                        value: d.num,
+                    });
+                }}
+                onMouseLeave={() => setHoveredCell(null)}
+                cursor="pointer"
+                onMouseDown={() => setOverlap(d.values)}
+            />
 
         );
     });
 
-    // const soloBottomAxisrange = invertedXrangeSet.range();
-    // const soloBottomAxis =
-    //     <>
-    //         {/* Main horizontal line */}
-    //         <path
-    //             d={["M", soloBottomAxisrange[0],  200, "L", 9 + (soloSets.length) * (rad * 2.7), 200].join(" ")}
-    //             fill="none"
-    //             stroke="currentColor"
-    //         />
-    //     </>
+    const setSizerange = invertedXrangeSet.range();
+    const setSizePixelsPerTick = 20 // increase spacing between ticks
+    const setSizeLineheight = setSizerange[0] - setSizerange[1];
+    const setSizeNumberOfTicksTarget = Math.floor(setSizeLineheight / setSizePixelsPerTick);
+    const setSizeTicks = invertedXrangeSet.ticks(setSizeNumberOfTicksTarget).map((value) => ({
+        value,
+        xOffset: invertedXrangeSet(value),
+    }));
+    console.log(setSizeTicks)
+    const soloBottomAxisrange = invertedXrangeSet.range();
+    const soloBottomAxis =
+        <>
+            <path
+                d={["M", soloBottomAxisrange[0] + margin.left, soloSets.length * (rad * 2.7), "L", soloBottomAxisrange[1] + margin.left, soloSets.length * (rad * 2.7)].join(" ")}
+                fill="none"
+                stroke="currentColor"
+            />
+            <text
+                x={soloBottomAxisrange[0] / 2 + margin.left}
+                y={soloSets.length * (rad * 2.7) + 30}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill='black'
+                fontSize={12}
+
+            >
+                Set Size
+            </text>
+            {/* Ticks and labels */}
+            {setSizeTicks.map(({ value, xOffset }) => (
+                <g key={value} transform={`translate(${xOffset + margin.left}, ${soloSets.length * (rad * 2.7) + 6})`}>
+                    <line y2={-6} stroke="currentColor" />
+                    <text
+                        key={value}
+                        style={{
+                            fontSize: "10px",
+                            textAnchor: "middle",
+                            transform: `translate(0px, 10px)`,
+                        }}
+                    >
+                        {value}
+                    </text>
+                </g>
+            ))}
+        </>
 
     // bars 
     const bars = data.map((d, i) => {
@@ -308,7 +357,13 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         if (d.values === null || !x || !y) {
             return;
         }
-
+        let fillColor
+        if (d.name == hoveredCell?.setLabel) {
+            fillColor = '#FFC000';
+            
+        } else {
+            fillColor = '#02577b';
+        }
         return (
             <rect
                 key={i}
@@ -318,16 +373,17 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 width={20}
                 height={boundsHeight - yrange(d.num)}
                 opacity={1}
-                fill={'#02577b'}
+                fill={fillColor}
                 // rx={5}
                 stroke={"white"}
                 onMouseEnter={(e) => {
                     setHoveredCell({
                         setLabel: d.name,
                         xPos: 9 + i * (rad * 2.7) + margin.left + 200,
-                        yPos: boundsHeight + yrange(d.num) + margin.top,
+                        yPos: yrange(d.num) + margin.top,
                         value: d.num,
                     });
+                
                 }}
                 onMouseLeave={() => setHoveredCell(null)}
                 cursor="pointer"
@@ -348,7 +404,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
 
             return (
                 <circle
-                    key={i*j}
+                    key={i * j}
                     r={rad}
                     cx={i * (rad * 2.7)}
                     cy={j * (rad * 2.7)}
@@ -364,7 +420,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         return allSetNames.map((y, j) => {
             return (
                 <line
-                    key={i*j}
+                    key={i * j}
                     id={`setline${i}`}
                     x1={i * (rad * 2.7)}
                     x2={i * (rad * 2.7)}
@@ -384,10 +440,10 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 <g
                     width={boundsWidth}
                     height={boundsHeight}
-                    transform={`translate(${[margin.left, margin.top].join(",")})`}
+                    transform={`translate(${[margin.left, 0].join(",")})`}
                 >
                     <g id='upsetBars'
-                        transform={`translate(${200},${boundsHeight})`}
+                        transform={`translate(${200},${margin.top})`}
                     >
                         <g id='chart'
                             transform={'translate(1,0)'}
@@ -401,14 +457,14 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                     </g>
 
                     <g id='setBars'
-                        transform={`translate(${[0, boundsHeight + 95].join(",")})`}
+                        transform={`translate(${[0, boundsHeight + margin.top + 25].join(",")})`}
                     >
-                            {setBars}
-                            {/* {soloBottomAxis} */}
+                        {setBars}
+                        {soloBottomAxis}
                     </g>
 
                     <g id='upsetCircles'
-                        transform={`translate(${[220, boundsHeight + 100].join(",")})`} // change 100 to another value
+                        transform={`translate(${[220, boundsHeight + margin.top + 30].join(",")})`} // change 100 to another value
                     >
                         {labels}
                         {circles}

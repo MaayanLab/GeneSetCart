@@ -15,7 +15,7 @@ import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
 import { revalidatePath } from 'next/cache'
-import GMTHeader from './GMTHeader'
+import GMTHeader, { CurrentSession } from './GMTHeader'
 export async function getGenesets(sessionId: string) {
     if (sessionId) {
         const sessionGenesets = await prisma.pipelineSession.findUnique({
@@ -76,6 +76,7 @@ export default async function Header() {
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                 <CartDrawer />
+                                <CurrentSession />
                                 <GMTHeader />
                                 <Link href="/sessions">
                                     <Typography variant="nav">MY SESSIONS</Typography>

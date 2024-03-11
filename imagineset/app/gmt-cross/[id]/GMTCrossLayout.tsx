@@ -53,10 +53,24 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
                             disabled
                         />
                     </Grid>
-                    <Grid item sx={{ mt: 2 }}>
-                        <Button variant='contained' color='primary' onClick={(event) => copyClipboardFunc()}>
-                            COPY TO CLIPBOARD
-                        </Button>
+                    <Grid item container spacing={1} sx={{ mt: 2 }} justifyContent="center" alignItems={'center'}>
+                        <Grid item>
+                            <Button variant='contained' color='primary' onClick={(event) => copyClipboardFunc()}>
+                                COPY TO CLIPBOARD
+                            </Button>
+                        </Grid>
+                        <Grid item>
+                            <Button
+                                variant='contained' color='primary'
+                                onClick={(evt) => {
+                                    enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' Intersection ' + params.row.geneset_2 })
+                                }}
+                            >
+                                SEND TO ENRICHR
+                            </Button>
+                        </Grid>
+
+
                     </Grid>
                 </Grid>
             </Dialog>
@@ -64,26 +78,6 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
     )
 }
 
-
-const RenderEnrichrButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
-    return (
-        <React.Fragment>
-            <Button
-                color="tertiary"
-                size="small"
-                variant="contained"
-                sx={{margin: 2}}
-                onClick={(evt) => {
-                    enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' Intersection ' + params.row.geneset_2 })
-                }}
-            >
-                <Typography sx={{fontSize: 10, textWrap: 'wrap'}}>
-                Send to Enrichr
-                </Typography>
-            </Button>
-        </React.Fragment>
-    )
-}
 
 
 
@@ -109,15 +103,15 @@ export function GMTCrossLayout() {
                     color="tertiary"
                     size="small"
                     variant="contained"
-                    sx={{margin: 2}}
+                    sx={{ margin: 2 }}
                     onClick={(evt) => {
                         setHypothesis('')
                         setHypLoading(true)
-                        generateHypothesis(params.row).then((response) => {setHypLoading(false); if (typeof (response) === 'string') { setHypothesis(response) } }).catch((err) => {setHypLoading(false);})
+                        generateHypothesis(params.row).then((response) => { setHypLoading(false); if (typeof (response) === 'string') { setHypothesis(response) } }).catch((err) => { setHypLoading(false); })
                     }}
                 >
-                    <Typography sx={{fontSize: 10, textWrap: 'wrap'}}>
-                    GPT-4 Hypothesis
+                    <Typography sx={{ fontSize: 10, textWrap: 'wrap' }}>
+                        GPT-4 Hypothesis
                     </Typography>
                 </Button>
             </React.Fragment>
@@ -131,7 +125,7 @@ export function GMTCrossLayout() {
             //   width: 150,
             flex: 1,
             editable: true,
-            minWidth: 150
+            minWidth: 120
         },
         {
             field: 'geneset_2',
@@ -139,7 +133,7 @@ export function GMTCrossLayout() {
             //   width: 150,
             flex: 1,
             editable: true,
-            minWidth: 150
+            minWidth: 120
         },
         {
             field: 'pvalue',
@@ -180,80 +174,73 @@ export function GMTCrossLayout() {
             editable: false
             // width: 160,
         },
-        {
-            field: 'enrichr-analyze',
-            headerName: 'Analyze Overlapping Genes with Enrichr',
-            flex: 0.5,
-            minWidth: 100,
-            renderCell: RenderEnrichrButton,
-            sortable: false,
-            editable: false
-            // width: 160,
-        },
     ];
 
 
     return (
-        <Stack direction="column" spacing={3} sx={{marginBottom: 3}}>
-            <Stack direction='row' spacing={2}>
-                <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} />
-                <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} />
-            </Stack>
-            <div className="flex justify-center">
-                <Button variant="contained" color="secondary" onClick={getCrossData}>
-                    <ShuffleIcon sx={{ fontsize: 100 }} />
-                </Button>
-                {loading && <CircularIndeterminate />}
-            </div>
-            {(rows.length > 0) && <div style={{ width: '100%' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: { page: 0, pageSize: 10 },
-                        },
-                        sorting: {
-                            sortModel: [{ field: 'pvalue', sort: 'asc' }],
-                        },
-                    }}
-                    pageSizeOptions={[5, 10, 25]}
-                    disableRowSelectionOnClick
-                    checkboxSelection
-                    sx={{
-                        '.MuiDataGrid-columnHeader': {
-                            backgroundColor: '#C9D2E9',
-                        },    
-                        '.MuiDataGrid-columnHeaderTitle': {
-                            whiteSpace: 'normal !important',
-                            wordWrap: 'break-word !important', 
-                            lineHeight: "normal", 
-                        }, 
-                        "& .MuiDataGrid-columnHeader": {
-                            // Forced to use important since overriding inline styles
-                            height: "unset !important",
-                            padding: 1
-                          },
-                          "& .MuiDataGrid-columnHeaders": {
-                            // Forced to use important since overriding inline styles
-                            maxHeight: "168px !important"
-                          },
-                        '.MuiDataGrid-cell': {
-                            whiteSpace: 'normal !important',
-                            wordWrap: 'break-word !important',
-                          },
-                    }}
-                />
-            </div>}
-            {hypLoading && <Box sx={{ width: '100%' }}>
-                <LinearProgress color="secondary" />
-            </Box>}
-            {(hypothesis.length > 0) && <TextField
-                multiline
-                value={hypothesis}
-                rows={10}
+        <>
+
+            <Stack direction="column" spacing={3} sx={{ marginBottom: 3 }}>
+                <Stack direction='row' spacing={2}>
+                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} />
+                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} />
+                </Stack>
+                <div className="flex justify-center">
+                    <Button variant="contained" color="secondary" onClick={getCrossData}>
+                        <ShuffleIcon sx={{ fontsize: 100 }} />
+                    </Button>
+                    {loading && <CircularIndeterminate />}
+                </div>
+                {(rows.length > 0) && <div style={{ width: '100%' }}>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        initialState={{
+                            pagination: {
+                                paginationModel: { page: 0, pageSize: 10 },
+                            },
+                            sorting: {
+                                sortModel: [{ field: 'pvalue', sort: 'asc' }],
+                            },
+                        }}
+                        pageSizeOptions={[5, 10, 25]}
+                        disableRowSelectionOnClick
+                        checkboxSelection
+                        sx={{
+                            '.MuiDataGrid-columnHeader': {
+                                backgroundColor: '#C9D2E9',
+                            },
+                            '.MuiDataGrid-columnHeaderTitle': {
+                                whiteSpace: 'normal !important',
+                                wordWrap: 'break-word !important',
+                                lineHeight: "normal",
+                            },
+                            "& .MuiDataGrid-columnHeader": {
+                                // Forced to use important since overriding inline styles
+                                height: "unset !important",
+                                padding: 1
+                            },
+                            "& .MuiDataGrid-columnHeaders": {
+                                // Forced to use important since overriding inline styles
+                                maxHeight: "168px !important"
+                            },
+                            '.MuiDataGrid-cell': {
+                                whiteSpace: 'normal !important',
+                                wordWrap: 'break-word !important',
+                            },
+                        }}
+                    />
+                </div>}
+                {hypLoading && <Box sx={{ width: '100%' }}>
+                    <LinearProgress color="secondary" />
+                </Box>}
+                {(hypothesis.length > 0) && <TextField
+                    multiline
+                    value={hypothesis}
+                    rows={10}
                 >
-            </TextField>}
-        </Stack>
+                </TextField>}
+            </Stack>
+        </>
     )
 }

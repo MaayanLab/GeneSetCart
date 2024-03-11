@@ -89,7 +89,7 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
         },
     })
 
-    revalidatePath('/', 'layout')
+    revalidatePath('/')
     return 'success'
 }
 

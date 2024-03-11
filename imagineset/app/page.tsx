@@ -1,4 +1,4 @@
-import Header from '@/components/Header'
+import Header from '@/components/header/Header'
 import { StartButton } from '@/components/misc/HomePage/StartButton'
 import StyledCard from '@/components/misc/HomePage/StyledCards'
 import { Button, Container, Typography } from '@mui/material'

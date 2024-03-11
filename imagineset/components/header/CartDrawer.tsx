@@ -7,7 +7,7 @@ import {Collapse, Grid, Table, TableBody, TableCell, TableHead, TableRow, TextFi
 import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
 import { Badge } from '@mui/material'
 import { type GeneSet } from '@prisma/client';
-import { copyToClipboard } from './assemble/fileUpload/DataTable';
+import { copyToClipboard } from '../assemble/fileUpload/DataTable';
 import { useParams} from 'next/navigation';
 import { deleteGenesetByID, getGenesets, getSessionInfo } from './Header';
 import DeleteIcon from '@mui/icons-material/Delete';

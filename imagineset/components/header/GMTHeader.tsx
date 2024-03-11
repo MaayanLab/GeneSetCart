@@ -1,7 +1,8 @@
 'use client';
 
-import { Link, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 export default function GMTHeader() {
   const currentPage = usePathname();

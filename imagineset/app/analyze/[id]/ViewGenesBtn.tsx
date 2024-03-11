@@ -26,7 +26,7 @@ import chea3logo from "@/public/img/otherLogos/chea3Logo.png"
 import sigcomLincsLogo from "@/public/img/otherLogos/sigcomLincsLogo.svg"
 import cfdeLogo from "@/public/img/favicon.png" 
 import { getEnrichrShortId, getRummageneLink, getRummageoLink, getSigComLINCSId } from "@/app/analyze/[id]/AnalyzeFunctions";
-import { deleteGenesetByID } from "@/components/Header";
+import { deleteGenesetByID } from "@/components/header/Header";
 
 
 
@@ -95,7 +95,7 @@ export const DeleteBtn = ({ row }: {
 
 
 
-function enrich(options: any) {
+export function enrich(options: any) {
     if (typeof options.list === 'undefined') {
         alert('No genes defined.');
         return;

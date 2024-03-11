@@ -5,7 +5,7 @@ import ThemeRegistry from './ThemeRegistry';
 import Background from '@/components/styled/background'
 import NavBreadcrumbs from '@/components/breadcrumbs'
 import { Grid } from '@mui/material/'
-import Header from '@/components/Header';
+import Header from '@/components/header/Header';
 import Footer from '@/components/Footer';
 
 // const inter = Inter({ subsets: ['latin'] })

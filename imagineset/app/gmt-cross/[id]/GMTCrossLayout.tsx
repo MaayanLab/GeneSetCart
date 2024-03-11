@@ -8,6 +8,7 @@ import { fetchCrossPairs, generateHypothesis } from "@/app/gmt-cross/[id]/GMTCro
 import CircularIndeterminate from "@/components/misc/Loading";
 import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
+import { enrich } from "@/app/analyze/[id]/ViewGenesBtn";
 
 
 const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
@@ -64,6 +65,25 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
 }
 
 
+const RenderEnrichrButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
+    return (
+        <React.Fragment>
+            <Button
+                color="tertiary"
+                size="small"
+                variant="contained"
+                sx={{margin: 2}}
+                onClick={(evt) => {
+                    enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' Intersection ' + params.row.geneset_2 })
+                }}
+            >
+                <Typography sx={{fontSize: 10, textWrap: 'wrap'}}>
+                Send to Enrichr
+                </Typography>
+            </Button>
+        </React.Fragment>
+    )
+}
 
 
 
@@ -152,10 +172,22 @@ export function GMTCrossLayout() {
         },
         {
             field: 'hypothesis',
-            headerName: '',
+            headerName: 'Form Hypothesis with GPT-4',
             flex: 0.5,
             minWidth: 100,
-            renderCell: RenderHypothesisButton
+            renderCell: RenderHypothesisButton,
+            sortable: false,
+            editable: false
+            // width: 160,
+        },
+        {
+            field: 'enrichr-analyze',
+            headerName: 'Analyze Overlapping Genes with Enrichr',
+            flex: 0.5,
+            minWidth: 100,
+            renderCell: RenderEnrichrButton,
+            sortable: false,
+            editable: false
             // width: 160,
         },
     ];
@@ -191,7 +223,21 @@ export function GMTCrossLayout() {
                     sx={{
                         '.MuiDataGrid-columnHeader': {
                             backgroundColor: '#C9D2E9',
-                        },
+                        },    
+                        '.MuiDataGrid-columnHeaderTitle': {
+                            whiteSpace: 'normal !important',
+                            wordWrap: 'break-word !important', 
+                            lineHeight: "normal", 
+                        }, 
+                        "& .MuiDataGrid-columnHeader": {
+                            // Forced to use important since overriding inline styles
+                            height: "unset !important",
+                            padding: 1
+                          },
+                          "& .MuiDataGrid-columnHeaders": {
+                            // Forced to use important since overriding inline styles
+                            maxHeight: "168px !important"
+                          },
                         '.MuiDataGrid-cell': {
                             whiteSpace: 'normal !important',
                             wordWrap: 'break-word !important',

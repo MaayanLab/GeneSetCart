@@ -21,6 +21,10 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
         setOpen(true);
     };
 
+    const copyClipboardFunc = React.useCallback(() => {
+        console.log(params)
+        copyToClipboard(params.row.overlap.join('\n').replaceAll("'", ""))
+    }, [params.row.overlappingGenes])
     return (
         <React.Fragment>
             <Button
@@ -33,7 +37,7 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
             <Dialog
                 onClose={handleClose}
                 open={open}>
-                <DialogTitle>{params.row.geneset_1 + '∩' + params.row.geneset_2}</DialogTitle>
+                <DialogTitle>{params.row.geneset_1 + ' ∩ ' + params.row.geneset_2}</DialogTitle>
                 <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
                     <Grid item>
                         {/* <Typography variant='body1' color='secondary'> {params.row.genes.length} genes</Typography> */}
@@ -49,7 +53,7 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
                         />
                     </Grid>
                     <Grid item sx={{ mt: 2 }}>
-                        <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(params.row.overlappingGenes.toString().replaceAll(',', '\n'))}>
+                        <Button variant='contained' color='primary' onClick={(event) => copyClipboardFunc()}>
                             COPY TO CLIPBOARD
                         </Button>
                     </Grid>
@@ -188,6 +192,10 @@ export function GMTCrossLayout() {
                         '.MuiDataGrid-columnHeader': {
                             backgroundColor: '#C9D2E9',
                         },
+                        '.MuiDataGrid-cell': {
+                            whiteSpace: 'normal !important',
+                            wordWrap: 'break-word !important',
+                          },
                     }}
                 />
             </div>}

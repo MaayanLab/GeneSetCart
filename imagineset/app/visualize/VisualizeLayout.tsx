@@ -242,7 +242,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     {visualization === 'Heatmap' && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />}
                                     {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets} />}
                                     {visualization === 'SuperVenn' && <SuperVenn selectedSets={legendSelectedSets} />}
-                                    {visualization === 'UpSet' && <UpsetPlotV2 selectedSets={legendSelectedSets} />}
+                                    {visualization === 'UpSet' && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                 </div>
                             </Box>
                         </Stack>

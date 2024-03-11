@@ -124,6 +124,10 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
           '.MuiDataGrid-columnHeader': {
             backgroundColor: '#C9D2E9',
           },
+          '.MuiDataGrid-cell': {
+            whiteSpace: 'normal !important',
+            wordWrap: 'break-word !important',
+          }
         }}
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setRowSelectionModel(newRowSelectionModel);

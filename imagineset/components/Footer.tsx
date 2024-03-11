@@ -25,7 +25,7 @@ export default async function Footer() {
                                     </Typography>
                                 </div>
                             </Link>
-                            <Link href="https://github.com/MaayanLab/ImaginesetV2/issues/new">
+                            <Link href="https://github.com/MaayanLab/ImaginesetV2/issues/new" target='_blank'>
                                 <div className='flex items-center space-x-1'>
                                     <Icon path={mdiBugOutline} size={1} />
                                     <Typography variant='subtitle2' className='flex'>

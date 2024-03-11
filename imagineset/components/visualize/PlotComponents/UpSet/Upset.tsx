@@ -113,11 +113,13 @@ const insertSoloDataOutersect = (intersections: SoloIntersectionType[], soloSets
 
 
 
-export function UpsetPlotV2({ selectedSets }: {
+export function UpsetPlotV2({ selectedSets, setOverlap }: {
     selectedSets: ({
         alphabet: string;
         genes: Gene[];
-    } & GeneSet)[] | undefined
+    } & GeneSet)[] | undefined; 
+    setOverlap: React.Dispatch<React.SetStateAction<string[]>>;
+
 }) {
     const [hoveredCell, setHoveredCell] = React.useState<UpsetInteractionData | null>(null);
 
@@ -251,7 +253,6 @@ export function UpsetPlotV2({ selectedSets }: {
     });
 
     const soloSetsLengthNums = soloSets.map((x) => x.num);
-
     // set range for data by domain, and scale by range
     const xrangeSet = d3.scaleLinear().range([0, 100]).domain([0, d3.max(soloSetsLengthNums) as number])
     const invertedXrangeSet = d3.scaleLinear()
@@ -282,6 +283,7 @@ export function UpsetPlotV2({ selectedSets }: {
             }}
             onMouseLeave={() => setHoveredCell(null)}
             cursor="pointer"
+            onMouseDown={() => setOverlap(d.values)}
         />
 
         );
@@ -329,6 +331,7 @@ export function UpsetPlotV2({ selectedSets }: {
                 }}
                 onMouseLeave={() => setHoveredCell(null)}
                 cursor="pointer"
+                onMouseDown={() => setOverlap(d.values)}
             />
         );
     })
@@ -377,7 +380,7 @@ export function UpsetPlotV2({ selectedSets }: {
 
     return (
         <div style={{ position: "relative", overflow: "auto" }} >
-            <svg width={width} height={height}>
+            <svg width={width} height={height} id='svg'>
                 <g
                     width={boundsWidth}
                     height={boundsHeight}

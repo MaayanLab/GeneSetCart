@@ -1,5 +1,5 @@
 'use client'
-import { Box, Button, Dialog, DialogTitle, Grid, LinearProgress, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, LinearProgress, Stack, TextField, Typography } from "@mui/material";
 import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
@@ -9,6 +9,7 @@ import CircularIndeterminate from "@/components/misc/Loading";
 import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
 import { enrich } from "@/app/analyze/[id]/ViewGenesBtn";
+import CloseIcon from '@mui/icons-material/Close';
 
 
 const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
@@ -88,6 +89,15 @@ export function GMTCrossLayout() {
     const [hypLoading, setHypLoading] = React.useState(false)
     const [hypothesis, setHypothesis] = React.useState('')
 
+    const [open, setOpen] = React.useState(false)
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     const getCrossData = React.useCallback(() => {
         setLoading(true)
         if (selectedLibs.length === 2) {
@@ -104,11 +114,12 @@ export function GMTCrossLayout() {
                     size="small"
                     variant="contained"
                     sx={{ margin: 2 }}
-                    onClick={(evt) => {
-                        setHypothesis('')
-                        setHypLoading(true)
-                        generateHypothesis(params.row).then((response) => { setHypLoading(false); if (typeof (response) === 'string') { setHypothesis(response) } }).catch((err) => { setHypLoading(false); })
-                    }}
+                    // onClick={(evt) => {
+                    //     setHypothesis('')
+                    //     setHypLoading(true)
+                    //     generateHypothesis(params.row).then((response) => { setHypLoading(false); if (typeof (response) === 'string') { setHypothesis(response) } }).catch((err) => { setHypLoading(false); })
+                    // }}
+                    onClick={handleClickOpen}
                 >
                     <Typography sx={{ fontSize: 10, textWrap: 'wrap' }}>
                         GPT-4 Hypothesis
@@ -241,6 +252,28 @@ export function GMTCrossLayout() {
                 >
                 </TextField>}
             </Stack>
+            <Dialog
+                onClose={handleClose}
+                open={open}>
+                <DialogTitle sx={{ m: 0, p: 2 }}>
+                    FEATURE COMING SOON
+                </DialogTitle>
+                <IconButton
+                    aria-label="close"
+                    onClick={handleClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+                <DialogContent >
+                    The GPT-generated hypothesis functionality is coming soon!
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

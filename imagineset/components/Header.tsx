@@ -15,6 +15,7 @@ import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
 import { revalidatePath } from 'next/cache'
+import GMTHeader from './GMTHeader'
 export async function getGenesets(sessionId: string) {
     if (sessionId) {
         const sessionGenesets = await prisma.pipelineSession.findUnique({
@@ -44,12 +45,7 @@ export async function deleteGenesetByID(genesetID: string) {
     return 'deleted'
 }
 
-export default async function Header() {
-    // add user authentication in header for cart drawer here
-    const session = await getServerSession(authOptions)
-    const headersList = headers();
-    const fullUrl = headersList.get('referer') || "";
-    const sessionId = fullUrl.split('/').slice(-1)[0]
+export async function getSessionInfo(sessionId: string) {
     const sessionInfo = await prisma.pipelineSession.findUnique({
         where: {
             id: sessionId
@@ -62,7 +58,13 @@ export default async function Header() {
             }
         }
     })
+    revalidatePath('/')
+    return sessionInfo
+}
 
+export default async function Header() {
+    // TO DO: add user authentication in header for cart drawer here
+    const session = await getServerSession(authOptions)
     return (
         <Container maxWidth="lg">
             <AppBar position="static" sx={{ color: "#000" }}>
@@ -73,10 +75,8 @@ export default async function Header() {
                         </Grid>
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                                <CartDrawer sessionInfo={sessionInfo} />
-                                <Link href={`/gmt-cross/${sessionId}`}>
-                                    <Typography variant="nav">CFDE GMT CROSSING</Typography>
-                                </Link>
+                                <CartDrawer />
+                                <GMTHeader />
                                 <Link href="/sessions">
                                     <Typography variant="nav">MY SESSIONS</Typography>
                                 </Link>

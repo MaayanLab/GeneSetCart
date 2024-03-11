@@ -1,7 +1,7 @@
 'use server'
 import Image from 'next/image'
 import Link from 'next/link'
-import { authOptions } from '../lib/auth/authOptions'
+import { authOptions } from '@/lib/auth/authOptions'
 import { Session, getServerSession } from 'next-auth'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
@@ -9,13 +9,13 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Container from '@mui/material/Container'
-import { Logo } from './styled/Logo'
-import UserComponent from './misc/LoginComponents/UserComponent'
+import { Logo } from '../styled/Logo'
+import UserComponent from '../misc/LoginComponents/UserComponent'
 import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
 import { revalidatePath } from 'next/cache'
-import GMTHeader from './GMTHeader'
+import GMTHeader, { CurrentSession } from './GMTHeader'
 export async function getGenesets(sessionId: string) {
     if (sessionId) {
         const sessionGenesets = await prisma.pipelineSession.findUnique({
@@ -76,6 +76,7 @@ export default async function Header() {
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                 <CartDrawer />
+                                <CurrentSession />
                                 <GMTHeader />
                                 <Link href="/sessions">
                                     <Typography variant="nav">MY SESSIONS</Typography>

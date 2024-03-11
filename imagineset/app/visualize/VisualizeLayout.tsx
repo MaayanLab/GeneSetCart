@@ -155,7 +155,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                     <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
                     <Box sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, height: 200, boxShadow: 2 }}>
                         <ListSubheader>
-                            Overlap ({overlap.length})
+                            Genes ({overlap.length})
                         </ListSubheader>
                         <TextField
                             multiline
@@ -240,9 +240,9 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             <Box sx={{ justifyContent: 'center' }}>
                                 <div className='flex justify-center' id="venn" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
                                     {visualization === 'Heatmap' && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />}
-                                    {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets} />}
+                                    {/* {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets} />} */}
                                     {visualization === 'SuperVenn' && <SuperVenn selectedSets={legendSelectedSets} />}
-                                    {visualization === 'UpSet' && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
+                                    {(visualization === 'UpSet' && checked.length < 11 && checked.length > 1)  && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                 </div>
                             </Box>
                         </Stack>
@@ -290,7 +290,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
     return (
         <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2 }}>
             <ListSubheader>
-                My Gene Sets
+                My Gene Sets ({checked.length})
             </ListSubheader>
             {sessionInfo?.gene_sets.map((geneset, i) => {
                 const labelId = `checkbox-list-label-${i}`;

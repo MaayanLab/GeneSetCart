@@ -37,20 +37,20 @@ export default async function Footer() {
                     </Grid>
                     <Grid item>
                         <Stack spacing={2}>
-                            <Typography variant="subtitle1">Contact</Typography>
+                            <Link href='mailto:avi.maayan@mssm.edu' target='_blank'><Typography variant="subtitle1">Contact</Typography></Link>
                         </Stack>
                     </Grid>
                     <Grid item>
                         <Stack spacing={2}>
-                            <Image src={maayanLabLogo} alt="" width='100' height={'100'}></Image>
+                            <Link href="https://labs.icahn.mssm.edu/maayanlab/" target='_blank'><Image src={maayanLabLogo} alt="" width='100' height={'100'}></Image></Link>
                         </Stack>
                     </Grid>
-                    <Grid item>
+                    {/* <Grid item>
                         <Stack spacing={2}>
                             <Link href="/"><Typography variant="caption">Terms of Service</Typography></Link>
                             <Link href="/"><Typography variant="caption">Privacy Policy</Typography></Link>
                         </Stack>
-                    </Grid>
+                    </Grid> */}
                 </Grid>
             </Container>
         </Paper>

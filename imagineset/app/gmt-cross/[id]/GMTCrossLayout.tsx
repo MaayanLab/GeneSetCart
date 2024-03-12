@@ -9,7 +9,6 @@ import CircularIndeterminate from "@/components/misc/Loading";
 import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
 import { enrich } from "@/app/analyze/[id]/ViewGenesBtn";
-import CloseIcon from '@mui/icons-material/Close';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DownloadIcon from '@mui/icons-material/Download';
 
@@ -25,7 +24,6 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
     };
 
     const copyClipboardFunc = React.useCallback(() => {
-        console.log(params)
         copyToClipboard(params.row.overlap.join('\n').replaceAll("'", ""))
     }, [params.row.overlappingGenes])
     return (
@@ -99,29 +97,37 @@ const download = (filename: string, text: string) => {
     document.body.removeChild(element);
 }
 
+
+const CFDELibHeaders: { [key: string]: string } = {
+    "LINCS_L1000_Chem_Pert_Consensus_Sigs": "LINCS Chemical Pertubations",
+    "LINCS_L1000_CRISPR_KO_Consensus_Sigs": "LINCS Genetic Pertubations",
+    "GTEx_Tissues": 'GTEX Tissues',
+    "GTEx_Aging_Sigs": 'GTEX Aging Signatures',
+    "Metabolomics_Workbench_Metabolites": 'Metabolites',
+    "IDG_Drug_Targets": 'IDG Drugs',
+    "GlyGen_Glycosylated_Proteins": 'Glycans',
+    "KOMP2_Mouse_Phenotypes": 'Phenotypes',
+    "MoTrPAC": 'MoTrPAC Gene Sets'
+}
+
 export function GMTCrossLayout() {
     const [rows, setRows] = React.useState<CFDECrossPair[]>([])
     const [selectedLibs, setSelectedLibs] = React.useState<string[]>([])
     const [loading, setLoading] = React.useState(false)
     const [hypLoading, setHypLoading] = React.useState(false)
     const [hypothesis, setHypothesis] = React.useState<hypothesisDisplay | null>(null)
-
-    const [open, setOpen] = React.useState(false)
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const [headers, setHeaders] = React.useState<string[] | null>(null)
 
     const getCrossData = React.useCallback(() => {
         setLoading(true)
         if (selectedLibs.length === 2) {
-            fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => { setLoading(false); setRows(result) }).catch((err) => setLoading(false))
+            fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => { 
+                setLoading(false); 
+                setRows(result); 
+                setHeaders([CFDELibHeaders[result[0].lib_1], CFDELibHeaders[result[0].lib_2]])
+            }).catch((err) => setLoading(false))
         }
     }, [selectedLibs])
-
 
     const RenderHypothesisButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
         return (
@@ -160,7 +166,7 @@ export function GMTCrossLayout() {
     const columns: GridColDef[] = [
         {
             field: 'geneset_1',
-            headerName: 'Geneset 1',
+            headerName: headers ? headers[0] : 'Geneset 1',
             //   width: 150,
             flex: 1,
             editable: true,
@@ -168,7 +174,7 @@ export function GMTCrossLayout() {
         },
         {
             field: 'geneset_2',
-            headerName: 'Geneset 2',
+            headerName: headers ? headers[1] : 'Geneset 2',
             //   width: 150,
             flex: 1,
             editable: true,
@@ -210,7 +216,8 @@ export function GMTCrossLayout() {
             minWidth: 100,
             renderCell: RenderHypothesisButton,
             sortable: false,
-            editable: false
+            editable: false,
+            headerClassName: 'super-app-theme--header'
             // width: 160,
         },
     ];
@@ -301,6 +308,10 @@ export function GMTCrossLayout() {
                                 whiteSpace: 'normal !important',
                                 wordWrap: 'break-word !important',
                             },
+                            '& .super-app-theme--header': {
+                                padding: 2,
+                                fontSize: 13,
+                              },
                         }}
                     />
                 </div>}

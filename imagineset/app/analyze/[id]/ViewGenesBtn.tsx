@@ -57,7 +57,6 @@ export const ViewGenesBtn = ({ row }: {
                             id="standard-multiline-static"
                             multiline
                             rows={10}
-                            placeholder="Paste gene symbols here"
                             value={row.genes.map((gene) => gene.gene_symbol).toString().replaceAll(',', '\n')}
                             disabled
                         />

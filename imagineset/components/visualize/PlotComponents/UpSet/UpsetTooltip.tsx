@@ -40,7 +40,7 @@ export const UpsetTooltip = ({ interactionData, width, height }: TooltipProps) =
           top: interactionData.yPos,
         }}
       >
-        <TooltipRow label={"x"} value={interactionData.setLabel} />
+        <TooltipRow label={"Gene Set"} value={interactionData.setLabel} />
         <TooltipRow label={"Genes: "} value={interactionData.value.toString()} />
       </div>
     </div>

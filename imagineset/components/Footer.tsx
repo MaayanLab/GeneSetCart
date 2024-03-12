@@ -17,7 +17,7 @@ export default async function Footer() {
                 <Grid container justifyContent={"space-around"}>
                     <Grid item>
                         <Stack direction={"column"} spacing={2}>
-                            <Link href="https://github.com/MaayanLab/ImaginesetV2/">
+                            <Link href="https://github.com/MaayanLab/G2SG/">
                                 <div className='flex items-center space-x-1'>
                                     <Icon path={mdiGithub} size={1} />
                                     <Typography variant='subtitle2' className='flex'>
@@ -25,7 +25,7 @@ export default async function Footer() {
                                     </Typography>
                                 </div>
                             </Link>
-                            <Link href="https://github.com/MaayanLab/ImaginesetV2/issues/new" target='_blank'>
+                            <Link href="https://github.com/MaayanLab/G2SG/issues/new" target='_blank'>
                                 <div className='flex items-center space-x-1'>
                                     <Icon path={mdiBugOutline} size={1} />
                                     <Typography variant='subtitle2' className='flex'>

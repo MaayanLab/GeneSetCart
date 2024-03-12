@@ -61,7 +61,6 @@ const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
               id="standard-multiline-static"
               multiline
               rows={10}
-              placeholder="Paste gene symbols here"
               value={params.row.genes.toString().replaceAll(',', '\n')}
               disabled
             />

@@ -82,7 +82,6 @@ const GenesetInfo = ({ geneset }: {
                                         id="standard-multiline-static"
                                         multiline
                                         rows={10}
-                                        placeholder="Paste gene symbols here"
                                         value={geneset.genes.map((gene) => gene.gene_symbol).toString().replaceAll(',', '\n')}
                                         disabled
                                     />

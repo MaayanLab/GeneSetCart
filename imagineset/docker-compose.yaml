@@ -1,8 +1,7 @@
 version: '3.9'
 services:
   g2sg-app:
-    build: . 
-    # image: node:latest
+    build: .
     container_name: g2sg-app
     platform: linux/amd64
     x-kubernetes:
@@ -29,10 +28,8 @@ services:
     ports:
       - 5432:5432
     volumes:
+      - ./migrate.sh:/docker-entrypoint-initdb.d/migrate.sh
       - g2sg-data:/var/lib/postgresql/data
 
 volumes:
   g2sg-data:
-      x-kubernetes:
-      size: 40Gi
-      class: gp2

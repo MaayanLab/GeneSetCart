@@ -193,7 +193,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
             />
             {/* Axis label*/}
             <text
-                x={(0 - margin.top ) * 3}
+                x={(0 - margin.top) * 3}
                 y={range[1] - margin.left}
                 textAnchor="middle"
                 dominantBaseline="middle"
@@ -208,7 +208,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 <g key={value} transform={`translate(0, ${yOffset})`}>
                     <line x2={-6} stroke="currentColor" />
                     <text
-                        key={value}
+                        key={value.toString() + '-1'}
                         style={{
                             fontSize: "10px",
                             textAnchor: "middle",
@@ -271,7 +271,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         let fillColor
         if (d.name == hoveredCell?.setLabel) {
             fillColor = '#FFC000';
-            
+
         } else {
             fillColor = '#02577b';
         }
@@ -311,7 +311,6 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         value,
         xOffset: invertedXrangeSet(value),
     }));
-    console.log(setSizeTicks)
     const soloBottomAxisrange = invertedXrangeSet.range();
     const soloBottomAxis =
         <>
@@ -336,7 +335,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 <g key={value} transform={`translate(${xOffset + margin.left}, ${soloSets.length * (rad * 2.7) + 6})`}>
                     <line y2={-6} stroke="currentColor" />
                     <text
-                        key={value}
+                        key={value.toString() + '-2'}
                         style={{
                             fontSize: "10px",
                             textAnchor: "middle",
@@ -360,7 +359,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         let fillColor
         if (d.name == hoveredCell?.setLabel) {
             fillColor = '#FFC000';
-            
+
         } else {
             fillColor = '#02577b';
         }
@@ -383,7 +382,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                         yPos: yrange(d.num) + margin.top,
                         value: d.num,
                     });
-                
+
                 }}
                 onMouseLeave={() => setHoveredCell(null)}
                 cursor="pointer"
@@ -404,7 +403,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
 
             return (
                 <circle
-                    key={i * j}
+                    key={i + ',' +  j}
                     r={rad}
                     cx={i * (rad * 2.7)}
                     cy={j * (rad * 2.7)}
@@ -420,7 +419,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         return allSetNames.map((y, j) => {
             return (
                 <line
-                    key={i * j}
+                    key={i +',' +j + '-circle'}
                     id={`setline${i}`}
                     x1={i * (rad * 2.7)}
                     x2={i * (rad * 2.7)}

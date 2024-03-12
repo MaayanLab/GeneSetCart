@@ -1,6 +1,7 @@
 'use server'
 import prisma from '@/lib/prisma';
 import cache from '@/lib/cache';
+import axios from 'axios';
 
 export type PairsData = {
     id: number,
@@ -48,6 +49,23 @@ export async function fetchCrossPairs(lib1: string, lib2: string) {
 }
 
 
+async function getEnrichmentTerms(overlapGenes: string[]) {
+    const ENRICHR_URL = 'https://maayanlab.cloud/Enrichr/addList'
+    const genesString = overlapGenes.join('\n')
+    const { data } = await axios.post(ENRICHR_URL, {
+        'list': genesString,
+        'description': ''
+    }, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+    )
+    const userListId = data.userListId
+    const enrichmentResults = await axios.get(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=WikiPathway%202023%20Human`)
+    console.log(enrichmentResults)
+    
+}
 
 export async function getSpecifiedAbstracts(term1: string, term2: string, abstract1: string, abstract2: string) {
     const input = `

@@ -23,13 +23,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Provisioning the Database
 To use the site, you have to populate your local database with gene and crossing pairs data. Firstly, make sure apply migrations to create the tables
-```
+```bash
 # go to app (imagineset) directory
 cd imagineset
 npx prisma migrate deploy
 ```
 and then run ingest script in database directory to add the data to these tables
-```
+```bash
 # go to database directory (use the following commands if in imagineset directory):
 cd ..
 cd database

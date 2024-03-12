@@ -51,7 +51,7 @@ export async function fetchCrossPairs(lib1: string, lib2: string) {
 
 async function getEnrichmentTerms(overlapGenes: string[]) {
     const ENRICHR_URL = 'https://maayanlab.cloud/Enrichr/addList'
-    const genesString = overlapGenes.join('\n')
+    const genesString = overlapGenes.toString().split(',').join('\n').replaceAll("'", '')
     const { data } = await axios.post(ENRICHR_URL, {
         'list': genesString,
         'description': ''
@@ -62,9 +62,14 @@ async function getEnrichmentTerms(overlapGenes: string[]) {
     }
     )
     const userListId = data.userListId
-    const enrichmentResults = await axios.get(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=WikiPathway%202023%20Human`)
-    console.log(enrichmentResults)
-    
+    // const response = await fetch('https://maayanlab.cloud/Enrichr/enrich?' + new URLSearchParams(`userListId=${userListId}&backgroundType=WikiPathway_2023_Human`))
+    const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=WikiPathway_2023_Human`)
+    if (response.status === 200) {
+        const enrichmentResults = await response.json() 
+        return enrichmentResults['WikiPathway_2023_Human'].slice(0, 10).map((result: any[]) => result[1])
+    } else {
+        return []
+    }
 }
 
 export async function getSpecifiedAbstracts(term1: string, term2: string, abstract1: string, abstract2: string) {
@@ -118,6 +123,7 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
 }
 
 export async function generateHypothesis(row: any ) {
+    const enrichedTerms = await getEnrichmentTerms(row.overlap)
     const abstract1 = await prisma.libAbstracts.findFirst({
         where: {
             lib: row.lib_1
@@ -142,8 +148,10 @@ export async function generateHypothesis(row: any ) {
     if ((abstract1 === null) || (abstract2 === null) ) throw new Error('templates not found')
     const abstracts = await getSpecifiedAbstracts(term1, term2, abstract1.abstract, abstract2.abstract)
     const input = `
-    There are two gene sets that highly overlap. Based on specified abstracts of each gene set that explains how each gene set 
-    was created and the overlapping genes between both gene sets, hypothesize why a high overlap between the gene sets exists.
+    There are two gene sets that highly overlap. Performing enrichment analysis on the overlapping genes shows that many of them are related to 
+    the following biological pathways: ${enrichedTerms.toString()}.  Hypothesize why a high overlap between the gene sets exists
+    based on specified abstracts of each gene set that explains how each gene set was created, the overlapping genes between 
+    both gene sets, and the biological pathways that the overlapping genes are related to based on the gene set enrichment analysis results.
     Specified Abstracts for gene sets: ${abstracts}
     The overlapping genes are ${overlapGeneSet.toString()}
     Do not include 'Hypothesis: ' at the beginning of your response

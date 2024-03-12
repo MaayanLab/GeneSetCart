@@ -1,5 +1,5 @@
 'use client'
-import { Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, LinearProgress, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, LinearProgress, Paper, Stack, TextField, Typography } from "@mui/material";
 import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
@@ -10,7 +10,8 @@ import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
 import { enrich } from "@/app/analyze/[id]/ViewGenesBtn";
 import CloseIcon from '@mui/icons-material/Close';
-
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import DownloadIcon from '@mui/icons-material/Download';
 
 const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
     const [open, setOpen] = React.useState(false);
@@ -80,14 +81,30 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
 }
 
 
+type hypothesisDisplay = {
+    geneset1: string,
+    geneset2: string,
+    library1: string,
+    library2: string,
+    hypothesis: string
+}
 
+const download = (filename: string, text: string) => {
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
 
 export function GMTCrossLayout() {
     const [rows, setRows] = React.useState<CFDECrossPair[]>([])
     const [selectedLibs, setSelectedLibs] = React.useState<string[]>([])
     const [loading, setLoading] = React.useState(false)
     const [hypLoading, setHypLoading] = React.useState(false)
-    const [hypothesis, setHypothesis] = React.useState('')
+    const [hypothesis, setHypothesis] = React.useState<hypothesisDisplay | null>(null)
 
     const [open, setOpen] = React.useState(false)
 
@@ -114,12 +131,23 @@ export function GMTCrossLayout() {
                     size="small"
                     variant="contained"
                     sx={{ margin: 2 }}
-                    // onClick={(evt) => {
-                    //     setHypothesis('')
-                    //     setHypLoading(true)
-                    //     generateHypothesis(params.row).then((response) => { setHypLoading(false); if (typeof (response) === 'string') { setHypothesis(response) } }).catch((err) => { setHypLoading(false); })
-                    // }}
-                    onClick={handleClickOpen}
+                    onClick={(evt) => {
+                        setHypothesis(null)
+                        setHypLoading(true)
+                        generateHypothesis(params.row).then((response) => {
+                            setHypLoading(false); if (typeof (response) === 'string') {
+                                const hypothesisDisplayObject = {
+                                    geneset1: params.row.geneset_1,
+                                    geneset2: params.row.geneset_2,
+                                    library1: params.row.lib_1,
+                                    library2: params.row.lib_2,
+                                    hypothesis: response
+                                }
+                                setHypothesis(hypothesisDisplayObject)
+                            }
+                        }).catch((err) => { setHypLoading(false); })
+                    }}
+                // onClick={handleClickOpen}
                 >
                     <Typography sx={{ fontSize: 10, textWrap: 'wrap' }}>
                         GPT-4 Hypothesis
@@ -190,7 +218,6 @@ export function GMTCrossLayout() {
 
     return (
         <>
-
             <Stack direction="column" spacing={3} sx={{ marginBottom: 3 }}>
                 <Stack direction='row' spacing={2}>
                     <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} />
@@ -202,6 +229,41 @@ export function GMTCrossLayout() {
                     </Button>
                     {loading && <CircularIndeterminate />}
                 </div>
+                {hypothesis !== null &&
+                    <Paper elevation={1} sx={{
+                        width: '100%',
+                        minHeight: '100px'
+                    }}>
+                        <Stack direction='column' sx={{ padding: 2 }}>
+                            <Box justifyContent={'flex-end'}>
+                                <Button color="secondary" onClick={(evt) => copyToClipboard(
+                                    `geneset 1: ${hypothesis.geneset1} \n
+                                geneset 2: ${hypothesis.geneset2} \n
+                                library 1: ${hypothesis.library1}\n
+                                library 2: ${hypothesis.library2}\n
+                                hypothesis:${hypothesis.hypothesis} 
+                                `
+                                )}><ContentPasteIcon /></Button>
+                                <Button color="secondary" onClick={(evt) => {
+                                    download('gpt-hypothesis',
+                                        `Geneset 1: ${hypothesis.geneset1}\n
+                                Geneset 2: ${hypothesis.geneset2}\n
+                                Library 1: ${hypothesis.library1}\n
+                                Library 2: ${hypothesis.library2}\n
+                                Hypothesis:${hypothesis.hypothesis} 
+                            `)
+                                }}><DownloadIcon /></Button>
+                            </Box>
+                            <Box><Typography><strong>GENE SET 1:</strong> {hypothesis.geneset1}</Typography></Box>
+                            <Box><Typography><strong>GENE SET 2:</strong> {hypothesis.geneset2}</Typography></Box>
+                            <Box><Typography><strong>LIBRARY 1:</strong> {hypothesis.library1}</Typography></Box>
+                            <Box><Typography><strong>LIBRARY 2:</strong> {hypothesis.library2}</Typography></Box>
+                            <Box><Typography><strong>HYPOTHESIS:</strong> {hypothesis.hypothesis}</Typography></Box>
+                        </Stack>
+                    </Paper>}
+                {hypLoading && <Box sx={{ width: '100%' }}>
+                    <LinearProgress color="secondary" />
+                </Box>}
                 {(rows.length > 0) && <div style={{ width: '100%' }}>
                     <DataGrid
                         rows={rows}
@@ -242,17 +304,8 @@ export function GMTCrossLayout() {
                         }}
                     />
                 </div>}
-                {hypLoading && <Box sx={{ width: '100%' }}>
-                    <LinearProgress color="secondary" />
-                </Box>}
-                {(hypothesis.length > 0) && <TextField
-                    multiline
-                    value={hypothesis}
-                    rows={10}
-                >
-                </TextField>}
             </Stack>
-            <Dialog
+            {/* <Dialog
                 onClose={handleClose}
                 open={open}>
                 <DialogTitle sx={{ m: 0, p: 2 }}>
@@ -273,7 +326,7 @@ export function GMTCrossLayout() {
                 <DialogContent >
                     The GPT-generated hypothesis functionality is coming soon!
                 </DialogContent>
-            </Dialog>
+            </Dialog> */}
         </>
     )
 }

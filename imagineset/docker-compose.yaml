@@ -1,11 +1,16 @@
 version: '3.9'
+x-kubernetes:
+  name: g2sg
+  namespace: g2sg
 services:
   g2sg-app:
     build: .
-    container_name: g2sg-app
+    image: maayanlab/g2sg-app:0.1.0
     platform: linux/amd64
     x-kubernetes:
       imagePullPolicy: IfNotPresent
+      annotations:
+        maayanlab.cloud/ingress: https://g2sg.cfde.cloud
     ports:
       - 3000:3000
     environment:
@@ -20,7 +25,6 @@ services:
     image: postgres:16
     x-kubernetes:
       imagePullPolicy: IfNotPresent
-    container_name: g2sg-postgres
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -28,8 +32,10 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./migrate.sh:/docker-entrypoint-initdb.d/migrate.sh
       - g2sg-data:/var/lib/postgresql/data
 
 volumes:
   g2sg-data:
+    x-kubernetes:
+      size: 8Gi
+      class: gp2

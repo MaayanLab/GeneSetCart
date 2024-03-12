@@ -9,7 +9,7 @@ cd imagineset
 cp .env.example .env
 # start database
 #  (NOTE: If you're running another postgres database on your system, you should turn it off as the ports will conflict)
-docker-compose up -d drc-portal-postgres
+docker-compose up -d g2sg-postgres
 # install node modules
 npm i
 # initialize prisma
@@ -22,14 +22,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 
 ## Provisioning the Database
-To use the site, you have to populate your database with some gene and crossing pairs data. Firstly,  make sure apply migrations
+To use the site, you have to populate your local database with gene and crossing pairs data. Firstly, make sure apply migrations to create the tables
 ```
 cd imagineset
 npx prisma migrate deploy
 ```
-and then run ingest script in database directory
+and then run ingest script in database directory to add the data to these tables
 ```
 cd database
+# download requirements
+pip install -r requirements.txt
 # prepare .env file containing DATABASE_URL & review
 cp .env.example .env
 # run ingest script

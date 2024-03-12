@@ -1,0 +1,38 @@
+# G2SG
+This is an application for assembling, augmenting, combining, visualizing and analyzing gene sets: [g2sg.cfde.cloud](g2sg.cfde.cloud)
+
+## Getting Started
+```bash
+# go to app (imagineset) directory)
+cd imagineset
+# prepare .env file & review
+cp .env.example .env
+# start database
+#  (NOTE: If you're running another postgres database on your system, you should turn it off as the ports will conflict)
+docker-compose up -d drc-portal-postgres
+# install node modules
+npm i
+# initialize prisma
+npx prisma migrate deploy
+# run dev server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the platform.
+
+
+## Provisioning the Database
+To use the site, you have to populate your database with some gene and crossing pairs data. Firstly,  make sure apply migrations
+```
+cd imagineset
+npx prisma migrate deploy
+```
+and then run ingest script in database directory
+```
+cd database
+# prepare .env file containing DATABASE_URL & review
+cp .env.example .env
+# run ingest script
+python3 ingest.py
+```
+

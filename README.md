@@ -3,7 +3,7 @@ This is an application for assembling, augmenting, combining, visualizing and an
 
 ## Getting Started
 ```bash
-# go to app (imagineset) directory)
+# go to app (imagineset) directory
 cd imagineset
 # prepare .env file & review
 cp .env.example .env

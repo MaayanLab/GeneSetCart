@@ -144,7 +144,7 @@ export default function SingleUpload() {
                     </Grid>
                 </Grid>
                 <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 6}>
-                    <Grid item >
+                    <Grid item container justifyContent={'center'}>
                         <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography>
                         <TextField
                             id="standard-multiline-static"
@@ -157,7 +157,7 @@ export default function SingleUpload() {
                             }}
                         />
                     </Grid>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                    <Grid container spacing={2} sx={{ mt: 1 }} justifyContent={'center'}>
                         <Grid item>
                             <Button onClick={getExample} variant='outlined' color="secondary">
                                 TRY EXAMPLE

@@ -245,7 +245,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                         downloadPNG('visualization')
                                     }}
                                     ><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadSVG() }}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadSVG()}} disabled={visualization === 'SuperVenn'}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
                                     <Tooltip
                                         title={

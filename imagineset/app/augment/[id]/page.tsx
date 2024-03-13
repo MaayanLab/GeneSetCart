@@ -2,10 +2,11 @@ import { authOptions } from '@/lib/auth/authOptions'
 import GenesetSelect, { AugmentLayout } from "@/app/augment/[id]/SelectGeneset";
 import ColorToggleButton from "@/components/misc/SectionToggle";
 import prisma from "@/lib/prisma";
-import { TextField, Typography } from "@mui/material";
+import { TextField, Typography, Grid } from "@mui/material";
 import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import Header from '@/components/header/Header';
 
 export default async function AugmentPage({ params }: { params: { id: string } }) {
     const session = await getServerSession(authOptions)
@@ -30,15 +31,20 @@ export default async function AugmentPage({ params }: { params: { id: string } }
         }
     })
     return (
-        <Container>
-            <ColorToggleButton sessionId={params.id} />
+        <>
+            <Grid item>
+                <Header sessionId={params.id} />
+            </Grid>
             <Container>
-                <Typography variant="h3" color="secondary.dark" className='p-5'>AUGMENT YOUR GENE SETS</Typography>
-                <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                    Augment your gene sets with co-expressed and co-mentioned genes
-                </Typography>
-                    <AugmentLayout sessionGenesets={sessionInfo} sessionId={params.id}/>
+                <ColorToggleButton sessionId={params.id} />
+                <Container>
+                    <Typography variant="h3" color="secondary.dark" className='p-5'>AUGMENT YOUR GENE SETS</Typography>
+                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
+                        Augment your gene sets with co-expressed and co-mentioned genes
+                    </Typography>
+                    <AugmentLayout sessionGenesets={sessionInfo} sessionId={params.id} />
+                </Container>
             </Container>
-        </Container>
+        </>
     )
 }

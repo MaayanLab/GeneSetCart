@@ -5,8 +5,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from '@/lib/auth/authOptions'
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { Grid } from "@mui/material";
+import Header from "@/components/header/Header";
 
-export default async function AssemblePage({ params }: { params: { id: string } }){
+export default async function AssemblePage({ params }: { params: { id: string } }) {
     // add user authentication before displaying
     const session = await getServerSession(authOptions)
     if (!session) return redirect(`/api/auth/signin?callbackUrl=/assemble/${params.id}`)
@@ -18,9 +20,15 @@ export default async function AssemblePage({ params }: { params: { id: string } 
     if (user === null) return redirect(`/api/auth/signin?callbackUrl=/assemble/${params.id}`)
 
     return (
-        <Container sx={{mb:4}}>
-        <ColorToggleButton sessionId={params.id}/>
-        <VerticalTabs />
-        </Container>
+        <>
+            <Grid item>
+                <Header sessionId={params.id} />
+            </Grid>
+            <Container sx={{ mb: 4 }}>
+                <ColorToggleButton sessionId={params.id} />
+                <VerticalTabs />
+            </Container>
+        </>
+
     )
 }

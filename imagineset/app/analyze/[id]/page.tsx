@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import * as React from 'react';
 import dynamic from 'next/dynamic'
+import Header from '@/components/header/Header';
 
 
 export default async function AnalyzePage({ params }: { params: { id: string } }) {
@@ -32,20 +33,25 @@ export default async function AnalyzePage({ params }: { params: { id: string } }
         }
     })
 
-    const PaginatedTable = dynamic(() =>  import ("./PaginationTable"), { ssr: false })
+    const PaginatedTable = dynamic(() => import("./PaginationTable"), { ssr: false })
     // get rows from sessionInfo and put in table
     const rows = sessionInfo ? sessionInfo.gene_sets : []
 
     return (
-        <Container>
-            <ColorToggleButton sessionId={params.id} />
-            <Container sx={{ mb: 5 }}>
-                <Typography variant="h3" color="secondary.dark" className='p-5'>ANALYZE YOUR GENE SETS</Typography>
-                <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                    Analyze your gene sets by sending them to Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
-                </Typography>
-                <PaginatedTable rows={rows} />
+        <>
+            <Grid item>
+                <Header sessionId={params.id} />
+            </Grid>
+            <Container>
+                <ColorToggleButton sessionId={params.id} />
+                <Container sx={{ mb: 5 }}>
+                    <Typography variant="h3" color="secondary.dark" className='p-5'>ANALYZE YOUR GENE SETS</Typography>
+                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
+                        Analyze your gene sets by sending them to Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
+                    </Typography>
+                    <PaginatedTable rows={rows} />
+                </Container>
             </Container>
-        </Container>
+        </>
     )
 }

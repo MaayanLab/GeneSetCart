@@ -3,9 +3,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import ThemeRegistry from './ThemeRegistry';
 import Background from '@/components/styled/background'
-import NavBreadcrumbs from '@/components/breadcrumbs'
 import { Grid } from '@mui/material/'
-import Header from '@/components/header/Header';
 import Footer from '@/components/Footer';
 
 // const inter = Inter({ subsets: ['latin'] })
@@ -29,15 +27,12 @@ export default async function RootLayout({
       <body>
         <ThemeRegistry options={{ key: 'mui' }}>
           <Grid container direction={"column"} justifyContent="space-between" sx={{ minHeight: "100vh", marginTop: 2 }}>
-          <Grid item>
-            <Header />
-            </Grid>
             <Grid item className="flex grow">
               <Background background="#E7F3F5">
                 {children}
               </Background>
             </Grid>
-            <Grid item><Footer/></Grid>  
+            <Grid item><Footer /></Grid>
           </Grid>
         </ThemeRegistry>
       </body>

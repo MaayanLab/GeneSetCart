@@ -132,6 +132,7 @@ export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[
             }
         }
     }
+    revalidatePath('/')
     return { code: 'success' }
 }
 

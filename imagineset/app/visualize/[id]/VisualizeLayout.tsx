@@ -13,13 +13,14 @@ import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
 import heatmapIcon from '@/public/img/otherLogos/visualizeIcon.png'
 import umapIcon from '@/public/img/otherLogos/umapPlot2.png'
 import Image from 'next/image';
-import { Heatmap } from '../../components/visualize/PlotComponents/Heatmap/Heatmap';
-import { VennPlot } from '../../components/visualize/PlotComponents/Venn/Venn';
-import { UpsetPlotV2 } from '../../components/visualize/PlotComponents/UpSet/Upset';
-import { SuperVenn } from '../../components/visualize/PlotComponents/SuperVenn/SuperVenn';
+import { Heatmap } from '../../../components/visualize/PlotComponents/Heatmap/Heatmap';
+import { VennPlot } from '../../../components/visualize/PlotComponents/Venn/Venn';
+import { UpsetPlotV2 } from '../../../components/visualize/PlotComponents/UpSet/Upset';
+import { SuperVenn } from '../../../components/visualize/PlotComponents/SuperVenn/SuperVenn';
 import upsetIconAlt from '@/public/img/otherLogos/plotly-upset-alt.png'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import html2canvas from 'html2canvas';
 
 
 function jaccard_similarity(set1: string[], set2: string[]) {
@@ -27,8 +28,65 @@ function jaccard_similarity(set1: string[], set2: string[]) {
     const intersection = set1.filter(function (n) {
         return set2.indexOf(n) !== -1;
     });
-
     return intersection.length / union.length
+}
+
+const downloadLegend = (filename: string, text: string) => {
+    downloadURI('data:text/plain;charset=utf-8,' + encodeURIComponent(text), filename)
+}
+
+const downloadSVG = () => {
+    //get svg element.
+    let svg = document.getElementById("svg");
+    if (svg) {
+        //get svg source.
+        let serializer = new XMLSerializer();
+        let source = serializer.serializeToString(svg);
+        //add name spaces.
+        if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+            source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+        if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+            source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+        }
+        //add xml declaration
+        source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), 'svg-visualization.svg')
+    }
+    ;
+}
+
+function downloadURI(uri: string, name: string) {
+    let element = document.createElement('a');
+    element.setAttribute('href', uri);
+    element.setAttribute('download', name);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
+
+function downloadPNG(divId: string) {
+    const div = document.getElementById(divId)
+    if (div) {
+        html2canvas(div).then(function (canvas: { toDataURL: (arg0: string) => any; }) {
+            let myImage = canvas.toDataURL("image/png");
+            downloadURI("data:" + myImage, "visualization.png");
+        }
+        );
+    }
+}
+
+function downloadSVGHTML(divId: string) {
+    const div = document.getElementById(divId)
+    if (div) {
+        html2canvas(div).then(function (canvas: { toDataURL: (arg0: string) => any; }) {
+            let source = '<?xml version="1.0" standalone="no"?>\r\n' + canvas;
+            downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), 'svg-visualization.svg')
+            // downloadURI("data:" + myImage, "visualization.png");
+        }
+        );
+    }
 }
 
 export const alphabet = [
@@ -109,43 +167,6 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
         }
     }, [legendSelectedSets]);
 
-    const download = React.useCallback((filename: string, text: string) => {
-        let element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-        element.setAttribute('download', filename);
-        element.style.display = 'none';
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
-    }, [])
-
-    const downloadSVG = React.useCallback(() => {
-        //get svg element.
-        let svg = document.getElementById("svg");
-        console.log(svg)
-        if (svg) {
-            //get svg source.
-            let serializer = new XMLSerializer();
-            let source = serializer.serializeToString(svg);
-            //add name spaces.
-            if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
-                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-            }
-            if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
-                source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-            }
-            //add xml declaration
-            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-            let element = document.createElement('a');
-            element.setAttribute('href', "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source));
-            element.setAttribute('download', 'visualization');
-            element.style.display = 'none';
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element)
-        }
-        ;
-    }, [])
 
 
     return (
@@ -174,7 +195,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             <Grid item xs={9}>
                 <Stack direction='column' spacing={2}>
                     <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }}>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('Venn')}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('Venn')} disabled={true}>
                             <Image
                                 src={vennIcon}
                                 fill
@@ -182,7 +203,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 style={{ padding: "10%", objectFit: "contain" }}
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         </Button>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('SuperVenn')}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('SuperVenn')} disabled={!(checked.length < 11 && checked.length > 0)}>
                             <Image
                                 src={superVennIcon}
                                 fill
@@ -190,7 +211,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 style={{ padding: "10%", objectFit: "contain" }}
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         </Button>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('UpSet')}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('UpSet')} disabled={!(checked.length < 11 && checked.length > 0)}>
                             <Image
                                 src={upsetIconAlt}
                                 fill
@@ -198,7 +219,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 style={{ padding: "10%", objectFit: "contain" }}
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         </Button>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('Heatmap')}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('Heatmap')} disabled={!(checked.length < 31 && checked.length > 0)}>
                             <Image
                                 src={heatmapIcon}
                                 fill
@@ -206,7 +227,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 style={{ padding: "10%", objectFit: "contain" }}
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         </Button>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} disabled={true}>
                             <Image
                                 src={umapIcon}
                                 fill
@@ -220,9 +241,12 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
                                 {/* <Typography variant='h3' style={{ textAlign: 'center', padding: 5 }} color={'secondary.dark'}>VISUALIZATION</Typography> */}
                                 <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadSVG()}}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { download('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => {
+                                        downloadPNG('visualization')
+                                    }}
+                                    ><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadSVG() }}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
                                     <Tooltip
                                         title={
                                             <React.Fragment>
@@ -233,16 +257,15 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                             </React.Fragment>
                                         }>
                                         <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}><VisibilityIcon />&nbsp;<Typography > Legend</Typography></Button>
-
                                     </Tooltip>
                                 </Stack>
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
-                                <div className='flex justify-center' id="venn" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
-                                    {visualization === 'Heatmap' && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />}
+                                <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
+                                    {(visualization === 'Heatmap' && checked.length < 31 && checked.length > 0) && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />}
                                     {/* {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets} />} */}
-                                    {visualization === 'SuperVenn' && <SuperVenn selectedSets={legendSelectedSets} />}
-                                    {(visualization === 'UpSet' && checked.length < 11 && checked.length > 1)  && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
+                                    {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
+                                    {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                 </div>
                             </Box>
                         </Stack>

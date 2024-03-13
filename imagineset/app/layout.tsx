@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: 'Get-Gene-Set-Go',
   description: '',
   icons: {
-    icon: '/img/favicon.png', // /public path
+    icon: '/img/G2SG-logo.png', // /public path
   },
 }
 

@@ -1,6 +1,6 @@
 import { authOptions } from '@/lib/auth/authOptions'
 import ColorToggleButton from "@/components/misc/SectionToggle";
-import { VisualizeLayout } from "@/app/visualize/VisualizeLayout";
+import { VisualizeLayout } from "@/app/visualize/[id]/VisualizeLayout";
 import prisma from "@/lib/prisma";
 import { Typography, Container, Grid } from "@mui/material";
 import { getServerSession } from "next-auth";

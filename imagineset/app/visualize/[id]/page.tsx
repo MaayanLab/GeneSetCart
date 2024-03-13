@@ -1,12 +1,12 @@
 import { authOptions } from '@/lib/auth/authOptions'
 import ColorToggleButton from "@/components/misc/SectionToggle";
-import { VisualizeLayout } from "@/app/visualize/VisualizeLayout";
+import { VisualizeLayout } from "@/app/visualize/[id]/VisualizeLayout";
 import prisma from "@/lib/prisma";
 import {Typography, Container } from "@mui/material";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-export default async function AugmentPage({ params }: { params: { id: string } }) {
+export default async function VisualizePage({ params }: { params: { id: string } }) {
     const session = await getServerSession(authOptions)
     if (!session) return redirect(`/api/auth/signin?callbackUrl=/augment/${params.id}`)
     const user = await prisma.user.findUnique({

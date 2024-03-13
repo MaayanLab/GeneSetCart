@@ -2,7 +2,7 @@
 import {
   Box,
   Button, Container,
-  Grid, LinearProgress, TextField,
+  Grid, Stack, TextField,
   Typography,
   useMediaQuery,
   useTheme
@@ -12,7 +12,7 @@ import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import React from "react";
 import { addToSessionSets, checkInSession, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
-import CircularIndeterminate from "../misc/Loading";
+import { LinearIndeterminate } from "../misc/Loading";
 import Status from "./Status";
 import { stat } from "fs";
 import { useParams } from "next/navigation";
@@ -78,24 +78,24 @@ export default function GeneshotSearch() {
   ) => {
     setLoading(true)
     const cachedResult: any = cache.get(query);
-    if ( cachedResult === undefined ){
-    fetch("https://maayanlab.cloud/geneshot/api/search",
-      {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        method: "POST",
-        body: JSON.stringify({ "rif": "generif", "term": query })
-      })
-      .then((response) => response.json()
-        .then((data) => {
-          setLoading(false)
-          const genes = Object.keys(data['gene_count'])
-          const success = cache.set(query, genes, 10000 )
-          setFoundGenes(genes)
-        }))
-      .catch((res) => { setLoading(false); console.log(res) })
+    if (cachedResult === undefined) {
+      fetch("https://maayanlab.cloud/geneshot/api/search",
+        {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          method: "POST",
+          body: JSON.stringify({ "rif": "generif", "term": query })
+        })
+        .then((response) => response.json()
+          .then((data) => {
+            setLoading(false)
+            const genes = Object.keys(data['gene_count'])
+            const success = cache.set(query, genes, 10000)
+            setFoundGenes(genes)
+          }))
+        .catch((res) => { setLoading(false); console.log(res) })
     } else {
       setLoading(false)
       setFoundGenes(cachedResult ? cachedResult : [])
@@ -108,7 +108,28 @@ export default function GeneshotSearch() {
       <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
         Enter a search term to obtain all genes mentioned with that term in publications
       </Typography>
-      {/* container sx={{ p: 2 }} display={isMobile ? 'block' : 'flex'} spacing={1} alignItems="center" justifyContent="center" component={'form'} */}
+      <Stack direction='column' >
+        {/* <Grid item sx={{ justifyItems: 'center' }}> */}
+          {loading ? <LinearIndeterminate /> : <></>}
+        {/* </Grid> */}
+        {/* <Grid item xs={12}> */}
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search…"
+              inputProps={{ 'aria-label': 'search' }}
+              name='search'
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  handleSearch((event.target as HTMLFormElement).value)
+                }
+              }}
+            />
+          </Search>
+        {/* </Grid> */}
+      </Stack>
       <Grid container sx={{ p: 2 }} alignItems="center" justifyContent="center" display={isMobile ? 'block' : 'flex'} spacing={1} component={'form'}
         onSubmit={(evt) => {
           evt.preventDefault();
@@ -120,37 +141,14 @@ export default function GeneshotSearch() {
           const sessionId = params.id
           checkInSession(sessionId, genesetName).then((response) => {
             if (response) {
-                setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+              setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
             } else {
-                addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => {setStatus({success:true})}).catch((err) => setStatus({error:{selected:true, message:"Error adding gene set!"}}))
+              addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error adding gene set!" } }))
             }
-        })   
+          })
         }
         }>
-        <Grid item direction='row' container alignItems="center" justifyItems='center'>
-          <Grid item sx={{justifyItems:'center'}}>
-            {loading ? <CircularIndeterminate /> : <></>}
-          </Grid>
-          <Grid item  xs={12}>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ 'aria-label': 'search' }}
-                name='search'
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    handleSearch((event.target as HTMLFormElement).value)
-                  }
-                }}
-              />
-            </Search>
-          </Grid>
-        </Grid>
         <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center'>
-
           <Grid item>
             <TextField id="outlined-basic" required label="Gene Set Name" variant="outlined" name='name' />
           </Grid>

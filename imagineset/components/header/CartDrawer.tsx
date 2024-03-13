@@ -9,7 +9,7 @@ import { Badge } from '@mui/material'
 import { type GeneSet } from '@prisma/client';
 import { copyToClipboard } from '../assemble/fileUpload/DataTable';
 import { useParams} from 'next/navigation';
-import { deleteGenesetByID, getGenesets, getSessionInfo } from './Header';
+import { deleteGenesetByID, getGenesets } from './Header';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { usePathname } from 'next/navigation';
 
@@ -147,7 +147,25 @@ type SessionInfo = {
         }[];
     } & GeneSet)[]
 }
-export default function CartDrawer() {
+
+
+export default function CartDrawer({getSessionInfo}: {getSessionInfo: (sessionId: string) =>  Promise<{
+    gene_sets: ({
+        genes: {
+            id: string;
+            gene_symbol: string;
+            synonyms: string;
+            description: string | null;
+        }[];
+    } & {
+        id: string;
+        name: string;
+        description: string | null;
+        session_id: string;
+        createdAt: Date;
+    })[];
+} | null>
+    }) {
     const currentPage = usePathname();
     const sessionId = currentPage.split('/')[2]
     const [sessionInfo, setSessionInfo] = React.useState<SessionInfo | null >(null)

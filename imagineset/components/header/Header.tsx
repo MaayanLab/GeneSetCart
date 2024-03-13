@@ -75,7 +75,7 @@ export default async function Header() {
                         </Grid>
                         <Grid item>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                                <CartDrawer />
+                                <CartDrawer getSessionInfo={getSessionInfo}/>
                                 <CurrentSession />
                                 <GMTHeader />
                                 <Link href="/sessions">

@@ -13,22 +13,22 @@ import InfoIcon from '@mui/icons-material/Info';
 const scrollbarStyles = {
     'webkitAppearance': 'none',
     'width': '10px'
-  };
+};
 
-  const scrollbarThumb = {
+const scrollbarThumb = {
     'borderRadius': '5px',
     'backgroundColor': 'rgba(0,0,0,.5)',
     'WebkitBoxShadow': '0 0 1px rgba(255,255,255,.5)'
-  }
+}
 
-  
+
 
 export function CombineLayout({ sessionInfo, sessionId }: {
     sessionInfo: {
         gene_sets: ({
             genes: Gene[];
         } & GeneSet)[];
-    } | null, 
+    } | null,
     sessionId: string
 }) {
 
@@ -39,7 +39,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
     const [displayedGenes, setDisplayedGenes] = React.useState<string[]>([])
     const [generatedSetName, setGeneratedSetName] = React.useState('')
     const [status, setStatus] = React.useState<addStatus>({})
-    
+
     const unionAction = () => {
         let genes: string[] = []
         let genesetNames: string[] = []
@@ -104,17 +104,18 @@ export function CombineLayout({ sessionInfo, sessionId }: {
     const handleAddToSets = React.useCallback(() => {
         checkInSession(sessionId, generatedSetName).then((response) => {
             if (response) {
-                setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+                setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
             } else {
                 addToSessionSets(displayedGenes, sessionId, generatedSetName, '')
-                .then((response) => setStatus({success:true}))
-                .catch((error) => setStatus({error:{selected:true, message:'Error adding gene set to list. Please try again'} }))         }
+                    .then((response) => setStatus({ success: true }))
+                    .catch((error) => setStatus({ error: { selected: true, message: 'Error adding gene set to list. Please try again' } }))
+            }
         })
     }, [displayedGenes, generatedSetName])
 
 
 
-    
+
     return (
         <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'}>
             <SelectGenesetsCard sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
@@ -122,7 +123,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                 <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 500, overflowY: 'scroll' }}>
                     <CardHeader
                         title="Select Set Operation"
-                        titleTypographyProps={{color:'secondary.dark', fontSize: 18 }}
+                        titleTypographyProps={{ color: 'secondary.dark', fontSize: 18 }}
                         style={{ textAlign: 'center' }}
                     />
                     <CardContent>
@@ -138,12 +139,12 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                                 label={
                                     <Tooltip title='The minimum number of gene sets that a gene has to appear in to be considered a part of the consensus gene set' placement="top">
                                         <div>
-                                        <span>Consensus Criteria</span> &nbsp;
-                                      <InfoIcon />
+                                            <span>Consensus Criteria</span> &nbsp;
+                                            <InfoIcon />
                                         </div>
                                     </Tooltip>
 
-                                  }
+                                }
                                 // label=Consensus Criteria"
                                 sx={{ fontSize: 16 }}
                                 color='secondary'
@@ -157,14 +158,15 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                 </Card>
             </Box>
             <Box sx={{ maxWidth: 500 }}>
-                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 400, overflowY: 'scroll', 
-                '&::-webkit-scrollbar': { ...scrollbarStyles },
-                '&::-webkit-scrollbar-thumb' : {...scrollbarThumb}
-            }}> 
+                <Card variant="outlined" sx={{
+                    minHeight: 400, maxHeight: 400, overflowY: 'scroll',
+                    '&::-webkit-scrollbar': { ...scrollbarStyles },
+                    '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }
+                }}>
                     <CardHeader
                         title="Generated Set"
                         subheader={generatedSetName}
-                        titleTypographyProps={{color:'secondary.dark', fontSize: 18 }}
+                        titleTypographyProps={{ color: 'secondary.dark', fontSize: 18 }}
                         style={{ textAlign: 'center' }}
                     />
                     <CardContent>
@@ -185,7 +187,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                                     ADD TO SETS
                                 </Button>
                             </Stack>
-                            <Status status={status}/>
+                            <Status status={status} />
                         </Stack>
                     </CardContent>
                 </Card>

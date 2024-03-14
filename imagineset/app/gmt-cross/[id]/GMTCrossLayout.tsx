@@ -11,14 +11,15 @@ import { CFDECrossPair } from "@prisma/client";
 import { enrich } from "@/app/analyze/[id]/ViewGenesBtn";
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DownloadIcon from '@mui/icons-material/Download';
-import { addMultipleSetsToSessionCross } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addMultipleSetsToSessionCross, addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
 import { addStatus } from "@/components/assemble/fileUpload/SingleUpload";
 import { useParams } from "next/navigation";
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import Status from "@/components/assemble/Status";
 
-const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
+const RenderOverlapButton = ({params, sessionId} : {params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, sessionId: string}) => {
     const [open, setOpen] = React.useState(false);
+    const [status, setStatus] = React.useState<addStatus>({})
 
     const handleClose = () => {
         setOpen(false);
@@ -74,6 +75,28 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
                                 SEND TO ENRICHR
                             </Button>
                         </Grid>
+                        <Grid item>
+                            <Button
+                                variant='contained' color='primary'
+                                onClick={(evt) => {
+                                    const genesetName = params.row.geneset_1 + ' Intersection ' + params.row.geneset_2
+                                    checkInSession(sessionId, genesetName).then((response) => {
+                                        if (response) {
+                                            setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+                                        } else {
+                                            addToSessionSets(params.row.overlap.toString().replaceAll("'", '').split(','), sessionId, genesetName ,'').then((result) => {setStatus({success:true})}).catch((err) => setStatus({error:{selected:true, message:"Error in adding gene set!"}}))
+                                        }
+                                    }) 
+                                    
+                                    // enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' Intersection ' + params.row.geneset_2 })
+                                }}
+                            >
+                                ADD TO CART
+                            </Button>
+                        </Grid>
+                    </Grid>
+                    <Grid item>
+                    <Status status={status} />
                     </Grid>
                 </Grid>
             </Dialog>
@@ -204,8 +227,9 @@ export function GMTCrossLayout() {
     const [status, setStatus] = React.useState<addStatus>({})
 
     const params = useParams<{ id: string }>()
+    const sessionId = params.id
     const addSets = React.useCallback(() => {
-        addMultipleSetsToSessionCross(selectedRows ? selectedRows : [], params.id)
+        addMultipleSetsToSessionCross(selectedRows ? selectedRows : [], sessionId)
         .then((results: any) => {
           if (results.code === 'success') {
             setStatus({ success: true })
@@ -313,7 +337,11 @@ export function GMTCrossLayout() {
             headerName: 'Overlap',
             flex: 0.3,
             minWidth: 100,
-            renderCell: RenderOverlapButton
+            renderCell: params => {
+                return <RenderOverlapButton params={params} sessionId={sessionId}/>
+            }
+
+                
             // width: 160,
         },
         {
@@ -425,7 +453,7 @@ export function GMTCrossLayout() {
                     <LinearProgress color="secondary" />
                 </Box>}
                 {(rows.length > 0) && <div style={{ width: '100%' }}>
-                {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon/> Add to List</Button>}
+                {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon/> ADD TO CART</Button>}
                     <DataGrid
                         rows={rows}
                         columns={columns}

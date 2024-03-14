@@ -28,8 +28,8 @@ export async function checkValidGenes(genes: string) {
             }
         }
     );
-    const allGenes = possibleGenes.map((geneRecord) => geneRecord.gene_symbol)
-    const genesFound = genesArray.filter((gene) => allGenes.includes(gene))
+    const allGenes = possibleGenes.map((geneRecord) => geneRecord.gene_symbol.toLowerCase())
+    const genesFound = genesArray.filter((gene) => allGenes.includes(gene.toLowerCase()))
     return genesFound
 }
 
@@ -37,7 +37,10 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
     // get gene objects
     const geneObjects = await Promise.all(gene_list.map(async (gene) => await prisma.gene.findFirst({
         where: {
-            gene_symbol: gene
+            gene_symbol: {
+                equals: gene,
+                mode: 'insensitive'
+            }
         }
     })));
 
@@ -70,7 +73,7 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
             description: description,
             session_id: sessionId,
             genes: {
-                connect: geneObjectIds,
+                connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
             },
         }
     })

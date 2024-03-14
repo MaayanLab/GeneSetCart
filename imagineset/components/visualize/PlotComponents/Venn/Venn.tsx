@@ -1,4 +1,5 @@
 // extracted from react
+'use client'
 import { type Gene, type GeneSet } from "@prisma/client";
 import { VennDiagram, VennArc, VennSeries, Gradient, VennLabel, VennOuterLabel } from "reaviz";
 import React from "react";
@@ -71,7 +72,7 @@ export function VennPlot({ selectedSets }: {
     return (
         <div style={{
             width: '90%',
-            height: '90%',
+            height: '80%',
             // border: 'solid 1px red',
             position: 'absolute',
             justifyContent:'center',
@@ -82,9 +83,9 @@ export function VennPlot({ selectedSets }: {
         // height={400} 
         // width={450} 
         margins={[3, 3, 3, 3]}
-        containerClassName= "p-3"
+        // containerClassName= "p-3÷"
         data={vennData} 
-        series={<VennSeries colorScheme="cybertron" arc={<VennArc strokeWidth={3} gradient={<Gradient />}/>} 
+        series={<VennSeries animated={false} colorScheme="cybertron" arc={<VennArc strokeWidth={3} gradient={<Gradient />}/>} 
         label={<VennLabel labelType={'value'} showAll={true} fill={'#000000'} fontSize={15} />} outerLabel={<VennOuterLabel />} />} 
         />
         </div>

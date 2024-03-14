@@ -174,7 +174,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             <Grid item xs={3}>
                 <Stack direction='column' spacing={2}>
                     <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
-                    <Box sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, height: 200, boxShadow: 2 }}>
+                    <Box sx={{ maxWidth: 250, bgcolor: 'background.paper', borderRadius: 2, height: 200, boxShadow: 2 }}>
                         <ListSubheader>
                             Genes ({overlap.length})
                         </ListSubheader>

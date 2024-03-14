@@ -17,7 +17,7 @@ import { useParams } from "next/navigation";
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import Status from "@/components/assemble/Status";
 
-const RenderOverlapButton = ({params, sessionId} : {params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, sessionId: string}) => {
+const RenderOverlapButton = ({ params, sessionId }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, sessionId: string }) => {
     const [open, setOpen] = React.useState(false);
     const [status, setStatus] = React.useState<addStatus>({})
 
@@ -82,12 +82,12 @@ const RenderOverlapButton = ({params, sessionId} : {params: GridRenderCellParams
                                     const genesetName = params.row.geneset_1 + ' Intersection ' + params.row.geneset_2
                                     checkInSession(sessionId, genesetName).then((response) => {
                                         if (response) {
-                                            setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+                                            setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
                                         } else {
-                                            addToSessionSets(params.row.overlap.toString().replaceAll("'", '').split(','), sessionId, genesetName ,'').then((result) => {setStatus({success:true})}).catch((err) => setStatus({error:{selected:true, message:"Error in adding gene set!"}}))
+                                            addToSessionSets(params.row.overlap.toString().replaceAll("'", '').split(','), sessionId, genesetName, '').then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
                                         }
-                                    }) 
-                                    
+                                    })
+
                                     // enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' Intersection ' + params.row.geneset_2 })
                                 }}
                             >
@@ -96,7 +96,7 @@ const RenderOverlapButton = ({params, sessionId} : {params: GridRenderCellParams
                         </Grid>
                     </Grid>
                     <Grid item>
-                    <Status status={status} />
+                        <Status status={status} />
                     </Grid>
                 </Grid>
             </Dialog>
@@ -168,14 +168,10 @@ const CFDE_Lib_Full: { [key: string]: string } = {
 const sortDict = (dict: { [key: string]: number[] }) => {
     let items = Object.keys(dict).map(
         (key) => { return [key, dict[key]] });
-
-    // Step - 2
-    // Sort the array based on the second element (i.e. the value)
+    // Sort the array based on the first number in the value (starting index) element
     items.sort(
         (first: any, second: any) => { return first[1][1] - second[1][1] }
     );
-
-    // Step - 3
     // Obtain the list of keys in sorted order of the values.
     let keys = items.map(
         (e) => { return e[0] as string });
@@ -230,14 +226,14 @@ export function GMTCrossLayout() {
     const sessionId = params.id
     const addSets = React.useCallback(() => {
         addMultipleSetsToSessionCross(selectedRows ? selectedRows : [], sessionId)
-        .then((results: any) => {
-          if (results.code === 'success') {
-            setStatus({ success: true })
-          } else if (results.code === 'error') {
-            setStatus({ error: { selected: true, message: results.message } })
-          }
-        }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
-      }, [selectedRows])
+            .then((results: any) => {
+                if (results.code === 'success') {
+                    setStatus({ success: true })
+                } else if (results.code === 'error') {
+                    setStatus({ error: { selected: true, message: results.message } })
+                }
+            }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
+    }, [selectedRows])
 
 
     const getCrossData = React.useCallback(() => {
@@ -338,10 +334,10 @@ export function GMTCrossLayout() {
             flex: 0.3,
             minWidth: 100,
             renderCell: params => {
-                return <RenderOverlapButton params={params} sessionId={sessionId}/>
+                return <RenderOverlapButton params={params} sessionId={sessionId} />
             }
 
-                
+
             // width: 160,
         },
         {
@@ -453,7 +449,7 @@ export function GMTCrossLayout() {
                     <LinearProgress color="secondary" />
                 </Box>}
                 {(rows.length > 0) && <div style={{ width: '100%' }}>
-                {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon/> ADD TO CART</Button>}
+                    {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> ADD TO CART</Button>}
                     <DataGrid
                         rows={rows}
                         columns={columns}

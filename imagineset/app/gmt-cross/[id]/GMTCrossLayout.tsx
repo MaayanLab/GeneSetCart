@@ -1,5 +1,5 @@
 'use client'
-import { Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, LinearProgress, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, LinearProgress, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
@@ -84,7 +84,11 @@ type hypothesisDisplay = {
     geneset2: string,
     library1: string,
     library2: string,
-    hypothesis: string
+    hypothesis: string,
+    abstract1: string,
+    abstract2: string,
+    enrichedTerms: string[]
+    topEnrichmentResults: { [key: string]: any[] } | null
 }
 
 const download = (filename: string, text: string) => {
@@ -110,6 +114,82 @@ const CFDELibHeaders: { [key: string]: string } = {
     "MoTrPAC": 'MoTrPAC Gene Sets'
 }
 
+const CFDE_Lib_Full: { [key: string]: string } = {
+    "LINCS_L1000_Chem_Pert_Consensus_Sigs": "LINCS L1000 Chemical Pertubations Consensus Signatures",
+    "LINCS_L1000_CRISPR_KO_Consensus_Sigs": "LINCS L1000 CRISPR Knockout Consensus Signatures",
+    "GTEx_Tissues": 'GTEx Tissue Gene Expression Profiles',
+    "GTEx_Aging_Sigs": 'GTEx Aging Signatures',
+    "Metabolomics_Workbench_Metabolites": 'Metabolomics Workbench Metabolites',
+    "IDG_Drug_Targets": 'IDG Drug Targets',
+    "GlyGen_Glycosylated_Proteins": 'GlyGen Glycosylated Proteins',
+    "KOMP2_Mouse_Phenotypes": 'KOMP2 Mouse Phenotypes',
+    "MoTrPAC": 'MoTrPAC Rat Endurance Exercise Training'
+}
+
+// const CFDELibraryOptions: { [key: string]: string } = {
+//     "LINCS_L1000_Chem_Pert_Consensus_Sigs": "LINCS L1000 CMAP Chemical Pertubation Consensus Signatures",
+//     "LINCS_L1000_CRISPR_KO_Consensus_Sigs": 'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures',
+//     "GTEx_Tissues_V8_2023": 'GTEx Tissue Gene Expression Profiles',
+//     "GTEx_Aging_Signatures_2021": 'GTEx Tissue-Specific Aging Signatures',
+//     "Metabolomics_Workbench_Metabolites_2022": 'Metabolomics Gene-Metabolite Associations',
+//     "IDG_Drug_Targets_2022": 'IDG Drug Targets',
+//     "GlyGen_Glycosylated_Proteins_2022": 'Glygen Glycosylated Proteins',
+//     "KOMP2_Mouse_Phenotypes_2022": 'KOMP2 Mouse Phenotypes',
+//     // "HuBMAP_ASCTplusB_augmented_2022": 'HuBMAP Anatomical Structures, Cell Types, and Biomarkers (ASCT+B)',
+//     "MoTrPAC_2023": 'MoTrPAC Rat Endurance Exercise Training'
+// }
+
+const sortDict = (dict: { [key: string]: number[] }) => {
+    let items = Object.keys(dict).map(
+        (key) => { return [key, dict[key]] });
+
+    // Step - 2
+    // Sort the array based on the second element (i.e. the value)
+    items.sort(
+        (first: any, second: any) => { return first[1][1] - second[1][1] }
+    );
+
+    // Step - 3
+    // Obtain the list of keys in sorted order of the values.
+    let keys = items.map(
+        (e) => { return e[0] as string});
+
+    return keys
+}
+
+const generateHypothesisTooltip = (hypothesisString: string, substringIndices: { [key: string]: number[] }, topEnrichmentResults: { [key: string]: any[] }) => {
+    let prevStart = 0;
+    const splittedStrings = [];
+    for (let term of sortDict(substringIndices)) {
+        splittedStrings.push(<Typography display="inline">{hypothesisString.substring(prevStart, substringIndices[term][0])}</Typography>);
+        splittedStrings.push(
+            <Tooltip title={
+                <React.Fragment>
+                    <Typography color="inherit"> Enrichment Analysis</Typography>
+                    Library: {topEnrichmentResults[term][9]}
+                    <br></br>
+                    Rank: {topEnrichmentResults[term][0]}
+                    <br></br>
+                    P-value: {topEnrichmentResults[term][2].toExponential(2)}
+                    <br></br>
+                    Odds Ratio: {topEnrichmentResults[term][3].toFixed(4)}
+                </React.Fragment>
+            } placement="right" >
+                <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
+                    {hypothesisString.substring(substringIndices[term][0], substringIndices[term][1])}
+                </Typography>
+            </Tooltip>
+        )
+        // splittedStrings.push(<b>{hypothesisString.substring(substringIndices[term][0],  substringIndices[term][1])}</b>);
+        prevStart = substringIndices[term][1]
+    }
+    splittedStrings.push(<Typography display="inline">{hypothesisString.substring(prevStart)}</Typography>);
+    return <React.Fragment>
+        {splittedStrings}
+    </React.Fragment>
+    // <Typography>{splittedStrings}</Typography>;
+}
+
 export function GMTCrossLayout() {
     const [rows, setRows] = React.useState<CFDECrossPair[]>([])
     const [selectedLibs, setSelectedLibs] = React.useState<string[]>([])
@@ -119,11 +199,12 @@ export function GMTCrossLayout() {
     const [headers, setHeaders] = React.useState<string[] | null>(null)
 
     const getCrossData = React.useCallback(() => {
+        setHypothesis(null)
         setLoading(true)
         if (selectedLibs.length === 2) {
-            fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => { 
-                setLoading(false); 
-                setRows(result); 
+            fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => {
+                setLoading(false);
+                setRows(result);
                 setHeaders([CFDELibHeaders[result[0].lib_1], CFDELibHeaders[result[0].lib_2]])
             }).catch((err) => setLoading(false))
         }
@@ -141,19 +222,23 @@ export function GMTCrossLayout() {
                         setHypothesis(null)
                         setHypLoading(true)
                         generateHypothesis(params.row).then((response) => {
-                            setHypLoading(false); if (typeof (response) === 'string') {
+                            setHypLoading(false);
+                            if (response.status === 200) {
                                 const hypothesisDisplayObject = {
                                     geneset1: params.row.geneset_1,
                                     geneset2: params.row.geneset_2,
-                                    library1: params.row.lib_1,
-                                    library2: params.row.lib_2,
-                                    hypothesis: response
+                                    library1: CFDE_Lib_Full[params.row.lib_1],
+                                    library2: CFDE_Lib_Full[params.row.lib_2],
+                                    hypothesis: response.response.hypothesis,
+                                    abstract1: response.response.abstract1,
+                                    abstract2: response.response.abstract2,
+                                    enrichedTerms: response.response.enrichedTerms,
+                                    topEnrichmentResults: response.response.topEnrichmentResults
                                 }
                                 setHypothesis(hypothesisDisplayObject)
                             }
                         }).catch((err) => { setHypLoading(false); })
                     }}
-                // onClick={handleClickOpen}
                 >
                     <Typography sx={{ fontSize: 10, textWrap: 'wrap' }}>
                         GPT-4 Hypothesis
@@ -197,7 +282,11 @@ export function GMTCrossLayout() {
             flex: 0.5,
             minWidth: 100,
             renderCell: (params) => {
-                return (params.value.toFixed(4));
+                if (params.value === 999999999999999.99) {
+                    return 'inf'
+                } else {
+                    return (params.value.toFixed(4));
+                }
             },
             //   width: 160,
         },
@@ -222,6 +311,19 @@ export function GMTCrossLayout() {
         },
     ];
 
+    const enrichedTermsIndices = React.useMemo(() => {
+        if (hypothesis) {
+            let indices: { [key: string]: number[] } = {}
+            for (let term of hypothesis.enrichedTerms) {
+                const termStart = hypothesis.hypothesis.indexOf(term)
+                if (termStart !== -1) {
+                    indices[term] = [termStart, termStart + term.length]
+                }
+            }
+            return indices
+        }
+        return null
+    }, [hypothesis])
 
     return (
         <>
@@ -261,11 +363,46 @@ export function GMTCrossLayout() {
                             `)
                                 }}><DownloadIcon /></Button>
                             </Box>
-                            <Box><Typography><strong>GENE SET 1:</strong> {hypothesis.geneset1}</Typography></Box>
-                            <Box><Typography><strong>GENE SET 2:</strong> {hypothesis.geneset2}</Typography></Box>
+                            <Box>
+                                <Typography>
+                                    <strong>GENE SET 1: </strong>
+                                    <Tooltip title={
+                                        <React.Fragment>
+                                            <Typography color="inherit"> Abstract for {hypothesis.geneset1}</Typography>
+                                            {hypothesis.abstract1}
+                                        </React.Fragment>
+                                    } placement="right">
+                                        <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
+                                            {hypothesis.geneset1}
+                                        </Typography>
+                                    </Tooltip>
+                                </Typography>
+                            </Box>
+                            {/* <Box><Typography><strong>GENE SET 2:</strong> {hypothesis.geneset2}</Typography></Box> */}
+                            <Box>
+                                <Typography>
+                                    <strong>GENE SET 2: </strong>
+                                    <Tooltip title={
+                                        <React.Fragment>
+                                            <Typography color="inherit"> Abstract for {hypothesis.geneset2}</Typography>
+                                            {hypothesis.abstract2}
+                                        </React.Fragment>
+                                    } placement="right">
+                                        <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
+                                            {hypothesis.geneset2}
+                                        </Typography>
+                                    </Tooltip>
+                                </Typography>
+                            </Box>
                             <Box><Typography><strong>LIBRARY 1:</strong> {hypothesis.library1}</Typography></Box>
                             <Box><Typography><strong>LIBRARY 2:</strong> {hypothesis.library2}</Typography></Box>
-                            <Box><Typography><strong>HYPOTHESIS:</strong> {hypothesis.hypothesis}</Typography></Box>
+                            {/* <Box><Typography><strong>HYPOTHESIS:</strong> {hypothesis.hypothesis}</Typography></Box> */}
+                            <Box>
+                                <Typography>
+                                    <strong>HYPOTHESIS: </strong>
+                                </Typography>
+                                {enrichedTermsIndices && hypothesis.topEnrichmentResults && generateHypothesisTooltip(hypothesis.hypothesis, enrichedTermsIndices, hypothesis.topEnrichmentResults)}
+                            </Box>
                         </Stack>
                     </Paper>}
                 {hypLoading && <Box sx={{ width: '100%' }}>
@@ -311,33 +448,11 @@ export function GMTCrossLayout() {
                             '& .super-app-theme--header': {
                                 padding: 2,
                                 fontSize: 13,
-                              },
+                            },
                         }}
                     />
                 </div>}
             </Stack>
-            {/* <Dialog
-                onClose={handleClose}
-                open={open}>
-                <DialogTitle sx={{ m: 0, p: 2 }}>
-                    FEATURE COMING SOON
-                </DialogTitle>
-                <IconButton
-                    aria-label="close"
-                    onClick={handleClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500],
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-                <DialogContent >
-                    The GPT-generated hypothesis functionality is coming soon!
-                </DialogContent>
-            </Dialog> */}
         </>
     )
 }

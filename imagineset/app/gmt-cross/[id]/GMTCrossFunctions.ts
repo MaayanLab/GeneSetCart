@@ -61,15 +61,36 @@ async function getEnrichmentTerms(overlapGenes: string[]) {
         }
     }
     )
-    const userListId = data.userListId
-    // const response = await fetch('https://maayanlab.cloud/Enrichr/enrich?' + new URLSearchParams(`userListId=${userListId}&backgroundType=WikiPathway_2023_Human`))
-    const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=WikiPathway_2023_Human`)
-    if (response.status === 200) {
-        const enrichmentResults = await response.json() 
-        return enrichmentResults['WikiPathway_2023_Human'].slice(0, 10).map((result: any[]) => result[1])
-    } else {
-        return []
+    const userListId = data.userListId 
+    const libraries = ['WikiPathway_2023_Human', 'GWAS_Catalog_2023', 'GO_Biological_Process_2023', 'MGI_Mammalian_Phenotype_Level_4_2021', ]
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    let enrichedTerms : string[] = []
+    let topEnrichmentResults : {[key: string]: any[]} = {}
+    for (let lib of libraries) {
+        const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}`)
+        if (response.status === 200) {
+            const enrichmentResults = await response.json() 
+            const topResults = enrichmentResults[lib].slice(0, 5)
+            for (let termInd in topResults){
+                const termResults = topResults[termInd]
+                const term = topResults[termInd][1]
+                topEnrichmentResults[term] = [...termResults, lib]
+                enrichedTerms.push(term)
+            }
+        } else {
+            await sleep(10)
+            const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}`)
+            const enrichmentResults = await response.json() 
+            const topResults = enrichmentResults[lib].slice(0, 5)
+            for (let termInd in topResults){
+                const termResults = topResults[termInd]
+                const term = topResults[termInd][1]
+                topEnrichmentResults[term] = [...termResults, lib]
+                enrichedTerms.push(term)
+            }
+        }
     }
+    return {enrichedTerms: enrichedTerms, topEnrichmentResults: topEnrichmentResults}
 }
 
 export async function getSpecifiedAbstracts(term1: string, term2: string, abstract1: string, abstract2: string) {
@@ -80,7 +101,7 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
     Term for gene set 1: ${term2}
     Abstract template for gene set 1: ${abstract1}
     Abstract template for gene set 2: ${abstract2}
-    The response should only include the specified abstracts for both gene sets
+    The response should only include the specified abstracts for both gene sets in the form [abstract1, abstract2]
     `
     try {
         const cachedAbstracts = cache.get( term1+ term2 + abstract1+ abstract2 );
@@ -106,9 +127,15 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
             const tagLineParsed = await tagLine.json()
             const abstracts: string = tagLineParsed.choices[0].message.content
             const success = cache.set( term1+ term2 + abstract1+ abstract2, abstracts, 10000 )
-            return abstracts
+            return {
+                response: abstracts,
+                status: 200,
+            }
         } else {
-            return cachedAbstracts ? cachedAbstracts : ''
+            return {
+                response: cachedAbstracts ? cachedAbstracts as string : '',
+                status: 200,
+            }
         }
 
 
@@ -116,14 +143,15 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
         return {
             response: "The OpenAI endpoint is currently overloaded. Please try again in a few minutes",
             status: 1,
-            input: undefined,
-            output: undefined
         }
     }
 }
 
+
 export async function generateHypothesis(row: any ) {
-    const enrichedTerms = await getEnrichmentTerms(row.overlap)
+    const enrichedResults = await getEnrichmentTerms(row.overlap)
+    const enrichedTerms = enrichedResults.enrichedTerms
+    const topEnrichmentResults = enrichedResults.topEnrichmentResults
     const abstract1 = await prisma.libAbstracts.findFirst({
         where: {
             lib: row.lib_1
@@ -146,14 +174,18 @@ export async function generateHypothesis(row: any ) {
     const term2 = row.geneset_2
     const overlapGeneSet = row.overlap
     if ((abstract1 === null) || (abstract2 === null) ) throw new Error('templates not found')
-    const abstracts = await getSpecifiedAbstracts(term1, term2, abstract1.abstract, abstract2.abstract)
+    const abstractsResponse = await getSpecifiedAbstracts(term1, term2, abstract1.abstract, abstract2.abstract)
+    if (abstractsResponse.status === 1) throw new Error('Could not parse abstracts')
+    const abstractsList = JSON.parse(abstractsResponse.response)
     const input = `
     There are two gene sets that highly overlap. Performing enrichment analysis on the overlapping genes shows that many of them are related to 
     the following biological pathways: ${enrichedTerms.toString()}.  Hypothesize why a high overlap between the gene sets exists
     based on specified abstracts of each gene set that explains how each gene set was created, the overlapping genes between 
     both gene sets, and the biological pathways that the overlapping genes are related to based on the gene set enrichment analysis results.
-    Specified Abstracts for gene sets: ${abstracts}
-    The overlapping genes are ${overlapGeneSet.toString()}
+    Make sure incorporate the enrichment analysis results in your response in a meaningful way with each enirchment term appearing in the text in the 
+    exact form it was given (do not exclude words or characters from a term).
+    Specified Abstracts for gene sets: ${abstractsList}
+    The overlapping genes are ${overlapGeneSet.toString().replaceAll("'", '')}
     Do not include 'Hypothesis: ' at the beginning of your response
     `
     try {
@@ -180,16 +212,20 @@ export async function generateHypothesis(row: any ) {
         const tagLineParsed = await tagLine.json()
         const hypothesis: string = tagLineParsed.choices[0].message.content
         const success = cache.set(term1+term2, hypothesis, 10000 )
-        return hypothesis
+        return {
+            response: {hypothesis: hypothesis, abstract1: abstractsList[0], abstract2: abstractsList[1], enrichedTerms: enrichedTerms, topEnrichmentResults: topEnrichmentResults},
+            status: 200
+        }
     } else {
-        return cachedHypothesis ? cachedHypothesis : ''
+        return {
+            response: {hypothesis: cachedHypothesis ? cachedHypothesis as string : '', abstract1: abstractsList[0], abstract2: abstractsList[1],  enrichedTerms: enrichedTerms, topEnrichmentResults: topEnrichmentResults},
+            status: 200
+        }
     }
     } catch {
         return {
-            response: "The OpenAI endpoint is currently overloaded. Please try again in a few minutes",
-            status: 1,
-            input: undefined,
-            output: undefined
+            response: {hypothesis: "The OpenAI endpoint is currently overloaded. Please try again in a few minutes", abstract1: '', abstract2: '',  enrichedTerms: [], topEnrichmentResults: null},
+            status: 1
         }
     }
 }

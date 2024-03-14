@@ -99,6 +99,17 @@ type GMTGenesetInfo = {
     genes: string[]
 }
 
+type selectedCrossRowType = {
+    id: string,
+    lib_1: string,
+    lib_2: string,
+    geneset_1: string,
+    geneset_2: string,
+    odds_ratio: number,
+    pvalue: number,
+    n_overlap: number,
+    overlap: string[]
+}
 
 
 export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string) {
@@ -116,6 +127,23 @@ export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined
     }
     return { code: 'success' }
 }
+
+export async function addMultipleSetsToSessionCross(rows: (selectedCrossRowType | undefined)[], sessionId: string) {
+    for (const row of rows) {
+        if (row) {
+            const alreadyExists = await checkInSession(sessionId, row.geneset_1 + ' ∩ ' + row.geneset_2)
+            if (alreadyExists) {
+                return { code: 'error', message: `Gene set : ${row.geneset_1 + ' ∩ ' + row.geneset_2} already in cart` }
+            } else {
+                const validGenes = await checkValidGenes(row.overlap.toString().replaceAll(',', '\n').replaceAll("'", ''))
+                const added = await addToSessionSets(validGenes, sessionId, row.geneset_1 + ' ∩ ' + row.geneset_2, '')
+            }
+
+        }
+    }
+    return { code: 'success' }
+}
+
 
 export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[], sessionId: string) {
     for (const row of rows) {

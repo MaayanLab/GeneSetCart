@@ -11,6 +11,11 @@ import { CFDECrossPair } from "@prisma/client";
 import { enrich } from "@/app/analyze/[id]/ViewGenesBtn";
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DownloadIcon from '@mui/icons-material/Download';
+import { addMultipleSetsToSessionCross } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addStatus } from "@/components/assemble/fileUpload/SingleUpload";
+import { useParams } from "next/navigation";
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import Status from "@/components/assemble/Status";
 
 const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
     const [open, setOpen] = React.useState(false);
@@ -69,8 +74,6 @@ const RenderOverlapButton = (params: GridRenderCellParams<any, any, any, GridTre
                                 SEND TO ENRICHR
                             </Button>
                         </Grid>
-
-
                     </Grid>
                 </Grid>
             </Dialog>
@@ -89,6 +92,19 @@ type hypothesisDisplay = {
     abstract2: string,
     enrichedTerms: string[]
     topEnrichmentResults: { [key: string]: any[] } | null
+}
+
+
+type selectedCrossRowType = {
+    id: string,
+    lib_1: string,
+    lib_2: string,
+    geneset_1: string,
+    geneset_2: string,
+    odds_ratio: number,
+    pvalue: number,
+    n_overlap: number,
+    overlap: string[]
 }
 
 const download = (filename: string, text: string) => {
@@ -126,19 +142,6 @@ const CFDE_Lib_Full: { [key: string]: string } = {
     "MoTrPAC": 'MoTrPAC Rat Endurance Exercise Training'
 }
 
-// const CFDELibraryOptions: { [key: string]: string } = {
-//     "LINCS_L1000_Chem_Pert_Consensus_Sigs": "LINCS L1000 CMAP Chemical Pertubation Consensus Signatures",
-//     "LINCS_L1000_CRISPR_KO_Consensus_Sigs": 'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures',
-//     "GTEx_Tissues_V8_2023": 'GTEx Tissue Gene Expression Profiles',
-//     "GTEx_Aging_Signatures_2021": 'GTEx Tissue-Specific Aging Signatures',
-//     "Metabolomics_Workbench_Metabolites_2022": 'Metabolomics Gene-Metabolite Associations',
-//     "IDG_Drug_Targets_2022": 'IDG Drug Targets',
-//     "GlyGen_Glycosylated_Proteins_2022": 'Glygen Glycosylated Proteins',
-//     "KOMP2_Mouse_Phenotypes_2022": 'KOMP2 Mouse Phenotypes',
-//     // "HuBMAP_ASCTplusB_augmented_2022": 'HuBMAP Anatomical Structures, Cell Types, and Biomarkers (ASCT+B)',
-//     "MoTrPAC_2023": 'MoTrPAC Rat Endurance Exercise Training'
-// }
-
 const sortDict = (dict: { [key: string]: number[] }) => {
     let items = Object.keys(dict).map(
         (key) => { return [key, dict[key]] });
@@ -152,7 +155,7 @@ const sortDict = (dict: { [key: string]: number[] }) => {
     // Step - 3
     // Obtain the list of keys in sorted order of the values.
     let keys = items.map(
-        (e) => { return e[0] as string});
+        (e) => { return e[0] as string });
 
     return keys
 }
@@ -180,14 +183,12 @@ const generateHypothesisTooltip = (hypothesisString: string, substringIndices: {
                 </Typography>
             </Tooltip>
         )
-        // splittedStrings.push(<b>{hypothesisString.substring(substringIndices[term][0],  substringIndices[term][1])}</b>);
         prevStart = substringIndices[term][1]
     }
     splittedStrings.push(<Typography display="inline">{hypothesisString.substring(prevStart)}</Typography>);
     return <React.Fragment>
         {splittedStrings}
     </React.Fragment>
-    // <Typography>{splittedStrings}</Typography>;
 }
 
 export function GMTCrossLayout() {
@@ -197,6 +198,23 @@ export function GMTCrossLayout() {
     const [hypLoading, setHypLoading] = React.useState(false)
     const [hypothesis, setHypothesis] = React.useState<hypothesisDisplay | null>(null)
     const [headers, setHeaders] = React.useState<string[] | null>(null)
+    const [rowSelectionModel, setRowSelectionModel] =
+        React.useState<GridRowSelectionModel>([]);
+    const [selectedRows, setSelectedRows] = React.useState<(selectedCrossRowType | undefined)[]>([])
+    const [status, setStatus] = React.useState<addStatus>({})
+
+    const params = useParams<{ id: string }>()
+    const addSets = React.useCallback(() => {
+        addMultipleSetsToSessionCross(selectedRows ? selectedRows : [], params.id)
+        .then((results: any) => {
+          if (results.code === 'success') {
+            setStatus({ success: true })
+          } else if (results.code === 'error') {
+            setStatus({ error: { selected: true, message: results.message } })
+          }
+        }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
+      }, [selectedRows])
+
 
     const getCrossData = React.useCallback(() => {
         setHypothesis(null)
@@ -378,7 +396,6 @@ export function GMTCrossLayout() {
                                     </Tooltip>
                                 </Typography>
                             </Box>
-                            {/* <Box><Typography><strong>GENE SET 2:</strong> {hypothesis.geneset2}</Typography></Box> */}
                             <Box>
                                 <Typography>
                                     <strong>GENE SET 2: </strong>
@@ -396,7 +413,6 @@ export function GMTCrossLayout() {
                             </Box>
                             <Box><Typography><strong>LIBRARY 1:</strong> {hypothesis.library1}</Typography></Box>
                             <Box><Typography><strong>LIBRARY 2:</strong> {hypothesis.library2}</Typography></Box>
-                            {/* <Box><Typography><strong>HYPOTHESIS:</strong> {hypothesis.hypothesis}</Typography></Box> */}
                             <Box>
                                 <Typography>
                                     <strong>HYPOTHESIS: </strong>
@@ -409,6 +425,7 @@ export function GMTCrossLayout() {
                     <LinearProgress color="secondary" />
                 </Box>}
                 {(rows.length > 0) && <div style={{ width: '100%' }}>
+                {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon/> Add to List</Button>}
                     <DataGrid
                         rows={rows}
                         columns={columns}
@@ -421,7 +438,12 @@ export function GMTCrossLayout() {
                             },
                         }}
                         pageSizeOptions={[5, 10, 25]}
-                        disableRowSelectionOnClick
+                        // disableRowSelectionOnClick
+                        onRowSelectionModelChange={(newRowSelectionModel) => {
+                            setRowSelectionModel(newRowSelectionModel);
+                            setSelectedRows(newRowSelectionModel.map((id) => rows.find((row) => row.id === id)))
+                        }}
+                        rowSelectionModel={rowSelectionModel}
                         checkboxSelection
                         sx={{
                             '.MuiDataGrid-columnHeader': {
@@ -451,6 +473,7 @@ export function GMTCrossLayout() {
                             },
                         }}
                     />
+                    <Status status={status} />
                 </div>}
             </Stack>
         </>

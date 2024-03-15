@@ -16,6 +16,7 @@ import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
 import { revalidatePath } from 'next/cache'
 import GMTHeader, { CurrentSession } from './GMTHeader'
+
 export async function getGenesets(sessionId: string) {
     if (sessionId) {
         const sessionGenesets = await prisma.pipelineSession.findUnique({
@@ -62,35 +63,77 @@ export async function getSessionInfo(sessionId: string) {
     return sessionInfo
 }
 
-export default async function Header() {
+export default async function Header({sessionId} : {sessionId: string}) {
     // TO DO: add user authentication in header for cart drawer here
     const session = await getServerSession(authOptions)
-    return (
-        <Container maxWidth="lg">
-            <AppBar position="static" sx={{ color: "#000" }}>
-                <Toolbar>
-                    <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
-                        <Grid item>
-                            <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" />
+    if (sessionId) {
+        const sessionInfo = await prisma.pipelineSession.findUnique({
+            where: {
+                id: sessionId
+            },
+            select: {
+                gene_sets: {
+                    include: {
+                        genes: true
+                    }
+                }
+            }
+        })
+    
+        return (
+            <Container maxWidth="lg">
+                <AppBar position="static" sx={{ color: "#000" }}>
+                    <Toolbar>
+                        <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
+                            <Grid item>
+                                <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" />
+                            </Grid>
+                            <Grid item>
+                                <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                                    <CartDrawer sessionInfo={sessionInfo}/>
+                                    <CurrentSession sessionId={sessionId}/>
+                                    <GMTHeader sessionId={sessionId}/>
+                                    <Link href="/sessions">
+                                        <Typography variant="nav">MY SESSIONS</Typography>
+                                    </Link>
+                                    <Link href="/use-cases">
+                                        <Typography variant="nav">USE CASES</Typography>
+                                    </Link>
+                                    <UserComponent session={session} />
+                                </Stack>
+                            </Grid>
+                            <Grid item xs={12}></Grid>
                         </Grid>
-                        <Grid item>
-                            <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                                <CartDrawer getSessionInfo={getSessionInfo}/>
-                                <CurrentSession />
-                                <GMTHeader />
-                                <Link href="/sessions">
-                                    <Typography variant="nav">MY SESSIONS</Typography>
-                                </Link>
-                                <Link href="/use-cases">
-                                    <Typography variant="nav">USE CASES</Typography>
-                                </Link>
-                                <UserComponent session={session} />
-                            </Stack>
+                    </Toolbar>
+                </AppBar>
+            </Container>
+        )
+    } else {
+        return (
+            <Container maxWidth="lg">
+                <AppBar position="static" sx={{ color: "#000" }}>
+                    <Toolbar>
+                        <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
+                            <Grid item>
+                                <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" />
+                            </Grid>
+                            <Grid item>
+                                <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                                    <Link href="/sessions">
+                                        <Typography variant="nav">MY SESSIONS</Typography>
+                                    </Link>
+                                    <Link href="/use-cases">
+                                        <Typography variant="nav">USE CASES</Typography>
+                                    </Link>
+                                    <UserComponent session={session} />
+                                </Stack>
+                            </Grid>
+                            <Grid item xs={12}></Grid>
                         </Grid>
-                        <Grid item xs={12}></Grid>
-                    </Grid>
-                </Toolbar>
-            </AppBar>
-        </Container>
-    )
+                    </Toolbar>
+                </AppBar>
+            </Container>
+        )
+    }
+
 }

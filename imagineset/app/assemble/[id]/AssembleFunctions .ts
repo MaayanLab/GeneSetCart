@@ -28,8 +28,8 @@ export async function checkValidGenes(genes: string) {
             }
         }
     );
-    const allGenes = possibleGenes.map((geneRecord) => geneRecord.gene_symbol)
-    const genesFound = genesArray.filter((gene) => allGenes.includes(gene))
+    const allGenes = possibleGenes.map((geneRecord) => geneRecord.gene_symbol.toLowerCase())
+    const genesFound = genesArray.filter((gene) => allGenes.includes(gene.toLowerCase()))
     return genesFound
 }
 
@@ -37,7 +37,10 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
     // get gene objects
     const geneObjects = await Promise.all(gene_list.map(async (gene) => await prisma.gene.findFirst({
         where: {
-            gene_symbol: gene
+            gene_symbol: {
+                equals: gene,
+                mode: 'insensitive'
+            }
         }
     })));
 
@@ -70,7 +73,7 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
             description: description,
             session_id: sessionId,
             genes: {
-                connect: geneObjectIds,
+                connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
             },
         }
     })
@@ -99,6 +102,17 @@ type GMTGenesetInfo = {
     genes: string[]
 }
 
+type selectedCrossRowType = {
+    id: string,
+    lib_1: string,
+    lib_2: string,
+    geneset_1: string,
+    geneset_2: string,
+    odds_ratio: number,
+    pvalue: number,
+    n_overlap: number,
+    overlap: string[]
+}
 
 
 export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string) {
@@ -116,6 +130,23 @@ export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined
     }
     return { code: 'success' }
 }
+
+export async function addMultipleSetsToSessionCross(rows: (selectedCrossRowType | undefined)[], sessionId: string) {
+    for (const row of rows) {
+        if (row) {
+            const alreadyExists = await checkInSession(sessionId, row.geneset_1 + ' ∩ ' + row.geneset_2)
+            if (alreadyExists) {
+                return { code: 'error', message: `Gene set : ${row.geneset_1 + ' ∩ ' + row.geneset_2} already in cart` }
+            } else {
+                const validGenes = await checkValidGenes(row.overlap.toString().replaceAll(',', '\n').replaceAll("'", ''))
+                const added = await addToSessionSets(validGenes, sessionId, row.geneset_1 + ' ∩ ' + row.geneset_2, '')
+            }
+
+        }
+    }
+    return { code: 'success' }
+}
+
 
 export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[], sessionId: string) {
     for (const row of rows) {

@@ -21,6 +21,7 @@ import upsetIconAlt from '@/public/img/otherLogos/plotly-upset-alt.png'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import html2canvas from 'html2canvas';
+import { UMAP } from '@/components/visualize/PlotComponents/Umap/Umap';
 
 
 function jaccard_similarity(set1: string[], set2: string[]) {
@@ -227,7 +228,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 style={{ padding: "10%", objectFit: "contain" }}
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         </Button>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} disabled={true}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('UMAP')}>
                             <Image
                                 src={umapIcon}
                                 fill
@@ -266,6 +267,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     {/* {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets} />} */}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
+                                    {(visualization === 'UMAP' && checked.length > 0) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                 </div>
                             </Box>
                         </Stack>

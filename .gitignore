@@ -7,3 +7,4 @@ kub/
 venv
 database/crossed_sets
 database/.ipynb_checkpoints
+__pycache__/

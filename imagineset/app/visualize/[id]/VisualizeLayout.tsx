@@ -14,7 +14,6 @@ import heatmapIcon from '@/public/img/otherLogos/visualizeIcon.png'
 import umapIcon from '@/public/img/otherLogos/umapPlot2.png'
 import Image from 'next/image';
 import { Heatmap } from '../../../components/visualize/PlotComponents/Heatmap/Heatmap';
-import { VennPlot } from '../../../components/visualize/PlotComponents/Venn/Venn';
 import { UpsetPlotV2 } from '../../../components/visualize/PlotComponents/UpSet/Upset';
 import { SuperVenn } from '../../../components/visualize/PlotComponents/SuperVenn/SuperVenn';
 import upsetIconAlt from '@/public/img/otherLogos/plotly-upset-alt.png'
@@ -22,7 +21,8 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import html2canvas from 'html2canvas';
 import { UMAP } from '@/components/visualize/PlotComponents/Umap/Umap';
-
+import dynamic from 'next/dynamic'
+const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), {ssr:false})
 
 function jaccard_similarity(set1: string[], set2: string[]) {
     const union = Array.from(new Set([...set1, ...set2]))
@@ -53,8 +53,7 @@ const downloadSVG = () => {
         //add xml declaration
         source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
         downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), 'svg-visualization.svg')
-    }
-    ;
+    };
 }
 
 function downloadURI(uri: string, name: string) {
@@ -80,14 +79,22 @@ function downloadPNG(divId: string) {
 
 function downloadSVGHTML(divId: string) {
     const div = document.getElementById(divId)
-    if (div) {
-        html2canvas(div).then(function (canvas: { toDataURL: (arg0: string) => any; }) {
-            let source = '<?xml version="1.0" standalone="no"?>\r\n' + canvas;
-            downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), 'svg-visualization.svg')
-            // downloadURI("data:" + myImage, "visualization.png");
+    const svgEl = div?.firstChild
+    if (svgEl) {
+        //get svg source.
+        let serializer = new XMLSerializer();
+        let source = serializer.serializeToString(svgEl);
+        //add name spaces.
+        if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+            source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
         }
-        );
-    }
+        if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+            source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+        }
+        //add xml declaration
+        source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), 'svg-visualization.svg')
+    };
 }
 
 export const alphabet = [
@@ -196,7 +203,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             <Grid item xs={9}>
                 <Stack direction='column' spacing={2}>
                     <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }}>
-                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('Venn')} disabled={true}>
+                        <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('Venn')} disabled={!(checked.length < 6 && checked.length > 0)}>
                             <Image
                                 src={vennIcon}
                                 fill
@@ -246,7 +253,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                         downloadPNG('visualization')
                                     }}
                                     ><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadSVG()}} disabled={visualization === 'SuperVenn'}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn')} else {downloadSVG()}}} disabled={visualization === 'SuperVenn'}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
                                     <Tooltip
                                         title={
@@ -264,7 +271,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             <Box sx={{ justifyContent: 'center' }}>
                                 <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
                                     {(visualization === 'Heatmap' && checked.length < 31 && checked.length > 0) && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />}
-                                    {/* {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets} />} */}
+                                    {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets}/>}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'UMAP' && checked.length > 0) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} />}

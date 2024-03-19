@@ -93,6 +93,7 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
   const [selectedRows, setSelectedRows] = React.useState<(GMTGenesetInfo | undefined)[]>([])
   
   const addSets = React.useCallback(() => {
+    setStatus({loading:true})
     addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id)
     .then((results: any) => {
       if (results.code === 'success') {

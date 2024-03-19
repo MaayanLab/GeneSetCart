@@ -25,11 +25,11 @@ const formatIntersectionData = (data: UpsetData) => {
 
     // nameStr is for the setName, which makes it easy to compile
     // each name would be A, then B, so on..
-    const nameStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.substr(0, data.length);
+    const nameStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.substring(0, data.length);
     data.forEach((x, i) => {
         soloSets.push({
             name: x.name,
-            setName: nameStr.substr(i, 1),
+            setName: nameStr.substring(i, i+1),
             num: x.values.length,
             values: x.values,
         });
@@ -145,7 +145,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         return { data, soloSets }
     }, [selectedSets])
 
-    const allSetNames = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.substr(0, soloSets.length).split('');
+    const allSetNames = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.substring(0, soloSets.length).split('');
 
     // position and dimensions
     const margin = {

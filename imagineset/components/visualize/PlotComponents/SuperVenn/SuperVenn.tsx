@@ -34,7 +34,6 @@ export function SuperVenn({ selectedSets }: {
             body: JSON.stringify(inputProps),
         }).then((res) => res.json()).then((jsonRes) => {setLoading(false); setProps(jsonRes)})
     }, [selectedSets])
-console.log(props)
     return (
         <div className='flex w-full p-1 justify-center'>
         {loading && <CircularProgress color='secondary' />}

@@ -55,7 +55,7 @@ function calculateIntersections(possibleSubsets: ({
 }
 
 
-export function VennPlot({ selectedSets }: {
+export default function VennPlot({ selectedSets }: {
     selectedSets: ({
         alphabet: string;
         genes: Gene[];
@@ -70,7 +70,7 @@ export function VennPlot({ selectedSets }: {
         return getIntersections
     }, [selectedSets])
     return (
-        <div style={{
+        <div id='venn' style={{
             width: '90%',
             height: '80%',
             // border: 'solid 1px red',
@@ -78,12 +78,12 @@ export function VennPlot({ selectedSets }: {
             justifyContent:'center',
             alignSelf:'center',
           }}>
-        <VennDiagram  id="test-chart"
+        <VennDiagram 
         type="starEuler"
         // height={400} 
         // width={450} 
         margins={[3, 3, 3, 3]}
-        // containerClassName= "p-3÷"
+        // containerClassName= "p-3"
         data={vennData} 
         series={<VennSeries animated={false} colorScheme="cybertron" arc={<VennArc strokeWidth={3} gradient={<Gradient />}/>} 
         label={<VennLabel labelType={'value'} showAll={true} fill={'#000000'} fontSize={15} />} outerLabel={<VennOuterLabel />} />} 

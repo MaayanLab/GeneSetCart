@@ -13,7 +13,7 @@ export function UMAP({ selectedSets, setOverlap }: {
     setOverlap: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
     let genesetDict: { [key: string]: string[] } = {}
-    const genesetGenes = selectedSets?.forEach((geneset) => {
+    selectedSets?.forEach((geneset) => {
         const genes = geneset.genes.map((gene) => gene.gene_symbol)
         const genesetName = geneset.name
         genesetDict[genesetName] = genes
@@ -39,9 +39,9 @@ export function UMAP({ selectedSets, setOverlap }: {
                 });
                 setDataMapped(dataMapped)
             }).catch((err) => console.log(err))
-        }, [])
+        }, [selectedSets])
 
-        return  <Scatterplot width={500} height={500} data={dataMapped} />
+        return  <Scatterplot width={600} height={600} data={dataMapped} />
     }
 }
 

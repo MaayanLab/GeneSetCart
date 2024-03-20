@@ -39,8 +39,6 @@ def geneset_umap(geneset_genes):
 def calculateUMAP():
     data = request.get_json()
     geneset_genes = data['geneset_genes']
-    # thread1 = threading.Thread(target=task1)
-    # thread2 = threading.Thread(target=task2)
     umap_df = geneset_umap(geneset_genes)
     return json.dumps(umap_df.to_dict('split')['data']) 
 

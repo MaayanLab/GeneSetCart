@@ -3,7 +3,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
-import { Collapse, Grid, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, styled } from '@mui/material';
+import { Collapse, Grid, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
 import { Badge } from '@mui/material'
 import { Gene, type GeneSet } from '@prisma/client';
@@ -41,10 +41,14 @@ const GenesetInfo = ({ geneset }: {
     return (
         <>
             <TableRow>
+                <>
                 <TableCell>
-                    <Grid container direction='column'>
-                        <Grid item>
-                            {geneset.name}
+                    <Grid container direction='column' sx={{ width:250}}>
+                        <Grid item zeroMinWidth sx={{
+                        whiteSpace: 'normal',
+                        overflowWrap: 'anywhere', // Force text wrap
+                    }}>
+                            <Typography>{geneset.name}</Typography>
                         </Grid>
                         <Grid item>
                             <Typography sx={{ fontSize: 12, color: 'gray' }}>
@@ -59,6 +63,7 @@ const GenesetInfo = ({ geneset }: {
                 <TableCell>
                     <Button color='secondary' onClick={(evt) => deleteGeneset(geneset)}><DeleteIcon /></Button>
                 </TableCell>
+                </>
             </TableRow>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <Table>
@@ -98,14 +103,13 @@ const DrawerInfo = ({ genesets }: {
 }) => {
     return (
         <Box
-            sx={{ width: 500 }}
+            sx={{ width: 500}}
             role="presentation"
         >
             <center>
                 <Typography variant='h4' sx={{ mt: 2, fontWeight: 'bold' }} color={'secondary'}> MY GENE SETS ({genesets?.length.toString()})</Typography>
             </center>
-
-            <Table sx={{ p: 2 }}>
+            <Table sx={{ p: 2}}>
                 <TableBody>
                     {genesets?.map((geneset) =>
                         <GenesetInfo key={geneset.id} geneset={geneset} />

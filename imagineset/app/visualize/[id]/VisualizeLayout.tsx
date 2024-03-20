@@ -22,7 +22,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import html2canvas from 'html2canvas';
 import { UMAP } from '@/components/visualize/PlotComponents/Umap/Umap';
 import dynamic from 'next/dynamic'
-const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), {ssr:false})
+const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), { ssr: false })
 
 function jaccard_similarity(set1: string[], set2: string[]) {
     const union = Array.from(new Set([...set1, ...set2]))
@@ -253,9 +253,9 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                         downloadPNG('visualization')
                                     }}
                                     ><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn')} else {downloadSVG()}}} disabled={visualization === 'SuperVenn'}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn') } else { downloadSVG() } }} disabled={visualization === 'SuperVenn'}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
-                                    <Tooltip
+                                    {/* <Tooltip
                                         title={
                                             <React.Fragment>
                                                 <Typography color="inherit">Legend:</Typography>
@@ -265,13 +265,13 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                             </React.Fragment>
                                         }>
                                         <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}><VisibilityIcon />&nbsp;<Typography > Legend</Typography></Button>
-                                    </Tooltip>
+                                    </Tooltip> */}
                                 </Stack>
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
                                 <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
                                     {(visualization === 'Heatmap' && checked.length < 31 && checked.length > 0) && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />}
-                                    {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets}/>}
+                                    {visualization === 'Venn' && <VennPlot selectedSets={legendSelectedSets} />}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'UMAP' && checked.length > 0) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
@@ -319,14 +319,77 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
     };
 
     const legendIds = legend.map((item) => item.id)
-    return (
-        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2 }}>
-            <ListSubheader>
-                My Gene Sets ({checked.length})
-            </ListSubheader>
-            {sessionInfo?.gene_sets.map((geneset, i) => {
-                const labelId = `checkbox-list-label-${i}`;
-                if (legendIds.includes(geneset.id)) {
+    if (sessionInfo?.gene_sets && sessionInfo?.gene_sets.length > 26) {
+        return (
+            <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2 }}>
+                <ListSubheader>
+                    My Gene Sets ({checked.length})
+                </ListSubheader>
+                {sessionInfo?.gene_sets.map((geneset, i) => {
+                    const labelId = `checkbox-list-label-${i}`;
+                    return (
+                        <ListItem
+                            key={i}
+                            disablePadding
+                            sx={{
+                                whiteSpace: 'normal !important',
+                                wordWrap: 'break-word !important',
+                            }}
+                        >
+                            <ListItemButton
+                                onClick={handleToggle(i)}
+                                dense>
+                                <ListItemIcon>
+                                    <Checkbox
+                                        edge="start"
+                                        checked={checked.indexOf(i) !== -1}
+                                        tabIndex={-1}
+                                        disableRipple
+                                        inputProps={{ 'aria-labelledby': labelId }}
+                                    />
+                                </ListItemIcon>
+                                <ListItemText id={labelId} primary={geneset.name} primaryTypographyProps={{ fontSize: 14 }} />
+                            </ListItemButton>
+                        </ListItem>
+                    );
+                })}
+            </List>
+        )
+    } else {
+        return (
+            <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2 }}>
+                <ListSubheader>
+                    My Gene Sets ({checked.length})
+                </ListSubheader>
+                {sessionInfo?.gene_sets.map((geneset, i) => {
+                    const labelId = `checkbox-list-label-${i}`;
+                    if (legendIds.includes(geneset.id)) {
+                        return (
+                            <ListItem
+                                key={i}
+                                disablePadding
+                                sx={{
+                                    whiteSpace: 'normal !important',
+                                    wordWrap: 'break-word !important',
+                                }}
+                            >
+                                <ListItemButton
+                                    onClick={handleToggle(i)}
+                                    dense>
+                                    <ListItemIcon>
+                                        <Checkbox
+                                            edge="start"
+                                            checked={checked.indexOf(i) !== -1}
+                                            tabIndex={-1}
+                                            disableRipple
+                                            inputProps={{ 'aria-labelledby': labelId }}
+                                        />
+                                    </ListItemIcon>
+                                    <ListItemText id={labelId} primary={legend[legendIds.indexOf(geneset.id)].alphabet + ': ' + geneset.name} primaryTypographyProps={{ fontSize: 14 }} />
+                                </ListItemButton>
+                            </ListItem>
+                        );
+                    }
                     return (
                         <ListItem
                             key={i}
@@ -344,33 +407,12 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
                                         inputProps={{ 'aria-labelledby': labelId }}
                                     />
                                 </ListItemIcon>
-                                <ListItemText id={labelId} primary={legend[legendIds.indexOf(geneset.id)].alphabet + ': ' + geneset.name} primaryTypographyProps={{ fontSize: 14 }} />
+                                <ListItemText id={labelId} primary={geneset.name} primaryTypographyProps={{ fontSize: 14 }} />
                             </ListItemButton>
                         </ListItem>
                     );
-                }
-                return (
-                    <ListItem
-                        key={i}
-                        disablePadding
-                    >
-                        <ListItemButton
-                            onClick={handleToggle(i)}
-                            dense>
-                            <ListItemIcon>
-                                <Checkbox
-                                    edge="start"
-                                    checked={checked.indexOf(i) !== -1}
-                                    tabIndex={-1}
-                                    disableRipple
-                                    inputProps={{ 'aria-labelledby': labelId }}
-                                />
-                            </ListItemIcon>
-                            <ListItemText id={labelId} primary={geneset.name} primaryTypographyProps={{ fontSize: 14 }} />
-                        </ListItemButton>
-                    </ListItem>
-                );
-            })}
-        </List>
-    )
+                })}
+            </List>
+        )
+    }
 }

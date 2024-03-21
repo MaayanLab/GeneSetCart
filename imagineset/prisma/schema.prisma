@@ -89,6 +89,7 @@ model PipelineSession {
   createdAt    DateTime  @default(now())
   lastModified DateTime  @default(now())
   gene_sets    GeneSet[]
+  session_name  String?  
 
   @@map("user_sessions")
 }

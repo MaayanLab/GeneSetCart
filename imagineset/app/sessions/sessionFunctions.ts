@@ -12,3 +12,16 @@ export async function deleteSessionByID(sessionID: string) {
     revalidatePath('/')
     return 'deleted'
 }
+
+export async function updateSessionName(sessionID: string, newSessionName: string) {
+  const updateSession = await prisma.pipelineSession.update({
+    where: {
+      id: sessionID,
+    },
+    data: {
+      session_name: newSessionName,
+    },
+  })
+  revalidatePath('/')
+  return 'updated'
+}

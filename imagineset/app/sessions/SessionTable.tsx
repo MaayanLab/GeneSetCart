@@ -1,17 +1,10 @@
 'use client'
-import { Table, TableBody, TextField, Typography,  TableFooter, TablePagination, TableRow  } from "@mui/material";
+import { Table, TableBody, TableFooter, TablePagination, TableRow  } from "@mui/material";
 import React from "react";
 import { SessionRow } from "./SessionRow";
-import { GeneSet, } from "@prisma/client";
+import { GeneSet, PipelineSession} from "@prisma/client";
 
-export default function SessionTable({sessions}: {sessions:  ({
-    gene_sets: GeneSet[];
-} & {
-    id: string;
-    user_id: string;
-    createdAt: Date;
-    lastModified: Date;
-})[]}){
+export default function SessionTable({sessions}: { sessions: (PipelineSession & { gene_sets: GeneSet[] })[]}){
     const [page, setPage] = React.useState(0)
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const handleChangePage = (

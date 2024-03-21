@@ -1,8 +1,7 @@
 import { Gene, GeneSet } from "@prisma/client";
 import React from "react";
 import { DataPoint, Scatterplot } from "./Scatterplot";
-import { parse } from "path";
-import { height, width } from "@mui/system";
+import CircularIndeterminate from "@/components/misc/Loading";
 
 
 export function UMAP({ selectedSets, setOverlap }: {
@@ -19,29 +18,35 @@ export function UMAP({ selectedSets, setOverlap }: {
         genesetDict[genesetName] = genes
     })
     const [dataMapped, setDataMapped] = React.useState<DataPoint[]>([])
+    const [loading, setLoading] = React.useState(false)
     if (!genesetDict || !selectedSets) return <></>
-    else {
-        React.useEffect(() => {
-            fetch('http://0.0.0.0:8000/api/getUMAP', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 'geneset_genes': genesetDict }),
-            }).then((response) => response.json()).then((parsedUMAP) => {
-                const dataMapped = parsedUMAP.map((datapoint: string[]) => {
-                    return ({
-                        x: datapoint[0],
-                        y: datapoint[1],
-                        group: datapoint[2],
-                        subGroup: datapoint[3]
-                    })
-                });
-                setDataMapped(dataMapped)
-            }).catch((err) => console.log(err))
-        }, [selectedSets])
 
-        return  <Scatterplot width={600} height={600} data={dataMapped} />
+    React.useEffect(() => {
+        setLoading(true)
+        fetch('http://0.0.0.0:8000/api/getUMAP', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 'geneset_genes': genesetDict }),
+        }).then((response) => response.json()).then((parsedUMAP) => {
+            const dataMapped = parsedUMAP.map((datapoint: string[]) => {
+                return ({
+                    x: datapoint[0],
+                    y: datapoint[1],
+                    group: datapoint[2],
+                    subGroup: datapoint[3]
+                })
+            });
+            setDataMapped(dataMapped)
+            setLoading(false)
+        }).catch((err) => console.log(err))
+    }, [selectedSets])
+
+    if (loading) return <CircularIndeterminate />
+    else {
+        return (
+            <Scatterplot width={600} height={600} data={dataMapped} />)
     }
 }
 

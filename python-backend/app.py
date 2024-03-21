@@ -5,6 +5,11 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 import scanpy as sc
 import anndata
+import io
+import seaborn as sns
+import matplotlib
+matplotlib.use('agg')
+from matplotlib import pyplot as plt
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -35,12 +40,50 @@ def geneset_umap(geneset_genes):
     df['term'] = adata.obs.index
     return df
 
+def jaccard_similarity(set1, set2):
+    # intersection of two sets
+    intersection = len(set1.intersection(set2))
+    # Unions of two sets
+    union = len(set1.union(set2))
+     
+    return intersection / union
+
+def jaccard_similarity_multiple(genesets_dict):
+    all_sets_jaccard = []
+    for outer_geneset in list(genesets_dict.keys()): 
+        jaccard_row = []
+        for inner_geneset in list(genesets_dict.keys()):
+            outer_genesets_genes = set(genesets_dict[outer_geneset])
+            inner_genesets_genes = set(genesets_dict[inner_geneset]) 
+            combo_jaccard_sim = jaccard_similarity(outer_genesets_genes, inner_genesets_genes)
+            jaccard_row.append(combo_jaccard_sim)
+        all_sets_jaccard.append(jaccard_row)
+    return all_sets_jaccard
+
 @app.route('/api/getUMAP', methods=['POST'])
 def calculateUMAP():
     data = request.get_json()
     geneset_genes = data['geneset_genes']
     umap_df = geneset_umap(geneset_genes)
     return json.dumps(umap_df.to_dict('split')['data']) 
+
+@app.route('/api/getHeatmap', methods=['POST'])
+def createHeatmap():
+    data = request.get_json()
+    genesets_dict = data['genesets_dict']
+    jindex_arrays = jaccard_similarity_multiple(genesets_dict)
+    jindex_df = pd.DataFrame(jindex_arrays, columns=range(len(genesets_dict)))
+    plt.clf()
+    sns.clustermap(jindex_df, cmap='mako')
+    # Save plot to a BytesIO object
+    img = io.BytesIO()
+    plt.savefig(img, format='svg')
+    img.seek(0)
+    # # Convert BytesIO object to base64 string
+    svg_data = img.getvalue().decode()
+    img.close()
+    plt.close()
+    return svg_data
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True, threading=True)

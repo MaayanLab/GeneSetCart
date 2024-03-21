@@ -41,7 +41,7 @@ export default async function VisualizePage({ params }: { params: { id: string }
                 <Container sx={{ mb: 5 }}>
                     <Typography variant="h3" color="secondary.dark" className='p-5'>VISUALIZE YOUR GENE SETS</Typography>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                        Visualize the overlap between your gene sets
+                        Visualize the overlap between your gene sets with Venn, Supervenn, UpSet, Hierarchically-Clustered Heatmaps and UMAP plots. 
                     </Typography>
                     <VisualizeLayout sessionInfo={sessionInfo} sessionId={params.id} />
                 </Container>

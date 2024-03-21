@@ -81,7 +81,7 @@ export const Scatterplot = ({ width, height, data }: ScatterplotProps) => {
                 onMouseEnter={() => setHoveredGroup(l)}
                 onMouseLeave={() => setHoveredGroup(null)}
             >
-                {l}
+                {'-' + l}
             </text>
         )
     })

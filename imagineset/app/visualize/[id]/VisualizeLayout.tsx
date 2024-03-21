@@ -135,6 +135,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [overlap, setOverlap] = React.useState<string[]>([])
 
     const legendSelectedSets = React.useMemo(() => {
+        setVisualization('')
         if (selectedSets) {
             if (selectedSets.length > 26) {
                 const dataArrays = selectedSets.map((geneset, i) => {
@@ -257,7 +258,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
                                     {/* {(visualization === 'Heatmap' && checked.length < 31 && checked.length > 0) && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />} */}
                                     {(visualization === 'Heatmap' && checked.length > 1 && checked.length < 39) && <ClusteredHeatmap selectedSets={legendSelectedSets} />}
-                                    {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} />}
+                                    {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap}/>}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} />}

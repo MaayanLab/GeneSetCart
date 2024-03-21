@@ -72,10 +72,21 @@ def createHeatmap():
     data = request.get_json()
     genesets_dict = data['genesets_dict']
     jindex_arrays = jaccard_similarity_multiple(genesets_dict)
-    jindex_df = pd.DataFrame(jindex_arrays, columns=range(len(genesets_dict)))
+    alphabet = ["A", "B","C", "D","E","F","G", "H","I", "J","K", "L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+
+    if len(genesets_dict.keys()) > 26: 
+        jindex_df = pd.DataFrame(jindex_arrays, columns=range(len(genesets_dict))) 
+        jindex_df = jindex_df.rename_axis("Gene Sets", axis='index')
+        jindex_df = jindex_df.rename_axis("Gene Sets", axis='columns')
+    else: 
+        alphabet_columnns = [alphabet[ind] for ind, x in enumerate(list(genesets_dict.keys()))]
+        jindex_df = pd.DataFrame(jindex_arrays, columns=alphabet_columnns)
+        jindex_df = jindex_df.set_axis([alphabet_columnns], axis='index')
+        jindex_df = jindex_df.rename_axis("Gene Sets", axis='index')
+        jindex_df = jindex_df.rename_axis("Gene Sets", axis='columns')
     plt.clf()
     sns.clustermap(jindex_df, cmap='mako')
-    # Save plot to a BytesIO object
+    # Save plot to a BytesIO object 
     img = io.BytesIO()
     plt.savefig(img, format='svg')
     img.seek(0)

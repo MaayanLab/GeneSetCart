@@ -38,7 +38,7 @@ export default function Status({status} : {status: addStatus}) {
                     >
                         <CloseIcon fontSize="inherit" />
                     </IconButton>
-                } sx={{fontSize:14}}>Adding gene sets to your session list...</Alert>}
+                } sx={{fontSize:14}}>Adding gene sets to your session cart...</Alert>}
             {open && status.success && <Alert onClose={() => { }}
                 action={
                     <IconButton
@@ -51,7 +51,7 @@ export default function Status({status} : {status: addStatus}) {
                     >
                         <CloseIcon fontSize="inherit" />
                     </IconButton>
-                } sx={{fontSize:14}}>Added to Session List</Alert>}
+                } sx={{fontSize:14}}>Added to Session Cart</Alert>}
         </>
 
     )

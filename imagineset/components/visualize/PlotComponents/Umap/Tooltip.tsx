@@ -5,6 +5,8 @@ export type InteractionData = {
   xPos: number;
   yPos: number;
   name: string;
+  group: string;
+  color: string;
 };
 
 type TooltipProps = {
@@ -24,7 +26,13 @@ export const Tooltip = ({ interactionData }: TooltipProps) => {
         top: interactionData.yPos,
       }}
     >
-      {interactionData.name}
+      <b className={styles.title}>{interactionData.name}</b>
+      <div className={styles.topHalfContainer} style={{ borderColor: interactionData.color }}>
+        <div className={styles.row}>
+          <span>Group</span>
+          <b>{interactionData.group}</b>
+        </div>
+      </div>
     </div>
   );
 };

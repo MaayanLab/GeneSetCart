@@ -46,7 +46,7 @@ export default function SingleUpload() {
         })
     }, []) 
 
-    const readFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const readFile = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files
         if (fileList) {
             const reader = new FileReader();
@@ -64,8 +64,7 @@ export default function SingleUpload() {
                 reader.readAsText(fileList[0]);
             }
         }
-    }
-
+    }, [])
 
 
     useEffect(() => {
@@ -94,8 +93,7 @@ export default function SingleUpload() {
                         } else {
                             addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => {setStatus({success:true})}).catch((err) => setStatus({error:{selected:true, message:"Error in adding gene set!"}}))
                         }
-                    })                   
-                    
+                    })                      
                 }
                 }>
                 <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center' alignItems={'center'} justifyContent={'center'}>

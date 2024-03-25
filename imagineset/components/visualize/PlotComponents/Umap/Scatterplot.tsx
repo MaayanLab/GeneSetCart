@@ -12,16 +12,18 @@ export type DataPoint = {
     y: number;
     group: string;
     subGroup: string;
+    genes: string[];
 };
 
 type ScatterplotProps = {
     width: number;
     height: number;
     data: DataPoint[];
+    setOverlap: React.Dispatch<React.SetStateAction<string[]>>
 };
 
 // Simplified version of a scatterplot
-export const Scatterplot = ({ width, height, data }: ScatterplotProps) => {
+export const Scatterplot = ({ width, height, data, setOverlap }: ScatterplotProps) => {
     const boundsWidth = width - MARGIN.right - MARGIN.left;
     const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
@@ -40,7 +42,7 @@ export const Scatterplot = ({ width, height, data }: ScatterplotProps) => {
     const colorScale = d3
         .scaleOrdinal<string>()
         .domain(allGroups)
-        .range(["#e0ac2b", "#e85252", "#6689c6", "#9a6fb0", "#a53253", "#5fe8b2", "#cba5c4", "#36209e", "#9801aa"]);
+        .range(["#e0ac2b", "#e85252", "#6689c6", "#9a6fb0", "#a53253", "#5fe8b2", "#cba5c4", "#36209e", "#9801aa", "#A07A19", "#AC30C0", "#EB9A72", "#BA86F5", "#EA22A8", "#78b98f", "#0b6d33", "#4ae182", "#344b46", "#20d8fd", "#3e69b6", "#421ec8", "#d45fea", "#793883", "#79acfd", "#cb1775", "#fe16f4", "#b1d34f", "#6e3901", "#e4bfab", "#f24219", "#fea53b", "#900e08", "#e5808e", "#a07d62", "#84ee15"]);
 
     // Build the shapes
     const allShapes = data.map((d, i) => {
@@ -63,26 +65,57 @@ export const Scatterplot = ({ width, height, data }: ScatterplotProps) => {
                         xPos: xScale(d.x),
                         yPos: yScale(d.y),
                         name: d.subGroup,
+                        color: colorScale(d.group),
+                        group: d.group
                     })
                     setHoveredGroup(d.group)
                 }
                 }
                 onMouseLeave={() => { setHovered(null); setHoveredGroup(null) }}
+                onMouseDown={() => setOverlap(d.genes)}
             />
         );
     });
 
+    // build the legends
     const legendgroups = Array.from(new Set(allGroups))
-    const legends = legendgroups.map((l, i) => {
+    const legends = legendgroups.sort((a, b) => {
+        if (a < b) return -1
+        else if (a > b) return 1
+        else return 0
+    }).map((l, i) => {
         return (
             <text
+                key={i + 'text'}
                 fill={colorScale(l)}
+                x={10}
                 y={0 + i * 20}
+                fontSize={12}
                 onMouseEnter={() => setHoveredGroup(l)}
                 onMouseLeave={() => setHoveredGroup(null)}
             >
-                {'-' + l}
+                {l}
             </text>
+        )
+    })
+
+    // build the legendsCircles
+    const legendCircles = legendgroups.sort((a, b) => {
+        if (a < b) return -1
+        else if (a > b) return 1
+        else return 0
+    }).map((l, i) => {
+        return (
+            <circle
+                key={i}
+                r={5}
+                cx={0}
+                cy={-4 + i * 20}
+                stroke={colorScale(l)}
+                fill={colorScale(l)}
+                onMouseEnter={() => setHoveredGroup(l)}
+                onMouseLeave={() => setHoveredGroup(null)}
+            />
         )
     })
 
@@ -112,7 +145,8 @@ export const Scatterplot = ({ width, height, data }: ScatterplotProps) => {
                 <g
                     width={100}
                     height={60}
-                    transform={`translate(${[MARGIN.left + boundsWidth, (MARGIN.top + boundsHeight) / 2].join(",")})`}>
+                    transform={`translate(${[MARGIN.left + boundsWidth, MARGIN.top].join(",")})`}>
+                    {legendCircles}
                     {legends}
                 </g>
             </svg>

@@ -121,6 +121,16 @@ export const alphabet = [
 ];
 
 
+export type UMAPOptionsType = {
+    assignGroups: boolean
+    filetype? : string
+    dataGroups?: {[key: string] : string}
+    minDist?: number
+    spread?: number
+    nNeighbors?: number 
+    nComponents?: number
+    randomState?: number
+}
 
 export function VisualizeLayout({ sessionInfo, sessionId }: {
     sessionInfo: {
@@ -135,6 +145,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [visualization, setVisualization] = React.useState('')
     const [overlap, setOverlap] = React.useState<string[]>([])
     const [switchChecked, setSwitchChecked] = React.useState(false)
+    const [assignGroups, setAssignGroups] = React.useState(false)
+    const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({assignGroups: assignGroups, filetype: 'CSV'})
     const handleSwitchChange = React.useCallback(() => {
         setSwitchChecked((oldchecked) => !oldchecked)
     }, [])
@@ -266,7 +278,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     label="Additional options"
                                     />
                                 </Stack>
-                                {switchChecked && <AdditionalOptions />}
+                                {switchChecked && <AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} />}
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
                                 <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
@@ -275,7 +287,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
-                                    {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
+                                    {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={umapOptions}/>}
                                 </div>
                             </Box>
                         </Stack>

@@ -29,7 +29,7 @@ export function GMTSelect({selectedLibs, setSelectedLibs, index} : {selectedLibs
         };
     return (
         <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label" color="secondary">Common Fund GMT</InputLabel>
+            <InputLabel id="gmt-select-label" color="secondary">Common Fund GMT</InputLabel>
             <Select
                 labelId="gmt-select"
                 id="gmt-select"

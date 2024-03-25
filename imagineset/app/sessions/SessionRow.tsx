@@ -58,6 +58,7 @@ function SessionNameDisplay({ session }: { session: PipelineSession & { gene_set
                 color='secondary'
                 name='sessionName box'
                 onKeyDown={(event) => { if (event.key === 'Enter') { updateSession(session.id, (event.target as HTMLFormElement).value);} }}
+                onBlur={() => setEditOpen(false)}
             ></TextField>
         )
     }

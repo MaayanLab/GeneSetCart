@@ -65,5 +65,22 @@ for lib in dataframe_names:
                     except:
                         continue
 
+# Ingest LINCS Crossing Data
+for lib in dataframe_names: 
+    for inner_lib in dataframe_names:
+        if not(lib == inner_lib):
+            if (lib == 'LINCS_L1000_Chem_Pert_Consensus_Sigs') or (lib == 'LINCS_L1000_CRISPR_KO_Consensus_Sigs') or (inner_lib == 'LINCS_L1000_Chem_Pert_Consensus_Sigs') or (inner_lib == 'LINCS_L1000_CRISPR_KO_Consensus_Sigs'):
+                try:
+                    crossed_dataframe = pd.read_csv('./crossed_sets/LINCS Top Pairs/' + lib+ '_' + inner_lib + '.csv', index_col=0)
+                    filtered_dataframe = crossed_dataframe[crossed_dataframe['P-value'] < 0.001]
+                    for index, row in tqdm(filtered_dataframe.iterrows(), total=filtered_dataframe.shape[0]):
+                        if row['Odds_Ratio'] == math.inf:
+                            row['Odds_Ratio'] = 999999999999999.99
+                        cur.execute('''INSERT INTO cfde_cross_pair (id, lib_1, lib_2, geneset_1, geneset_2, odds_ratio, pvalue, n_overlap, overlap) 
+                                        VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s);''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', ')))
+                        conn.commit()
+                except:
+                    continue
+
 conn.close()
 cur.close()

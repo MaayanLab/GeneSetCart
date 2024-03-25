@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import { ListSubheader, Grid, Container, Stack, Button, Typography, Box, Tooltip, TextField } from '@mui/material';
+import { ListSubheader, Grid, Container, Stack, Button, Typography, Box, Tooltip, TextField, Switch, FormControlLabel } from '@mui/material';
 import { type Gene, type GeneSet } from '@prisma/client';
 import vennIcon from '@/public/img/otherLogos/VennDagramIcon.png'
 import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
@@ -23,6 +23,7 @@ import html2canvas from 'html2canvas';
 import { UMAP } from '@/components/visualize/PlotComponents/Umap/Umap';
 import dynamic from 'next/dynamic'
 import { ClusteredHeatmap } from '@/components/visualize/PlotComponents/Heatmap/ClusteredHeatmap';
+import { AdditionalOptions } from './AdditionalOptionsDisplay';
 const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), { ssr: false })
 
 const downloadLegend = (filename: string, text: string) => {
@@ -133,6 +134,10 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked])
     const [visualization, setVisualization] = React.useState('')
     const [overlap, setOverlap] = React.useState<string[]>([])
+    const [switchChecked, setSwitchChecked] = React.useState(false)
+    const handleSwitchChange = React.useCallback(() => {
+        setSwitchChecked((oldchecked) => !oldchecked)
+    }, [])
 
     const legendSelectedSets = React.useMemo(() => {
         setVisualization('')
@@ -252,13 +257,22 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadPNG('visualization') }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn') } else { downloadSVG() } }} disabled={(visualization === 'SuperVenn') || (visualization === 'Heatmap')}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
+                                    <FormControlLabel control={<Switch
+                                        checked={switchChecked}
+                                        onChange={handleSwitchChange}
+                                        inputProps={{ 'aria-label': 'controlled' }}
+                                        color='secondary'
+                                    />}
+                                    label="Additional options"
+                                    />
                                 </Stack>
+                                {switchChecked && <AdditionalOptions />}
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
                                 <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
                                     {/* {(visualization === 'Heatmap' && checked.length < 31 && checked.length > 0) && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />} */}
                                     {(visualization === 'Heatmap' && checked.length > 1 && checked.length < 39) && <ClusteredHeatmap selectedSets={legendSelectedSets} />}
-                                    {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap}/>}
+                                    {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} />}

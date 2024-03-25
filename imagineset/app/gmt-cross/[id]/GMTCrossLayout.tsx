@@ -165,44 +165,49 @@ const CFDE_Lib_Full: { [key: string]: string } = {
     "MoTrPAC": 'MoTrPAC Rat Endurance Exercise Training'
 }
 
-const sortDict = (dict: { [key: string]: number[] }) => {
-    let items = Object.keys(dict).map(
-        (key) => { return [key, dict[key]] });
+const sortDict = (dict: { [key: string]: number[][] }) => {
+    let items : any[] = []
+    for (let term of Object.keys(dict)) {
+        const termValues = dict[term]
+        for (let termOccurence of termValues){
+            items.push([term, termOccurence])
+        }
+    }
     // Sort the array based on the first number in the value (starting index) element
     items.sort(
         (first: any, second: any) => { return first[1][1] - second[1][1] }
     );
-    // Obtain the list of keys in sorted order of the values.
-    let keys = items.map(
-        (e) => { return e[0] as string });
-
-    return keys
+    return items
 }
 
-const generateHypothesisTooltip = (hypothesisString: string, substringIndices: { [key: string]: number[] }, topEnrichmentResults: { [key: string]: any[] }) => {
+
+const generateHypothesisTooltip = (hypothesisString: string, substringIndices: { [key: string]: number[][] }, topEnrichmentResults: { [key: string]: any[] }) => {
     let prevStart = 0;
     const splittedStrings = [];
     for (let term of sortDict(substringIndices)) {
-        splittedStrings.push(<Typography display="inline">{hypothesisString.substring(prevStart, substringIndices[term][0])}</Typography>);
+        let termWords = term[0]
+        let termStart = term[1][0]
+        let termEnd = term[1][1]
+        splittedStrings.push(<Typography display="inline">{hypothesisString.substring(prevStart, termStart)}</Typography>);
         splittedStrings.push(
             <Tooltip title={
                 <React.Fragment>
                     <Typography color="inherit"> Enrichment Analysis</Typography>
-                    Library: {topEnrichmentResults[term][9]}
+                    Library: {topEnrichmentResults[termWords][9]}
                     <br></br>
-                    Rank: {topEnrichmentResults[term][0]}
+                    Rank: {topEnrichmentResults[termWords][0]}
                     <br></br>
-                    P-value: {topEnrichmentResults[term][2].toExponential(2)}
+                    P-value: {topEnrichmentResults[termWords][2].toExponential(2)}
                     <br></br>
-                    Odds Ratio: {topEnrichmentResults[term][3].toFixed(4)}
+                    Odds Ratio: {topEnrichmentResults[termWords][3].toFixed(4)}
                 </React.Fragment>
             } placement="right" >
                 <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
-                    {hypothesisString.substring(substringIndices[term][0], substringIndices[term][1])}
+                    {hypothesisString.substring(termStart, termEnd)}
                 </Typography>
             </Tooltip>
         )
-        prevStart = substringIndices[term][1]
+        prevStart = termEnd
     }
     splittedStrings.push(<Typography display="inline">{hypothesisString.substring(prevStart)}</Typography>);
     return <React.Fragment>
@@ -355,17 +360,22 @@ export function GMTCrossLayout() {
 
     const enrichedTermsIndices = React.useMemo(() => {
         if (hypothesis) {
-            let indices: { [key: string]: number[] } = {}
+            let indices: { [key: string]: number[][] } = {}
             for (let term of hypothesis.enrichedTerms) {
-                const termStart = hypothesis.hypothesis.indexOf(term)
-                if (termStart !== -1) {
-                    indices[term] = [termStart, termStart + term.length]
+                let startIndex = 0
+                while ((hypothesis.hypothesis.indexOf(term, startIndex)) > -1) {
+                    let index = hypothesis.hypothesis.indexOf(term, startIndex)
+                    let oldTermValues : number [][]; 
+                    (term in indices) ? oldTermValues = indices[term] : oldTermValues = []
+                    indices[term] = [...oldTermValues, [index, index + term.length]];
+                    startIndex = index + term.length;
                 }
             }
             return indices
         }
         return null
     }, [hypothesis])
+
 
     return (
         <>

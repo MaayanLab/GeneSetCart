@@ -40,7 +40,7 @@ export function GMTSelect({selectedLibs, setSelectedLibs, index} : {selectedLibs
             >
                 {
                     Object.values(CFDELibraryOptions).map((cfdeLib) =>
-                        <MenuItem key={cfdeLib} value={cfdeLib} disabled={(selectedLibs.includes(cfdeLib)) || (cfdeLib === "LINCS L1000 CMAP Chemical Pertubation Consensus Signatures") || (cfdeLib === 'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures') }>
+                         <MenuItem key={cfdeLib} value={cfdeLib}>
                             {cfdeLib}
                         </MenuItem>)
                 }

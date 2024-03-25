@@ -13,6 +13,12 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
         const loadDataFile = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
             const fileList = event.target.files
             if (fileList) {
+                const label = document.getElementById('file-input-label');
+                if (label){
+                    label.textContent = `${fileList[0].name}`;
+                }
+              }
+            if (fileList) {
                 try {
                     const reader = new FileReader();
                     if (umapOptions.filetype === 'CSV') {
@@ -84,6 +90,7 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
                                     onChange={loadDataFile}
                                 />
                             </Button>
+                            <span id="file-input-label"></span>
                             <FormControl sx={{ minWidth: 100 }}>
                                 <InputLabel id="filetype-select-label" color="secondary">File Type</InputLabel>
                                 <Select

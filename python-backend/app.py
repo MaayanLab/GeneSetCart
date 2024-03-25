@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-def geneset_umap(geneset_genes):
+def geneset_umap(geneset_genes, umapOptions):
     geneset_strings = []
     for term, geneset in geneset_genes.items():
         geneset_string= str(geneset).replace(',', ' ')
@@ -30,7 +30,7 @@ def geneset_umap(geneset_genes):
     else:
         sc.pp.neighbors(adata, n_neighbors=10, use_rep='X')
     sc.tl.leiden(adata, resolution=1.0)
-    sc.tl.umap(adata, min_dist=0.1, spread=1.0, random_state=42)
+    sc.tl.umap(adata, min_dist=umapOptions['minDist'], spread=umapOptions['spread'], random_state=umapOptions['randomState'])
     new_order = adata.obs.sort_values(by='leiden').index.tolist()
     adata = adata[new_order, :]
     adata.obs['leiden'] = 'Cluster ' + adata.obs['leiden'].astype('object')
@@ -63,8 +63,9 @@ def jaccard_similarity_multiple(genesets_dict):
 @app.route('/api/getUMAP', methods=['POST'])
 def calculateUMAP():
     data = request.get_json()
-    geneset_genes = data['geneset_genes']
-    umap_df = geneset_umap(geneset_genes)
+    geneset_genes = data['genesetGenes']
+    umapOptions = data['umapOptions']
+    umap_df = geneset_umap(geneset_genes, umapOptions)
     return json.dumps(umap_df.to_dict('split')['data']) 
 
 @app.route('/api/getHeatmap', methods=['POST'])

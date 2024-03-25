@@ -30,7 +30,7 @@ export function UMAP({ selectedSets, setOverlap, umapOptions }: {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ 'geneset_genes': genesetDict }),
+            body: JSON.stringify({ 'genesetGenes': genesetDict, 'umapOptions': umapOptions }),
         }).then((response) => response.json()).then((parsedUMAP) => {
             const dataMapped = parsedUMAP.map((datapoint: string[]) => {
                 return ({
@@ -43,8 +43,8 @@ export function UMAP({ selectedSets, setOverlap, umapOptions }: {
             });
             setDataMapped(dataMapped)
             setLoading(false)
-        }).catch((err) => console.log(err))
-    }, [selectedSets])
+        }).catch((err) => {setLoading(true); console.log(err)})
+    }, [selectedSets, umapOptions])
 
     if (loading) return <CircularIndeterminate />
     else {

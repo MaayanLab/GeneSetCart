@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import { ListSubheader, Grid, Container, Stack, Button, Typography, Box, Tooltip, TextField, Switch, FormControlLabel } from '@mui/material';
+import { ListSubheader, Grid, Stack, Button, Typography, Box, Tooltip, TextField } from '@mui/material';
 import { type Gene, type GeneSet } from '@prisma/client';
 import vennIcon from '@/public/img/otherLogos/VennDagramIcon.png'
 import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
@@ -125,11 +125,10 @@ export type UMAPOptionsType = {
     assignGroups: boolean
     filetype? : string
     dataGroups?: {[key: string] : string}
-    minDist?: number
-    spread?: number
-    nNeighbors?: number 
-    nComponents?: number
-    randomState?: number
+    minDist: number
+    spread: number
+    nNeighbors: number 
+    randomState: number
 }
 
 export function VisualizeLayout({ sessionInfo, sessionId }: {
@@ -144,12 +143,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked])
     const [visualization, setVisualization] = React.useState('')
     const [overlap, setOverlap] = React.useState<string[]>([])
-    const [switchChecked, setSwitchChecked] = React.useState(false)
-    const [assignGroups, setAssignGroups] = React.useState(false)
-    const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({assignGroups: assignGroups, filetype: 'CSV'})
-    const handleSwitchChange = React.useCallback(() => {
-        setSwitchChecked((oldchecked) => !oldchecked)
-    }, [])
+    const [assignGroups, setAssignGroups] = React.useState(false)    
+    const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({assignGroups: assignGroups, filetype: 'CSV', minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42})
 
     const legendSelectedSets = React.useMemo(() => {
         setVisualization('')
@@ -174,7 +169,6 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             return []
         }
     }, [selectedSets])
-
     return (
         <Grid container direction='row' spacing={1}>
             <Grid item xs={3}>
@@ -269,16 +263,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadPNG('visualization') }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn') } else { downloadSVG() } }} disabled={(visualization === 'SuperVenn') || (visualization === 'Heatmap')}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
-                                    <FormControlLabel control={<Switch
-                                        checked={switchChecked}
-                                        onChange={handleSwitchChange}
-                                        inputProps={{ 'aria-label': 'controlled' }}
-                                        color='secondary'
-                                    />}
-                                    label="Additional options"
-                                    />
                                 </Stack>
-                                {switchChecked && <AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} />}
+                                {<AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} />}
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
                                 <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>

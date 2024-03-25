@@ -126,7 +126,7 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
             })
             const tagLineParsed = await tagLine.json()
             const abstracts: string = tagLineParsed.choices[0].message.content
-            const success = cache.set( term1+ term2 + abstract1+ abstract2, abstracts, 10000 )
+            const success = cache.set( term1+ term2 + abstract1+ abstract2, abstracts, 600000)
             return {
                 response: abstracts,
                 status: 200,
@@ -212,7 +212,7 @@ export async function generateHypothesis(row: any ) {
         })
         const tagLineParsed = await tagLine.json()
         const hypothesis: string = tagLineParsed.choices[0].message.content
-        const success = cache.set(term1+term2, hypothesis, 10000 )
+        const success = cache.set(term1+term2, hypothesis, 600000 )
         return {
             response: {hypothesis: hypothesis, abstract1: abstractsList[0], abstract2: abstractsList[1], enrichedTerms: enrichedTerms, topEnrichmentResults: topEnrichmentResults},
             status: 200

@@ -40,7 +40,7 @@ export function GMTSelect({selectedLibs, setSelectedLibs, index} : {selectedLibs
             >
                 {
                     Object.values(CFDELibraryOptions).map((cfdeLib) =>
-                         <MenuItem key={cfdeLib} value={cfdeLib}>
+                         <MenuItem key={cfdeLib} value={cfdeLib} disabled={(selectedLibs.includes(cfdeLib))}>
                             {cfdeLib}
                         </MenuItem>)
                 }

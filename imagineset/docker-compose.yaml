@@ -36,6 +36,13 @@ services:
     volumes:
       - g2sg-data:/var/lib/postgresql/data
 
+  g2sg-flask:
+        build: ../python-backend
+        ports: 
+            - 8000:8000
+        environment: 
+            PORT: 8000
+
 volumes:
   g2sg-data:
     x-kubernetes:

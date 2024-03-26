@@ -22,7 +22,6 @@ export function UMAP({ selectedSets, setOverlap, umapOptions }: {
     })
     const [dataMapped, setDataMapped] = React.useState<DataPoint[]>([])
     const [loading, setLoading] = React.useState(false)
-    if (!genesetDict || !selectedSets) return <></>
 
     React.useEffect(() => {
         setLoading(true)
@@ -39,9 +38,10 @@ export function UMAP({ selectedSets, setOverlap, umapOptions }: {
             });
             setDataMapped(dataMapped)
             setLoading(false)
-        }).catch((err) => {setLoading(true); console.log(err)})
+        }).catch((err) => {setLoading(false); console.log(err)})
     }, [selectedSets, umapOptions])
 
+    if (!genesetDict || !selectedSets) return <></>
     if (loading) return <CircularIndeterminate />
     else {
         if (umapOptions.assignGroups === false) {

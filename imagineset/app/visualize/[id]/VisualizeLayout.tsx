@@ -25,6 +25,8 @@ import dynamic from 'next/dynamic'
 import { ClusteredHeatmap } from '@/components/visualize/PlotComponents/Heatmap/ClusteredHeatmap';
 import { AdditionalOptions } from './AdditionalOptionsDisplay';
 const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), { ssr: false })
+import { useDebounce } from 'use-debounce';
+
 
 const downloadLegend = (filename: string, text: string) => {
     downloadURI('data:text/plain;charset=utf-8,' + encodeURIComponent(text), filename)
@@ -145,6 +147,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [overlap, setOverlap] = React.useState<string[]>([])
     const [assignGroups, setAssignGroups] = React.useState(false)    
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({assignGroups: assignGroups, filetype: 'CSV', minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42})
+    const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
+
 
     const legendSelectedSets = React.useMemo(() => {
         setVisualization('')
@@ -273,7 +277,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
-                                    {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={umapOptions}/>}
+                                    {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={debouncedUmapOptions}/>}
                                 </div>
                             </Box>
                         </Stack>

@@ -22,7 +22,7 @@ services:
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - PYTHON_API_BASE=http://gsge-flask:8000
+      - PYTHON_API_BASE=http://g2sg-flask:8000
 
   g2sg-postgres:
     image: postgres:16

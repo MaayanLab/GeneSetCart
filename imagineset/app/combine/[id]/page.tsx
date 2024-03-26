@@ -8,15 +8,15 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
 
-export default async function AugmentPage({ params }: { params: { id: string } }) {
+export default async function CombinePage({ params }: { params: { id: string } }) {
     const session = await getServerSession(authOptions)
-    if (!session) return redirect(`/api/auth/signin?callbackUrl=/augment/${params.id}`)
+    if (!session) return redirect(`/api/auth/signin?callbackUrl=/combine/${params.id}`)
     const user = await prisma.user.findUnique({
         where: {
             id: session?.user.id
         }
     })
-    if (user === null) return redirect(`/api/auth/signin?callbackUrl=/augment/${params.id}`)
+    if (user === null) return redirect(`/api/auth/signin?callbackUrl=/combine/${params.id}`)
 
     const sessionInfo = await prisma.pipelineSession.findUnique({
         where: {

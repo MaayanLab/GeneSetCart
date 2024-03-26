@@ -140,7 +140,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     sessionId: string
 }) {
     const [checked, setChecked] = React.useState<number[]>([]);
-    const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked])
+    const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked, sessionInfo?.gene_sets] )
     const [visualization, setVisualization] = React.useState('')
     const [overlap, setOverlap] = React.useState<string[]>([])
     const [assignGroups, setAssignGroups] = React.useState(false)    

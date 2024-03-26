@@ -26,7 +26,7 @@ export const AxisBottom = ({
             value,
             xOffset: xScale(value),
         }));
-    }, [xScale]);
+    }, [xScale, range, pixelsPerTick]);
 
     return (
         <>

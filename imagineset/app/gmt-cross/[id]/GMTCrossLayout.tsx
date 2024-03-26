@@ -31,7 +31,7 @@ const RenderOverlapButton = ({ params, sessionId }: { params: GridRenderCellPara
 
     const copyClipboardFunc = React.useCallback(() => {
         copyToClipboard(params.row.overlap.join('\n').replaceAll("'", ""))
-    }, [params.row.overlappingGenes])
+    }, [params.row.overlappingGenes, params.row.overlap])
     return (
         <React.Fragment>
             <Button
@@ -238,7 +238,7 @@ export function GMTCrossLayout() {
                     setStatus({ error: { selected: true, message: results.message } })
                 }
             }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
-    }, [selectedRows])
+    }, [selectedRows, sessionId])
 
 
     const getCrossData = React.useCallback(() => {

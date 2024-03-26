@@ -15,7 +15,7 @@ export default async function VisualizePage({ params }: { params: { id: string }
             id: session?.user.id
         }
     })
-    if (user === null) return redirect(`/api/auth/signin?callbackUrl=/augment/${params.id}`)
+    if (user === null) return redirect(`/api/auth/signin?callbackUrl=/visualize/${params.id}`)
 
     const sessionInfo = await prisma.pipelineSession.findUnique({
         where: {

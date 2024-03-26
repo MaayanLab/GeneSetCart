@@ -111,7 +111,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                     .catch((error) => setStatus({ error: { selected: true, message: 'Error adding gene set to list. Please try again' } }))
             }
         })
-    }, [displayedGenes, generatedSetName])
+    }, [displayedGenes, generatedSetName, sessionId])
 
 
 

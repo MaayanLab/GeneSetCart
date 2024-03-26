@@ -105,7 +105,7 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
           setStatus({ error: { selected: true, message: results.message } })
         }
       }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
-  }, [selectedRows])
+  }, [selectedRows, params.id])
 
   return (
     <div style={{ height: 400, width: '100%' }}>

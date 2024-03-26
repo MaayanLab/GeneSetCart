@@ -102,7 +102,7 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
         setStatus({ error: { selected: true, message: results.message } })
       }
     }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
-  }, [selectedRows])
+  }, [selectedRows, params.id])
 
 
 

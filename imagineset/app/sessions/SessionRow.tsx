@@ -10,7 +10,7 @@ import EditIcon from '@mui/icons-material/Edit';
 export function SessionRow({ session }: { session: PipelineSession & { gene_sets: GeneSet[] } }) {
     const deleteSession = React.useCallback((session: PipelineSession & { gene_sets: GeneSet[] }) => {
         deleteSessionByID(session.id).then((result) => console.log('deleted'))
-    }, [session])
+    }, [])
 
     return (
             <TableRow>

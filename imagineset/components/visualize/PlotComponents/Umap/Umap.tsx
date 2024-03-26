@@ -3,6 +3,7 @@ import React from "react";
 import { DataPoint, Scatterplot } from "./Scatterplot";
 import CircularIndeterminate from "@/components/misc/Loading";
 import { UMAPOptionsType } from "@/app/visualize/[id]/VisualizeLayout";
+import { getUMAP } from "./getUMAP";
 
 
 export function UMAP({ selectedSets, setOverlap, umapOptions }: {
@@ -25,13 +26,8 @@ export function UMAP({ selectedSets, setOverlap, umapOptions }: {
 
     React.useEffect(() => {
         setLoading(true)
-        fetch('http://0.0.0.0:8000/api/getUMAP', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 'genesetGenes': genesetDict, 'umapOptions': umapOptions }),
-        }).then((response) => response.json()).then((parsedUMAP) => {
+        getUMAP(genesetDict, umapOptions)
+        .then((parsedUMAP) => {
             const dataMapped = parsedUMAP.map((datapoint: string[]) => {
                 return ({
                     x: datapoint[0],

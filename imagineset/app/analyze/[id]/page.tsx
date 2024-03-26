@@ -12,13 +12,13 @@ import Header from '@/components/header/Header';
 
 export default async function AnalyzePage({ params }: { params: { id: string } }) {
     const session = await getServerSession(authOptions)
-    if (!session) return redirect(`/api/auth/signin?callbackUrl=/augment/${params.id}`)
+    if (!session) return redirect(`/api/auth/signin?callbackUrl=/analyze/${params.id}`)
     const user = await prisma.user.findUnique({
         where: {
             id: session?.user.id
         }
     })
-    if (user === null) return redirect(`/api/auth/signin?callbackUrl=/augment/${params.id}`)
+    if (user === null) return redirect(`/api/auth/signin?callbackUrl=/analyze/${params.id}`)
 
     const sessionInfo = await prisma.pipelineSession.findUnique({
         where: {

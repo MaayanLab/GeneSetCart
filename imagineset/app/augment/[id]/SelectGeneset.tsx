@@ -83,7 +83,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                 }
             }
         } 
-    }, [selected])
+    }, [selected, sessionGenesets])
 
     const geneshotAugment = React.useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>, augmentWith: string) => {
         setLoading(true)
@@ -96,7 +96,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                 setLoading(false)
             }).catch(() => {setLoading(false); setStatus({error:{selected:true, message:'Augmentation failed. Please try again.'} })})
         }
-    }, [originalGenes])
+    }, [originalGenes, selected])
 
     const ppiAugment =  React.useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setLoading(true)
@@ -109,7 +109,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                 setLoading(false)
             })
         }
-    }, [originalGenes])
+    }, [originalGenes, selected])
 
     React.useEffect(() => {
         if (includeOriginal){
@@ -117,7 +117,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
         } else {
             setTextAreaGenes(Array.from(augmentedGenes.slice(0, maxAddGenes)))
         }
-    }, [maxAddGenes, includeOriginal, augmentedGenes])
+    }, [maxAddGenes, includeOriginal, augmentedGenes, originalGenes])
 
     const handleAddToSets = React.useCallback(() => {
         checkInSession(sessionId, genesetName).then((response) => {
@@ -128,10 +128,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                 .then((response) => setStatus({success:true}))
                 .catch((error) => setStatus({error:{selected:true, message:'Error adding gene set to list. Please try again'} }))            }
         })  
-    }, [textAreaGenes, genesetName])
-
-
-
+    }, [textAreaGenes, genesetName, sessionId])
 
 
     return (

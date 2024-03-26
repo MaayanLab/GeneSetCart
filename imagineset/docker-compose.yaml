@@ -38,6 +38,7 @@ services:
 
   g2sg-flask:
         build: ../python-backend
+        image: maayanlab/g2sg-flask:0.1.5
         ports: 
             - 8000:8000
         environment: 

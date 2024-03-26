@@ -30,7 +30,17 @@ export function OptionsSlider({ optionName, range, step, defaultParam, umapOptio
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value === '' ? 0 : Number(event.target.value));
+    const newValue = event.target.value === '' ? range[0] : Number(event.target.value);
+    setValue(newValue as number);
+    if (optionName === 'minDist') {
+      setUmapOptions({...umapOptions, minDist: newValue as number})
+    }
+    if (optionName === 'spread') {
+      setUmapOptions({...umapOptions, spread: newValue as number})
+    }
+    if (optionName === 'nNeighbors') {
+      setUmapOptions({...umapOptions, nNeighbors: newValue as number})
+    }
   };
 
   const handleBlur = () => {

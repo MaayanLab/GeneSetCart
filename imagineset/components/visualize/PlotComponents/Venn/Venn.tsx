@@ -78,47 +78,16 @@ export default function VennPlot({ selectedSets, setOverlap }: {
         setIntersectionGeneDict(getIntersections.intersectionGeneDict)
         return getIntersections.intersectionDict
     }, [selectedSets])
-    // if (selectedSets && selectedSets.length < 4) {
-    //     return (
-    //         <VennDiagram
-    //             height={450}
-    //             width={450}
-    //             type='venn'
-    //             data={vennData}
-    //             series={
-    //                 <VennSeries
-    //                     colorScheme="cybertron"
-    //                     arc={<VennArc strokeWidth={3} gradient={<Gradient />}
-    //                         onClick={(evt) => setOverlap(intersectionGeneDict[evt.value.sets])} />}
-    //                     label={<VennLabel
-    //                         labelType={'value'}
-    //                         showAll={true}
-    //                         fill={'#000000'}
-    //                         fontSize={15} 
-    //                         // format={(data: any) => {console.log(data.data.key); return data.data.key}}
-    //                         />}
-    //                     outerLabel={<VennOuterLabel 
-    //                     />}
-    //                 />
-    //             }
-    //         />
-    //     )
-    // } else {
-
     return (
         <div id='venn' style={{
             width: '60%',
             height: '80%',
-            // width: '20vw',
-            // height: '30vh',
             position: 'absolute',
             justifyContent:'center',
             alignSelf:'center',
           }}>
         <VennDiagram
             type="starEuler"
-            // height={450}
-            // width={450}
             data={vennData}
             margins={[3, 3, 3, 3]}
             series={
@@ -138,5 +107,4 @@ export default function VennPlot({ selectedSets, setOverlap }: {
         />
         </div>
     )
-    // }
 }

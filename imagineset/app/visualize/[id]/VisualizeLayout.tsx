@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import { ListSubheader, Grid, Stack, Button, Typography, Box, Tooltip, TextField } from '@mui/material';
+import { ListSubheader, Grid, Stack, Button, Typography, Box, Tooltip, TextField, useMediaQuery, useTheme } from '@mui/material';
 import { type Gene, type GeneSet } from '@prisma/client';
 import vennIcon from '@/public/img/otherLogos/VennDagramIcon.png'
 import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
@@ -147,6 +147,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [assignGroups, setAssignGroups] = React.useState(false)    
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42})
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
 
     const legendSelectedSets = React.useMemo(() => {
@@ -174,10 +176,10 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     }, [selectedSets])
     return (
         <Grid container direction='row' spacing={1}>
-            <Grid item xs={3}>
+            <Grid item xs={isMobile ? 12 : 3}>
                 <Stack direction='column' spacing={2}>
                     <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
-                    <Box sx={{ maxWidth: 250, bgcolor: 'background.paper', borderRadius: 2, height: 200, boxShadow: 2 }}>
+                    <Box sx={{ maxWidth: '100%' , bgcolor: 'background.paper', borderRadius: 2, height: 200, boxShadow: 2 }}>
                         <ListSubheader>
                             Genes ({overlap.length})
                         </ListSubheader>
@@ -193,11 +195,10 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                         </TextField>
                     </Box>
                 </Stack>
-
             </Grid>
-            <Grid item xs={9}>
-                <Stack direction='column' spacing={2}>
-                    <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }}>
+            <Grid item xs={isMobile ? 12 : 9}>
+                <Stack direction='column' spacing={2} maxWidth={'100%'}>
+                    <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
                         <Tooltip title={"Can visualize for number of selected sets between 0 and 6 "}>
                             <div>
                                 <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => setVisualization('Venn')} disabled={!(checked.length < 6 && checked.length > 0)}>
@@ -259,7 +260,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             </div>
                         </Tooltip>
                     </Stack>
-                    <Box sx={{ boxShadow: 2, borderRadius: 2, minHeight: 400, minWidth: '500px' }}>
+                    <Box sx={{ boxShadow: 2, borderRadius: 2, minHeight: 400, minWidth: '500px', maxWidth:'100%'}}>
                         <Stack direction='column' sx={{ p: 0 }}>
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
                                 <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
@@ -270,7 +271,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 {<AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} />}
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
-                                <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px' }}>
+                                <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%' }}>
                                     {/* {(visualization === 'Heatmap' && checked.length < 31 && checked.length > 0) && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />} */}
                                     {(visualization === 'Heatmap' && checked.length > 1 && checked.length < 39) && <ClusteredHeatmap selectedSets={legendSelectedSets} />}
                                     {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
@@ -322,7 +323,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
 
     const legendIds = legend.map((item) => item.id)
     return (
-        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2 }}>
+        <List sx={{ maxWidth: '100%', bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2 }}>
             <ListSubheader>
                 My Gene Sets ({checked.length})
             </ListSubheader>

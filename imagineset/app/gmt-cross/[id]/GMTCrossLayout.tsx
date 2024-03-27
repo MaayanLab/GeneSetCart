@@ -47,7 +47,6 @@ const RenderOverlapButton = ({ params, sessionId }: { params: GridRenderCellPara
                 <DialogTitle>{params.row.geneset_1 + ' ∩ ' + params.row.geneset_2}</DialogTitle>
                 <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
                     <Grid item>
-                        {/* <Typography variant='body1' color='secondary'> {params.row.genes.length} genes</Typography> */}
                         <Typography variant='body1' color='secondary'> {params.row.n_overlap} genes found</Typography>
                     </Grid>
                     <Grid item>
@@ -87,8 +86,6 @@ const RenderOverlapButton = ({ params, sessionId }: { params: GridRenderCellPara
                                             addToSessionSets(params.row.overlap.toString().replaceAll("'", '').split(','), sessionId, genesetName, '').then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
                                         }
                                     })
-
-                                    // enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' Intersection ' + params.row.geneset_2 })
                                 }}
                             >
                                 ADD TO CART
@@ -184,6 +181,7 @@ const sortDict = (dict: { [key: string]: number[][] }) => {
 const generateHypothesisTooltip = (hypothesisString: string, substringIndices: { [key: string]: number[][] }, topEnrichmentResults: { [key: string]: any[] }) => {
     let prevStart = 0;
     const splittedStrings = [];
+    console.log(sortDict(substringIndices))
     for (let term of sortDict(substringIndices)) {
         let termWords = term[0]
         let termStart = term[1][0]

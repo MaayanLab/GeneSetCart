@@ -101,7 +101,9 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
     Term for gene set 1: ${term2}
     Abstract template for gene set 1: ${abstract1}
     Abstract template for gene set 2: ${abstract2}
-    The response should only include the specified abstracts for both gene sets in the form [abstract1, abstract2]
+    Ignore the word GTEx if it appears in the term of a gene set. 
+    The response should only include the specified abstracts for both gene sets in the form ["abstract1", "abstract2"] 
+    where each abstract is a string containing the specified abstracts with no extra words/characters.
     `
     try {
         const cachedAbstracts = cache.get( term1+ term2 + abstract1+ abstract2 );

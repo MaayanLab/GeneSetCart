@@ -9,7 +9,7 @@ import Header from '@/components/header/Header';
 
 export default async function VisualizePage({ params }: { params: { id: string } }) {
     const session = await getServerSession(authOptions)
-    if (!session) return redirect(`/api/auth/signin?callbackUrl=/augment/${params.id}`)
+    if (!session) return redirect(`/api/auth/signin?callbackUrl=/visualize/${params.id}`)
     const user = await prisma.user.findUnique({
         where: {
             id: session?.user.id

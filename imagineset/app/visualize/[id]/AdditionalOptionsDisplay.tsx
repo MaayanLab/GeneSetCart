@@ -10,7 +10,6 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
     }, [])
 
     const loadDataFile = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(1)
         const fileList = event.target.files
         if (fileList) {
             const label = document.getElementById('file-input-label');
@@ -51,6 +50,7 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
                 }
                 if (fileList[0]) {
                     reader.readAsText(fileList[0]);
+                    
                 }
             } catch {
                 console.log('Error in reading file')
@@ -58,7 +58,6 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
         }
     }, [umapOptions, setUmapOptions])
 
-    console.log(umapOptions)
     if (visualization === 'UMAP') {
         return (
             <>

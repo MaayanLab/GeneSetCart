@@ -125,7 +125,6 @@ export const alphabet = [
 
 export type UMAPOptionsType = {
     assignGroups: boolean
-    filetype? : string
     dataGroups?: {[key: string] : string}
     minDist: number
     spread: number
@@ -146,7 +145,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [visualization, setVisualization] = React.useState('')
     const [overlap, setOverlap] = React.useState<string[]>([])
     const [assignGroups, setAssignGroups] = React.useState(false)    
-    const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({assignGroups: assignGroups, filetype: 'CSV', minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42})
+    const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42})
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
 
 

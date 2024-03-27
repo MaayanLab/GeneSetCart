@@ -22,13 +22,13 @@ def geneset_umap(geneset_genes, umapOptions):
     # create object
     tfidf = TfidfVectorizer(max_df=1.0, min_df=1)
     # get tf-df values
-    X = tfidf.fit_transform(geneset_strings)   
+    X = tfidf.fit_transform(geneset_strings)
     adata = anndata.AnnData(X)
     adata.obs.index = geneset_genes.keys()
     if len(geneset_genes.keys()) < 11:
         sc.pp.neighbors(adata, n_neighbors= len(geneset_genes.keys()) - 1, use_rep='X')
     else:
-        sc.pp.neighbors(adata, n_neighbors=10, use_rep='X')
+        sc.pp.neighbors(adata, n_neighbors=umapOptions['nNeighbors'], use_rep='X')
     sc.tl.leiden(adata, resolution=1.0)
     sc.tl.umap(adata, min_dist=umapOptions['minDist'], spread=umapOptions['spread'], random_state=umapOptions['randomState'])
     new_order = adata.obs.sort_values(by='leiden').index.tolist()

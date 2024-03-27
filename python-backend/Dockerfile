@@ -26,4 +26,4 @@ EXPOSE 8000
 
 RUN pip3 install gunicorn
 
-CMD gunicorn --workers 2 --bind 0.0.0.0:8000 app:app
+CMD gunicorn --workers 2 --log-level debug --timeout 600 --bind 0.0.0.0:8000 app:app

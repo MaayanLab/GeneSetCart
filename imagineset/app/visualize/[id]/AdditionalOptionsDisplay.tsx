@@ -20,7 +20,6 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
         if (fileList) {
             try {
                 const reader = new FileReader();
-                if (umapOptions.filetype === 'CSV') {
                     reader.addEventListener(
                         "load",
                         () => {
@@ -36,21 +35,8 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
                         },
                         false,
                     );
-                } else {
-                    reader.addEventListener(
-                        "load",
-                        () => {
-                            if (reader.result) {
-                                let dataGroups = JSON.parse(reader.result.toString())
-                                setUmapOptions({ ...umapOptions, dataGroups: dataGroups })
-                            }
-                        },
-                        false,
-                    );
-                }
                 if (fileList[0]) {
                     reader.readAsText(fileList[0]);
-                    
                 }
             } catch {
                 console.log('Error in reading file')
@@ -90,24 +76,6 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
                                 />
                             </Button>
                             <span id="file-input-label"></span>
-                            <FormControl sx={{ minWidth: 100 }}>
-                                <InputLabel id="filetype-select-label" color="secondary">File Type</InputLabel>
-                                <Select
-                                    labelId="filetype-select"
-                                    id="filetype-select"
-                                    value={umapOptions.filetype}
-                                    label="File type"
-                                    onChange={(evt) => setUmapOptions({ ...umapOptions, filetype: evt.target.value as string })}
-                                    color="secondary"
-                                >
-                                    <MenuItem key={'csv'} value={'CSV'}>
-                                        CSV
-                                    </MenuItem>
-                                    <MenuItem key={'json'} value={'JSON'}>
-                                        JSON
-                                    </MenuItem>
-                                </Select>
-                            </FormControl>
                         </>
                     }
 

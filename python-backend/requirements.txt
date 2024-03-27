@@ -7,4 +7,5 @@ scanpy==1.10.0
 scikit_learn==1.4.1.post1
 seaborn==0.13.2
 gunicorn==21.2.0
-leidenalg
+leidenalg==0.10.2
+umap-learn==0.5.5

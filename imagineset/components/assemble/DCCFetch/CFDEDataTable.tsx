@@ -104,7 +104,13 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
         } else if (results.code === 'error') {
           setStatus({ error: { selected: true, message: results.message } })
         }
-      }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
+      }).catch((err) => {
+        if (err.message === 'No valid genes in gene set') {
+          setStatus({ error: { selected: true, message: err.message } })
+      } else {
+          setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+      }
+      })
   }, [selectedRows, params.id])
 
   return (

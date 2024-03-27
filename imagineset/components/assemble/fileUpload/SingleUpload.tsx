@@ -15,10 +15,10 @@ export type addStatus = {
     success?: boolean,
     loading?: boolean,
     error?: {
-      selected: boolean;
-      message: string
+        selected: boolean;
+        message: string
     },
-  }
+}
 
 
 export default function SingleUpload() {
@@ -27,7 +27,7 @@ export default function SingleUpload() {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [genes, setGenes] = React.useState('')
     const [validGenes, setValidGenes] = React.useState<string[]>([])
-    const  [status, setStatus] = React.useState<addStatus>({})
+    const [status, setStatus] = React.useState<addStatus>({})
 
 
     const getExample = () => {
@@ -44,7 +44,7 @@ export default function SingleUpload() {
             element.click();
             document.body.removeChild(element);
         })
-    }, []) 
+    }, [])
 
     const readFile = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files
@@ -89,11 +89,17 @@ export default function SingleUpload() {
                     const sessionId = params.id
                     checkInSession(sessionId, genesetName).then((response) => {
                         if (response) {
-                            setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
+                            setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
                         } else {
-                            addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => {setStatus({success:true})}).catch((err) => setStatus({error:{selected:true, message:"Error in adding gene set!"}}))
+                            addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => { setStatus({ success: true }) }).catch((err) => {
+                                if (err.message === 'No valid genes in gene set') {
+                                    setStatus({ error: { selected: true, message: err.message } })
+                                } else {
+                                    setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+                                }
+                            })
                         }
-                    })                      
+                    })
                 }
                 }>
                 <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center' alignItems={'center'} justifyContent={'center'}>
@@ -114,35 +120,34 @@ export default function SingleUpload() {
                     </Grid>
                     <Grid item>
                         <Stack direction='row' spacing={2}>
-                        <Button
-                            variant="contained"
-                            component="label"
-                            onClick={(event) => {
-                                const inputFile = document.getElementById('single-file-input');
-                                if (inputFile) {
-                                    return inputFile.onclick
-                                }
-                            }}
-                        >
-                            Upload File
-                            <input
-                                id='single-file-input'
-                                hidden
-                                type="file"
-                                onChange={(event) => { readFile(event) }}
-                            />
-                        </Button>
-                        <Button 
-                        variant="contained"
-                        onClick={downloadExample}>
-                            Download Example
-                        </Button>
+                            <Button
+                                variant="contained"
+                                component="label"
+                                onClick={(event) => {
+                                    const inputFile = document.getElementById('single-file-input');
+                                    if (inputFile) {
+                                        return inputFile.onclick
+                                    }
+                                }}
+                            >
+                                Upload File
+                                <input
+                                    id='single-file-input'
+                                    hidden
+                                    type="file"
+                                    onChange={(event) => { readFile(event) }}
+                                />
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={downloadExample}>
+                                Download Example
+                            </Button>
                         </Stack>
- 
                     </Grid>
                 </Grid>
                 <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 6}>
-                    <Grid item container justifyContent={'center'} alignItems={'center'} direction='column'> 
+                    <Grid item container justifyContent={'center'} alignItems={'center'} direction='column'>
                         <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography>
                         <TextField
                             id="standard-multiline-static"
@@ -167,7 +172,7 @@ export default function SingleUpload() {
                             </Button>
                         </Grid>
                     </Grid>
-                    <Status status={status}/>
+                    <Status status={status} />
                 </Grid>
             </Grid>
         </Container>

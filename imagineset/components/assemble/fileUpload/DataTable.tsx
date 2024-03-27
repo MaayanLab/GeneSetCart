@@ -25,7 +25,7 @@ const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
   const [validGenes, setValidGenes] = React.useState<string[]>([])
   React.useEffect(() => {
     checkValidGenes(params.row.genes.toString().replaceAll(',', '\n'))
-      .then((result) => setValidGenes(result) )
+      .then((result) => setValidGenes(result))
   }, [params.row.genes])
 
 
@@ -88,27 +88,33 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
   const params = useParams<{ id: string }>()
   const [status, setStatus] = React.useState<addStatus>({})
   const [rowSelectionModel, setRowSelectionModel] =
-  React.useState<GridRowSelectionModel>([]);
+    React.useState<GridRowSelectionModel>([]);
 
   const [selectedRows, setSelectedRows] = React.useState<(GMTGenesetInfo | undefined)[]>([])
-  
+
   const addSets = React.useCallback(() => {
-    setStatus({loading:true})
+    setStatus({ loading: true })
     addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id)
-    .then((results: any) => {
-      if (results.code === 'success') {
-        setStatus({ success: true })
-      } else if (results.code === 'error') {
-        setStatus({ error: { selected: true, message: results.message } })
-      }
-    }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
+      .then((results: any) => {
+        if (results.code === 'success') {
+          setStatus({ success: true })
+        } else if (results.code === 'error') {
+          setStatus({ error: { selected: true, message: results.message } })
+        }
+      }).catch((err) => {
+        if (err.message === 'No valid genes in gene set') {
+          setStatus({ error: { selected: true, message: err.message } })
+        } else {
+          setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+        }
+      })
   }, [selectedRows, params.id])
 
 
 
   return (
     <div style={{ height: 400, width: '100%' }}>
-      {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon/> ADD TO CART</Button>}
+      {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> ADD TO CART</Button>}
       <DataGrid
         rows={rows}
         columns={columns}
@@ -136,6 +142,6 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
       />
       <Status status={status} />
     </div>
-    
+
   );
 }

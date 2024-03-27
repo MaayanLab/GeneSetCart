@@ -109,10 +109,7 @@ export default function GeneshotSearch() {
         Enter a search term to obtain all genes mentioned with that term in publications
       </Typography>
       <Stack direction='column' >
-        {/* <Grid item sx={{ justifyItems: 'center' }}> */}
           {loading ? <LinearIndeterminate /> : <></>}
-        {/* </Grid> */}
-        {/* <Grid item xs={12}> */}
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -128,9 +125,8 @@ export default function GeneshotSearch() {
               }}
             />
           </Search>
-        {/* </Grid> */}
       </Stack>
-      <Grid container sx={{ p: 2 }} alignItems="center" justifyContent="center" display={isMobile ? 'block' : 'flex'} spacing={1} component={'form'}
+      <Grid container sx={{ p: 2 }} alignItems="center" justifyContent="center" display={isMobile ? 'block' : 'flex'} spacing={5} component={'form'}
         onSubmit={(evt) => {
           evt.preventDefault();
           const formData = new FormData(evt.currentTarget)
@@ -143,7 +139,15 @@ export default function GeneshotSearch() {
             if (response) {
               setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
             } else {
-              addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error adding gene set!" } }))
+              addToSessionSets(validGenes, sessionId, genesetName, description ? description : '')
+              .then((result) => { setStatus({ success: true }) })
+              .catch((err) => {
+                if (err.message === 'No valid genes in gene set') {
+                  setStatus({ error: { selected: true, message: err.message } })
+              } else {
+                  setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+              }
+              })
             }
           })
         }

@@ -1,4 +1,15 @@
 'use server'
+import { readFileSync } from 'fs';
+import path from 'path';
+
+export async function loadDataFileExample() {
+    const exampleSet = readFileSync(
+        path.resolve('public/examples', './example data file.csv'),
+        { encoding: 'utf8', flag: 'r' }
+    )
+    return exampleSet
+}
+
 
 type UMAPOptionsType = {
     assignGroups: boolean

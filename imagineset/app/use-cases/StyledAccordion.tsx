@@ -23,7 +23,6 @@ export const StyledAccordionSummary = styled((props: AccordionSummaryProps) => (
     <AccordionSummary {...props} expandIcon={<PlayArrowIcon sx={{ color: "#ffffff" }} />} />
 ))(({ theme }) => ({
     backgroundColor: '#b8c4e1',
-    fontWeight: 3,
     flexDirection: 'row-reverse',
     "&.Mui-expanded": {
         minHeight: 0,
@@ -45,7 +44,7 @@ export function StyledAccordionComponent({ heading, content }: { heading: string
             <StyledAccordionSummary
                 expandIcon={<ArrowDownwardIcon />}
             >
-                <Typography>{heading}</Typography>
+                <Typography sx={{fontWeight: 'bold', color: '#ffffff'}}>{heading}</Typography>
             </StyledAccordionSummary>
             <StyledAccordionDetails>
                 {content}

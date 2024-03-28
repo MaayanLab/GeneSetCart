@@ -184,7 +184,7 @@ export async function generateHypothesis(row: any ) {
     the following biological pathways: ${enrichedTerms.toString()}.  Hypothesize why a high overlap between the gene sets exists
     based on specified abstracts of each gene set that explains how each gene set was created, the overlapping genes between 
     both gene sets, and the biological pathways that the overlapping genes are related to based on the gene set enrichment analysis results.
-    Make sure incorporate the enrichment analysis results in your response in a meaningful way. For each enrichment term that appears in your response, 
+    Make sure to incorporate the enrichment analysis results in your response in a meaningful way. For each enrichment term that appears in your response, 
     the term should appear in the exact form it was given to you (do not exclude any words or characters from a term. For example, 
     Complement And Coagulation Cascades WP558 should appear as Complement And Coagulation Cascades WP558, not Complement And Coagulation Cascades).
     Specified Abstracts for gene sets: ${abstractsList}

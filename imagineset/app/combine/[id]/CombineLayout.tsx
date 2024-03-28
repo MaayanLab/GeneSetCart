@@ -108,7 +108,17 @@ export function CombineLayout({ sessionInfo, sessionId }: {
             } else {
                 addToSessionSets(displayedGenes, sessionId, generatedSetName, '')
                     .then((response) => setStatus({ success: true }))
-                    .catch((error) => setStatus({ error: { selected: true, message: 'Error adding gene set to list. Please try again' } }))
+                    .catch((err) => {
+                        if (err.message === 'No valid genes in gene set') {
+                            setStatus({ error: { selected: true, message: err.message } })
+                        }                        
+                        else if (err.message === 'Empty gene set name') {
+                            setStatus({ error: { selected: true, message: err.message } })
+                        }
+                         else {
+                            setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+                        }
+                    })
             }
         })
     }, [displayedGenes, generatedSetName, sessionId])

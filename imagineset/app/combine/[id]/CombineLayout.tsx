@@ -114,10 +114,8 @@ export function CombineLayout({ sessionInfo, sessionId }: {
     }, [displayedGenes, generatedSetName, sessionId])
 
 
-
-
     return (
-        <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'}>
+        <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'} useFlexGap flexWrap="wrap">
             <SelectGenesetsCard sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
             <Box sx={{ minWidth: 100 }}>
                 <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 500, overflowY: 'scroll' }}>
@@ -145,7 +143,6 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                                     </Tooltip>
 
                                 }
-                                // label=Consensus Criteria"
                                 sx={{ fontSize: 16 }}
                                 color='secondary'
                                 name='max-Add'
@@ -159,7 +156,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
             </Box>
             <Box sx={{ maxWidth: 500 }}>
                 <Card variant="outlined" sx={{
-                    minHeight: 400, maxHeight: 400, overflowY: 'scroll',
+                    minHeight: 400, overflowY: 'scroll',
                     '&::-webkit-scrollbar': { ...scrollbarStyles },
                     '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }
                 }}>

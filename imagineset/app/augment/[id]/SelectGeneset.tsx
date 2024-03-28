@@ -103,7 +103,6 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
         if (originalGenes) {
             getPPIGenes(originalGenes)
             .then((response) => {
-                console.log(response)
                 setAugmentedGenes(response)
                 setGenesetName('Augmented ' + selected)
                 setLoading(false)

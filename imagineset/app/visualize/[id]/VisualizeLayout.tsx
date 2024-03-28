@@ -192,7 +192,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                     <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
                     <Box sx={{ maxWidth: '100%' , bgcolor: 'background.paper', borderRadius: 2, height: 200, boxShadow: 2 }}>
                         <ListSubheader>
-                            Genes ({overlap.length})
+                            Genes ({overlap === undefined ? 0 : overlap.length})
                         </ListSubheader>
                         <TextField
                             multiline
@@ -200,7 +200,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             sx={{
                                 "& fieldset": { border: 'none' },
                             }}
-                            value={overlap.join('\n')}
+                            value={overlap === undefined ? '' : overlap.join('\n')}
                             disabled
                         >
                         </TextField>

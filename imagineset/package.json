@@ -1,13 +1,13 @@
 {
   "name": "imagineset",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "version": "ts-node cli/version-compose.ts && docker-compose build",
+    "version": "ts-node cli/version-compose.ts && docker-compose build --parallel",
     "postversion": "docker-compose push"
   },
   "dependencies": {

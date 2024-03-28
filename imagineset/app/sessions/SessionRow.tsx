@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import React from "react";
 import { deleteSessionByID, updateSessionName } from "./sessionFunctions";
 import EditIcon from '@mui/icons-material/Edit';
+import ShareIcon from '@mui/icons-material/Share';
 
 export function SessionRow({ session }: { session: PipelineSession & { gene_sets: GeneSet[] } }) {
     const deleteSession = React.useCallback((session: PipelineSession & { gene_sets: GeneSet[] }) => {
@@ -30,6 +31,9 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
                     </Grid>
                 </TableCell>
                 <TableCell>
+                </TableCell>
+                <TableCell>
+                <Button color='secondary' disabled><ShareIcon /></Button>
                 </TableCell>
                 <TableCell>
                     <Button color='secondary' onClick={(evt) => deleteSession(session)}><DeleteIcon /></Button>

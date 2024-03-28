@@ -28,6 +28,17 @@ const VennPlot = dynamic(() => import('../../../components/visualize/PlotCompone
 import { useDebounce } from 'use-debounce';
 
 
+const scrollbarStyles = {
+    'webkitAppearance': 'none',
+    'width': '10px'
+};
+
+const scrollbarThumb = {
+    'borderRadius': '5px',
+    'backgroundColor': 'rgba(0,0,0,.5)',
+    'WebkitBoxShadow': '0 0 1px rgba(255,255,255,.5)'
+}
+
 const downloadLegend = (filename: string, text: string) => {
     downloadURI('data:text/plain;charset=utf-8,' + encodeURIComponent(text), filename)
 }
@@ -190,8 +201,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 "& fieldset": { border: 'none' },
                             }}
                             value={overlap.join('\n')}
+                            disabled
                         >
-
                         </TextField>
                     </Box>
                 </Stack>
@@ -260,7 +271,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             </div>
                         </Tooltip>
                     </Stack>
-                    <Box sx={{ boxShadow: 2, borderRadius: 2, minHeight: 400, minWidth: '500px', maxWidth:'100%'}}>
+                    <Box sx={{ boxShadow: 2, borderRadius: 2, minHeight: 400, minWidth: '400px', maxWidth:'100%'}}>
                         <Stack direction='column' sx={{ p: 0 }}>
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
                                 <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
@@ -323,7 +334,8 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
 
     const legendIds = legend.map((item) => item.id)
     return (
-        <List sx={{ maxWidth: '100%', bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2 }}>
+        <List sx={{ maxWidth: '100%', bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2, '&::-webkit-scrollbar': { ...scrollbarStyles },
+        '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }}}>
             <ListSubheader>
                 My Gene Sets ({checked.length})
             </ListSubheader>

@@ -33,6 +33,8 @@ export default async function AnalyzePage({ params }: { params: { id: string } }
         }
     })
 
+    if (sessionInfo === null) return redirect('/')
+
     const PaginatedTable = dynamic(() => import("./PaginationTable"), { ssr: false })
     // get rows from sessionInfo and put in table
     const rows = sessionInfo ? sessionInfo.gene_sets : []

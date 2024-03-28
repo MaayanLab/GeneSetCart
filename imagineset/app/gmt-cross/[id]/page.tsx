@@ -17,6 +17,12 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
     })
     if (user === null) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/`)
 
+    const sessionInfo = await prisma.pipelineSession.findUnique({
+        where: {
+            id: params.id
+        },
+    })
+    if (sessionInfo === null) return redirect('/')
     return (
         <>
             <Grid item>

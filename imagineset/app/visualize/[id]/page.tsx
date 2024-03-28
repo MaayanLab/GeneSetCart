@@ -30,6 +30,7 @@ export default async function VisualizePage({ params }: { params: { id: string }
         }
     })
 
+    if (sessionInfo === null) return redirect('/')
 
     return (
         <>

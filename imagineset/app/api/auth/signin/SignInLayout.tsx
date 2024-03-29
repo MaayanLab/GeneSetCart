@@ -6,6 +6,7 @@ import styles from '../signin/signin.module.css'
 import { styled } from '@mui/material/styles';
 import { BuiltInProviderType } from "next-auth/providers/index";
 import { Alert, Card, Stack, Typography } from "@mui/material";
+import StyledCard from "./StyledCards";
 
 const Item = styled(Card)(() => ({
   padding: 8,
@@ -51,8 +52,9 @@ export function SignInLayout({ providers }: { providers: never[] | Record<Litera
   const error = searchParams.get('error')
   return (
     <div className={styles.page}>
-      <Stack direction='column'>
+      <Stack direction='column' sx={{justifyContent: 'center', alignItems: 'center'}}>
       <Typography variant="h1" color="secondary.dark" className='p-5'>GET-GENE-SET-GO</Typography>
+      <StyledCard />
       <Item elevation={3}>
         <center><img src="/img/G2SG-logo.png" alt="Logo" loading="lazy" height="200" width="200" ></img></center>
         {error !== null && <Alert severity="error"sx={{fontSize:14, marginBottom: 1}}>{errors[error]}</Alert>}

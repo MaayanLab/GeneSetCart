@@ -3,8 +3,6 @@ import { getServerSession } from "next-auth"
 import { authOptions } from '@/lib/auth/authOptions'
 import { SignInLayout } from "./SignInLayout"
 
-
-
 export default async function SignIn() {
   const providers = await getProvidersServer()
   if (providers.providers) {
@@ -17,7 +15,7 @@ else {
 }
 }
 
-export async function getProvidersServer() {
+async function getProvidersServer() {
   'use server'
   const session = await getServerSession(authOptions)
   // If the user is already logged in, redirect.

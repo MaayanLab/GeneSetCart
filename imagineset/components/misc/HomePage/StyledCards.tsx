@@ -19,10 +19,10 @@ export default function StyledCard() {
         // color: 'black',
         minHeight: '12vw',
         minWidth: '3vw',
-        border: 'solid',
+        border: 'solid 1px',
         borderRadius: 20, 
         borderColor: '#a7c4e4',
-        boxShadow: '12px 12px 2px 1px rgb(167 196 228)'
+        boxShadow: '12px 12px 10px 1px rgb(167 196 228)'
     }));
 
     return (

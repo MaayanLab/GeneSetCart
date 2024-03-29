@@ -102,7 +102,7 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
                             variant='contained'
                             onClick={downloadExample}
                             >
-                                Example Data File
+                                Example data file
                             </Button>
                         </>
                     }

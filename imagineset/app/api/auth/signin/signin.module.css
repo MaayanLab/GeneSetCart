@@ -1,0 +1,25 @@
+.providerbutton {
+    background-color: rgb(167 196 228);
+    border-color: rgba(0,0,0,.1);
+    border-radius: 10px;
+    display: flex;
+    font-size: 1.1rem;
+    font-weight: 500;
+    flex-grow: 1;
+    justify-content: center;
+    margin-bottom: 10px;
+    min-height: 62px;
+    padding: 1rem 1rem;
+    position: relative;
+    transition: all .1s ease-in-out;
+    width: 100%
+}
+
+.page {
+    position: relative;
+    display: flex;
+    width: 100%; 
+    height: calc(100vh - 144px);
+    align-items: center;
+    justify-content: center;
+}

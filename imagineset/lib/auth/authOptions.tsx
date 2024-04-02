@@ -38,12 +38,6 @@ export const authOptions: NextAuthOptions = {
           return newSession
         }
     },
-    // theme: {
-    //   colorScheme: "light", // "auto" | "dark" | "light"
-    //   brandColor: '#E7F3F5', // Hex color code
-    //   logo: "/img/G2SG-logo.png", // Absolute URL to image
-    //   // buttonText: "" // Hex color code
-    // },
     pages: {
       signIn: '/api/auth/signin',
     }

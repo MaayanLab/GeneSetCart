@@ -128,3 +128,11 @@ model cfdegeneset {
 
   @@map("cfde_genesets")
 }
+
+model tempSessions {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  lastModified DateTime  @default(now())
+  genesetName  String
+  genes        String[]
+}

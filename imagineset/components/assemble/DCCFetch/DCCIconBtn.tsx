@@ -1,11 +1,7 @@
 import React from "react";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
-import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import Grid from "@mui/material/Grid";
-import { styled } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 import Image from 'next/image'
 import LINCSImg from '@/public/img/DCCImg/LINCS.gif'
@@ -99,9 +95,6 @@ const CustomCard = ({
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
             </CardMedia>
-            {/* <CardContent sx={{ backgroundColor: '#C9D2E9' }}>
-                <Typography variant={"body2"} sx={{fontSize: 10}}>{title}</Typography>
-            </CardContent> */}
         </CardActionArea>
     </Card>
 );

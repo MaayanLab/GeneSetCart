@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 import uuid
 import math
+import urllib.request
 
 
 load_dotenv()
@@ -37,7 +38,40 @@ for index, row in library_abstracts.iterrows():
                     VALUES  (%s, %s, %s);''', (str(uuid.uuid4()), row['Library'], row['Descriptions']))
     conn.commit()
 
-#Ingest data crossing data
+
+# ingest all GMT data
+cfde_genesets = pd.read_csv("CFDE Genesets.tsv", sep='\t')
+
+CFDE_geneset_df = pd.DataFrame([], columns=['Library', 'Geneset', 'Genes'])
+
+# for each line, open with file link and populate database
+data = []
+for index, row in cfde_genesets.iterrows():
+    with urllib.request.urlopen(row['Link']) as f:
+        html = f.read().decode('utf-8') 
+        for line in tqdm(html.split('\n'), total=len(html.split('\n'))):
+            line_content = line.split('\t')
+            geneset_name =  line_content[0]
+            genes = line_content[1:]
+            genes = [i for i in genes if i != '']
+            if len(genes) > 0:
+                data.append([row['Library '], geneset_name, genes])
+                geneset_id = str(uuid.uuid4())
+                cur.execute('''INSERT INTO cfde_genesets (id, term, library) 
+                                            VALUES  (%s, %s, %s);''', (geneset_id, geneset_name, row['Library ']))
+                conn.commit()
+
+            mask = genes_info['Symbol'].isin(genes)
+            geneInfoFiltered = genes_info[mask]
+            valid_gene_ids = geneInfoFiltered['GeneID'].to_list()
+            table_name = "_GeneTocfdegeneset"
+            for geneId in valid_gene_ids: 
+                cur.execute(f'''INSERT INTO "{table_name}"  ("A", "B") 
+                                                VALUES  (%s, %s);''', (geneId, geneset_id))
+                conn.commit()
+CFDE_geneset_df = pd.DataFrame(data, columns=['Library', 'Geneset', 'Genes'])
+
+#Ingest GMT crossing data
 dataframe_names = ['GlyGen_Glycosylated_Proteins', 
  'GTEx_Aging_Sigs', 
  'GTEx_Tissues', 
@@ -48,22 +82,36 @@ dataframe_names = ['GlyGen_Glycosylated_Proteins',
  'MoTrPAC', 
  'Metabolomics_Workbench_Metabolites']
 
+CFDE_Lib_Full = {
+    "LINCS_L1000_Chem_Pert_Consensus_Sigs": "LINCS L1000 CMAP Chemical Pertubation Consensus Signatures",
+    "LINCS_L1000_CRISPR_KO_Consensus_Sigs": "LINCS L1000 CMAP CRISPR Knockout Consensus Signatures",
+    "GTEx_Tissues": 'GTEx Tissue Gene Expression Profiles',
+    "GTEx_Aging_Sigs": 'GTEx Tissue-Specific Aging Signatures',
+    "Metabolomics_Workbench_Metabolites": 'Metabolomics Gene-Metabolite Associations',
+    "IDG_Drug_Targets": 'IDG Drug Targets',
+    "GlyGen_Glycosylated_Proteins": 'Glygen Glycosylated Proteins',
+    "KOMP2_Mouse_Phenotypes": 'KOMP2 Mouse Phenotypes',
+    "MoTrPAC": 'MoTrPAC Rat Endurance Exercise Training'
+}
+
 for lib in dataframe_names: 
     for inner_lib in dataframe_names:
         if not(lib == inner_lib):
             if not((lib == 'LINCS_L1000_Chem_Pert_Consensus_Sigs') or (lib == 'LINCS_L1000_CRISPR_KO_Consensus_Sigs')):
                 if not((inner_lib == 'LINCS_L1000_Chem_Pert_Consensus_Sigs') or (inner_lib == 'LINCS_L1000_CRISPR_KO_Consensus_Sigs')):
-                    try: 
+                    try:
                         crossed_dataframe = pd.read_csv('./crossed_sets/' + lib+ '_' + inner_lib + '_crossing_data.csv', index_col=0)
-                        filtered_dataframe = crossed_dataframe[crossed_dataframe['P-value'] < 0.001]
+                        filtered_dataframe = crossed_dataframe[crossed_dataframe['P-value'] < 0.001].iloc[:5000]
                         for index, row in tqdm(filtered_dataframe.iterrows(), total=filtered_dataframe.shape[0]):
+                            n_genes1 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_1']) & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib1']])]['Genes'].item())
+                            n_genes2 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_2'])  & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib2']])]['Genes'].item())
                             if row['Odds_Ratio'] == math.inf:
                                 row['Odds_Ratio'] = 999999999999999.99
-                            cur.execute('''INSERT INTO cfde_cross_pair (id, lib_1, lib_2, geneset_1, geneset_2, odds_ratio, pvalue, n_overlap, overlap) 
-                                            VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s);''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', ')))
+                            cur.execute('''INSERT INTO cfde_cross_pair (id, lib_1, lib_2, geneset_1, geneset_2, odds_ratio, pvalue, n_overlap, overlap, n_genes1, n_genes2) 
+                                            VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', '), n_genes1, n_genes2))
                             conn.commit()
-                    except:
-                        continue
+                    except Exception as e: print(e)
+
 
 # Ingest LINCS Crossing Data
 for lib in dataframe_names: 
@@ -74,10 +122,12 @@ for lib in dataframe_names:
                     crossed_dataframe = pd.read_csv('./crossed_sets/LINCS Top Pairs/' + lib+ '_' + inner_lib + '.csv', index_col=0)
                     filtered_dataframe = crossed_dataframe[crossed_dataframe['P-value'] < 0.001]
                     for index, row in tqdm(filtered_dataframe.iterrows(), total=filtered_dataframe.shape[0]):
+                        n_genes1 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_1']) & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib1']])]['Genes'].item())
+                        n_genes2 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_2'])  & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib2']])]['Genes'].item())
                         if row['Odds_Ratio'] == math.inf:
                             row['Odds_Ratio'] = 999999999999999.99
-                        cur.execute('''INSERT INTO cfde_cross_pair (id, lib_1, lib_2, geneset_1, geneset_2, odds_ratio, pvalue, n_overlap, overlap) 
-                                        VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s);''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', ')))
+                        cur.execute('''INSERT INTO cfde_cross_pair (id, lib_1, lib_2, geneset_1, geneset_2, odds_ratio, pvalue, n_overlap, overlap, n_genes1, n_genes2) 
+                                        VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', '), n_genes1, n_genes2))
                         conn.commit()
                 except:
                     continue

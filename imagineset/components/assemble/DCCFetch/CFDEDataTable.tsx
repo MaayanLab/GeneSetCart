@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react';
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from '@mui/x-data-grid';
-import { Button } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import {
   Grid, TextField, Typography, useMediaQuery
 } from "@mui/material";
@@ -14,6 +14,7 @@ import { useParams } from 'next/navigation';
 import Status from '../Status';
 import { searchResultsType } from './DCCUpload';
 import { addStatus } from '../fileUpload/SingleUpload';
+import { Gene } from '@prisma/client';
 
 export function copyToClipboard(genesString: string) {
   navigator.clipboard.writeText(genesString);
@@ -24,10 +25,7 @@ const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
   const [open, setOpen] = React.useState(false);
   const [validGenes, setValidGenes] = React.useState<string[]>([])
   React.useEffect(() => {
-    fetch('https://maayanlab.cloud/Enrichr/geneSetLibrary?' + new URLSearchParams(`libraryName=${params.row.libraryName}&term=${params.row.genesetName}&mode=json`))
-      .then((response) => response.json())
-      .then((responsejson) => checkValidGenes(responsejson[params.row.genesetName].toString().replaceAll(',', '\n'))
-        .then((result) => setValidGenes(result)))
+    setValidGenes(params.row.genes.map((gene: Gene) => gene.gene_symbol))
   }, [params.row.genes])
 
 
@@ -45,6 +43,7 @@ const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
         variant="contained"
         color="tertiary"
         size="small"
+        sx={{margin:1}}
         onClick={(event) => { event.stopPropagation(); handleOpen() }}>
         <VisibilityIcon /> &nbsp;
         Genes
@@ -68,7 +67,7 @@ const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
             />
           </Grid>
           <Grid item sx={{ mt: 2 }}>
-            <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(params.row.genes.toString().replaceAll(',', '\n'))}>
+            <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(params.row.genes.map((gene: Gene) => gene.gene_symbol).toString().replaceAll(',', '\n'))}>
               COPY TO CLIPBOARD
             </Button>
           </Grid>
@@ -114,9 +113,11 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
   }, [selectedRows, params.id])
 
   return (
-    <div style={{ height: 400, width: '100%' }}>
+    <Stack direction='column' spacing={6}>
+    <div style={{ minHeight: 200, width: '100%' }}>
       {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> ADD TO CART</Button>}
       <DataGrid
+        getRowHeight={() => 'auto'}
         rows={rows}
         columns={columns}
         initialState={{
@@ -133,7 +134,10 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
           '.MuiDataGrid-cell': {
             whiteSpace: 'normal !important',
             wordWrap: 'break-word !important',
-          }
+          },
+          '.MuiDataGrid-columnHeaderTitle': {
+            fontWeight: 700
+          },
         }}
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setRowSelectionModel(newRowSelectionModel);
@@ -141,8 +145,10 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
         }}
         rowSelectionModel={rowSelectionModel}
       />
-      <Status status={status} />
     </div>
-
+    <div style={{width: '100%'}}>
+    <Status status={status} />
+    </div>
+    </Stack>
   );
 }

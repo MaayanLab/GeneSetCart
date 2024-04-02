@@ -160,7 +160,7 @@ export default function SingleUpload() {
                             }}
                         />
                     </Grid>
-                    <Grid container spacing={2} sx={{ mt: 1 }} justifyContent={'center'}>
+                    <Grid container item spacing={2} sx={{ mt: 1 }} justifyContent={'center'}>
                         <Grid item>
                             <Button onClick={getExample} variant='outlined' color="secondary">
                                 TRY EXAMPLE

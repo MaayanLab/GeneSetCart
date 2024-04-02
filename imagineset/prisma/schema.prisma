@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -64,7 +65,7 @@ model Gene {
   synonyms    String
   description String?
   genesets    GeneSet[]
-  // cfde_genesets CFDEGeneSet[]
+  cfde_genesets cfdegeneset[]
 
   @@map("genes")
 }
@@ -104,6 +105,8 @@ model CFDECrossPair {
   pvalue        Float
   n_overlap     Int
   overlap       String[]
+  n_genes1      Int
+  n_genes2      Int
 
 @@map("cfde_cross_pair")
 }
@@ -116,12 +119,12 @@ model LibAbstracts {
   @@map("lib_abstracts")
 }
 
-// model CFDEGeneSet {
-//   id          String          @id @default(cuid())
-//   name        String
-//   library     String
-//   description String?
-//   genes       Gene[]
+model cfdegeneset {
+  id          String          @id @default(cuid())
+  term        String
+  library     String
+  description String?
+  genes       Gene[]
 
-//   @@map("cfde_genesets")
-// }
+  @@map("cfde_genesets")
+}

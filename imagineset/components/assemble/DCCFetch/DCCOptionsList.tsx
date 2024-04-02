@@ -10,18 +10,15 @@ import { ListSubheader } from '@mui/material';
 
 
 export const genesetLibDCCMap: { [key: string]: string } = {
-  "LINCS_L1000_Chem_Pert_Consensus_Sigs": "LINCS",
-  "LINCS_L1000_CRISPR_KO_Consensus_Sigs": 'LINCS',
-  "GTEx_Tissues_V8_2023": 'GTEx',
-  "GTEx_Aging_Signatures_2021": 'GTEx',
-  "Metabolomics_Workbench_Metabolites_2022": 'Metabolomics',
-  "IDG_Drug_Targets_2022": 'IDG',
-  "GlyGen_Glycosylated_Proteins_2022": 'Glycoscience',
-  "KOMP2_Mouse_Phenotypes_2022": 'KOMP2',
-  "HuBMAP_ASCTplusB_augmented_2022": 'HuBMAP',
-  "MoTrPAC_2023": 'MoTrPAC'
-}
-
+  'Glygen Glycosylated Proteins': 'Glycoscience',
+  'GTEx Tissue-Specific Aging Signatures': 'GTEx',
+  'GTEx Tissue Gene Expression Profiles': 'GTEx',
+  'IDG Drug Targets': 'IDG',
+  'KOMP2 Mouse Phenotypes': 'KOMP2',
+  'LINCS L1000 CMAP Chemical Pertubation Consensus Signatures': "LINCS",
+  'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures': "LINCS",
+  'MoTrPAC Rat Endurance Exercise Training' : 'MoTrPAC',
+  'Metabolomics Gene-Metabolite Associations': 'Metabolomics',}
 
 
 export const DCCList = ({dccs, checked, setChecked} : {dccs:string[], checked: number[], setChecked: React.Dispatch<React.SetStateAction<number[]>>}) => {

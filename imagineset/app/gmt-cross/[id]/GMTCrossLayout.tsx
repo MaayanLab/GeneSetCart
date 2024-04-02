@@ -4,7 +4,7 @@ import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import { fetchCrossPairs, generateHypothesis } from "@/app/gmt-cross/[id]/GMTCrossFunctions";
+import { fetchCrossPairs, fetchGenes, generateHypothesis } from "@/app/gmt-cross/[id]/GMTCrossFunctions";
 import CircularIndeterminate from "@/components/misc/Loading";
 import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
@@ -16,90 +16,7 @@ import { addStatus } from "@/components/assemble/fileUpload/SingleUpload";
 import { useParams } from "next/navigation";
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import Status from "@/components/assemble/Status";
-
-const RenderOverlapButton = ({ params, sessionId }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, sessionId: string }) => {
-    const [open, setOpen] = React.useState(false);
-    const [status, setStatus] = React.useState<addStatus>({})
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleOpen = () => {
-        setOpen(true);
-    };
-
-    const copyClipboardFunc = React.useCallback(() => {
-        copyToClipboard(params.row.overlap.join('\n').replaceAll("'", ""))
-    }, [params.row.overlappingGenes, params.row.overlap])
-    return (
-        <React.Fragment>
-            <Button
-                color="tertiary"
-                size="small"
-                style={{ textDecoration: 'underline' }}
-                onClick={(event) => { event.stopPropagation(); handleOpen() }}>
-                {params.row.n_overlap}
-            </Button>
-            <Dialog
-                onClose={handleClose}
-                open={open}>
-                <DialogTitle>{params.row.geneset_1 + ' ∩ ' + params.row.geneset_2}</DialogTitle>
-                <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
-                    <Grid item>
-                        <Typography variant='body1' color='secondary'> {params.row.n_overlap} genes found</Typography>
-                    </Grid>
-                    <Grid item>
-                        <TextField
-                            id="standard-multiline-static"
-                            multiline
-                            rows={10}
-                            value={params.row.overlap.toString().replaceAll(',', '\n').replaceAll("'", '')}
-                            disabled
-                        />
-                    </Grid>
-                    <Grid item container spacing={1} sx={{ mt: 2 }} justifyContent="center" alignItems={'center'}>
-                        <Grid item>
-                            <Button variant='contained' color='primary' onClick={(event) => copyClipboardFunc()}>
-                                COPY TO CLIPBOARD
-                            </Button>
-                        </Grid>
-                        <Grid item>
-                            <Button
-                                variant='contained' color='primary'
-                                onClick={(evt) => {
-                                    enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' Intersection ' + params.row.geneset_2 })
-                                }}
-                            >
-                                SEND TO ENRICHR
-                            </Button>
-                        </Grid>
-                        <Grid item>
-                            <Button
-                                variant='contained' color='primary'
-                                onClick={(evt) => {
-                                    const genesetName = params.row.geneset_1 + ' Intersection ' + params.row.geneset_2
-                                    checkInSession(sessionId, genesetName).then((response) => {
-                                        if (response) {
-                                            setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
-                                        } else {
-                                            addToSessionSets(params.row.overlap.toString().replaceAll("'", '').split(','), sessionId, genesetName, '').then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
-                                        }
-                                    })
-                                }}
-                            >
-                                ADD TO CART
-                            </Button>
-                        </Grid>
-                    </Grid>
-                    <Grid item>
-                        <Status status={status} />
-                    </Grid>
-                </Grid>
-            </Dialog>
-        </React.Fragment>
-    )
-}
+import { RenderGeneSet1, RenderGeneSet2, RenderOverlapButton} from "./TableButtons";
 
 
 type hypothesisDisplay = {
@@ -163,10 +80,10 @@ const CFDE_Lib_Full: { [key: string]: string } = {
 }
 
 const sortDict = (dict: { [key: string]: number[][] }) => {
-    let items : any[] = []
+    let items: any[] = []
     for (let term of Object.keys(dict)) {
         const termValues = dict[term]
-        for (let termOccurence of termValues){
+        for (let termOccurence of termValues) {
             items.push([term, termOccurence])
         }
     }
@@ -295,7 +212,12 @@ export function GMTCrossLayout() {
             //   width: 150,
             flex: 1,
             editable: true,
-            minWidth: 120
+            minWidth: 120,
+            headerClassName: 'theme--header',
+            renderCell: params => {
+                return <RenderGeneSet1 params={params} />
+            },
+            headerAlign: 'center',
         },
         {
             field: 'geneset_2',
@@ -303,7 +225,11 @@ export function GMTCrossLayout() {
             //   width: 150,
             flex: 1,
             editable: true,
-            minWidth: 120
+            minWidth: 120,
+            renderCell: params => {
+                return <RenderGeneSet2 params={params} />
+            },
+            headerAlign: 'center',
         },
         {
             field: 'pvalue',
@@ -315,6 +241,7 @@ export function GMTCrossLayout() {
             renderCell: (params) => {
                 return (params.value.toExponential(2));
             },
+            headerAlign: 'center',
         },
         {
             field: 'odds_ratio',
@@ -337,9 +264,8 @@ export function GMTCrossLayout() {
             minWidth: 100,
             renderCell: params => {
                 return <RenderOverlapButton params={params} sessionId={sessionId} />
-            }
-
-
+            },
+            headerAlign: 'center',
             // width: 160,
         },
         {
@@ -350,7 +276,8 @@ export function GMTCrossLayout() {
             renderCell: RenderHypothesisButton,
             sortable: false,
             editable: false,
-            headerClassName: 'super-app-theme--header'
+            headerClassName: 'super-app-theme--header',
+            headerAlign: 'center',
             // width: 160,
         },
     ];
@@ -362,7 +289,7 @@ export function GMTCrossLayout() {
                 let startIndex = 0
                 while ((hypothesis.hypothesis.indexOf(term, startIndex)) > -1) {
                     let index = hypothesis.hypothesis.indexOf(term, startIndex)
-                    let oldTermValues : number [][]; 
+                    let oldTermValues: number[][];
                     (term in indices) ? oldTermValues = indices[term] : oldTermValues = []
                     indices[term] = [...oldTermValues, [index, index + term.length]];
                     startIndex = index + term.length;
@@ -375,7 +302,6 @@ export function GMTCrossLayout() {
 
 
     return (
-        <>
             <Stack direction="column" spacing={3} sx={{ marginBottom: 3 }}>
                 <Stack direction='row' spacing={2}>
                     <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} />
@@ -455,9 +381,10 @@ export function GMTCrossLayout() {
                 {hypLoading && <Box sx={{ width: '100%' }}>
                     <LinearProgress color="secondary" />
                 </Box>}
-                {(rows.length > 0) && <div style={{ width: '100%' }}>
+                {(rows.length > 0) && <Box style={{ width: '100%' }} >
                     {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> ADD TO CART</Button>}
                     <DataGrid
+                        getRowHeight={() => 'auto'}
                         rows={rows}
                         columns={columns}
                         initialState={{
@@ -484,6 +411,7 @@ export function GMTCrossLayout() {
                                 whiteSpace: 'normal !important',
                                 wordWrap: 'break-word !important',
                                 lineHeight: "normal",
+                                fontWeight: 700
                             },
                             "& .MuiDataGrid-columnHeader": {
                                 // Forced to use important since overriding inline styles
@@ -505,8 +433,7 @@ export function GMTCrossLayout() {
                         }}
                     />
                     <Status status={status} />
-                </div>}
+                </Box>}
             </Stack>
-        </>
     )
 }

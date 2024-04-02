@@ -43,6 +43,7 @@ const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
         variant="contained"
         color="tertiary"
         size="small"
+        sx={{margin:1}}
         onClick={(event) => { event.stopPropagation(); handleOpen() }}>
         <VisibilityIcon /> &nbsp;
         Genes
@@ -116,6 +117,7 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
     <div style={{ height: 400, width: '100%' }}>
       {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> ADD TO CART</Button>}
       <DataGrid
+        getRowHeight={() => 'auto'}
         rows={rows}
         columns={columns}
         initialState={{
@@ -132,7 +134,10 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
           '.MuiDataGrid-cell': {
             whiteSpace: 'normal !important',
             wordWrap: 'break-word !important',
-          }
+          },
+          '.MuiDataGrid-columnHeaderTitle': {
+            fontWeight: 700
+          },
         }}
         onRowSelectionModelChange={(newRowSelectionModel) => {
           setRowSelectionModel(newRowSelectionModel);

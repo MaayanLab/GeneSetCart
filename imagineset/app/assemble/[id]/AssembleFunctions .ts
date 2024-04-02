@@ -130,6 +130,7 @@ export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined
 
         }
     }
+    revalidatePath('/')
     return { code: 'success' }
 }
 
@@ -146,6 +147,7 @@ export async function addMultipleSetsToSessionCross(rows: (selectedCrossRowType 
 
         }
     }
+    revalidatePath('/')
     return { code: 'success' }
 }
 
@@ -157,10 +159,7 @@ export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[
             if (alreadyExists) {
                 return { code: 'error', message: `Gene set : ${row.genesetName} + (${row.dcc}) already in cart` }
             } else {
-            const response = await fetch('https://maayanlab.cloud/Enrichr/geneSetLibrary?' + new URLSearchParams(`libraryName=${row.libraryName}&term=${row.genesetName}&mode=json`))
-            const data = await response.json()
-            const genes = data[row.genesetName]
-            const validGenes = await checkValidGenes(genes.toString().replaceAll(',', '\n'))
+            const validGenes = row.genes.map((gene) => gene.gene_symbol)
             const added = addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '')
             }
         }

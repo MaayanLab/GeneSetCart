@@ -13,8 +13,6 @@ export type PairsData = {
 }
 
 
-
-
 const libMap : {[key: string]: string} = {
     'LINCS L1000 CMAP Chemical Pertubation Consensus Signatures': 'LINCS_L1000_Chem_Pert_Consensus_Sigs',
     'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures': 'LINCS_L1000_CRISPR_KO_Consensus_Sigs',
@@ -44,10 +42,28 @@ export async function fetchCrossPairs(lib1: string, lib2: string) {
             }
         })
         return rows
-    }
+    } 
     return rows
 }
 
+export async function fetchGenes(term: string) {
+    const result = await prisma.cfdegeneset.findFirst({
+        where : {
+            term: term
+        }, 
+        select: {
+            genes: true
+        }
+    })
+
+    if (result) {
+        const genesStringList = result.genes.map((gene) => gene.gene_symbol)
+        return genesStringList
+    } else {
+        return []
+    }
+    
+}
 
 async function getEnrichmentTerms(overlapGenes: string[]) {
     const ENRICHR_URL = 'https://maayanlab.cloud/Enrichr/addList'

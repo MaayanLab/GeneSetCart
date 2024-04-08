@@ -51,11 +51,21 @@ function calculateIntersections(possibleSubsets: ({
             return previousValue[currentvalue] ? ++previousValue[currentvalue] : previousValue[currentvalue] = 1, previousValue
         }, countArray);
 
-        const genes = Object.keys(occurrences).filter((gene) => occurrences[gene] === subsetLength)
+        const genes = Object.keys(occurrences).filter((gene) => occurrences[gene] === subsetLength) // get intersecting genes 
         const intersectionCount = genes.length
         intersectionDict.push({ key: possibleSubset.map((subset) => subset.alphabet), data: intersectionCount })
         intersectionGeneDict[possibleSubset.map((subset) => subset.alphabet).toString()] = genes
-
+    }
+    // for each single set, remove intersection counts from to get substracted numbers
+    const soloSets = possibleSubsets.filter((set) => set.length === 1).map((set) => set[0])
+    for (let soloSet of soloSets) {
+        let containingSets = Object.keys(intersectionGeneDict).filter((item) => item.split(',').length > 1 && item.split(',').includes(soloSet.alphabet))
+        let containedGenes : string[] = []
+        containingSets.forEach((item) => containedGenes = containedGenes.concat(intersectionGeneDict[item]))
+        const soloGenes = intersectionGeneDict[soloSet.alphabet].filter((gene) => !(containedGenes.includes(gene)))
+        intersectionGeneDict[soloSet.alphabet] = soloGenes
+        const soloSetItemIndex = intersectionDict.findIndex((item) => item.key.toString() === soloSet.alphabet)
+        intersectionDict[soloSetItemIndex].data = soloGenes.length
     }
     return { intersectionDict: intersectionDict, intersectionGeneDict: intersectionGeneDict }
 }
@@ -95,7 +105,7 @@ export default function VennPlot({ selectedSets, setOverlap }: {
                     colorScheme="cybertron"
                     arc={<VennArc strokeWidth={3}
                         gradient={<Gradient />}
-                        onClick={(evt) => setOverlap(intersectionGeneDict[evt.value.sets])} />}
+                        onClick={(evt) => setOverlap(intersectionGeneDict[evt.value.sets.sort().toString()])} />}
                     label={<VennLabel
                         labelType={'value'}
                         showAll={true}

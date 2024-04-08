@@ -43,7 +43,7 @@ const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTre
         variant="contained"
         color="tertiary"
         size="small"
-        sx={{margin:1}}
+        sx={{ margin: 1 }}
         onClick={(event) => { event.stopPropagation(); handleOpen() }}>
         <VisibilityIcon /> &nbsp;
         Genes
@@ -106,49 +106,49 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
       }).catch((err) => {
         if (err.message === 'No valid genes in gene set') {
           setStatus({ error: { selected: true, message: err.message } })
-      } else {
+        } else {
           setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
-      }
+        }
       })
   }, [selectedRows, params.id])
 
   return (
     <Stack direction='column' spacing={6}>
-    <div style={{ minHeight: 200, width: '100%' }}>
-      {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> ADD TO CART</Button>}
-      <DataGrid
-        getRowHeight={() => 'auto'}
-        rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
-          },
-        }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        sx={{
-          '.MuiDataGrid-columnHeader': {
-            backgroundColor: '#C9D2E9',
-          },
-          '.MuiDataGrid-cell': {
-            whiteSpace: 'normal !important',
-            wordWrap: 'break-word !important',
-          },
-          '.MuiDataGrid-columnHeaderTitle': {
-            fontWeight: 700
-          },
-        }}
-        onRowSelectionModelChange={(newRowSelectionModel) => {
-          setRowSelectionModel(newRowSelectionModel);
-          setSelectedRows(newRowSelectionModel.map((id) => rows.find((row) => row.id === id)))
-        }}
-        rowSelectionModel={rowSelectionModel}
-      />
-    </div>
-    <div style={{width: '100%'}}>
-    <Status status={status} />
-    </div>
+      <div style={{ minHeight: 200, width: '100%' }}>
+        {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> ADD TO CART</Button>}
+        <DataGrid
+          getRowHeight={() => 'auto'}
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 5 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          sx={{
+            '.MuiDataGrid-columnHeader': {
+              backgroundColor: '#C9D2E9',
+            },
+            '.MuiDataGrid-cell': {
+              whiteSpace: 'normal !important',
+              wordWrap: 'break-word !important',
+            },
+            '.MuiDataGrid-columnHeaderTitle': {
+              fontWeight: 700
+            },
+          }}
+          onRowSelectionModelChange={(newRowSelectionModel) => {
+            setRowSelectionModel(newRowSelectionModel);
+            setSelectedRows(newRowSelectionModel.map((id) => rows.find((row) => row.id === id)))
+          }}
+          rowSelectionModel={rowSelectionModel}
+        />
+      </div>
+      <div style={{ width: '100%' }}>
+        <Status status={status} />
+      </div>
     </Stack>
   );
 }

@@ -160,7 +160,7 @@ export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[
                 return { code: 'error', message: `Gene set : ${row.genesetName} + (${row.dcc}) already in cart` }
             } else {
             const validGenes = row.genes.map((gene) => gene.gene_symbol)
-            const added = addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '')
+            const added = await addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '')
             }
         }
     }

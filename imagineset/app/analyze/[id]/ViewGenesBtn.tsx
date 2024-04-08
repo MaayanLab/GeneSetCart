@@ -177,8 +177,6 @@ export function SplitButton({ row }: {
     const [selectedIndex, setSelectedIndex] = React.useState(0);
 
     const handleClick = (selectedIndex: number) => {
-        console.log(selectedIndex)
-        console.info(`You clicked ${buttonOptions[selectedIndex]}`);
         const selectedButton = buttonOptions[selectedIndex]
         if (selectedButton === 'Enrichr') {
             const genes = row.genes.map((gene) => gene.gene_symbol)

@@ -9,20 +9,24 @@ import Header from '@/components/header/Header';
 
 export default async function GMTCross({ params }: { params: { id: string } }) {
     const session = await getServerSession(authOptions)
-    if (!session) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`)
-    const user = await prisma.user.findUnique({
-        where: {
-            id: session?.user.id
+    if (session) {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: session?.user.id
+            }
+        })
+        if (user !== null) {
+            const newSession = await prisma.pipelineSession.create({
+                data: {
+                    user_id: user.id,
+                },
+            })
+
+            const newSessionId = newSession.id
+            redirect(`/gmt-cross/${newSessionId}`)
         }
-    })
-    if (user === null)  return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`)
- 
-    const sessionInfo = await prisma.pipelineSession.findUnique({
-        where: {
-            id: params.id
-        },
-    })
-    if (sessionInfo === null) return redirect('/')
+    }
+
     return (
         <>
             <Grid item>

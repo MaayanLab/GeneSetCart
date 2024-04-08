@@ -1,7 +1,6 @@
 import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions '
 import { authOptions } from '@/lib/auth/authOptions'
 import prisma from '@/lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { NextResponse } from 'next/server'
@@ -51,18 +50,21 @@ export async function POST(request: Request) {
     const data = await request.json();
     const genesetName = data['term']
     const genes = data['genes']
+    try{
+        const newTempSession = await prisma.tempSessions.create({
+            data: {
+                genesetName: genesetName,
+                genes: genes
+            },
+            select: {
+                id: true
+            }
+        })
 
-    const newTempSession = await prisma.tempSessions.create({
-        data: {
-            genesetName: genesetName,
-            genes: genes
-        },
-        select: {
-            id: true
-        }
-    })
+        const newSessionId = newTempSession.id
+        return NextResponse.json({ text: newSessionId }, { status: 200 })
+    } catch {
+        return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
+    }
 
-    const newSessionId = newTempSession.id
-
-    return NextResponse.json({ text: newSessionId }, { status: 200 })
 }

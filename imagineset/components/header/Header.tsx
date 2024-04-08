@@ -63,7 +63,7 @@ export async function getSessionInfo(sessionId: string) {
     return sessionInfo
 }
 
-export default async function Header({sessionId} : {sessionId: string}) {
+export default async function Header({ sessionId }: { sessionId: string }) {
     // TO DO: add user authentication in header for cart drawer here
     const session = await getServerSession(authOptions)
     if (sessionId) {
@@ -79,7 +79,7 @@ export default async function Header({sessionId} : {sessionId: string}) {
                 }
             }
         })
-    
+
         return (
             <Container maxWidth="lg">
                 <AppBar position="static" sx={{ color: "#000" }}>
@@ -90,14 +90,17 @@ export default async function Header({sessionId} : {sessionId: string}) {
                             </Grid>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                                    <CartDrawer sessionInfo={sessionInfo}/>
-                                    <CurrentSession sessionId={sessionId}/>
-                                    <GMTHeader sessionId={sessionId}/>
+                                    <CartDrawer sessionInfo={sessionInfo} />
+                                    <CurrentSession sessionId={sessionId} />
+                                    <GMTHeader sessionId={sessionId} />
                                     <Link href="/sessions">
                                         <Typography variant="nav">MY SESSIONS</Typography>
                                     </Link>
                                     <Link href="/use-cases">
                                         <Typography variant="nav">USE CASES</Typography>
+                                    </Link>
+                                    <Link href="/api-documentation">
+                                        <Typography variant="nav"> API </Typography>
                                     </Link>
                                     <UserComponent session={session} />
                                 </Stack>
@@ -119,11 +122,17 @@ export default async function Header({sessionId} : {sessionId: string}) {
                             </Grid>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                                    <Link href={"/gmt-cross"}>
+                                        <Typography variant="nav">CFDE GMT CROSSING</Typography>
+                                    </Link>
                                     <Link href="/sessions">
                                         <Typography variant="nav">MY SESSIONS</Typography>
                                     </Link>
                                     <Link href="/use-cases">
                                         <Typography variant="nav">USE CASES</Typography>
+                                    </Link>
+                                    <Link href="/api-documentation">
+                                        <Typography variant="nav"> API </Typography>
                                     </Link>
                                     <UserComponent session={session} />
                                 </Stack>

@@ -1,7 +1,7 @@
 'use client'
 import { Box, Button, LinearProgress, Paper, Stack, Tooltip, Typography } from "@mui/material";
-import { GMTSelect } from "../GMTSelect";
-import { GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from "@mui/x-data-grid";
+import { GMTSelect } from "./GMTSelect";
+import { GridColDef, GridRenderCellParams, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { fetchCrossPairs, generateHypothesis } from "@/app/gmt-cross/[id]/GMTCrossFunctions";
@@ -10,10 +10,9 @@ import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DownloadIcon from '@mui/icons-material/Download';
-import { addStatus } from "@/components/assemble/fileUpload/SingleUpload";
 import { useParams } from "next/navigation";
-import { RenderGeneSet1, RenderGeneSet2, RenderOverlapButton} from "./TableButtons";
-import { CrossingTable } from "../CrossingTable";
+import { RenderGeneSet, RenderOverlapButton} from "./TableButtons";
+import { CrossingTable } from "./CrossingTable";
 
 
 type hypothesisDisplay = {
@@ -28,18 +27,6 @@ type hypothesisDisplay = {
     topEnrichmentResults: { [key: string]: any[] } | null
 }
 
-
-type selectedCrossRowType = {
-    id: string,
-    lib_1: string,
-    lib_2: string,
-    geneset_1: string,
-    geneset_2: string,
-    odds_ratio: number,
-    pvalue: number,
-    n_overlap: number,
-    overlap: string[]
-}
 
 const download = (filename: string, text: string) => {
     let element = document.createElement('a');
@@ -133,7 +120,6 @@ export function GMTCrossLayout() {
     const [hypLoading, setHypLoading] = React.useState(false)
     const [hypothesis, setHypothesis] = React.useState<hypothesisDisplay | null>(null)
     const [headers, setHeaders] = React.useState<string[] | null>(null)
-    const [status, setStatus] = React.useState<addStatus>({})
 
     const params = useParams<{ id: string }>()
     const sessionId = params.id
@@ -196,7 +182,7 @@ export function GMTCrossLayout() {
             minWidth: 120,
             headerClassName: 'theme--header',
             renderCell: params => {
-                return <RenderGeneSet1 params={params} sessionId={sessionId}/>
+                return <RenderGeneSet params={params} index={1}/>
             },
             headerAlign: 'center',
         },
@@ -206,7 +192,7 @@ export function GMTCrossLayout() {
             flex: 1,
             minWidth: 120,
             renderCell: params => {
-                return <RenderGeneSet2 params={params} sessionId={sessionId}/>
+                return <RenderGeneSet params={params} index={2}/>
             },
             headerAlign: 'center',
         },
@@ -357,7 +343,7 @@ export function GMTCrossLayout() {
                     <LinearProgress color="secondary" />
                 </Box>}
                 {(rows.length > 0) && <Box style={{ width: '100%' }} >
-                    <CrossingTable rows={rows} columns={columns} />
+                    <CrossingTable rows={rows} columns={columns}/>
                 </Box>}
             </Stack>
     )

@@ -5,13 +5,15 @@ import React from "react";
 import { fetchGenes } from "@/app/gmt-cross/[id]/GMTCrossFunctions";
 import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { enrich } from "@/app/analyze/[id]/ViewGenesBtn";
-import {addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
 import { addStatus } from "@/components/assemble/fileUpload/SingleUpload";
 import Status from "@/components/assemble/Status";
 
-export const RenderGeneSet1 = ({ params }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>}) => {
+export const RenderGeneSet1 = ({ params, sessionId }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, sessionId: string }) => {
     const [open, setOpen] = React.useState(false);
     const [genesetGenes, setGenesetGenes] = React.useState<string[]>([])
+    const [status, setStatus] = React.useState<addStatus>({})
+
 
     React.useEffect(() => {
         fetchGenes(params.row.geneset_1).then((result) => setGenesetGenes(result))
@@ -65,15 +67,46 @@ export const RenderGeneSet1 = ({ params }: { params: GridRenderCellParams<any, a
                             COPY TO CLIPBOARD
                         </Button>
                     </Grid>
+                    <Grid item>
+                        <Button
+                            variant='contained' color='primary'
+                            onClick={(evt) => {
+                                enrich({ list: genesetGenes.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 })
+                            }}
+                        >
+                            SEND TO ENRICHR
+                        </Button>
+                    </Grid>
+                    <Grid item>
+                        <Button
+                            variant='contained' color='primary'
+                            onClick={(evt) => {
+                                const genesetName = params.row.geneset_1
+                                checkInSession(sessionId, genesetName).then((response) => {
+                                    if (response) {
+                                        setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
+                                    } else {
+                                        addToSessionSets(genesetGenes.toString().replaceAll("'", '').split(','), sessionId, genesetName, '').then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
+                                    }
+                                })
+                            }}
+                        >
+                            ADD TO CART
+                        </Button>
+                    </Grid>
+                </Grid>
+                <Grid item>
+                    <Status status={status} />
                 </Grid>
             </Grid>
         </Dialog>
     </React.Fragment>
 }
 
-export const RenderGeneSet2 = ({ params }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>}) => {
+export const RenderGeneSet2 = ({ params, sessionId }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, sessionId: string }) => {
     const [open, setOpen] = React.useState(false);
     const [genesetGenes, setGenesetGenes] = React.useState<string[]>([])
+    const [status, setStatus] = React.useState<addStatus>({})
 
     React.useEffect(() => {
         fetchGenes(params.row.geneset_2).then((result) => setGenesetGenes(result))
@@ -96,13 +129,13 @@ export const RenderGeneSet2 = ({ params }: { params: GridRenderCellParams<any, a
             sx={{ color: "black" }}
             size="small"
             onClick={(event) => { event.stopPropagation(); handleOpen() }}>
-          <Typography>
-            {params.row.geneset_2}
-        </Typography>
-        &nbsp;
-        <Typography color='secondary' sx={{ fontSize: 12 }}>
-            ({params.row.n_genes2})
-        </Typography>
+            <Typography>
+                {params.row.geneset_2}
+            </Typography>
+            &nbsp;
+            <Typography color='secondary' sx={{ fontSize: 12 }}>
+                ({params.row.n_genes2})
+            </Typography>
         </Button>
         <Dialog
             onClose={handleClose}
@@ -127,8 +160,36 @@ export const RenderGeneSet2 = ({ params }: { params: GridRenderCellParams<any, a
                             COPY TO CLIPBOARD
                         </Button>
                     </Grid>
+                    <Grid item>
+                        <Button
+                            variant='contained' color='primary'
+                            onClick={(evt) => {
+                                enrich({ list: genesetGenes.join('\n').replaceAll("'", "") || '', description: params.row.geneset_2 })
+                            }}
+                        >
+                            SEND TO ENRICHR
+                        </Button>
+                    </Grid>
+                    <Grid item>
+                        <Button
+                            variant='contained' color='primary'
+                            onClick={(evt) => {
+                                const genesetName = params.row.geneset_2
+                                checkInSession(sessionId, genesetName).then((response) => {
+                                    if (response) {
+                                        setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
+                                    } else {
+                                        addToSessionSets(genesetGenes.toString().replaceAll("'", '').split(','), sessionId, genesetName, '').then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
+                                    }
+                                })
+                            }}
+                        >
+                            ADD TO CART
+                        </Button>
+                    </Grid>
                 </Grid>
                 <Grid item>
+                    <Status status={status} />
                 </Grid>
             </Grid>
         </Dialog>

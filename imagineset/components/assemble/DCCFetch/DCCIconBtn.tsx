@@ -5,15 +5,11 @@ import CardMedia from "@mui/material/CardMedia";
 import { Box } from "@mui/material";
 import Image from 'next/image'
 import LINCSImg from '@/public/img/DCCImg/LINCS.gif'
-import glycoscienceImg from  '@/public/img/DCCImg/Glycoscience.png'
+import glygenImg from  '@/public/img/DCCImg/glygen.png'
 import metabolomicsImg from '@/public/img/DCCImg/Metabolomics.png'
 import komp2Img from '@/public/img/DCCImg/KOMP2.png'
-import exrnaimg from '@/public/img/DCCImg/exRNA.png'
 import gteximg from '@/public/img/DCCImg/GTEx.png'
-import hmpimg from '@/public/img/DCCImg/HMP.png'
-import hubmapimg from '@/public/img/DCCImg/HuBMAP.png'
 import idgimg from '@/public/img/DCCImg/IDG.png'
-import kidsfirstimg from '@/public/img/DCCImg/Kids First.png'
 import motrpacimg from '@/public/img/DCCImg/MoTrPAC.png'
 
 
@@ -35,9 +31,9 @@ export const dccInfo: dccsInfoType[] = [
         imgString: metabolomicsImg.src
     },
     {
-        shortName: 'Glycoscience',
-        longName:  'Glycoscience',
-        imgString: glycoscienceImg.src
+        shortName: 'GlyGen',
+        longName:  'GlyGen',
+        imgString: glygenImg.src
     },
     {
         shortName: 'KOMP2',
@@ -48,11 +44,6 @@ export const dccInfo: dccsInfoType[] = [
         shortName: 'GTEx',
         longName:'Genotype Tissue Expression',
         imgString: gteximg.src
-    },
-    {
-        shortName: 'HuBMAP',
-        longName: 'Human BioMolecular Atlas Program',
-        imgString: hubmapimg.src
     },
     {
         shortName: 'IDG',
@@ -105,7 +96,8 @@ export const DCCIcons = () => {
             sx={{
                 display: 'flex',
                 overflowX: 'scroll',
-                maxWidth: '50vw'
+                justifyContent: 'center'
+                // maxWidth: '50vw'
             }}>
             {dccInfo.map((dcc, i) => (
                 <CustomCard key={dcc.shortName} image={dcc.imgString} title={dcc.shortName} subtitle={dcc.longName} />

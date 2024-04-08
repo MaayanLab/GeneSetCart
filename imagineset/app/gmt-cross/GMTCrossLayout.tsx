@@ -13,6 +13,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useParams } from "next/navigation";
 import { RenderGeneSet, RenderOverlapButton} from "./TableButtons";
 import { CrossingTable } from "./CrossingTable";
+import { DCCIcons } from "@/components/assemble/DCCFetch/DCCIconBtn";
 
 
 type hypothesisDisplay = {
@@ -264,6 +265,7 @@ export function GMTCrossLayout() {
 
     return (
             <Stack direction="column" spacing={3} sx={{ marginBottom: 3 }}>
+                <DCCIcons />
                 <Stack direction='row' spacing={2}>
                     <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} />
                     <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} />

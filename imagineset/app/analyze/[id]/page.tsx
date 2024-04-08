@@ -47,8 +47,8 @@ export default async function AnalyzePage({ params }: { params: { id: string } }
             <Container>
                 <ColorToggleButton sessionId={params.id} />
                 <Container sx={{ mb: 5 }}>
-                    <Typography variant="h3" color="secondary.dark" className='p-5'>ANALYZE YOUR GENE SETS</Typography>
-                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
+                    <Typography variant="h3" color="secondary.dark" sx={{mb: 2, mt: 2}}>ANALYZE YOUR GENE SETS</Typography>
+                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3}}>
                         Analyze your gene sets by sending them to Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
                     </Typography>
                     <PaginatedTable rows={rows} />

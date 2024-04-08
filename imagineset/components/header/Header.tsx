@@ -83,11 +83,35 @@ export default async function Header({ sessionId }: { sessionId: string }) {
         return (
             <Container maxWidth="lg">
                 <AppBar position="static" sx={{ color: "#000" }}>
-                    <Toolbar>
+                <Toolbar>
                         <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
                             <Grid item>
                                 <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" />
                             </Grid>
+                            <Grid item>
+                                <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                                    <a
+                                        href='https://info.cfde.cloud'
+                                        target={"_blank"}
+                                        rel={"noreferrer"}>
+                                        <Typography variant="nav"> CFDE INFORMATION PORTAL</Typography>
+                                    </a>
+                                    <a
+                                        href='https://data.cfde.cloud'
+                                        target={"_blank"}
+                                        rel={"noreferrer"}>
+                                        <Typography variant="nav"> CFDE DATA PORTAL</Typography>
+                                    </a>
+                                    <Link href="/about">
+                                        <Typography variant="nav">ABOUT</Typography>
+                                    </Link>
+                                    <UserComponent session={session} />
+                                </Stack>
+                            </Grid>
+                        </Grid>
+                    </Toolbar>
+                    <Toolbar>
+                        <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                     <CartDrawer sessionInfo={sessionInfo} />
@@ -102,10 +126,8 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                                     <Link href="/api-documentation">
                                         <Typography variant="nav"> API </Typography>
                                     </Link>
-                                    <UserComponent session={session} />
                                 </Stack>
                             </Grid>
-                            <Grid item xs={12}></Grid>
                         </Grid>
                     </Toolbar>
                 </AppBar>
@@ -122,6 +144,30 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                             </Grid>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                                    <a
+                                        href='https://info.cfde.cloud'
+                                        target={"_blank"}
+                                        rel={"noreferrer"}>
+                                        <Typography variant="nav"> CFDE INFORMATION PORTAL</Typography>
+                                    </a>
+                                    <a
+                                        href='https://data.cfde.cloud'
+                                        target={"_blank"}
+                                        rel={"noreferrer"}>
+                                        <Typography variant="nav"> CFDE DATA PORTAL</Typography>
+                                    </a>
+                                    <Link href="/about">
+                                        <Typography variant="nav">ABOUT</Typography>
+                                    </Link>
+                                    <UserComponent session={session} />
+                                </Stack>
+                            </Grid>
+                        </Grid>
+                    </Toolbar>
+                    <Toolbar>
+                        <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
+                            <Grid item>
+                                <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                     <Link href={"/gmt-cross"}>
                                         <Typography variant="nav">CFDE GMT CROSSING</Typography>
                                     </Link>
@@ -134,10 +180,8 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                                     <Link href="/api-documentation">
                                         <Typography variant="nav"> API </Typography>
                                     </Link>
-                                    <UserComponent session={session} />
                                 </Stack>
                             </Grid>
-                            <Grid item xs={12}></Grid>
                         </Grid>
                     </Toolbar>
                 </AppBar>

@@ -34,8 +34,8 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
             </Grid>
             <Container>
                 <Container>
-                    <Typography variant="h3" color="secondary.dark" className='p-5'>COMMON FUND GENE SET CROSSING</Typography>
-                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, marginLeft: 3 }}>
+                    <Typography variant="h3" color="secondary.dark"  sx={{mb: 2, mt: 2}}>COMMON FUND GENE SET CROSSING</Typography>
+                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
                         Cross Common Fund GMTs to explore their similarity for novel hypothesis generation. Each gene set pair is displayed with their Fisher exact test p-value, odds ratio and overlapping genes.
                     </Typography>
                     <GMTCrossLayout />

@@ -1,7 +1,7 @@
 'use client'
 import { Box, Button, LinearProgress, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import { GMTSelect } from "../GMTSelect";
-import { GridColDef, GridRenderCellParams, GridRowSelectionModel, GridTreeNodeWithRender } from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { fetchCrossPairs, generateHypothesis } from "@/app/gmt-cross/[id]/GMTCrossFunctions";

@@ -134,7 +134,8 @@ export function GMTCrossLayout() {
     const [hypLoading, setHypLoading] = React.useState(false)
     const [hypothesis, setHypothesis] = React.useState<hypothesisDisplay | null>(null)
     const [headers, setHeaders] = React.useState<string[] | null>(null)
-    const [status, setStatus] = React.useState<addStatus>({})
+    const [selectedDCCs, setSelectedDCCs] = React.useState<string[]>([])
+
 
     const params = useParams<{ id: string }>()
     const sessionId = params.id
@@ -276,13 +277,12 @@ export function GMTCrossLayout() {
         return null
     }, [hypothesis])
 
-
     return (
             <Stack direction="column" spacing={3} sx={{ marginBottom: 3, justifyContent: 'center' }}>
-                <DCCIcons />
+                <DCCIcons selected={selectedDCCs}/>
                 <Stack direction='row' spacing={2}>
-                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} />
-                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} />
+                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs}/>
+                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs}/>
                 </Stack>
                 <div className="flex justify-center">
                     <Button variant="contained" color="secondary" onClick={getCrossData}>

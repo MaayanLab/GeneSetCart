@@ -1,5 +1,6 @@
 'use client'
-import { Container, Grid, 
+import {
+  Container, Grid,
   Typography,
 } from "@mui/material";;
 import { styled, alpha } from '@mui/material/styles';
@@ -61,15 +62,16 @@ const DCCGenesetOptions = ["LINCS_L1000_Chem_Pert_Consensus_Sigs", "LINCS_L1000_
   "GlyGen_Glycosylated_Proteins_2022", "KOMP2_Mouse_Phenotypes_2022", "HuBMAP_ASCTplusB_augmented_2022", "MoTrPAC_2023"]
 
 export const genesetLibDCCMap: { [key: string]: string } = {
-  'Glygen Glycosylated Proteins': 'Glycoscience',
+  'Glygen Glycosylated Proteins': 'GlyGen',
   'GTEx Tissue-Specific Aging Signatures': 'GTEx',
   'GTEx Tissue Gene Expression Profiles': 'GTEx',
   'IDG Drug Targets': 'IDG',
   'KOMP2 Mouse Phenotypes': 'KOMP2',
   'LINCS L1000 CMAP Chemical Pertubation Consensus Signatures': "LINCS",
   'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures': "LINCS",
-  'MoTrPAC Rat Endurance Exercise Training' : 'MoTrPAC',
-  'Metabolomics Gene-Metabolite Associations': 'Metabolomics'}
+  'MoTrPAC Rat Endurance Exercise Training': 'MoTrPAC',
+  'Metabolomics Gene-Metabolite Associations': 'Metabolomics'
+}
 
 const dccCheckedDisplay = Object.values(genesetLibDCCMap).filter((v, i, self) => i == self.indexOf(v))
 
@@ -120,7 +122,7 @@ export function DCCPage() {
       <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
         Search for Common Fund generated gene sets related to a term
       </Typography>
-      <DCCIcons />
+      <DCCIcons selected={dccCheckedDisplay.filter((dccOption, i) => checked.includes(i) && searchDCCs.includes(dccOption))} />
       <Grid container spacing={2} sx={{ mt: 3 }}>
         <Grid container item xs={12} justifyContent={'right'}>
           <Search>

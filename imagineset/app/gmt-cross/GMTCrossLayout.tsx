@@ -117,6 +117,7 @@ const generateHypothesisTooltip = (hypothesisString: string, substringIndices: {
 export function GMTCrossLayout() {
     const [rows, setRows] = React.useState<CFDECrossPair[]>([])
     const [selectedLibs, setSelectedLibs] = React.useState<string[]>([])
+    const [selectedDCCs, setSelectedDCCs] = React.useState<string[]>([])
     const [loading, setLoading] = React.useState(false)
     const [hypLoading, setHypLoading] = React.useState(false)
     const [hypothesis, setHypothesis] = React.useState<hypothesisDisplay | null>(null)
@@ -262,13 +263,12 @@ export function GMTCrossLayout() {
         return null
     }, [hypothesis])
 
-
     return (
             <Stack direction="column" spacing={3} sx={{ marginBottom: 3 }}>
-                <DCCIcons />
+                <DCCIcons selected={selectedDCCs}/>
                 <Stack direction='row' spacing={2}>
-                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} />
-                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} />
+                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs}/>
+                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs}/>
                 </Stack>
                 <div className="flex justify-center">
                     <Button variant="contained" color="secondary" onClick={getCrossData}>

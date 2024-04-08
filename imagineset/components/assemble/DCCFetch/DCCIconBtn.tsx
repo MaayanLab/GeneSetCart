@@ -2,10 +2,10 @@ import React from "react";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardMedia from "@mui/material/CardMedia";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import Image from 'next/image'
 import LINCSImg from '@/public/img/DCCImg/LINCS.gif'
-import glygenImg from  '@/public/img/DCCImg/glygen.png'
+import glygenImg from '@/public/img/DCCImg/glygen.png'
 import metabolomicsImg from '@/public/img/DCCImg/Metabolomics.png'
 import komp2Img from '@/public/img/DCCImg/KOMP2.png'
 import gteximg from '@/public/img/DCCImg/GTEx.png'
@@ -32,7 +32,7 @@ export const dccInfo: dccsInfoType[] = [
     },
     {
         shortName: 'GlyGen',
-        longName:  'GlyGen',
+        longName: 'GlyGen',
         imgString: glygenImg.src
     },
     {
@@ -42,7 +42,7 @@ export const dccInfo: dccsInfoType[] = [
     },
     {
         shortName: 'GTEx',
-        longName:'Genotype Tissue Expression',
+        longName: 'Genotype Tissue Expression',
         imgString: gteximg.src
     },
     {
@@ -63,20 +63,23 @@ const CustomCard = ({
     image,
     title,
     subtitle,
+    selected
 }: {
     image: string;
     title: string;
     subtitle: string;
+    selected: string[]
 }) => (
     <Card sx={{
         flexShrink: 0,
-        height: '100%',
-        width: '90px',
-        margin: 1
+        height: '100px',
+        width: '120px',
+        margin: 1,
+        backgroundColor: selected.includes(title) ? 'lightblue' : 'white'
     }} >
         <CardActionArea>
             <CardMedia
-                sx={{ position: 'relative', height:'90px' }}
+                sx={{ position: 'relative', height: '90px' }}
             >
                 <Image
                     src={image}
@@ -90,7 +93,7 @@ const CustomCard = ({
     </Card>
 );
 
-export const DCCIcons = () => {
+export const DCCIcons = ({ selected }: { selected: string[] }) => {
     return (
         <Box
             sx={{
@@ -99,9 +102,11 @@ export const DCCIcons = () => {
                 justifyContent: 'center'
                 // maxWidth: '50vw'
             }}>
-            {dccInfo.map((dcc, i) => (
-                <CustomCard key={dcc.shortName} image={dcc.imgString} title={dcc.shortName} subtitle={dcc.longName} />
-            ))}
+            <Stack direction='row' useFlexGap flexWrap="wrap">
+                {dccInfo.map((dcc, i) => (
+                    <CustomCard key={dcc.shortName} image={dcc.imgString} title={dcc.shortName} subtitle={dcc.longName} selected={selected} />
+                ))}
+            </Stack>
         </Box>
 
     )

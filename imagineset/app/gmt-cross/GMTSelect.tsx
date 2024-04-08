@@ -5,19 +5,18 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 export const CFDELibraryOptions: { [key: string]: string } = {
-    "LINCS_L1000_Chem_Pert_Consensus_Sigs": "LINCS L1000 CMAP Chemical Pertubation Consensus Signatures",
-    "LINCS_L1000_CRISPR_KO_Consensus_Sigs": 'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures',
-    "GTEx_Tissues_V8_2023": 'GTEx Tissue Gene Expression Profiles',
-    "GTEx_Aging_Signatures_2021": 'GTEx Tissue-Specific Aging Signatures',
-    "Metabolomics_Workbench_Metabolites_2022": 'Metabolomics Gene-Metabolite Associations',
-    "IDG_Drug_Targets_2022": 'IDG Drug Targets',
-    "GlyGen_Glycosylated_Proteins_2022": 'Glygen Glycosylated Proteins',
-    "KOMP2_Mouse_Phenotypes_2022": 'KOMP2 Mouse Phenotypes',
-    // "HuBMAP_ASCTplusB_augmented_2022": 'HuBMAP Anatomical Structures, Cell Types, and Biomarkers (ASCT+B)',
-    "MoTrPAC_2023": 'MoTrPAC Rat Endurance Exercise Training'
+    "LINCS L1000 CMAP Chemical Pertubation Consensus Signatures": 'LINCS',
+    'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures': 'LINCS',
+    'GTEx Tissue Gene Expression Profiles': 'GTEx',
+    'GTEx Tissue-Specific Aging Signatures': 'GTEx',
+    'Metabolomics Gene-Metabolite Associations': 'Metabolomics',
+    'IDG Drug Targets': 'IDG',
+    'Glygen Glycosylated Proteins': 'GlyGen',
+    'KOMP2 Mouse Phenotypes': 'KOMP2',
+    'MoTrPAC Rat Endurance Exercise Training': 'MoTrPAC'
 }
 
-export function GMTSelect({selectedLibs, setSelectedLibs, index} : {selectedLibs: string[], setSelectedLibs: React.Dispatch<React.SetStateAction<string[]>>, index: number}) {
+export function GMTSelect({selectedLibs, setSelectedLibs, index, selectedDCCs, setSelectedDCCs} : {selectedLibs: string[], setSelectedLibs: React.Dispatch<React.SetStateAction<string[]>>, index: number, selectedDCCs: string[], setSelectedDCCs: React.Dispatch<React.SetStateAction<string[]>>}) {
     const [library, setLibrary] = React.useState('');
 
     const handleChange = (event: SelectChangeEvent) => {
@@ -25,6 +24,9 @@ export function GMTSelect({selectedLibs, setSelectedLibs, index} : {selectedLibs
         const newArr = [...selectedLibs];
         newArr.splice(index, 1, event.target.value as string);
         setSelectedLibs(newArr)
+        const newArrDCCs = [...selectedDCCs];
+        newArrDCCs.splice(index, 1, CFDELibraryOptions[event.target.value as string]);
+        setSelectedDCCs(newArrDCCs)
         };
     return (
         <FormControl fullWidth>
@@ -38,7 +40,7 @@ export function GMTSelect({selectedLibs, setSelectedLibs, index} : {selectedLibs
                 color="secondary"
             >
                 {
-                    Object.values(CFDELibraryOptions).map((cfdeLib) =>
+                    Object.keys(CFDELibraryOptions).map((cfdeLib) =>
                          <MenuItem key={cfdeLib} value={cfdeLib} disabled={(selectedLibs.includes(cfdeLib))}>
                             {cfdeLib}
                         </MenuItem>)

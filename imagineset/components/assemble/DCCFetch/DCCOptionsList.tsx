@@ -10,7 +10,7 @@ import { ListSubheader } from '@mui/material';
 
 
 export const genesetLibDCCMap: { [key: string]: string } = {
-  'Glygen Glycosylated Proteins': 'Glycoscience',
+  'Glygen Glycosylated Proteins': 'GlyGen',
   'GTEx Tissue-Specific Aging Signatures': 'GTEx',
   'GTEx Tissue Gene Expression Profiles': 'GTEx',
   'IDG Drug Targets': 'IDG',

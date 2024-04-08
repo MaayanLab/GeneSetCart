@@ -8,6 +8,7 @@ import SingleUpload from '@/components/assemble/fileUpload/SingleUpload';
 import MultipleUpload from '@/components/assemble/fileUpload/MultipleUpload';
 import GeneshotSearch from '@/components/assemble/Pubmed';
 import { DCCPage } from '@/components/assemble/DCCFetch/DCCUpload';
+import { Grid } from '@mui/material';
 
 
 interface TabPanelProps {
@@ -51,36 +52,42 @@ export default function VerticalTabs() {
   };
 
   return (
-    <Box
-      sx={{ flexGrow: 1, display: 'flex', minHeight: '70vh'}}
-    >
-    <Tabs
-        orientation="vertical"
-        variant="scrollable"
-        value={value}
-        onChange={handleChange}
-        aria-label="Vertical tabs"
-        sx={{ borderRight: 1, borderColor: 'divider', alignSelf: 'center'}}
-        indicatorColor='secondary'
-        textColor='secondary'
-    >
-        <Tab label="Upload .txt" {...a11yProps(0)} sx={{}}/>
-        <Tab label=" Upload .gmt" {...a11yProps(1)} />
-        <Tab label="Search CFDE DCC Gene Sets" {...a11yProps(2)} />
-        <Tab label="Search Gene Sets from Pubmed" {...a11yProps(3)} />
-      </Tabs>
-      <TabPanel value={value} index={0} >
-        <SingleUpload />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <MultipleUpload />
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        <DCCPage />
-      </TabPanel>
-      <TabPanel value={value} index={3}>
-        <GeneshotSearch />
-      </TabPanel>
-    </Box>
+    // <Box
+    //   sx={{ flexGrow: 1, display: 'flex', minHeight: '70vh', maxWidth: '100%' }}
+    // >
+    <Grid container direction='row' sx={{ minHeight: '70vh', maxWidth: '100%' }}>
+      <Grid item container xs={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+        <Tabs
+          orientation="vertical"
+          variant="scrollable"
+          value={value}
+          onChange={handleChange}
+          aria-label="Vertical tabs"
+          sx={{ borderRight: 1, borderColor: 'divider', alignSelf: 'center' }}
+          indicatorColor='secondary'
+          textColor='secondary'
+        >
+          <Tab label="Upload .txt" {...a11yProps(0)} sx={{}} />
+          <Tab label=" Upload .gmt" {...a11yProps(1)} />
+          <Tab label="Search CFDE DCC Gene Sets" {...a11yProps(2)} />
+          <Tab label="Search Gene Sets from Pubmed" {...a11yProps(3)} />
+        </Tabs>
+      </Grid>
+      <Grid item container xs={10}>
+        <TabPanel value={value} index={0} >
+          <SingleUpload />
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          <MultipleUpload />
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          <DCCPage />
+        </TabPanel>
+        <TabPanel value={value} index={3}>
+          <GeneshotSearch />
+        </TabPanel>
+      </Grid>
+    </Grid>
+    // </Box>
   );
 }

@@ -119,7 +119,7 @@ export const RenderOverlapButton = ({ params, sessionId }: { params: GridRenderC
                             <Button
                                 variant='contained' color='primary'
                                 onClick={(evt) => {
-                                    enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' Intersection ' + params.row.geneset_2 })
+                                    enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' ∩ ' + params.row.geneset_2 })
                                 }}
                             >
                                 SEND TO ENRICHR

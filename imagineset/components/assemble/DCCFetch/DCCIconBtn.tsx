@@ -21,11 +21,6 @@ type dccsInfoType = {
 
 export const dccInfo: dccsInfoType[] = [
     {
-        shortName: 'LINCS',
-        longName: 'Library of Integrated Network-based Cellular Signatures',
-        imgString: LINCSImg.src
-    },
-    {
         shortName: 'Metabolomics',
         longName: 'Metabolomics',
         imgString: metabolomicsImg.src
@@ -34,6 +29,11 @@ export const dccInfo: dccsInfoType[] = [
         shortName: 'GlyGen',
         longName: 'GlyGen',
         imgString: glygenImg.src
+    },
+    {
+        shortName: 'LINCS',
+        longName: 'Library of Integrated Network-based Cellular Signatures',
+        imgString: LINCSImg.src
     },
     {
         shortName: 'KOMP2',

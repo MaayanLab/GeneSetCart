@@ -33,6 +33,66 @@ export async function checkValidGenes(genes: string) {
     return genesFound
 }
 
+export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string) {
+    // get gene objects
+    if (genesetName === '') throw new Error('Empty gene set name')
+    const geneObjects = gene_list
+
+    if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
+    const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
+    // get user
+    const session = await getServerSession(authOptions)
+    if (!session) return redirect("/auth/signin?callbackUrl=/")
+    const user = await prisma.user.findUnique({
+        where: {
+            id: session.user?.id
+        }
+    })
+    if (user === null) return redirect("/auth/signin?callbackUrl=/")
+
+    // get sets that are already in session 
+    const sessionOldSets = await prisma.pipelineSession.findUnique({
+        where: {
+            id: sessionId,
+            user_id: user.id
+        },
+        select: {
+            gene_sets: true
+        }
+    })
+
+    const oldSetsArray = sessionOldSets?.gene_sets ? sessionOldSets?.gene_sets : []
+    const newGeneset = await prisma.geneSet.create({
+        data: {
+            name: genesetName,
+            description: description,
+            session_id: sessionId,
+            genes: {
+                connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
+            },
+        }
+    })
+
+
+    const updatedSession = await prisma.pipelineSession.update({
+        where: {
+            id: sessionId,
+            user_id: user.id
+        },
+        data: {
+            gene_sets: {
+                set: [...oldSetsArray, newGeneset],
+            },
+            lastModified: new Date()
+        },
+    })
+
+    revalidatePath('/')
+    return 'success'
+}
+
+
+
 export async function addToSessionSets(gene_list: string[], sessionId: string, genesetName: string, description: string) {
     // get gene objects
     if (genesetName === '') throw new Error('Empty gene set name')

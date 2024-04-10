@@ -23,7 +23,7 @@ export default function SessionTable({sessions}: { sessions: (PipelineSession & 
     };
 
     const displayedRows = React.useMemo(()=> {
-        return sessions.slice(
+        return sessions.sort((a, b) => a.lastModified < b.lastModified ? 1 : a.lastModified > b.lastModified ? -1 : 0).slice(
             page * rowsPerPage,
             page * rowsPerPage + rowsPerPage,
         )

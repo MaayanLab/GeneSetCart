@@ -72,10 +72,16 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
 
 function SessionNameDisplay({ session }: { session: PipelineSession & { gene_sets: GeneSet[] } }) {
     const [editOpen, setEditOpen] = React.useState(false)
+    const [sessionNameValue, setSessionNameValue] = React.useState(session.session_name ? session.session_name  : session.id)
 
-    const updateSession = React.useCallback((sessionId: string, newSessionName: string) => {
-        updateSessionName(session.id, newSessionName).then((result) => { console.log(result); setEditOpen(false) }).catch((err) => { console.log(err); setEditOpen(false) })
-    }, [session])
+
+    const updateSession = React.useCallback(() => {
+        if (sessionNameValue !== '') {
+            updateSessionName(session.id, sessionNameValue).then((result) => {setEditOpen(false) }).catch((err) => { console.log(err); setEditOpen(false) })
+        } else {
+            setEditOpen(false)
+        }
+    }, [session, sessionNameValue])
 
     if (!editOpen) {
         return (<div className="display-inline">
@@ -85,13 +91,17 @@ function SessionNameDisplay({ session }: { session: PipelineSession & { gene_set
     }
     else {
         return (
-            <ClickAwayListener onClickAway={() => setEditOpen(false)}>
+            <ClickAwayListener onClickAway={() => updateSession()}>
             <TextField
                 inputProps={{ 'aria-label': 'edit name' }}
                 color='secondary'
-                name='sessionName box'
-                onKeyDown={(event) => { if (event.key === 'Enter') { updateSession(session.id, (event.target as HTMLFormElement).value); } }}
-                onBlur={() => setEditOpen(false)}
+                name='sessionName'
+                value={sessionNameValue}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setSessionNameValue(event.target.value);
+                  }}
+                onKeyDown={(event) => { if (event.key === 'Enter') {  setSessionNameValue((oldValue) => (event.target as HTMLFormElement).value !== '' ? (event.target as HTMLFormElement).value : oldValue); updateSession() } }}
+                // onBlur={(evt) => setSessionNameValue(evt.target.value)}
             ></TextField>
             </ClickAwayListener>
         )

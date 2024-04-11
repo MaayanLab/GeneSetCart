@@ -6,7 +6,7 @@ from tqdm import tqdm
 import uuid
 import math
 import urllib.request
-
+import s3fs
 
 load_dotenv()
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -23,8 +23,11 @@ cur.execute(
                                         gene_symbol VARCHAR, 
                                         synonyms VARCHAR )''')
 
-
-genes_info = pd.read_table('Homo_sapiens.gene_info')
+s3_endpoint = 'https://' + os.environ.get('S3_ENDPOINT') + '/'
+s3 = s3fs.S3FileSystem(anon=True, client_kwargs={'endpoint_url': s3_endpoint })
+s3_bucket = os.environ.get('S3_BUCKET')
+gene_info_file = f'{s3_bucket}/Homo_sapiens.gene_info'
+genes_info =  pd.read_csv(s3.open(gene_info_file), index_col=0, sep="\t")
 for index, row in tqdm(genes_info.iterrows(), total=genes_info.shape[0]):
     cur.execute('''INSERT INTO genes (id, description, gene_symbol, synonyms) 
                     VALUES  (%s, %s, %s, %s);''', (row['GeneID'], row['description'], row['Symbol'], row['Synonyms']))
@@ -32,7 +35,8 @@ conn.commit()
 
 
 #Ingest abstract templates
-library_abstracts = pd.read_csv('library_abstracts.csv')
+library_abstracts_file = f'{s3_bucket}/library_abstracts.csv'
+library_abstracts = pd.read_csv(s3.open(library_abstracts_file))
 for index, row in library_abstracts.iterrows():
     cur.execute('''INSERT INTO lib_abstracts (id, lib, abstract) 
                     VALUES  (%s, %s, %s);''', (str(uuid.uuid4()), row['Library'], row['Descriptions']))
@@ -40,8 +44,8 @@ for index, row in library_abstracts.iterrows():
 
 
 # ingest all GMT data
-cfde_genesets = pd.read_csv("CFDE Genesets.tsv", sep='\t')
-
+cfde_genesets_file = f'{s3_bucket}/CFDE Genesets.tsv'
+cfde_genesets = pd.read_csv(s3.open(cfde_genesets_file), sep='\t')
 CFDE_geneset_df = pd.DataFrame([], columns=['Library', 'Geneset', 'Genes'])
 
 # for each line, open with file link and populate database
@@ -100,7 +104,8 @@ for lib in dataframe_names:
             if not((lib == 'LINCS_L1000_Chem_Pert_Consensus_Sigs') or (lib == 'LINCS_L1000_CRISPR_KO_Consensus_Sigs')):
                 if not((inner_lib == 'LINCS_L1000_Chem_Pert_Consensus_Sigs') or (inner_lib == 'LINCS_L1000_CRISPR_KO_Consensus_Sigs')):
                     try:
-                        crossed_dataframe = pd.read_csv('./crossed_sets/' + lib+ '_' + inner_lib + '_crossing_data.csv', index_col=0)
+                        crossed_dataframe_file = f'{s3_bucket}/crossed_sets/{lib}_{inner_lib}_crossing_data.csv'
+                        crossed_dataframe = pd.read_csv(s3.open(crossed_dataframe_file), index_col=0)
                         filtered_dataframe = crossed_dataframe[crossed_dataframe['P-value'] < 0.001].iloc[:5000]
                         for index, row in tqdm(filtered_dataframe.iterrows(), total=filtered_dataframe.shape[0]):
                             n_genes1 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_1']) & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib1']])]['Genes'].item())
@@ -119,7 +124,8 @@ for lib in dataframe_names:
         if not(lib == inner_lib):
             if (lib == 'LINCS_L1000_Chem_Pert_Consensus_Sigs') or (lib == 'LINCS_L1000_CRISPR_KO_Consensus_Sigs') or (inner_lib == 'LINCS_L1000_Chem_Pert_Consensus_Sigs') or (inner_lib == 'LINCS_L1000_CRISPR_KO_Consensus_Sigs'):
                 try:
-                    crossed_dataframe = pd.read_csv('./crossed_sets/LINCS Top Pairs/' + lib+ '_' + inner_lib + '.csv', index_col=0)
+                    crossed_dataframe_file = f'{s3_bucket}/crossed_sets/LINCS Top Pairs/{lib}_{inner_lib}.csv'
+                    crossed_dataframe = pd.read_csv(s3.open(crossed_dataframe_file), index_col=0)
                     filtered_dataframe = crossed_dataframe[crossed_dataframe['P-value'] < 0.001]
                     for index, row in tqdm(filtered_dataframe.iterrows(), total=filtered_dataframe.shape[0]):
                         n_genes1 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_1']) & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib1']])]['Genes'].item())

@@ -23,7 +23,6 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
 
     const [numSelectOptions, setNumSelectOptions] = React.useState(1)
 
-
     return (
         <Box sx={{ maxWidth: 300 }}>
             <Card variant="outlined" sx={{minHeight: 400, maxHeight: 500, overflowY: 'scroll'}}>
@@ -33,7 +32,7 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
                     style={{ textAlign: 'center' }}
                 />
                 <CardContent>
-                    <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} selectedSets={selectedSets} setSelectedSets={setSelectedSets} setNumSelectOptions={setNumSelectOptions}/>
+                    <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
                     <div className="flex justify-center">
                     <Button onClick={() =>{setNumSelectOptions(oldNum => oldNum + 1)}} color="tertiary"><AddCircleIcon /></Button>
                     </div>
@@ -46,12 +45,11 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
 
 
 
-export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, setNumSelectOptions, selectedSets, setSelectedSets  }: {
+export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, selectedSets, setSelectedSets  }: {
     sessionGeneSets: ({
         genes: Gene[];
     } & GeneSet)[],
     numSelectOptions: number,
-    setNumSelectOptions: React.Dispatch<React.SetStateAction<number>>
     selectedSets: ({
         genes: Gene[];
     } & GeneSet)[], setSelectedSets: React.Dispatch<React.SetStateAction<({
@@ -65,13 +63,13 @@ export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, setNumS
     }
     return (
         <Stack spacing={2}>
-            {dropDownCountArray.map((i) => <GenesetSelectDropDown key={i} sessionGenesets={sessionGeneSets} selectedSets={selectedSets} setSelectedSets={setSelectedSets}  setNumSelectOptions={setNumSelectOptions} index={i}/>)}
+            {dropDownCountArray.map((i) => <GenesetSelectDropDown key={i} sessionGenesets={sessionGeneSets} selectedSets={selectedSets} setSelectedSets={setSelectedSets} index={i}/>)}
         </Stack>
     )
 }
 
 
-function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets, setNumSelectOptions, index }: {
+function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets, index }: {
     sessionGenesets: ({
         genes: Gene[];
     } & GeneSet)[], 
@@ -80,7 +78,6 @@ function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets,
     } & GeneSet)[], setSelectedSets: React.Dispatch<React.SetStateAction<({
         genes: Gene[];
     } & GeneSet)[]>>, 
-    setNumSelectOptions: React.Dispatch<React.SetStateAction<number>>, 
     index: number
 }) {
 
@@ -123,7 +120,7 @@ function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets,
                         color='secondary'
                     >
                         {sessionGenesets.map((geneset, i) => {
-                            return <MenuItem key={i} value={geneset.name}>{geneset.name}</MenuItem>
+                            return <MenuItem key={i} value={geneset.name} disabled={selectedSets.map((selectedSet) => selectedSet.name).includes(geneset.name)}>{geneset.name}</MenuItem>
                         })}
                     </Select>
                 </FormControl>

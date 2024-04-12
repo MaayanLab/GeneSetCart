@@ -91,6 +91,7 @@ model PipelineSession {
   lastModified DateTime  @default(now())
   gene_sets    GeneSet[]
   session_name  String?  
+  private       Boolean
 
   @@map("user_sessions")
 }

@@ -1,13 +1,15 @@
 'use client'
 
-import { TableRow, TableCell, Grid, Button, Typography, Link, TextField, ClickAwayListener, Tooltip } from "@mui/material";
+import { TableRow, TableCell, Grid, Button, Typography, Link, TextField, ClickAwayListener, Tooltip, Chip } from "@mui/material";
 import { GeneSet, PipelineSession } from "@prisma/client";
 import DeleteIcon from '@mui/icons-material/Delete';
 import React from "react";
-import { deleteSessionByID, updateSessionName } from "./sessionFunctions";
+import { deleteSessionByID, updatePrivacyAccess, updateSessionName } from "./sessionFunctions";
 import EditIcon from '@mui/icons-material/Edit';
 import ShareIcon from '@mui/icons-material/Share';
 import { copyToClipboard } from "@/components/assemble/fileUpload/DataTable";
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 
 export function SessionRow({ session }: { session: PipelineSession & { gene_sets: GeneSet[] } }) {
     const deleteSession = React.useCallback((session: PipelineSession & { gene_sets: GeneSet[] }) => {
@@ -40,12 +42,13 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
                             {'Last Modified: ' + session.lastModified.toUTCString()}
                         </Typography>
                         <Typography sx={{ fontSize: 12, color: 'gray' }}>
-                            {'No. Gene Sets: ' +session.gene_sets.length}
+                            {'No. Gene Sets: ' + session.gene_sets.length}
                         </Typography>
                     </Grid>
                 </Grid>
             </TableCell>
             <TableCell>
+                <Chip label={session.private ? 'Private' : 'Public'} variant="outlined" />
             </TableCell>
             <TableCell>
                 <ClickAwayListener onClickAway={handleTooltipClose}>
@@ -61,7 +64,7 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
                             disableTouchListener
                             title="Copied"
                         >
-                            <Button color='secondary' onClick={() => { handleTooltipOpen(); copyToClipboard(`https://g2sg.cfde.cloud/analyze/${session.id}`) }}><ShareIcon /></Button>
+                            <Button color='secondary' onClick={() => { handleTooltipOpen(); copyToClipboard(`https://g2sg.cfde.cloud/analyze/${session.id}`) }} disabled={session.private}><ShareIcon /></Button>
                         </Tooltip>
                     </div>
                 </ClickAwayListener>
@@ -75,37 +78,42 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
 
 function SessionNameDisplay({ session }: { session: PipelineSession & { gene_sets: GeneSet[] } }) {
     const [editOpen, setEditOpen] = React.useState(false)
-    const [sessionNameValue, setSessionNameValue] = React.useState(session.session_name ? session.session_name  : session.id)
+    const [sessionNameValue, setSessionNameValue] = React.useState(session.session_name ? session.session_name : session.id)
 
 
     const updateSession = React.useCallback(() => {
         if (sessionNameValue !== '') {
-            updateSessionName(session.id, sessionNameValue).then((result) => {setEditOpen(false) }).catch((err) => { console.log(err); setEditOpen(false) })
+            updateSessionName(session.id, sessionNameValue).then((result) => { setEditOpen(false) }).catch((err) => { console.log(err); setEditOpen(false) })
         } else {
             setEditOpen(false)
         }
     }, [session, sessionNameValue])
 
+    const changeAccess = React.useCallback(() => {
+        updatePrivacyAccess(session.id)
+    }, [session])
+
     if (!editOpen) {
         return (<div className="display-inline">
             <Link href={`/assemble/${session.id}`} color='secondary'>{session.session_name ? session.session_name : session.id}</Link>
             <Button color='secondary' size={'small'} onClick={() => { setEditOpen(true) }}><EditIcon fontSize="small" /></Button>
+            <Button color='secondary' size={'small'} onClick={() => { changeAccess() }}> {session.private ? <LockIcon /> : <LockOpenIcon />} </Button>
         </div>)
     }
     else {
         return (
             <ClickAwayListener onClickAway={() => updateSession()}>
-            <TextField
-                inputProps={{ 'aria-label': 'edit name' }}
-                color='secondary'
-                name='sessionName'
-                value={sessionNameValue}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setSessionNameValue(event.target.value);
-                  }}
-                onKeyDown={(event) => { if (event.key === 'Enter') {  setSessionNameValue((oldValue) => (event.target as HTMLFormElement).value !== '' ? (event.target as HTMLFormElement).value : oldValue); updateSession() } }}
+                <TextField
+                    inputProps={{ 'aria-label': 'edit name' }}
+                    color='secondary'
+                    name='sessionName'
+                    value={sessionNameValue}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setSessionNameValue(event.target.value);
+                    }}
+                    onKeyDown={(event) => { if (event.key === 'Enter') { setSessionNameValue((oldValue) => (event.target as HTMLFormElement).value !== '' ? (event.target as HTMLFormElement).value : oldValue); updateSession() } }}
                 // onBlur={(evt) => setSessionNameValue(evt.target.value)}
-            ></TextField>
+                ></TextField>
             </ClickAwayListener>
         )
     }

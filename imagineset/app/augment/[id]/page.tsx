@@ -10,6 +10,38 @@ import Header from '@/components/header/Header';
 import { addToSessionSetsGeneObj } from '@/app/assemble/[id]/AssembleFunctions ';
 
 export default async function AugmentPage({ params }: { params: { id: string } }) {
+    const anonymousUserSession = await prisma.pipelineSession.findFirst({
+        where: {
+            id: params.id,
+            user_id: process.env.PUBLIC_USER_ID
+        }, 
+        include: {
+            gene_sets: {
+                include: {
+                    genes: true
+                }
+            }
+        }
+    })
+    if (anonymousUserSession) {
+        return (
+            <>
+            <Grid item>
+                <Header sessionId={params.id} />
+            </Grid>
+            <Container>
+                <ColorToggleButton sessionId={params.id} />
+                <Container>
+                    <Typography variant="h3" color="secondary.dark" className='p-5'>AUGMENT YOUR GENE SETS</Typography>
+                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
+                        Augment your gene sets with co-expressed and co-mentioned genes
+                    </Typography>
+                    <AugmentLayout sessionGenesets={anonymousUserSession} sessionId={params.id} />
+                </Container>
+            </Container>
+        </>
+        )
+    }
     // if gene set does not exist, shallow copy and then reopen in new link
     const session = await getServerSession(authOptions)
     if (!session) return redirect(`/api/auth/signin?callbackUrl=/augment/${params.id}`)
@@ -25,7 +57,8 @@ export default async function AugmentPage({ params }: { params: { id: string } }
 
     const sessionInfo = await prisma.pipelineSession.findUnique({
         where: {
-            id: params.id
+            id: params.id,
+            private: false // only if session exists and is public
         },
         include: {
             gene_sets: {
@@ -45,6 +78,7 @@ export default async function AugmentPage({ params }: { params: { id: string } }
             const newSession = await prisma.pipelineSession.create({
                 data: {
                     user_id: user.id,
+                    private: true
                 },
             })
             await Promise.all(sessionSets.map(async (sessionGeneset) => await addToSessionSetsGeneObj(sessionGeneset.genes, newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : '')))

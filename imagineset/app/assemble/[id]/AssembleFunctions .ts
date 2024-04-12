@@ -8,6 +8,7 @@ import path from 'path'
 import { type GeneSet, type Gene } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { searchResultsType } from '@/components/assemble/DCCFetch/DCCUpload'
+import { generateCombinations } from '@upsetjs/react'
 
 // For Assemble Single Upload
 export async function loadTxtExample() {
@@ -36,7 +37,8 @@ export async function checkValidGenes(genes: string) {
 export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string) {
     // get gene objects
     if (genesetName === '') throw new Error('Empty gene set name')
-    const geneObjects = gene_list
+    const filteredList = gene_list.filter((item) => item !== null) 
+    const geneObjects = filteredList
 
     if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
     const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
@@ -73,7 +75,6 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
         }
     })
 
-
     const updatedSession = await prisma.pipelineSession.update({
         where: {
             id: sessionId,
@@ -87,7 +88,7 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
         },
     })
 
-    revalidatePath('/')
+    // revalidatePath('/')
     return 'success'
 }
 
@@ -108,20 +109,20 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
     if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
     const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
     // get user
-    const session = await getServerSession(authOptions)
-    if (!session) return redirect("/auth/signin?callbackUrl=/")
-    const user = await prisma.user.findUnique({
-        where: {
-            id: session.user?.id
-        }
-    })
-    if (user === null) return redirect("/auth/signin?callbackUrl=/")
+    // const session = await getServerSession(authOptions)
+    // if (!session) return redirect("/auth/signin?callbackUrl=/")
+    // const user = await prisma.user.findUnique({
+    //     where: {
+    //         id: session.user?.id
+    //     }
+    // })
+    // if (user === null) return redirect("/auth/signin?callbackUrl=/")
 
     // get sets that are already in session 
     const sessionOldSets = await prisma.pipelineSession.findUnique({
         where: {
             id: sessionId,
-            user_id: user.id
+            // user_id: user.id
         },
         select: {
             gene_sets: true
@@ -140,11 +141,10 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
         }
     })
 
-
     const updatedSession = await prisma.pipelineSession.update({
         where: {
             id: sessionId,
-            user_id: user.id
+            // user_id: user.id
         },
         data: {
             gene_sets: {

@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Typography from '@mui/material/Typography'
 import { ElevatedIconButton } from "./Buttons";
 
-import cfdeLogo from "@/public/img/favicon.png"
 import g2sgLogo from "@/public/img/g2sg-logo-nbg.png"
 
 export const Logo = ({href, title, color}: {href: string, title: string, color: "primary"| "secondary" | "inherit"}) => (

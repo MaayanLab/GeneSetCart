@@ -12,6 +12,42 @@ import { addToSessionSetsGeneObj } from '@/app/assemble/[id]/AssembleFunctions '
 
 
 export default async function AnalyzePage({ params }: { params: { id: string } }) {
+    const PaginatedTable = dynamic(() => import("./PaginationTable"), { ssr: false })
+
+    const anonymousUserSession = await prisma.pipelineSession.findFirst({
+        where: {
+            id: params.id,
+            user_id: process.env.PUBLIC_USER_ID
+        }, 
+        include: {
+            gene_sets: {
+                include: {
+                    genes: true
+                }
+            }
+        }
+    })
+    if (anonymousUserSession) {
+        const rows = anonymousUserSession ? anonymousUserSession.gene_sets : []
+        return (
+            <>
+            <Grid item>
+                <Header sessionId={params.id} />
+            </Grid>
+            <Container>
+                <ColorToggleButton sessionId={params.id} />
+                <Container sx={{ mb: 5 }}>
+                    <Typography variant="h3" color="secondary.dark" sx={{mb: 2, mt: 2}}>ANALYZE YOUR GENE SETS</Typography>
+                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3}}>
+                        Analyze your gene sets by sending them to Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
+                    </Typography>
+                    <PaginatedTable rows={rows} />
+                </Container>
+            </Container>
+        </>
+        )
+    }
+
     const session = await getServerSession(authOptions)
     if (!session) return redirect(`/api/auth/signin?callbackUrl=/assemble/${params.id}`)
     const user = await prisma.user.findUnique({
@@ -26,7 +62,8 @@ export default async function AnalyzePage({ params }: { params: { id: string } }
 
     const sessionInfo = await prisma.pipelineSession.findUnique({
         where: {
-            id: params.id
+            id: params.id,
+            private: false
         },
         include: {
             gene_sets: {
@@ -46,6 +83,7 @@ export default async function AnalyzePage({ params }: { params: { id: string } }
             const newSession = await prisma.pipelineSession.create({
                 data: {
                     user_id: user.id,
+                    private: true
                 },
             })
             await Promise.all(sessionSets.map(async (sessionGeneset) => await addToSessionSetsGeneObj(sessionGeneset.genes, newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : '')))
@@ -55,7 +93,7 @@ export default async function AnalyzePage({ params }: { params: { id: string } }
         }
     }
 
-    const PaginatedTable = dynamic(() => import("./PaginationTable"), { ssr: false })
+   
     // get rows from sessionInfo and put in table
     const rows = sessionInfo ? sessionInfo.gene_sets : []
 

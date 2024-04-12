@@ -25,3 +25,21 @@ export async function updateSessionName(sessionID: string, newSessionName: strin
   revalidatePath('/')
   return 'updated'
 }
+
+export async function updatePrivacyAccess(sessionId: string) {
+  const session = await prisma.pipelineSession.findUnique({
+    where: {
+      id: sessionId
+    }
+  })
+
+  await prisma.pipelineSession.update({
+    where: {
+      id: sessionId,
+    },
+    data: {
+      private: !(session?.private),
+    },
+  })
+  revalidatePath('/')
+}

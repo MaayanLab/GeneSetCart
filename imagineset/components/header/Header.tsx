@@ -16,6 +16,12 @@ import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
 import { revalidatePath } from 'next/cache'
 import GMTHeader, { CurrentSession } from './GMTHeader'
+// import { AppTitle } from './AppTitle'
+import dynamic from 'next/dynamic'
+
+const AppTitle =  dynamic(() => import("./AppTitle"), { ssr: false, loading: () => <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" /> })
+
+
 
 export async function getGenesets(sessionId: string) {
     if (sessionId) {
@@ -86,7 +92,8 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                 <Toolbar>
                         <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
                             <Grid item>
-                                <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" />
+                                {/* <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" /> */}
+                                <AppTitle sessionId={sessionId}/>
                             </Grid>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
@@ -115,11 +122,11 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                     <CartDrawer sessionInfo={sessionInfo} />
-                                    <CurrentSession sessionId={sessionId} />
+                                    {/* <CurrentSession sessionId={sessionId} /> */}
                                     <GMTHeader sessionId={sessionId} />
-                                    <Link href="/sessions">
+                                    {session && <Link href="/sessions">
                                         <Typography variant="nav">MY SESSIONS</Typography>
-                                    </Link>
+                                    </Link>}
                                     <Link href="/use-cases">
                                         <Typography variant="nav">USE CASES</Typography>
                                     </Link>
@@ -140,7 +147,8 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                     <Toolbar>
                         <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
                             <Grid item>
-                                <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" />
+                                {/* <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" /> */}
+                                <AppTitle sessionId={sessionId}/>
                             </Grid>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
@@ -171,9 +179,9 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                                     <Link href={"/gmt-cross"}>
                                         <Typography variant="nav">CFDE GMT CROSSING</Typography>
                                     </Link>
-                                    <Link href="/sessions">
+                                    {session && <Link href="/sessions">
                                         <Typography variant="nav">MY SESSIONS</Typography>
-                                    </Link>
+                                    </Link>}
                                     <Link href="/use-cases">
                                         <Typography variant="nav">USE CASES</Typography>
                                     </Link>

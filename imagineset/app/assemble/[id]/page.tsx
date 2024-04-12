@@ -7,9 +7,37 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Grid } from "@mui/material";
 import Header from "@/components/header/Header";
-import { addToSessionSets, addToSessionSetsGeneObj } from "./AssembleFunctions ";
+import { addToSessionSetsGeneObj } from "./AssembleFunctions ";
 
 export default async function AssemblePage({ params }: { params: { id: string } }) {
+    // if session belongs to anonymous account go there: 
+    const anonymousUserSession = await prisma.pipelineSession.findFirst({
+        where: {
+            id: params.id,
+            user_id: process.env.PUBLIC_USER_ID
+        }, 
+        include: {
+            gene_sets: {
+                include: {
+                    genes: true
+                }
+            }
+        }
+    })
+    if (anonymousUserSession) {
+        return (
+            <>
+                <Grid item>
+                    <Header sessionId={params.id} />
+                </Grid>
+                <Container sx={{ mb: 4 }}>
+                    <ColorToggleButton sessionId={params.id} />
+                    <VerticalTabs />
+                </Container>
+            </>
+        )
+    }
+
     // if gene set does not exist, shallow copy and then reopen in new link
     const session = await getServerSession(authOptions)
     if (!session) return redirect(`/api/auth/signin?callbackUrl=/assemble/${params.id}`)
@@ -25,7 +53,8 @@ export default async function AssemblePage({ params }: { params: { id: string } 
 
     const sessionInfo = await prisma.pipelineSession.findUnique({
         where: {
-            id: params.id
+            id: params.id,
+            private: false
         },
         include: {
             gene_sets: {
@@ -45,10 +74,12 @@ export default async function AssemblePage({ params }: { params: { id: string } 
             const newSession = await prisma.pipelineSession.create({
                 data: {
                     user_id: user.id,
+                    private: true
+
                 },
             })
-            await Promise.all(sessionSets.map(async (sessionGeneset) => await addToSessionSetsGeneObj(sessionGeneset.genes, newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : '')))
-            redirect(`/gmt-cross/${newSession.id}`)
+            sessionSets.map(async (sessionGeneset) => await addToSessionSetsGeneObj(sessionGeneset.genes, newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : ''))
+            redirect(`/assemble/${newSession.id}`)
         } else {
             redirect('/') // redirect to home page because shared session does not exist
         }
@@ -64,6 +95,5 @@ export default async function AssemblePage({ params }: { params: { id: string } 
                 <VerticalTabs />
             </Container>
         </>
-
     )
 }

@@ -2,7 +2,7 @@ import { Gene, GeneSet } from "@prisma/client";
 import React from "react";
 import { DataPoint, Scatterplot } from "./Scatterplot";
 import CircularIndeterminate from "@/components/misc/Loading";
-import { UMAPOptionsType } from "@/app/visualize/[id]/VisualizeLayout";
+import { OverlapSelection, UMAPOptionsType } from "@/app/visualize/[id]/VisualizeLayout";
 import { getUMAP } from "./getUMAP";
 
 
@@ -11,7 +11,7 @@ export function UMAP({ selectedSets, setOverlap, umapOptions }: {
         alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined;
-    setOverlap: React.Dispatch<React.SetStateAction<string[]>>;
+    setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
     umapOptions: UMAPOptionsType
 }) {
     let genesetDict: { [key: string]: string[] } = {}

@@ -39,6 +39,9 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
                         <Typography sx={{ fontSize: 12, color: 'gray' }}>
                             {'Last Modified: ' + session.lastModified.toUTCString()}
                         </Typography>
+                        <Typography sx={{ fontSize: 12, color: 'gray' }}>
+                            {'No. Gene Sets: ' +session.gene_sets.length}
+                        </Typography>
                     </Grid>
                 </Grid>
             </TableCell>

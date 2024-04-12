@@ -17,10 +17,10 @@ export const CFDELibraryOptions: { [key: string]: string } = {
 }
 
 export function GMTSelect({selectedLibs, setSelectedLibs, index, selectedDCCs, setSelectedDCCs} : {selectedLibs: string[], setSelectedLibs: React.Dispatch<React.SetStateAction<string[]>>, index: number, selectedDCCs: string[], setSelectedDCCs: React.Dispatch<React.SetStateAction<string[]>>}) {
-    const [library, setLibrary] = React.useState('');
+    // const [library, setLibrary] = React.useState('');
 
     const handleChange = (event: SelectChangeEvent) => {
-        setLibrary(event.target.value as string);
+        // setLibrary(event.target.value as string);
         const newArr = [...selectedLibs];
         newArr.splice(index, 1, event.target.value as string);
         setSelectedLibs(newArr)
@@ -34,7 +34,7 @@ export function GMTSelect({selectedLibs, setSelectedLibs, index, selectedDCCs, s
             <Select
                 labelId="gmt-select"
                 id="gmt-select"
-                value={library}
+                value={selectedLibs[index]}
                 label="Common Fund GMT"
                 onChange={handleChange}
                 color="secondary"

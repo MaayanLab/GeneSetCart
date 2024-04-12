@@ -4,6 +4,7 @@ import React from "react"
 import { UpsetInteractionData } from "./UpsetTooltip";
 import { UpsetTooltip } from "./UpsetTooltip";
 import { Gene, GeneSet } from "@prisma/client";
+import { OverlapSelection } from "@/app/visualize/[id]/VisualizeLayout";
 
 type UpsetData = {
     name: string,
@@ -118,7 +119,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined;
-    setOverlap: React.Dispatch<React.SetStateAction<string[]>>;
+    setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
 
 }) {
     const [hoveredCell, setHoveredCell] = React.useState<UpsetInteractionData | null>(null);
@@ -297,7 +298,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 }}
                 onMouseLeave={() => setHoveredCell(null)}
                 cursor="pointer"
-                onMouseDown={() => setOverlap(d.values)}
+                onMouseDown={() => setOverlap({name: d.setName, overlapGenes: d.values})}
             />
 
         );
@@ -386,7 +387,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 }}
                 onMouseLeave={() => setHoveredCell(null)}
                 cursor="pointer"
-                onMouseDown={() => setOverlap(d.values)}
+                onMouseDown={() => setOverlap({name: d.setName, overlapGenes: d.values})}
             />
         );
     })

@@ -1,6 +1,6 @@
 'use client'
 import { Box, Button, LinearProgress, Paper, Stack, Tooltip, Typography } from "@mui/material";
-import { GMTSelect } from "./GMTSelect";
+import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { GridColDef, GridRenderCellParams, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
@@ -10,7 +10,7 @@ import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DownloadIcon from '@mui/icons-material/Download';
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { RenderGeneSet, RenderOverlapButton} from "./TableButtons";
 import { CrossingTable } from "./CrossingTable";
 import { DCCIcons } from "@/components/assemble/DCCFetch/DCCIconBtn";
@@ -115,8 +115,13 @@ const generateHypothesisTooltip = (hypothesisString: string, substringIndices: {
 }
 
 export function GMTCrossLayout() {
+    // get query parameters
+    const searchParams = useSearchParams()
+    const library1 = searchParams.get('lib1')
+    const library2 = searchParams.get('lib2')
+
     const [rows, setRows] = React.useState<CFDECrossPair[]>([])
-    const [selectedLibs, setSelectedLibs] = React.useState<string[]>([])
+    const [selectedLibs, setSelectedLibs] = React.useState<string[]>(['', ''])
     const [selectedDCCs, setSelectedDCCs] = React.useState<string[]>([])
     const [loading, setLoading] = React.useState(false)
     const [hypLoading, setHypLoading] = React.useState(false)
@@ -126,10 +131,32 @@ export function GMTCrossLayout() {
     const params = useParams<{ id: string }>()
     const sessionId = params.id
 
+    const router = useRouter();
+
+    const createQueryString = React.useCallback((name: string, value: string) => {
+      const params = new URLSearchParams();
+      params.set(name, value);
+      return params.toString();
+    }, []);
+
+    if (library1 !== null && library2 !== null) {
+        React.useEffect(() => {
+                setSelectedLibs([library1, library2])
+                setSelectedDCCs([CFDELibraryOptions[library1], CFDELibraryOptions[library2]])
+                setLoading(true)
+                fetchCrossPairs(library1, library2).then((result) => {
+                    setLoading(false);
+                    setRows(result);
+                    setHeaders([CFDELibHeaders[result[0].lib_1], CFDELibHeaders[result[0].lib_2]])
+                }).catch((err) => setLoading(false))
+        }, [])
+    }
+    
     const getCrossData = React.useCallback(() => {
+        router.push("/gmt-cross" + "?" + createQueryString("lib1", selectedLibs[0]) + "&" + createQueryString("lib2", selectedLibs[1]));
         setHypothesis(null)
         setLoading(true)
-        if (selectedLibs.length === 2) {
+        if (selectedLibs.length === 2 && selectedLibs[0] !== '' && selectedLibs[1] !== '') {
             fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => {
                 setLoading(false);
                 setRows(result);

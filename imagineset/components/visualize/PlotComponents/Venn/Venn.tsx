@@ -3,6 +3,19 @@
 import { type Gene, type GeneSet } from "@prisma/client";
 import { VennDiagram, VennArc, VennSeries, Gradient, VennLabel, VennOuterLabel } from "reaviz";
 import React from "react";
+import { OverlapSelection } from "@/app/visualize/[id]/VisualizeLayout";
+
+function haveCommonItems(arr1: string[], arr2: string[]) {
+    const set1 = new Set(arr1);
+    const commonItems = arr2.filter(item => set1.has(item));
+    return commonItems.length > 0;
+}
+
+function checkSubsetContained(arr1: string[], arr2: string[]) {
+    // returns true for arr1: [A, B] arr2: [A, B, C] if all elements in [A,B] are in [A,B,C] ie arr1 is a subset of arr2
+    return arr1.every(element => arr2.includes(element))
+}
+
 
 export type VennProps = {
     key: string[];
@@ -56,18 +69,19 @@ function calculateIntersections(possibleSubsets: ({
         intersectionDict.push({ key: possibleSubset.map((subset) => subset.alphabet), data: intersectionCount })
         intersectionGeneDict[possibleSubset.map((subset) => subset.alphabet).toString()] = genes
     }
-    // for each single set, remove intersection counts from to get substracted numbers
-    const soloSets = possibleSubsets.filter((set) => set.length === 1).map((set) => set[0])
-    for (let soloSet of soloSets) {
-        let containingSets = Object.keys(intersectionGeneDict).filter((item) => item.split(',').length > 1 && item.split(',').includes(soloSet.alphabet))
-        let containedGenes : string[] = []
-        containingSets.forEach((item) => containedGenes = containedGenes.concat(intersectionGeneDict[item]))
-        const soloGenes = intersectionGeneDict[soloSet.alphabet].filter((gene) => !(containedGenes.includes(gene)))
-        intersectionGeneDict[soloSet.alphabet] = soloGenes
-        const soloSetItemIndex = intersectionDict.findIndex((item) => item.key.toString() === soloSet.alphabet)
-        intersectionDict[soloSetItemIndex].data = soloGenes.length
+
+    // for each set, get all other that it is a subset of and the subtract to get intersection genes 
+    let finalIntersectionDict: VennProps[] = []
+    let finalIntersectionGeneDict: { [key: string]: string[] } = {}
+    for (let intersectionSet of Object.keys(intersectionGeneDict)) {
+        const allSets = Object.keys(intersectionGeneDict)
+        let containerSets = allSets.filter((setItem) => checkSubsetContained(intersectionSet.split(','), setItem.split(',')) && setItem !== intersectionSet)
+        let allContainerSetGenes = containerSets.map((containerSet) => intersectionGeneDict[containerSet]).flat()
+        let correctIntersectionGenes = intersectionGeneDict[intersectionSet].filter((gene) => !(allContainerSetGenes.includes(gene)))
+        finalIntersectionGeneDict[intersectionSet] = correctIntersectionGenes
+        finalIntersectionDict.push({key: intersectionSet.split(','), data: correctIntersectionGenes.length})
     }
-    return { intersectionDict: intersectionDict, intersectionGeneDict: intersectionGeneDict }
+    return { intersectionDict: finalIntersectionDict, intersectionGeneDict: finalIntersectionGeneDict }
 }
 
 
@@ -76,9 +90,10 @@ export default function VennPlot({ selectedSets, setOverlap }: {
         alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined,
-    setOverlap: React.Dispatch<React.SetStateAction<string[]>>;
+    setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
 }) {
     const [intersectionGeneDict, setIntersectionGeneDict] = React.useState<VennGeneProps>({})
+
     const vennData: VennProps[] = React.useMemo(() => {
         if (!selectedSets) return [];
         // get all possible combinations
@@ -93,28 +108,28 @@ export default function VennPlot({ selectedSets, setOverlap }: {
             width: '60%',
             height: '80%',
             position: 'absolute',
-            justifyContent:'center',
-            alignSelf:'center',
-          }}>
-        <VennDiagram
-            type="starEuler"
-            data={vennData}
-            margins={[3, 3, 3, 3]}
-            series={
-                <VennSeries
-                    colorScheme="cybertron"
-                    arc={<VennArc strokeWidth={3}
-                        gradient={<Gradient />}
-                        onClick={(evt) => setOverlap(intersectionGeneDict[evt.value.sets.sort().toString()])} />}
-                    label={<VennLabel
-                        labelType={'value'}
-                        showAll={true}
-                        fill={'#000000'}
-                        fontSize={15} 
+            justifyContent: 'center',
+            alignSelf: 'center',
+        }}>
+            <VennDiagram
+                type="starEuler"
+                data={vennData}
+                margins={[3, 3, 3, 3]}
+                series={
+                    <VennSeries
+                        colorScheme="cybertron"
+                        arc={<VennArc strokeWidth={3}
+                            gradient={<Gradient />}
+                            onClick={(evt) => setOverlap({ name: evt.value.sets.sort().toString(), overlapGenes: intersectionGeneDict[evt.value.sets.sort().toString()] })} />}
+                        label={<VennLabel
+                            labelType={'value'}
+                            showAll={true}
+                            fill={'#000000'}
+                            fontSize={15}
                         />}
-                    outerLabel={<VennOuterLabel />}
-                />}
-        />
+                        outerLabel={<VennOuterLabel />}
+                    />}
+            />
         </div>
     )
 }

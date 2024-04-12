@@ -136,11 +136,16 @@ export const alphabet = [
 
 export type UMAPOptionsType = {
     assignGroups: boolean
-    dataGroups?: {[key: string] : string}
+    dataGroups?: { [key: string]: string }
     minDist: number
     spread: number
-    nNeighbors: number 
+    nNeighbors: number
     randomState: number
+}
+
+export type OverlapSelection ={
+    name: string, 
+    overlapGenes: string[]
 }
 
 export function VisualizeLayout({ sessionInfo, sessionId }: {
@@ -152,11 +157,11 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     sessionId: string
 }) {
     const [checked, setChecked] = React.useState<number[]>([]);
-    const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked, sessionInfo?.gene_sets] )
+    const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked, sessionInfo?.gene_sets])
     const [visualization, setVisualization] = React.useState('')
-    const [overlap, setOverlap] = React.useState<string[]>([])
-    const [assignGroups, setAssignGroups] = React.useState(false)    
-    const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42})
+    const [overlap, setOverlap] = React.useState<OverlapSelection>({name:'', overlapGenes:[]})
+    const [assignGroups, setAssignGroups] = React.useState(false)
+    const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -190,17 +195,24 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             <Grid item xs={isMobile ? 12 : 3}>
                 <Stack direction='column' spacing={2}>
                     <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
-                    <Box sx={{ maxWidth: '100%' , bgcolor: 'background.paper', borderRadius: 2, height: 200, boxShadow: 2 }}>
-                        <ListSubheader>
-                            Genes ({overlap === undefined ? 0 : overlap.length})
+                    <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, height: 350, boxShadow: 2, overflowY:'scroll', wordWrap: 'break-word' }}>
+                        {/* <ListSubheader>
+                            Selection:  {overlap.name.split(',')
+                            .map((setAlphabet) => {
+                                const fullSet = legendSelectedSets?.find((set) => set.alphabet=== setAlphabet)
+                                return fullSet?.name
+                            }).join(' ∩ ')}
+                        </ListSubheader> */}
+                        <ListSubheader disableSticky={true}>
+                            Genes ({overlap.overlapGenes === undefined ? 0 : overlap.overlapGenes.length})
                         </ListSubheader>
                         <TextField
                             multiline
-                            rows={5}
+                            rows={9}
                             sx={{
                                 "& fieldset": { border: 'none' },
                             }}
-                            value={overlap === undefined ? '' : overlap.join('\n')}
+                            value={overlap === undefined ? '' : overlap.overlapGenes.join('\n')}
                             disabled
                         >
                         </TextField>
@@ -271,7 +283,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             </div>
                         </Tooltip>
                     </Stack>
-                    <Box sx={{ boxShadow: 2, borderRadius: 2, minHeight: 400, minWidth: '400px', maxWidth:'100%'}}>
+                    <Box sx={{ boxShadow: 2, borderRadius: 2, minHeight: 400, minWidth: '400px', maxWidth: '100%' }}>
                         <Stack direction='column' sx={{ p: 0 }}>
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
                                 <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
@@ -288,7 +300,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
-                                    {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={debouncedUmapOptions}/>}
+                                    {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={debouncedUmapOptions} />}
                                 </div>
                             </Box>
                         </Stack>
@@ -334,8 +346,10 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
 
     const legendIds = legend.map((item) => item.id)
     return (
-        <List sx={{ maxWidth: '100%', bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2, '&::-webkit-scrollbar': { ...scrollbarStyles },
-        '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }}}>
+        <List sx={{
+            maxWidth: '100%', bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2, '&::-webkit-scrollbar': { ...scrollbarStyles },
+            '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }
+        }}>
             <ListSubheader>
                 My Gene Sets ({checked.length})
             </ListSubheader>

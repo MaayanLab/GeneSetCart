@@ -4,6 +4,7 @@ import { AxisLeft } from "./AxisLeft";
 import { AxisBottom } from "./AxisBottom";
 import { useState } from "react";
 import { InteractionData, Tooltip } from "./Tooltip";
+import { OverlapSelection } from "@/app/visualize/[id]/VisualizeLayout";
 
 export const MARGIN = { top: 60, right: 80, bottom: 60, left: 60 };
 
@@ -19,7 +20,7 @@ type ScatterplotProps = {
     width: number;
     height: number;
     data: DataPoint[];
-    setOverlap: React.Dispatch<React.SetStateAction<string[]>>
+    setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>
 };
 
 // Simplified version of a scatterplot
@@ -72,7 +73,7 @@ export const Scatterplot = ({ width, height, data, setOverlap }: ScatterplotProp
                 }
                 }
                 onMouseLeave={() => { setHovered(null); setHoveredGroup(null) }}
-                onMouseDown={() => setOverlap(d.genes)}
+                onMouseDown={() => setOverlap({name: d.subGroup, overlapGenes: d.genes})}
             />
         );
     });

@@ -4,13 +4,13 @@ import CardActionArea from "@mui/material/CardActionArea";
 import CardMedia from "@mui/material/CardMedia";
 import { Box, Stack } from "@mui/material";
 import Image from 'next/image'
-import LINCSImg from '@/public/img/DCCImg/LINCS.gif'
+import LINCSImg from '@/public/img/DCCImg/LINCS-logo.png'
 import glygenImg from '@/public/img/DCCImg/glygen.png'
 import metabolomicsImg from '@/public/img/DCCImg/Metabolomics.png'
 import komp2Img from '@/public/img/DCCImg/KOMP2.png'
 import gteximg from '@/public/img/DCCImg/GTEx.png'
 import idgimg from '@/public/img/DCCImg/IDG.png'
-import motrpacimg from '@/public/img/DCCImg/MoTrPAC.png'
+import motrpacimg from '@/public/img/DCCImg/motrpac_logo_copy.png'
 
 
 type dccsInfoType = {

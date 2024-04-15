@@ -13,12 +13,10 @@ import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
 import heatmapIcon from '@/public/img/otherLogos/visualizeIcon.png'
 import umapIcon from '@/public/img/otherLogos/umapPlot2.png'
 import Image from 'next/image';
-import { Heatmap } from '../../../components/visualize/PlotComponents/Heatmap/Heatmap';
 import { UpsetPlotV2 } from '../../../components/visualize/PlotComponents/UpSet/Upset';
 import { SuperVenn } from '../../../components/visualize/PlotComponents/SuperVenn/SuperVenn';
 import upsetIconAlt from '@/public/img/otherLogos/plotly-upset-alt.png'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import html2canvas from 'html2canvas';
 import { UMAP } from '@/components/visualize/PlotComponents/Umap/Umap';
 import dynamic from 'next/dynamic'
@@ -26,6 +24,10 @@ import { ClusteredHeatmap } from '@/components/visualize/PlotComponents/Heatmap/
 import { AdditionalOptions } from './AdditionalOptionsDisplay';
 const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), { ssr: false })
 import { useDebounce } from 'use-debounce';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
+import { addStatus } from '@/components/assemble/fileUpload/SingleUpload';
+import Status from '@/components/assemble/Status';
 
 
 const scrollbarStyles = {
@@ -165,6 +167,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const [status, setStatus] = React.useState<addStatus>({})
 
 
     const legendSelectedSets = React.useMemo(() => {
@@ -190,22 +193,32 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             return []
         }
     }, [selectedSets])
+
+
+    const addSelectedToCart = React.useCallback(() => {
+        console.log(overlap)
+        addToSessionSets(overlap.overlapGenes, sessionId, overlap.name, '').then((result) => setStatus({success: true}))
+    }, [overlap])
+
     return (
         <Grid container direction='row' spacing={1}>
             <Grid item xs={isMobile ? 12 : 3}>
                 <Stack direction='column' spacing={2}>
                     <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
                     <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, height: 350, boxShadow: 2, overflowY:'scroll', wordWrap: 'break-word' }}>
-                        {/* <ListSubheader>
-                            Selection:  {overlap.name.split(',')
-                            .map((setAlphabet) => {
-                                const fullSet = legendSelectedSets?.find((set) => set.alphabet=== setAlphabet)
-                                return fullSet?.name
-                            }).join(' ∩ ')}
-                        </ListSubheader> */}
                         <ListSubheader disableSticky={true}>
                             Genes ({overlap.overlapGenes === undefined ? 0 : overlap.overlapGenes.length})
+                            <Button color='secondary' onClick={addSelectedToCart}>  <LibraryAddIcon /> ADD TO CART</Button>
                         </ListSubheader>
+                        <Status status={status} />
+                        <TextField color='secondary' 
+                        variant='outlined' 
+                        size='small' 
+                        value={overlap.name} 
+                        sx={{marginLeft: 2, marginRight: 2}} 
+                        placeholder='Enter name of selected set'
+                        onChange={(evt) => setOverlap({name: evt.target.value, overlapGenes: overlap.overlapGenes})}
+                        />
                         <TextField
                             multiline
                             rows={9}
@@ -347,7 +360,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
     const legendIds = legend.map((item) => item.id)
     return (
         <List sx={{
-            maxWidth: '100%', bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 650, boxShadow: 2, '&::-webkit-scrollbar': { ...scrollbarStyles },
+            maxWidth: '100%', bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 350, boxShadow: 2, '&::-webkit-scrollbar': { ...scrollbarStyles },
             '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }
         }}>
             <ListSubheader>

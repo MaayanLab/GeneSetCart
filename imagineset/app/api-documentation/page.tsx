@@ -26,7 +26,7 @@ export default async function DocumentationPage({ params }: { params: { id: stri
                 <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>API DOCUMENTATION</Typography>
                 <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
                 </Typography>
-                 <ReactMarkdown children={documentationText}
+                 <ReactMarkdown
                   className={styles.markdown}
                    rehypePlugins={[rehypeRaw]}
                     remarkPlugins={[remarkGfm]}
@@ -45,7 +45,7 @@ export default async function DocumentationPage({ params }: { params: { id: stri
                           );
                         },
                       }}
-                 />
+                 >{documentationText}</ReactMarkdown>
             </Container>
         </>
     )

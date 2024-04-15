@@ -140,8 +140,9 @@ export function GMTCrossLayout() {
         return params.toString();
     }, []);
 
-    if ((library1 !== null) && (library2 !== null)) {
-        React.useEffect(() => {
+
+    React.useEffect(() => {
+        if ((library1 !== null) && (library2 !== null)) {
             setSelectedLibs([library1, library2])
             setSelectedDCCs([CFDELibraryOptions[library1], CFDELibraryOptions[library2]])
             setHypothesis(null)
@@ -151,11 +152,12 @@ export function GMTCrossLayout() {
                 setRows(result);
                 setHeaders([CFDELibHeaders[result[0].lib_1], CFDELibHeaders[result[0].lib_2]])
             }).catch((err) => setLoading(false))
-        }, [])
-    }
+        }
+    }, [])
+
 
     const getCrossData = React.useCallback(() => {
-        router.push("/gmt-cross/" + params.id +  "?" + createQueryString("lib1", selectedLibs[0]) + "&" + createQueryString("lib2", selectedLibs[1]));
+        router.push("/gmt-cross/" + params.id + "?" + createQueryString("lib1", selectedLibs[0]) + "&" + createQueryString("lib2", selectedLibs[1]));
         setHypothesis(null)
         setLoading(true)
         if (selectedLibs.length === 2 && selectedLibs[0] !== '' && selectedLibs[1] !== '') {

@@ -17,6 +17,16 @@ import { usePathname } from 'next/navigation';
 
 export default function AppTitle({ sessionId }: { sessionId: string }) {
     const pathname = usePathname() 
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     if (( pathname === '/') || (pathname === '/use-cases') || (pathname === '/api-documentation') || (pathname === '/sessions')){
         return (
             <Button className='flex items-center space-x-3' href='/'>
@@ -34,15 +44,6 @@ export default function AppTitle({ sessionId }: { sessionId: string }) {
         </Button>
         )
     }
-    const [open, setOpen] = React.useState(false);
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
 
     return (
         <React.Fragment>

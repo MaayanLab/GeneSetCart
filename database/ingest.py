@@ -30,8 +30,7 @@ gene_info_file = f'{s3_bucket}/Homo_sapiens.gene_info'
 genes_info =  pd.read_csv(s3.open(gene_info_file), index_col=0, sep="\t")
 for index, row in tqdm(genes_info.iterrows(), total=genes_info.shape[0]):
     cur.execute('''INSERT INTO genes (id, description, gene_symbol, synonyms) 
-                    VALUES  (%s, %s, %s, %s)
-                    ON CONFLICT (id) DO NOTHING;''', (row['GeneID'], row['description'], row['Symbol'], row['Synonyms']))
+                    VALUES  (%s, %s, %s, %s);''', (row['GeneID'], row['description'], row['Symbol'], row['Synonyms']))
 conn.commit()
 
 
@@ -40,8 +39,7 @@ library_abstracts_file = f'{s3_bucket}/library_abstracts.csv'
 library_abstracts = pd.read_csv(s3.open(library_abstracts_file))
 for index, row in library_abstracts.iterrows():
     cur.execute('''INSERT INTO lib_abstracts (id, lib, abstract) 
-                    VALUES  (%s, %s, %s)
-                    ON CONFLICT (lib) DO NOTHING;''', (str(uuid.uuid4()), row['Library'], row['Descriptions']))
+                    VALUES  (%s, %s, %s);''', (str(uuid.uuid4()), row['Library'], row['Descriptions']))
     conn.commit()
 
 
@@ -64,8 +62,7 @@ for index, row in cfde_genesets.iterrows():
                 data.append([row['Library '], geneset_name, genes])
                 geneset_id = str(uuid.uuid4())
                 cur.execute('''INSERT INTO cfde_genesets (id, term, library) 
-                                            VALUES  (%s, %s, %s)
-                                            ON CONFLICT (term, library) DO NOTHING;''', (geneset_id, geneset_name, row['Library ']))
+                                            VALUES  (%s, %s, %s);''', (geneset_id, geneset_name, row['Library ']))
                 conn.commit()
 
             mask = genes_info['Symbol'].isin(genes)
@@ -74,8 +71,7 @@ for index, row in cfde_genesets.iterrows():
             table_name = "_GeneTocfdegeneset"
             for geneId in valid_gene_ids: 
                 cur.execute(f'''INSERT INTO "{table_name}"  ("A", "B") 
-                                                VALUES  (%s, %s)
-                                                ON CONFLICT ("A", "B") DO NOTHING;''', (geneId, geneset_id))
+                                                VALUES  (%s, %s);''', (geneId, geneset_id))
                 conn.commit()
 CFDE_geneset_df = pd.DataFrame(data, columns=['Library', 'Geneset', 'Genes'])
 
@@ -117,8 +113,7 @@ for lib in dataframe_names:
                             if row['Odds_Ratio'] == math.inf:
                                 row['Odds_Ratio'] = 999999999999999.99
                             cur.execute('''INSERT INTO cfde_cross_pair (id, lib_1, lib_2, geneset_1, geneset_2, odds_ratio, pvalue, n_overlap, overlap, n_genes1, n_genes2) 
-                                            VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                                            ON CONFLICT (lib_1, lib_2, geneset_1, geneset_2) DO NOTHING;''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', '), n_genes1, n_genes2))
+                                            VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', '), n_genes1, n_genes2))
                             conn.commit()
                     except Exception as e: print(e)
 
@@ -138,8 +133,7 @@ for lib in dataframe_names:
                         if row['Odds_Ratio'] == math.inf:
                             row['Odds_Ratio'] = 999999999999999.99
                         cur.execute('''INSERT INTO cfde_cross_pair (id, lib_1, lib_2, geneset_1, geneset_2, odds_ratio, pvalue, n_overlap, overlap, n_genes1, n_genes2) 
-                                        VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                                        ON CONFLICT (lib_1, lib_2, geneset_1, geneset_2) DO NOTHING;''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', '), n_genes1, n_genes2))
+                                        VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', '), n_genes1, n_genes2))
                         conn.commit()
                 except:
                     continue

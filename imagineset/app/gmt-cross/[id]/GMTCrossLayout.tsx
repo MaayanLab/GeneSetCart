@@ -140,7 +140,7 @@ export function GMTCrossLayout() {
         return params.toString();
     }, []);
 
-    if (library1 !== null && library2 !== null) {
+    if ((library1 !== null) && (library2 !== null)) {
         React.useEffect(() => {
             setSelectedLibs([library1, library2])
             setSelectedDCCs([CFDELibraryOptions[library1], CFDELibraryOptions[library2]])

@@ -40,7 +40,7 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
         </>
         )
     }
-
+    
     const session = await getServerSession(authOptions)
     if (!session) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`)
     const user = await prisma.user.findUnique({
@@ -52,7 +52,8 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
 
     const sessionInfo = await prisma.pipelineSession.findUnique({
         where: {
-            id: params.id
+            id: params.id,
+            user_id: user.id
         },
     })
     if (sessionInfo === null) return redirect('/')

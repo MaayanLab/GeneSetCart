@@ -1,6 +1,6 @@
 'use client'
 import { Box, Button, LinearProgress, Paper, Stack, Tooltip, Typography } from "@mui/material";
-import { GMTSelect } from "../GMTSelect";
+import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { GridColDef, GridRenderCellParams, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
@@ -10,10 +10,9 @@ import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DownloadIcon from '@mui/icons-material/Download';
-import { addStatus } from "@/components/assemble/fileUpload/SingleUpload";
-import { useParams } from "next/navigation";
-import { RenderGeneSet1, RenderGeneSet2, RenderOverlapButton} from "./TableButtons";
-import { CrossingTable } from "../CrossingTable";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { RenderGeneSet1, RenderGeneSet2, RenderOverlapButton } from "./TableButtons";
+import { CrossingTable } from "./CrossingTable";
 import { DCCIcons } from "@/components/assemble/DCCFetch/DCCIconBtn";
 
 
@@ -30,17 +29,6 @@ type hypothesisDisplay = {
 }
 
 
-type selectedCrossRowType = {
-    id: string,
-    lib_1: string,
-    lib_2: string,
-    geneset_1: string,
-    geneset_2: string,
-    odds_ratio: number,
-    pvalue: number,
-    n_overlap: number,
-    overlap: string[]
-}
 
 const download = (filename: string, text: string) => {
     let element = document.createElement('a');
@@ -128,22 +116,49 @@ const generateHypothesisTooltip = (hypothesisString: string, substringIndices: {
 }
 
 export function GMTCrossLayout() {
+    // get query parameters
+    const searchParams = useSearchParams()
+    const library1 = searchParams.get('lib1')
+    const library2 = searchParams.get('lib2')
+
     const [rows, setRows] = React.useState<CFDECrossPair[]>([])
-    const [selectedLibs, setSelectedLibs] = React.useState<string[]>([])
+    const [selectedLibs, setSelectedLibs] = React.useState<string[]>(['', ''])
+    const [selectedDCCs, setSelectedDCCs] = React.useState<string[]>([])
     const [loading, setLoading] = React.useState(false)
     const [hypLoading, setHypLoading] = React.useState(false)
     const [hypothesis, setHypothesis] = React.useState<hypothesisDisplay | null>(null)
     const [headers, setHeaders] = React.useState<string[] | null>(null)
-    const [selectedDCCs, setSelectedDCCs] = React.useState<string[]>([])
 
 
     const params = useParams<{ id: string }>()
     const sessionId = params.id
+    const router = useRouter();
+
+    const createQueryString = React.useCallback((name: string, value: string) => {
+        const params = new URLSearchParams();
+        params.set(name, value);
+        return params.toString();
+    }, []);
+
+    if (library1 !== null && library2 !== null) {
+        React.useEffect(() => {
+            setSelectedLibs([library1, library2])
+            setSelectedDCCs([CFDELibraryOptions[library1], CFDELibraryOptions[library2]])
+            setHypothesis(null)
+            setLoading(true)
+            fetchCrossPairs(library1, library2).then((result) => {
+                setLoading(false);
+                setRows(result);
+                setHeaders([CFDELibHeaders[result[0].lib_1], CFDELibHeaders[result[0].lib_2]])
+            }).catch((err) => setLoading(false))
+        }, [])
+    }
 
     const getCrossData = React.useCallback(() => {
+        router.push("/gmt-cross/" + params.id +  "?" + createQueryString("lib1", selectedLibs[0]) + "&" + createQueryString("lib2", selectedLibs[1]));
         setHypothesis(null)
         setLoading(true)
-        if (selectedLibs.length === 2) {
+        if (selectedLibs.length === 2 && selectedLibs[0] !== '' && selectedLibs[1] !== '') {
             fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => {
                 setLoading(false);
                 setRows(result);
@@ -198,7 +213,7 @@ export function GMTCrossLayout() {
             minWidth: 120,
             headerClassName: 'theme--header',
             renderCell: params => {
-                return <RenderGeneSet1 params={params} sessionId={sessionId}/>
+                return <RenderGeneSet1 params={params} sessionId={sessionId} />
             },
             headerAlign: 'center',
         },
@@ -208,7 +223,7 @@ export function GMTCrossLayout() {
             flex: 1,
             minWidth: 120,
             renderCell: params => {
-                return <RenderGeneSet2 params={params} sessionId={sessionId}/>
+                return <RenderGeneSet2 params={params} sessionId={sessionId} />
             },
             headerAlign: 'center',
         },
@@ -278,89 +293,89 @@ export function GMTCrossLayout() {
     }, [hypothesis])
 
     return (
-            <Stack direction="column" spacing={3} sx={{ marginBottom: 3, justifyContent: 'center' }}>
-                <DCCIcons selected={selectedDCCs}/>
-                <Stack direction='row' spacing={2}>
-                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs}/>
-                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs}/>
-                </Stack>
-                <div className="flex justify-center">
-                    <Button variant="contained" color="secondary" onClick={getCrossData}>
-                        <ShuffleIcon sx={{ fontsize: 100 }} />
-                    </Button>
-                    {loading && <CircularIndeterminate />}
-                </div>
-                {hypothesis !== null &&
-                    <Paper elevation={1} sx={{
-                        width: '100%',
-                        minHeight: '100px'
-                    }}>
-                        <Stack direction='column' sx={{ padding: 2 }}>
-                            <Box justifyContent={'flex-end'}>
-                                <Button color="secondary" onClick={(evt) => copyToClipboard(
-                                    `geneset 1: ${hypothesis.geneset1} \n
+        <Stack direction="column" spacing={3} sx={{ marginBottom: 3, justifyContent: 'center' }}>
+            <DCCIcons selected={selectedDCCs} />
+            <Stack direction='row' spacing={2}>
+                <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs} />
+                <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs} />
+            </Stack>
+            <div className="flex justify-center">
+                <Button variant="contained" color="secondary" onClick={getCrossData}>
+                    <ShuffleIcon sx={{ fontsize: 100 }} />
+                </Button>
+                {loading && <CircularIndeterminate />}
+            </div>
+            {hypothesis !== null &&
+                <Paper elevation={1} sx={{
+                    width: '100%',
+                    minHeight: '100px'
+                }}>
+                    <Stack direction='column' sx={{ padding: 2 }}>
+                        <Box justifyContent={'flex-end'}>
+                            <Button color="secondary" onClick={(evt) => copyToClipboard(
+                                `geneset 1: ${hypothesis.geneset1} \n
                                 geneset 2: ${hypothesis.geneset2} \n
                                 library 1: ${hypothesis.library1}\n
                                 library 2: ${hypothesis.library2}\n
                                 hypothesis:${hypothesis.hypothesis} 
                                 `
-                                )}><ContentPasteIcon /></Button>
-                                <Button color="secondary" onClick={(evt) => {
-                                    download('gpt-hypothesis',
-                                        `Geneset 1: ${hypothesis.geneset1}\n
+                            )}><ContentPasteIcon /></Button>
+                            <Button color="secondary" onClick={(evt) => {
+                                download('gpt-hypothesis',
+                                    `Geneset 1: ${hypothesis.geneset1}\n
                                 Geneset 2: ${hypothesis.geneset2}\n
                                 Library 1: ${hypothesis.library1}\n
                                 Library 2: ${hypothesis.library2}\n
                                 Hypothesis:${hypothesis.hypothesis} 
                             `)
-                                }}><DownloadIcon /></Button>
-                            </Box>
-                            <Box>
-                                <Typography>
-                                    <strong>GENE SET 1: </strong>
-                                    <Tooltip title={
-                                        <React.Fragment>
-                                            <Typography color="inherit"> Abstract for {hypothesis.geneset1}</Typography>
-                                            {hypothesis.abstract1}
-                                        </React.Fragment>
-                                    } placement="right">
-                                        <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
-                                            {hypothesis.geneset1}
-                                        </Typography>
-                                    </Tooltip>
-                                </Typography>
-                            </Box>
-                            <Box>
-                                <Typography>
-                                    <strong>GENE SET 2: </strong>
-                                    <Tooltip title={
-                                        <React.Fragment>
-                                            <Typography color="inherit"> Abstract for {hypothesis.geneset2}</Typography>
-                                            {hypothesis.abstract2}
-                                        </React.Fragment>
-                                    } placement="right">
-                                        <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
-                                            {hypothesis.geneset2}
-                                        </Typography>
-                                    </Tooltip>
-                                </Typography>
-                            </Box>
-                            <Box><Typography><strong>LIBRARY 1:</strong> {hypothesis.library1}</Typography></Box>
-                            <Box><Typography><strong>LIBRARY 2:</strong> {hypothesis.library2}</Typography></Box>
-                            <Box>
-                                <Typography>
-                                    <strong>HYPOTHESIS: </strong>
-                                </Typography>
-                                {enrichedTermsIndices && hypothesis.topEnrichmentResults && generateHypothesisTooltip(hypothesis.hypothesis, enrichedTermsIndices, hypothesis.topEnrichmentResults)}
-                            </Box>
-                        </Stack>
-                    </Paper>}
-                {hypLoading && <Box sx={{ width: '100%' }}>
-                    <LinearProgress color="secondary" />
-                </Box>}
-                {(rows.length > 0) && <Box style={{ width: '100%' }} >
-                    <CrossingTable rows={rows} columns={columns} />
-                </Box>}
-            </Stack>
+                            }}><DownloadIcon /></Button>
+                        </Box>
+                        <Box>
+                            <Typography>
+                                <strong>GENE SET 1: </strong>
+                                <Tooltip title={
+                                    <React.Fragment>
+                                        <Typography color="inherit"> Abstract for {hypothesis.geneset1}</Typography>
+                                        {hypothesis.abstract1}
+                                    </React.Fragment>
+                                } placement="right">
+                                    <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
+                                        {hypothesis.geneset1}
+                                    </Typography>
+                                </Tooltip>
+                            </Typography>
+                        </Box>
+                        <Box>
+                            <Typography>
+                                <strong>GENE SET 2: </strong>
+                                <Tooltip title={
+                                    <React.Fragment>
+                                        <Typography color="inherit"> Abstract for {hypothesis.geneset2}</Typography>
+                                        {hypothesis.abstract2}
+                                    </React.Fragment>
+                                } placement="right">
+                                    <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
+                                        {hypothesis.geneset2}
+                                    </Typography>
+                                </Tooltip>
+                            </Typography>
+                        </Box>
+                        <Box><Typography><strong>LIBRARY 1:</strong> {hypothesis.library1}</Typography></Box>
+                        <Box><Typography><strong>LIBRARY 2:</strong> {hypothesis.library2}</Typography></Box>
+                        <Box>
+                            <Typography>
+                                <strong>HYPOTHESIS: </strong>
+                            </Typography>
+                            {enrichedTermsIndices && hypothesis.topEnrichmentResults && generateHypothesisTooltip(hypothesis.hypothesis, enrichedTermsIndices, hypothesis.topEnrichmentResults)}
+                        </Box>
+                    </Stack>
+                </Paper>}
+            {hypLoading && <Box sx={{ width: '100%' }}>
+                <LinearProgress color="secondary" />
+            </Box>}
+            {(rows.length > 0) && <Box style={{ width: '100%' }} >
+                <CrossingTable rows={rows} columns={columns} />
+            </Box>}
+        </Stack>
     )
 }

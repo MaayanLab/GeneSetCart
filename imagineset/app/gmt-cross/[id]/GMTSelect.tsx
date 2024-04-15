@@ -17,8 +17,6 @@ export const CFDELibraryOptions: { [key: string]: string } = {
 }
 
 export function GMTSelect({selectedLibs, setSelectedLibs, index, selectedDCCs, setSelectedDCCs} : {selectedLibs: string[], setSelectedLibs: React.Dispatch<React.SetStateAction<string[]>>, index: number, selectedDCCs: string[], setSelectedDCCs: React.Dispatch<React.SetStateAction<string[]>>}) {
-    // const [library, setLibrary] = React.useState('');
-
     const handleChange = (event: SelectChangeEvent) => {
         // setLibrary(event.target.value as string);
         const newArr = [...selectedLibs];

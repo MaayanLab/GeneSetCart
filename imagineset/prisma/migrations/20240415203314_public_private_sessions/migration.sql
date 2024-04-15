@@ -6,7 +6,7 @@
 
 */
 -- AlterTable
-ALTER TABLE "user_sessions" ADD COLUMN     "private" BOOLEAN NOT NULL;
+ALTER TABLE "user_sessions" ADD COLUMN     "private" BOOLEAN NOT NULL DEFAULT TRUE;
 
 -- DropTable
 DROP TABLE "tempSessions";

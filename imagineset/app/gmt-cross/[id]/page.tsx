@@ -6,13 +6,15 @@ import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
+import { shallowCopy } from '@/app/assemble/[id]/page';
 
 export default async function GMTCross({ params }: { params: { id: string } }) {
-    // if session belongs to anonymous account go there: 
+    // if a public session created by a public user go there: 
     const anonymousUserSession = await prisma.pipelineSession.findFirst({
         where: {
             id: params.id,
-            user_id: process.env.PUBLIC_USER_ID
+            user_id: process.env.PUBLIC_USER_ID,
+            private: false
         },
         include: {
             gene_sets: {
@@ -25,38 +27,75 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
     if (anonymousUserSession) {
         return (
             <>
-            <Grid item>
-                <Header sessionId={params.id} />
-            </Grid>
-            <Container>
+                <Grid item>
+                    <Header sessionId={params.id} />
+                </Grid>
                 <Container>
-                    <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>COMMON FUND GENE SET CROSSING</Typography>
-                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
-                        Cross Common Fund GMTs to explore their similarity for novel hypothesis generation. Each gene set pair is displayed with their Fisher exact test p-value, odds ratio and overlapping genes.
-                    </Typography>
-                    <GMTCrossLayout />
+                    <Container>
+                        <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>COMMON FUND GENE SET CROSSING</Typography>
+                        <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
+                            Cross Common Fund GMTs to explore their similarity for novel hypothesis generation. Each gene set pair is displayed with their Fisher exact test p-value, odds ratio and overlapping genes.
+                        </Typography>
+                        <GMTCrossLayout />
+                    </Container>
                 </Container>
-            </Container>
-        </>
+            </>
         )
     }
-    
-    const session = await getServerSession(authOptions)
-    if (!session) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`)
-    const user = await prisma.user.findUnique({
-        where: {
-            id: session?.user.id
-        }
-    })
-    if (user === null) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`)
 
-    const sessionInfo = await prisma.pipelineSession.findUnique({
+    // else if created by a user account 
+    // get session information
+    const sessionInfo = await prisma.pipelineSession.findFirst({
         where: {
             id: params.id,
-            user_id: user.id
+            // private: false // session must be public
         },
+        include: {
+            gene_sets: {
+                include: {
+                    genes: true
+                }
+            }
+        }
     })
-    if (sessionInfo === null) return redirect('/')
+    // if public session created by another user but current user is not logged in shallow copy to public user account
+    const session = await getServerSession(authOptions)
+    if (!session) {
+        const anonymousUserId = process.env.PUBLIC_USER_ID
+        const anonymousUser = await prisma.user.upsert({
+            where: {
+                id: anonymousUserId,
+            },
+            update: {},
+            create: {
+                id: anonymousUserId,
+                name: 'Anonymous User',
+            },
+        })
+        await shallowCopy(anonymousUser, sessionInfo, 'gmt-cross', true)
+    } else { // if a public session but user is logged in then shallow copy to user's account
+        const user = await prisma.user.findUnique({
+            where: {
+                id: session?.user.id
+            },
+            include: {
+                pipelineSessions: true
+            }
+        })
+        if (user === null) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`) // if user is not logged in redirect
+        // get all users saved sessions
+        const savedUserSessions = user.pipelineSessions.map((savedSession) => savedSession.id)
+        // if session does not belong to currently logged in user then shallow copy session to user
+        if (!savedUserSessions.includes(params.id)) {
+            if (sessionInfo) { // if shared session exists
+                await shallowCopy(user, sessionInfo, 'gmt-cross', false)
+            } else {
+                redirect('/') // redirect to home page because shared session does not exist
+            }
+        }
+    }
+
+    // else if current user is the owner of session
     return (
         <>
             <Grid item>

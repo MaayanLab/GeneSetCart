@@ -28,7 +28,7 @@ import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
 import { addStatus } from '@/components/assemble/fileUpload/SingleUpload';
 import Status from '@/components/assemble/Status';
-
+import ShareIcon from '@mui/icons-material/Share';
 
 const scrollbarStyles = {
     'webkitAppearance': 'none',
@@ -145,8 +145,8 @@ export type UMAPOptionsType = {
     randomState: number
 }
 
-export type OverlapSelection ={
-    name: string, 
+export type OverlapSelection = {
+    name: string,
     overlapGenes: string[]
 }
 
@@ -161,7 +161,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [checked, setChecked] = React.useState<number[]>([]);
     const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked, sessionInfo?.gene_sets])
     const [visualization, setVisualization] = React.useState('')
-    const [overlap, setOverlap] = React.useState<OverlapSelection>({name:'', overlapGenes:[]})
+    const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
     const [assignGroups, setAssignGroups] = React.useState(false)
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
@@ -197,7 +197,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
 
     const addSelectedToCart = React.useCallback(() => {
         console.log(overlap)
-        addToSessionSets(overlap.overlapGenes, sessionId, overlap.name, '').then((result) => setStatus({success: true}))
+        addToSessionSets(overlap.overlapGenes, sessionId, overlap.name, '').then((result) => setStatus({ success: true }))
     }, [overlap])
 
     return (
@@ -205,19 +205,19 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             <Grid item xs={isMobile ? 12 : 3}>
                 <Stack direction='column' spacing={2}>
                     <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
-                    <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, height: 350, boxShadow: 2, overflowY:'scroll', wordWrap: 'break-word' }}>
+                    <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, height: 350, boxShadow: 2, overflowY: 'scroll', wordWrap: 'break-word' }}>
                         <ListSubheader disableSticky={true}>
                             Genes ({overlap.overlapGenes === undefined ? 0 : overlap.overlapGenes.length})
                             <Button color='secondary' onClick={addSelectedToCart}>  <LibraryAddIcon /> ADD TO CART</Button>
                         </ListSubheader>
                         <Status status={status} />
-                        <TextField color='secondary' 
-                        variant='outlined' 
-                        size='small' 
-                        value={overlap.name} 
-                        sx={{marginLeft: 2, marginRight: 2}} 
-                        placeholder='Enter name of selected set'
-                        onChange={(evt) => setOverlap({name: evt.target.value, overlapGenes: overlap.overlapGenes})}
+                        <TextField color='secondary'
+                            variant='outlined'
+                            size='small'
+                            value={overlap.name}
+                            sx={{ marginLeft: 2, marginRight: 2 }}
+                            placeholder='Enter name of selected set'
+                            onChange={(evt) => setOverlap({ name: evt.target.value, overlapGenes: overlap.overlapGenes })}
                         />
                         <TextField
                             multiline
@@ -303,6 +303,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadPNG('visualization') }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn') } else { downloadSVG() } }} disabled={(visualization === 'SuperVenn') || (visualization === 'Heatmap')}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}> <ShareIcon /> &nbsp;<Typography >Share</Typography></Button>
                                 </Stack>
                                 {<AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} />}
                             </Box>

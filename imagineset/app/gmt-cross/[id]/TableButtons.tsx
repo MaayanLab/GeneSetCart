@@ -71,7 +71,7 @@ export const RenderGeneSet1 = ({ params, sessionId }: { params: GridRenderCellPa
                         <Button
                             variant='contained' color='primary'
                             onClick={(evt) => {
-                                enrich({ list: genesetGenes.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 })
+                                enrich({ list: genesetGenes.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1.replace('∩', 'Intersect') })
                             }}
                         >
                             SEND TO ENRICHR
@@ -164,7 +164,7 @@ export const RenderGeneSet2 = ({ params, sessionId }: { params: GridRenderCellPa
                         <Button
                             variant='contained' color='primary'
                             onClick={(evt) => {
-                                enrich({ list: genesetGenes.join('\n').replaceAll("'", "") || '', description: params.row.geneset_2 })
+                                enrich({ list: genesetGenes.join('\n').replaceAll("'", "") || '', description: params.row.geneset_2.replace('∩', 'Intersect') })
                             }}
                         >
                             SEND TO ENRICHR
@@ -248,7 +248,7 @@ export const RenderOverlapButton = ({ params, sessionId }: { params: GridRenderC
                             <Button
                                 variant='contained' color='primary'
                                 onClick={(evt) => {
-                                    enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' ∩ ' + params.row.geneset_2 })
+                                    enrich({ list: params.row.overlap.join('\n').replaceAll("'", "") || '', description: params.row.geneset_1 + ' Intersect ' + params.row.geneset_2 })
                                 }}
                             >
                                 SEND TO ENRICHR

@@ -146,11 +146,14 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
         },
         data: {
             gene_sets: {
-                set: [...oldSetsArray, newGeneset],
+                // set: [...oldSetsArray, newGeneset],
+                connect: [...oldSetsArray, newGeneset].filter((geneset) => geneset.id !== undefined),
             },
             lastModified: new Date()
         },
     })
+
+    console.log(updatedSession)
 
     revalidatePath('/')
     return 'success'

@@ -14,10 +14,10 @@
 
 ## RESPONSES
 
-| http code     | content-type                      | response                                                            |
-|---------------|-----------------------------------|---------------------------------------------------------------------|
-| `200`         | application/json                  |  {"session_id":"clu1gfzj6003212xxhzuw8617"} unique id of newly created gene set   |
-| `500`         | application/json                | {"code":"500","message":"Error processing request"}              |
+| http code     | content-type                      | response                                      | description         |
+|---------------|-----------------------------------|-----------------------------------------------| ------------------ |
+| `200`         | application/json                  |  {"session_id":"clu1gfzj6003212xxhzuw8617"}   | unique id of newly created session containing gene sets   |
+| `500`         | application/json                | {"code":"500","message":"Error processing request"}              | |
 
 <br />
 
@@ -39,5 +39,5 @@ if not response.ok:
 
 session_id = response.json()['session_id']
 geneset_link = 'https://g2sg.cfde.cloud/analyze/%s' % session_id
-print(geneset_link) # e.g: https://g2sg.cfde.cloud/assemble/clu1gfzj6003212xxhzuw8617
+print(geneset_link) # e.g: https://g2sg.cfde.cloud/analyze/clu1gfzj6003212xxhzuw8617
 ```

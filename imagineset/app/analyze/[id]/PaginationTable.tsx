@@ -86,6 +86,7 @@ export default function PaginatedTable({ rows }: {
                 <TableFooter>
                     <TableRow>
                         <TablePagination
+                            sx={{width: '100%'}}
                             component="div"
                             count={rows.length}
                             page={page}

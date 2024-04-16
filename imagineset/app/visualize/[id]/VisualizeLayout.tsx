@@ -6,8 +6,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import { ListSubheader, Grid, Stack, Button, Typography, Box, Tooltip, TextField, useMediaQuery, useTheme } from '@mui/material';
-import { type Gene, type GeneSet } from '@prisma/client';
+import { ListSubheader, Grid, Stack, Button, Typography, Box, Tooltip, TextField, useMediaQuery, useTheme, ClickAwayListener } from '@mui/material';
+import { PipelineSession, type Gene, type GeneSet } from '@prisma/client';
 import vennIcon from '@/public/img/otherLogos/VennDagramIcon.png'
 import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
 import heatmapIcon from '@/public/img/otherLogos/visualizeIcon.png'
@@ -29,6 +29,8 @@ import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
 import { addStatus } from '@/components/assemble/fileUpload/SingleUpload';
 import Status from '@/components/assemble/Status';
 import ShareIcon from '@mui/icons-material/Share';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { copyToClipboard } from '@/components/assemble/DCCFetch/CFDEDataTable';
 
 const scrollbarStyles = {
     'webkitAppearance': 'none',
@@ -151,16 +153,22 @@ export type OverlapSelection = {
 }
 
 export function VisualizeLayout({ sessionInfo, sessionId }: {
-    sessionInfo: {
+    sessionInfo:         (({
         gene_sets: ({
             genes: Gene[];
-        } & GeneSet)[];
-    } | null,
+        } & GeneSet)[]
+    } & PipelineSession | null)),
     sessionId: string
 }) {
-    const [checked, setChecked] = React.useState<number[]>([]);
+
+    const searchParams = useSearchParams()
+    const checkedSets = searchParams.get('checked')
+    const visType = searchParams.get('type')
+    const pathname = usePathname()
+
+    const [checked, setChecked] = React.useState<number[]>(checkedSets !== null ?  checkedSets.split(',').map((item) => parseInt(item)) : []);
     const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked, sessionInfo?.gene_sets])
-    const [visualization, setVisualization] = React.useState('')
+    const [visualization, setVisualization] = React.useState(visType !==null ? visType : '')
     const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
     const [assignGroups, setAssignGroups] = React.useState(false)
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
@@ -168,10 +176,21 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [status, setStatus] = React.useState<addStatus>({})
+    const [open, setOpen] = React.useState(false);
 
+    const handleTooltipClose = () => {
+        setOpen(false);
+    };
+
+    const handleTooltipOpen = () => {
+        setOpen(true);
+    };
 
     const legendSelectedSets = React.useMemo(() => {
         setVisualization('')
+        if ((checkedSets !== null) && (visType !== null)) {
+            setVisualization(visType)
+        }
         if (selectedSets) {
             if (selectedSets.length > 26) {
                 const dataArrays = selectedSets.map((geneset, i) => {
@@ -196,7 +215,6 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
 
 
     const addSelectedToCart = React.useCallback(() => {
-        console.log(overlap)
         addToSessionSets(overlap.overlapGenes, sessionId, overlap.name, '').then((result) => setStatus({ success: true }))
     }, [overlap])
 
@@ -303,13 +321,28 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadPNG('visualization') }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn') } else { downloadSVG() } }} disabled={(visualization === 'SuperVenn') || (visualization === 'Heatmap')}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }}> <ShareIcon /> &nbsp;<Typography >Share</Typography></Button>
+                                    <ClickAwayListener onClickAway={handleTooltipClose}>
+                                        <div>
+                                            <Tooltip
+                                                PopperProps={{
+                                                    disablePortal: true,
+                                                }}
+                                                onClose={handleTooltipClose}
+                                                open={open}
+                                                disableFocusListener
+                                                disableHoverListener
+                                                disableTouchListener
+                                                title="Copied"
+                                            >
+                                                <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} disabled={sessionInfo?.private} onClick={() => { handleTooltipOpen(); copyToClipboard(`https://g2sg.cfde.cloud${pathname}?checked=${checked.toString()}&type=${visualization}`) }}><ShareIcon /> &nbsp;<Typography >Share</Typography></Button>
+                                            </Tooltip>
+                                        </div>
+                                    </ClickAwayListener>                                    
                                 </Stack>
                                 {<AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} />}
                             </Box>
                             <Box sx={{ justifyContent: 'center' }}>
                                 <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%' }}>
-                                    {/* {(visualization === 'Heatmap' && checked.length < 31 && checked.length > 0) && <Heatmap data={data} width={300} height={300} setOverlap={setOverlap} />} */}
                                     {(visualization === 'Heatmap' && checked.length > 1 && checked.length < 39) && <ClusteredHeatmap selectedSets={legendSelectedSets} />}
                                     {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}

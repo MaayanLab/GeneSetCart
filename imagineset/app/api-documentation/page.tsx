@@ -3,7 +3,6 @@ import Container from "@mui/material/Container";
 import Header from '@/components/header/Header';
 import { readFileSync } from "fs"
 import path from 'path'
-import Markdown from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";

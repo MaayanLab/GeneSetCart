@@ -20,8 +20,8 @@
 
 | http code     | content-type                      | response                                                            |
 |---------------|-----------------------------------|---------------------------------------------------------------------|
-| `200`         | `text/plain;charset=UTF-8`        | unique id of newly created gene set e.g clu1gfzj6003212xxhzuw8617   |
-| `500`         | `application/json`                | `{"code":"500","message":"Error processing request" `               |
+| `200`         | text/plain;charset=UTF-8        | unique id of newly created gene set e.g clu1gfzj6003212xxhzuw8617   |
+| `500`         | application/json                | {"code":"500","message":"Error processing request"}              |
 
 <br />
 
@@ -46,4 +46,3 @@ geneset_link = 'https://g2sg.cfde.cloud/assemble/%s' % session_id
 print(geneset_link) # e.g: https://g2sg.cfde.cloud/assemble/clu1gfzj6003212xxhzuw8617
 ```
 </details>
-------------------------------------------------------------------------------------------

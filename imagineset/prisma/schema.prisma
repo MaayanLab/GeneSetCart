@@ -91,7 +91,7 @@ model PipelineSession {
   lastModified DateTime  @default(now())
   gene_sets    GeneSet[]
   session_name  String?  
-  private       Boolean
+  private       Boolean @default(true)
 
   @@map("user_sessions")
 }
@@ -110,6 +110,7 @@ model CFDECrossPair {
   n_genes2      Int
 
 @@map("cfde_cross_pair")
+@@unique([lib_1, lib_2, geneset_1, geneset_2])
 }
 
 model LibAbstracts {
@@ -118,6 +119,7 @@ model LibAbstracts {
   abstract  String 
 
   @@map("lib_abstracts")
+  @@unique([lib])
 }
 
 model cfdegeneset {
@@ -128,4 +130,5 @@ model cfdegeneset {
   genes       Gene[]
 
   @@map("cfde_genesets")
+  @@unique([term, library])
 }

@@ -1,8 +1,4 @@
-# ADDING GENE SET TO A NEW SESSION
-<details>
- <summary>
- <code>POST</code> <code><b>/</b></code> addGeneset
- </summary>
+<code>POST</code> <code><b>/api/addGeneset </b></code> 
 
 <br />
 
@@ -45,4 +41,3 @@ session_id = json.loads(response.text)
 geneset_link = 'https://g2sg.cfde.cloud/assemble/%s' % session_id
 print(geneset_link) # e.g: https://g2sg.cfde.cloud/assemble/clu1gfzj6003212xxhzuw8617
 ```
-</details>

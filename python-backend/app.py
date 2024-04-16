@@ -10,6 +10,7 @@ import seaborn as sns
 import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
+import numpy as np
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -72,6 +73,7 @@ def calculateUMAP():
 def createHeatmap():
     data = request.get_json()
     genesets_dict = data['genesets_dict']
+    display_diagonal= data['display-diagonal']
     jindex_arrays = jaccard_similarity_multiple(genesets_dict)
     alphabet = ["A", "B","C", "D","E","F","G", "H","I", "J","K", "L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
 
@@ -85,8 +87,14 @@ def createHeatmap():
         jindex_df = jindex_df.set_axis([alphabet_columnns], axis='index')
         jindex_df = jindex_df.rename_axis("Gene Sets", axis='index')
         jindex_df = jindex_df.rename_axis("Gene Sets", axis='columns')
-    plt.clf()
-    sns.clustermap(jindex_df, cmap='mako')
+    a = np.zeros((jindex_df.shape[0], jindex_df.shape[1]), int)
+    if display_diagonal: 
+        sns.clustermap(jindex_df, cmap='mako')
+    else: 
+        np.fill_diagonal(a, 5)
+        mask = np.where(a == 5, True, False)
+        plt.clf()
+        sns.clustermap(jindex_df, cmap='mako', mask=mask)
     # Save plot to a BytesIO object 
     img = io.BytesIO()
     plt.savefig(img, format='svg')

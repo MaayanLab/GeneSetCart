@@ -5,7 +5,16 @@ import { OptionsSlider } from './OptionsSlider';
 import { loadDataFileExample } from '@/components/visualize/PlotComponents/Umap/getUMAP';
 import InfoIcon from '@mui/icons-material/Info';
 
-export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }: { visualization: string, umapOptions: UMAPOptionsType, setUmapOptions: React.Dispatch<React.SetStateAction<UMAPOptionsType>> }) {
+export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, heatmapOptions, setHeatmapOptions }:
+    {
+        visualization: string,
+        umapOptions: UMAPOptionsType,
+        setUmapOptions: React.Dispatch<React.SetStateAction<UMAPOptionsType>>,
+        heatmapOptions: { diagonal: boolean; },
+        setHeatmapOptions: React.Dispatch<React.SetStateAction<{
+            diagonal: boolean;
+        }>>
+    }) {
     const [switchChecked, setSwitchChecked] = React.useState(false)
     const handleSwitchChange = React.useCallback(() => {
         setSwitchChecked((oldchecked) => !oldchecked)
@@ -81,7 +90,7 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
                                 variant="contained"
                                 component="label"
                                 color="secondary"
-                                sx={{ mt: 1}}
+                                sx={{ mt: 1 }}
                             >
                                 <Tooltip title='Upload a .csv file with each gene set in your list mapped to their group. Gene sets should be on the first column and groups in the second. To ensure proper display, please enter a  MAX OF 27 GROUPS.' placement="top">
                                     <div>
@@ -97,10 +106,10 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
                                 />
                             </Button>
                             <span id="file-input-label"></span>
-                            <Button 
-                            color='secondary' 
-                            variant='contained'
-                            onClick={downloadExample}
+                            <Button
+                                color='secondary'
+                                variant='contained'
+                                onClick={downloadExample}
                             >
                                 Example data file
                             </Button>
@@ -134,6 +143,25 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions }
                     </Stack>
                 </Stack>}
             </>
+        )
+    }
+
+    if (visualization === 'Heatmap') {
+        return (
+            <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
+            <FormControlLabel
+                label="Mask Diagonal"
+                control={
+                    <Checkbox
+                        checked={!heatmapOptions.diagonal}
+                        onChange={(evt) => {
+                            setHeatmapOptions({diagonal: !heatmapOptions.diagonal })
+                        }
+                        }
+                    />
+                }
+            />
+            </Stack>
         )
     }
 }

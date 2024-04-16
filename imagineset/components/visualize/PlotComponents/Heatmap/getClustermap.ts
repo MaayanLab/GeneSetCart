@@ -12,7 +12,7 @@ type UMAPOptionsType = {
 
 export async function getClustermap(genesetDict: {
     [key: string]: string[];
-}){
+}, heatmapOptions: {diagonal: boolean}){
     const API_BASE_URL = process.env.PYTHON_API_BASE
     if (!API_BASE_URL) throw new Error('API_BASE_URL not found')
     const req = await fetch(API_BASE_URL + '/api/getHeatmap', {
@@ -20,7 +20,7 @@ export async function getClustermap(genesetDict: {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 'genesets_dict': genesetDict }),
+        body: JSON.stringify({ 'genesets_dict': genesetDict, 'display-diagonal': heatmapOptions.diagonal }),
     })
     const response = await req.text()
     return response

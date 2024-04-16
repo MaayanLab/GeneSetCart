@@ -29,7 +29,7 @@ export async function POST(request: Request) {
             },
         })
         await addToSessionSets(genes, newSession.id, genesetName, description)
-        return NextResponse.json({ text: newSession.id }, { status: 200 })
+        return NextResponse.json({ session_id : newSession.id }, { status: 200 })
     } catch {
         return NextResponse.json({ error: 'Error processing request' }, { status: 500 })
     }

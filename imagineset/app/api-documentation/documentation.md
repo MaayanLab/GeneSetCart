@@ -16,7 +16,7 @@
 
 | http code     | content-type                      | response                                                            |
 |---------------|-----------------------------------|---------------------------------------------------------------------|
-| `200`         | text/plain;charset=UTF-8        | unique id of newly created gene set e.g clu1gfzj6003212xxhzuw8617   |
+| `200`         | application/json                  |  {"session_id":"clu1gfzj6003212xxhzuw8617"} unique id of newly created gene set   |
 | `500`         | application/json                | {"code":"500","message":"Error processing request"}              |
 
 <br />
@@ -37,7 +37,7 @@ response = requests.post(G2SG_URL, json = payload)
 if not response.ok:
     raise Exception('Error analyzing gene list')
 
-session_id = json.loads(response.text)
-geneset_link = 'https://g2sg.cfde.cloud/assemble/%s' % session_id
+session_id = response.json()['session_id']
+geneset_link = 'https://g2sg.cfde.cloud/analyze/%s' % session_id
 print(geneset_link) # e.g: https://g2sg.cfde.cloud/assemble/clu1gfzj6003212xxhzuw8617
 ```

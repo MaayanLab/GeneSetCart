@@ -28,7 +28,7 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                         }
                     />
                     <StyledAccordionComponent
-                        heading="CFDE GMT Crossing: GTEx Aging Signatures with MoTrPAC Exercise"
+                        heading="CFDE GMT Crossing: GTEx Aging Signatures vs MoTrPAC Exercise Gene Sets"
                         content={
                             <UseCaseContent description={`By crossing the aging signatures created from GTEx with MoTrPAC Rat Endurance Exercise Training gene sets, 
                             we can investigate the possible genes that could be implicated in both aging and exercise. We find that in the crossing pairs with the

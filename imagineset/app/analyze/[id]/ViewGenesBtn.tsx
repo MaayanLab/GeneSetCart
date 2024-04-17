@@ -208,7 +208,7 @@ export function SplitButton({ row }: {
         } else if (selectedButton  === 'CFDE GSE') {
             const genes = row.genes.map((gene) => gene.gene_symbol)
             const newSetName = row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION')
-            getEnrichrShortId(newSetName, genes).then((userListId) => window.open(`https://cfde-gskg.dev.maayanlab.cloud/?q={%22min_lib%22:1,%22libraries%22:[{%22name%22:%22LINCS_L1000_Chem_Pert_Consensus_Sigs%22,%22limit%22:5},{%22name%22:%22HuBMAP_ASCTplusB_augmented_2022%22,%22limit%22:5}],%22userListId%22:%22${userListId}%22,%22search%22:true}`, "_blank"))
+            getEnrichrShortId(newSetName, genes).then((userListId) => window.open(`https://gse.cfde.cloud/?q={%22min_lib%22:1,%22libraries%22:[{%22name%22:%22LINCS_L1000_Chem_Pert_Consensus_Sigs%22,%22limit%22:5},{%22name%22:%22HuBMAP_ASCTplusB_augmented_2022%22,%22limit%22:5}],%22userListId%22:%22${userListId}%22,%22search%22:true}`, "_blank"))
         }
     };
 

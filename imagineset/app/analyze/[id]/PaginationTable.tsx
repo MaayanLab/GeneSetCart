@@ -85,8 +85,8 @@ export default function PaginatedTable({ rows }: {
                 </TableBody>
                 <TableFooter>
                     <TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
                         <TablePagination
-                            sx={{width: '100%'}}
                             component="div"
                             count={rows.length}
                             page={page}
@@ -95,6 +95,7 @@ export default function PaginatedTable({ rows }: {
                             onRowsPerPageChange={handleChangeRowsPerPage}
                             rowsPerPageOptions={[5, 10, 25, 50]}
                         />
+                        </TableCell>
                     </TableRow>
                 </TableFooter>
             </Table>

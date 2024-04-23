@@ -11,6 +11,10 @@ import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
 import numpy as np
+from clustergrammer import Network
+from scipy.cluster.hierarchy import linkage, dendrogram
+from collections import defaultdict
+
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -104,6 +108,41 @@ def createHeatmap():
     img.close()
     plt.close()
     return svg_data
+
+
+def get_cluster_classes(den, label='ivl'):
+    cluster_idxs = defaultdict(list)
+    for c, pi in zip(den['color_list'], den['icoord']):
+        for leg in pi[1:3]:
+            i = (leg - 5.0) / 10.0
+            if abs(i - int(i)) < 1e-5:
+                cluster_idxs[c].append(int(i))
+
+    cluster_classes = {}
+    for c, l in cluster_idxs.items():
+        i_l = [den[label][i] for i in l]
+        cluster_classes[c] = i_l
+    return cluster_classes
+
+@app.route('/api/getClusteredHeatmap', methods=['POST'])
+def createClusteredHeatmap():
+    data = request.get_json()
+    genesets_dict = data['genesets_dict']
+    jindex_arrays = jaccard_similarity_multiple(genesets_dict)
+    geneset_strings = []
+    for term, geneset in genesets_dict.items():
+        geneset_string= str(geneset).replace(',', ' ')
+        geneset_strings.append(geneset_string)
+    # create object
+    tfidf = TfidfVectorizer(max_df=1.0, min_df=1)
+    # get tf-df values
+    X = tfidf.fit_transform(geneset_strings)
+    # link = linkage(X.toarray(), metric='correlation', method='average')
+    link = linkage(jindex_arrays, metric='correlation', method='average')
+    den = dendrogram(link, labels=list(genesets_dict.keys()), no_plot=True)
+    # get clusters
+    clustered_classes = get_cluster_classes(den)
+    return {'clustered_classes': clustered_classes}
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True, threading=True)

@@ -10,9 +10,10 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
         visualization: string,
         umapOptions: UMAPOptionsType,
         setUmapOptions: React.Dispatch<React.SetStateAction<UMAPOptionsType>>,
-        heatmapOptions: { diagonal: boolean; },
+        heatmapOptions: { diagonal: boolean; interactive: boolean },
         setHeatmapOptions: React.Dispatch<React.SetStateAction<{
             diagonal: boolean;
+            interactive: boolean;
         }>>
     }) {
     const [switchChecked, setSwitchChecked] = React.useState(false)
@@ -149,18 +150,30 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
     if (visualization === 'Heatmap') {
         return (
             <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
-            <FormControlLabel
-                label="Mask Diagonal"
-                control={
-                    <Checkbox
-                        checked={!heatmapOptions.diagonal}
-                        onChange={(evt) => {
-                            setHeatmapOptions({diagonal: !heatmapOptions.diagonal })
-                        }
-                        }
-                    />
-                }
-            />
+                <FormControlLabel
+                    label="Mask Diagonal"
+                    control={
+                        <Checkbox
+                            checked={!heatmapOptions.diagonal}
+                            onChange={(evt) => {
+                                setHeatmapOptions({ diagonal: !heatmapOptions.diagonal, interactive: heatmapOptions.interactive })
+                            }
+                            }
+                        />
+                    }
+                />
+                <FormControlLabel
+                    label="Interative"
+                    control={
+                <Switch
+                    color='secondary'
+                    checked={heatmapOptions.interactive}
+                    onChange={(evt) => {
+                        setHeatmapOptions({ diagonal: heatmapOptions.diagonal, interactive: !heatmapOptions.interactive, })
+                    }}
+                />
+                    }
+                />
             </Stack>
         )
     }

@@ -15,3 +15,13 @@ export function UseCaseContent({ description, launchLink }: { description: strin
         </Box>
     )
 }
+
+export function UseCaseContent2({ description, launchLink }: { description: React.ReactNode, launchLink: string }) {
+    return (
+        <Box sx={{ p: 1, m: 1, display: 'block', justifyContent: 'center' }}>
+            <Typography style={{ textAlign: 'left' }} variant='body1' sx={{ fontWeight: 'bold', borderBottom: 1 }}>Description</Typography>
+                {description}
+            <Button color='secondary' size='large' variant="contained" onClick={() => window.open(launchLink, '_blank')}> <LaunchIcon /> &nbsp; LAUNCH </Button>
+        </Box>
+    )
+}

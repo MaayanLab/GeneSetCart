@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import * as d3 from "d3";
 import { InteractionData } from "./Heatmap";
+import { OverlapSelection } from "@/app/visualize/[id]/VisualizeLayout";
 
 const MARGIN = { top: 10, right: 10, bottom: 30, left: 30 };
 
@@ -10,8 +11,9 @@ type RendererProps = {
   height: number;
   data: { x: string; y: string; value: number, overlap: string[] }[];
   setHoveredCell: (hoveredCell: InteractionData | null) => void;
-  setOverlap: React.Dispatch<React.SetStateAction<string[]>>;
+  setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
   colorScale: d3.ScaleLinear<string, string, never>;
+  clusterClasses: { [key: string]: number };
 };
 
 
@@ -21,8 +23,8 @@ export const Renderer = ({
   data,
   setOverlap,
   setHoveredCell,
-
-  colorScale
+  colorScale,
+  clusterClasses
 }: RendererProps) => {
   // The bounds (=area inside the axis) is calculated by substracting the margins
   const boundsWidth = width - MARGIN.right - MARGIN.left;
@@ -49,10 +51,6 @@ export const Renderer = ({
       .padding(0.01);
   }, [data, height]);
 
-//   var colorScale = d3
-//     .scaleSequential()
-//     .interpolator(d3.interpolateInferno)
-//     .domain([min, max]);
 
   // Build the rectangles
   const allShapes = data.map((d, i) => {
@@ -63,33 +61,33 @@ export const Renderer = ({
       return;
     }
 
-    if( d.x === d.y) {
-        return (
-            <rect
-              key={i}
-              r={4}
-              x={xScale(d.x)}
-              y={yScale(d.y)}
-              width={xScale.bandwidth()}
-              height={yScale.bandwidth()}
-              opacity={1}
-              fill={'gray'}
-              // rx={5}
-              stroke={"white"}
-              onMouseEnter={(e) => {
-                setHoveredCell({
-                  xLabel: "Gene Set " + d.x,
-                  yLabel: "Gene Set " + d.y,
-                  xPos: x + xScale.bandwidth() + MARGIN.left,
-                  yPos: y + xScale.bandwidth() / 2 + MARGIN.top,
-                  value: Math.round(d.value * 100) / 100,
-                  overlap: d.overlap
-                });
-              }}
-              onMouseLeave={() => setHoveredCell(null)}
-              cursor="pointer"
-            />
-          );
+    if (d.x === d.y) {
+      return (
+        <rect
+          key={i}
+          r={4}
+          x={xScale(d.x)}
+          y={yScale(d.y)}
+          width={xScale.bandwidth()}
+          height={yScale.bandwidth()}
+          opacity={1}
+          fill={'gray'}
+          // rx={5}
+          stroke={"white"}
+          onMouseEnter={(e) => {
+            setHoveredCell({
+              xLabel: "Gene Set " + d.x,
+              yLabel: "Gene Set " + d.y,
+              xPos: x + xScale.bandwidth() + MARGIN.left,
+              yPos: y + xScale.bandwidth() / 2 + MARGIN.top,
+              value: Math.round(d.value * 100) / 100,
+              overlap: d.overlap
+            });
+          }}
+          onMouseLeave={() => setHoveredCell(null)}
+          cursor="pointer"
+        />
+      );
     }
 
     return (
@@ -115,7 +113,7 @@ export const Renderer = ({
           });
         }}
         onMouseLeave={() => setHoveredCell(null)}
-        onMouseDown={() => setOverlap(d.overlap)}
+        onMouseDown={() => setOverlap({ name: d.x + ',' + d.y, overlapGenes: d.overlap })}
         cursor="pointer"
       />
     );
@@ -163,6 +161,42 @@ export const Renderer = ({
     );
   });
 
+
+  const allSubgroups = Object.keys(clusterClasses);
+  // Data Wrangling: stack the data
+  const stackSeries = d3.stack().keys(allSubgroups).order(d3.stackOrderNone);
+  //.offset(d3.stackOffsetNone);
+  const series = stackSeries([clusterClasses]);
+  // Y axis
+  let barMax = 0
+  Object.values(clusterClasses).forEach((item) => barMax += item)
+  const yScaleBar = useMemo(() => {
+    return d3
+      .scaleLinear()
+      .domain([0, barMax])
+      .range([boundsHeight, 0]);
+  }, [data, height]);
+
+  const rectangles = series.map((subgroup, i) => {
+    return (
+      <g key={i}>
+        {subgroup.map((group, j) => {
+          return (
+            <rect
+              key={j}
+              x={1}
+              y={yScaleBar(group[1])}
+              height={yScaleBar(group[0]) - yScaleBar(group[1])}
+              width={xScale.bandwidth()}
+              opacity={0.5} 
+              stroke={"white"}
+            ></rect>
+          );
+        })}
+      </g>
+    );
+  });
+
   return (
     <svg width={width} height={height} id='svg'>
       <g
@@ -173,6 +207,13 @@ export const Renderer = ({
         {allShapes}
         {xLabels}
         {yLabels}
+
+      </g>
+      <g
+        width={15}
+        height={boundsHeight}
+        transform={`translate(${[boundsWidth+ MARGIN.left, MARGIN.top].join(",")})`}>
+        {rectangles}
       </g>
     </svg>
   );

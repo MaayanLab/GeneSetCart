@@ -11,7 +11,6 @@ import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
 import numpy as np
-from clustergrammer import Network
 from scipy.cluster.hierarchy import linkage, dendrogram, distance
 from collections import defaultdict
 

@@ -13,7 +13,7 @@ export default function About({ params }: { params: { id: string } }) {
             <Container>
                 <Typography variant="h3" color="secondary.dark" className='p-5'>ABOUT G2SG</Typography>
                 <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                To facilitate data integration, discovery, and hypothesis generation across diverse Common Fund programs' datasets, 
+                To facilitate data integration, discovery, and hypothesis generation across diverse Common Fund programs&apos; datasets, 
                 highly processed data can be converted into gene-, metabolite- and drug-set libraries. Such abstracted versions of 
                 the data facilitate data integration and discovery. Get-Gene-Set-Go is an interactive web-based application that 
                 enables users to fetch gene sets from various Common Fund programs data sources, augment these sets with gene-gene 

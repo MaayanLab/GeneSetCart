@@ -340,7 +340,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                         style={{
                             fontSize: "10px",
                             textAnchor: "middle",
-                            transform: `translate(0px, 10px)`,
+                            transform: `translate(0px, 10px) rotate(45deg)`,
                         }}
                     >
                         {value}

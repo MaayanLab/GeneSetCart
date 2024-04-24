@@ -9,6 +9,7 @@ import Header from '@/components/header/Header';
 import { shallowCopy } from '@/app/assemble/[id]/page';
 
 export default async function VisualizePage({ params }: { params: { id: string } }) {
+    const session = await getServerSession(authOptions)
     // if a public session created by a public user go there: 
     const anonymousUserSession = await prisma.pipelineSession.findFirst({
         where: {
@@ -25,23 +26,36 @@ export default async function VisualizePage({ params }: { params: { id: string }
         }
     })
     if (anonymousUserSession) {
-        return (
-            <>
-                <Grid item>
-                    <Header sessionId={params.id} />
-                </Grid>
-                <Container>
-                    <ColorToggleButton sessionId={params.id} />
-                    <Container sx={{ mb: 5 }}>
-                        <Typography variant="h3" color="secondary.dark" className='p-5'>VISUALIZE YOUR GENE SETS</Typography>
-                        <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                            Visualize the overlap between your gene sets with Venn, Supervenn, UpSet, Hierarchically-Clustered Heatmaps and UMAP plots.
-                        </Typography>
-                        <VisualizeLayout sessionInfo={anonymousUserSession} sessionId={params.id} />
+        if (!session) {
+            return (
+                <>
+                    <Grid item>
+                        <Header sessionId={params.id} />
+                    </Grid>
+                    <Container>
+                        <ColorToggleButton sessionId={params.id} />
+                        <Container sx={{ mb: 5 }}>
+                            <Typography variant="h3" color="secondary.dark" className='p-5'>VISUALIZE YOUR GENE SETS</Typography>
+                            <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
+                                Visualize the overlap between your gene sets with Venn, Supervenn, UpSet, Hierarchically-Clustered Heatmaps and UMAP plots.
+                            </Typography>
+                            <VisualizeLayout sessionInfo={anonymousUserSession} sessionId={params.id} />
+                        </Container>
                     </Container>
-                </Container>
-            </>
-        )
+                </>
+            )
+        } else {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: session?.user.id
+                },
+                include: {
+                    pipelineSessions: true
+                }
+            })
+            if (user === null) return redirect(`/api/auth/signin?callbackUrl=/visualize/${params.id}`)
+            await shallowCopy(user, anonymousUserSession, 'visualize', false)
+        }
     }
 
     // else if created by a user account 
@@ -60,7 +74,6 @@ export default async function VisualizePage({ params }: { params: { id: string }
         }
     })
     // if public session created by another user but current user is not logged in shallow copy to public user account
-    const session = await getServerSession(authOptions)
     if (!session) {
         const anonymousUserId = process.env.PUBLIC_USER_ID
         const anonymousUser = await prisma.user.upsert({

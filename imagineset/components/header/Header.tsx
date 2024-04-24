@@ -2,24 +2,39 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { authOptions } from '@/lib/auth/authOptions'
-import { Session, getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Container from '@mui/material/Container'
-import { Logo } from '../styled/Logo'
 import UserComponent from '../misc/LoginComponents/UserComponent'
-import { headers } from 'next/headers';
 import prisma from '@/lib/prisma'
 import CartDrawer from './CartDrawer'
 import { revalidatePath } from 'next/cache'
 import GMTHeader, { CurrentSession } from './GMTHeader'
-// import { AppTitle } from './AppTitle'
 import dynamic from 'next/dynamic'
+import { ElevatedIconButton } from '../styled/Buttons'
+import { Button } from '@mui/material'
+import g2sgLogo from "@/public/img/g2sg-logo-nbg.png"
 
-const AppTitle =  dynamic(() => import("./AppTitle"), { ssr: false, loading: () => <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" /> })
+
+const AppTitle = dynamic(() => import("./AppTitle"), {
+    ssr: false, loading: () => <Button className='flex items-center space-x-3' href='/'>
+        <div>
+            <ElevatedIconButton
+                aria-label="menu"
+                sx={{ width: 35, height: 35 }}
+            >
+                <Image style={{ padding: 2, objectFit: "contain" }} fill={true} alt="cfde-logo" src={g2sgLogo} />
+            </ElevatedIconButton>
+        </div>
+        <div>
+            <Typography variant='cfde' color={'secondary'}>{'Get-Gene-Set-Go'}</Typography>
+        </div>
+    </Button>
+})
 
 
 
@@ -89,11 +104,11 @@ export default async function Header({ sessionId }: { sessionId: string }) {
         return (
             <Container maxWidth="lg">
                 <AppBar position="static" sx={{ color: "#000" }}>
-                <Toolbar>
+                    <Toolbar>
                         <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
                             <Grid item>
                                 {/* <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" /> */}
-                                <AppTitle sessionId={sessionId}/>
+                                <AppTitle sessionId={sessionId} sessionInfo={sessionInfo} />
                             </Grid>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
@@ -148,7 +163,7 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                         <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
                             <Grid item>
                                 {/* <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" /> */}
-                                <AppTitle sessionId={sessionId}/>
+                                <AppTitle sessionId={sessionId} sessionInfo={null} />
                             </Grid>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>

@@ -188,7 +188,7 @@ export const Renderer = ({
               y={yScaleBar(group[1])}
               height={yScaleBar(group[0]) - yScaleBar(group[1])}
               width={xScale.bandwidth()}
-              opacity={0.5} 
+              opacity={0.5}
               stroke={"white"}
             ></rect>
           );
@@ -212,7 +212,7 @@ export const Renderer = ({
       <g
         width={15}
         height={boundsHeight}
-        transform={`translate(${[boundsWidth+ MARGIN.left, MARGIN.top].join(",")})`}>
+        transform={`translate(${[boundsWidth + MARGIN.left, MARGIN.top].join(",")})`}>
         {rectangles}
       </g>
     </svg>

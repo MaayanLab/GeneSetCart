@@ -12,6 +12,7 @@ import { shallowCopy } from '@/app/assemble/[id]/page';
 
 export default async function AnalyzePage({ params }: { params: { id: string } }) {
     const PaginatedTable = dynamic(() => import("./PaginationTable"), { ssr: false })
+    const session = await getServerSession(authOptions)
 
     // if a public session created by a public user go there: 
     const anonymousUserSession = await prisma.pipelineSession.findFirst({
@@ -30,23 +31,36 @@ export default async function AnalyzePage({ params }: { params: { id: string } }
     })
     if (anonymousUserSession) {
         const rows = anonymousUserSession ? anonymousUserSession.gene_sets : []
-        return (
-            <>
-            <Grid item>
-                <Header sessionId={params.id} />
-            </Grid>
-            <Container>
-                <ColorToggleButton sessionId={params.id} />
-                <Container sx={{ mb: 5 }}>
-                    <Typography variant="h3" color="secondary.dark" sx={{mb: 2, mt: 2}}>ANALYZE YOUR GENE SETS</Typography>
-                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3}}>
-                        Analyze your gene sets by sending them to Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
-                    </Typography>
-                    <PaginatedTable rows={rows} />
+        if (!session) {
+            return (
+                <>
+                <Grid item>
+                    <Header sessionId={params.id} />
+                </Grid>
+                <Container>
+                    <ColorToggleButton sessionId={params.id} />
+                    <Container sx={{ mb: 5 }}>
+                        <Typography variant="h3" color="secondary.dark" sx={{mb: 2, mt: 2}}>ANALYZE YOUR GENE SETS</Typography>
+                        <Typography variant="subtitle1" color="#666666" sx={{ mb: 3}}>
+                            Analyze your gene sets by sending them to Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
+                        </Typography>
+                        <PaginatedTable rows={rows} />
+                    </Container>
                 </Container>
-            </Container>
-        </>
-        )
+            </>
+            )
+        } else {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: session?.user.id
+                },
+                include: {
+                    pipelineSessions: true
+                }
+            })
+            if (user === null) return redirect(`/api/auth/signin?callbackUrl=/analyze/${params.id}`)
+            await shallowCopy(user, anonymousUserSession, 'analyze', false)
+        }
     }
 
     // else if created by a user account 
@@ -65,7 +79,6 @@ export default async function AnalyzePage({ params }: { params: { id: string } }
         }
     })
     // if public session created by another user but current user is not logged in shallow copy to public user account
-    const session = await getServerSession(authOptions)
     if (!session) {
         const anonymousUserId = process.env.PUBLIC_USER_ID
         const anonymousUser = await prisma.user.upsert({

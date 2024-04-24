@@ -59,9 +59,9 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
                     })
                     setClusteredGroups(yGroups)
 
-                    const clusterCount : {[key: string]: number} = {}
+                    const clusterCount: { [key: string]: number } = {}
                     Object.keys(clusteredClasses).forEach((cluster: any) => {
-                            clusterCount[cluster] = clusteredClasses[cluster].length
+                        clusterCount[cluster] = clusteredClasses[cluster].length
                     })
                     setClusteredClassesCount(clusterCount)
                 } else {
@@ -75,10 +75,10 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
             const items = Object.keys(clusteredGroups).map(
                 (key) => { return [key, clusteredGroups[key]] });
             items.sort(
-                (first: string[], second: string[]) => { 
+                (first: string[], second: string[]) => {
                     if (first[1] > second[1]) {
                         return 1
-                    }  if (first[1] < second[1]) {
+                    } if (first[1] < second[1]) {
                         return -1
                     } else {
                         return 0
@@ -87,7 +87,7 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
             );
             const keys = items.map(
                 (e) => { return e[0] });
-            const sortedLegendSets = legendSelectedSets.sort((a,b) => {
+            const sortedLegendSets = legendSelectedSets.sort((a, b) => {
                 if (keys.indexOf(a.alphabet) > keys.indexOf(b.alphabet)) {
                     return 1
                 } else if (keys.indexOf(a.alphabet) < keys.indexOf(b.alphabet)) {
@@ -127,7 +127,7 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
         .scaleSequential()
         .interpolator(d3.interpolateViridis)
         .domain([0, max])
-        // .range(["lightblue", "purple"]);
+    // .range(["lightblue", "purple"]);
 
     return (
         <div style={{ position: "relative" }}>

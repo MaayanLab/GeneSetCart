@@ -191,7 +191,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
 
     const legendSelectedSets = React.useMemo(() => {
         setVisualization('')
-        setOverlap({name: '', overlapGenes: []})
+        setOverlap({ name: '', overlapGenes: [] })
         if ((checkedSets !== null) && (visType !== null)) {
             setVisualization(visType)
         }
@@ -228,7 +228,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
         } else if (visualization === 'UpSet') {
             const newOverlapName = overlapSelection.split('').map((selection) => legendSelectedSets.find((item) => item.alphabet === selection)?.name).join(' ∩ ')
             return newOverlapName
-        } 
+        }
         else if (visualization === 'Heatmap') {
             const newOverlapName = overlapSelection.split(',').map((selection) => legendSelectedSets.find((item) => item.alphabet === selection)?.name).join(' ∩ ')
             return newOverlapName
@@ -276,7 +276,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                     <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
                         <Tooltip title={"Can visualize for number of selected sets between 0 and 6 "}>
                             <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({name: '', overlapGenes: []}); setVisualization('Venn')}} disabled={!(checked.length < 6 && checked.length > 0)}>
+                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Venn') }} disabled={!(checked.length < 6 && checked.length > 0)}>
                                     <Image
                                         src={vennIcon}
                                         fill
@@ -288,7 +288,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                         </Tooltip>
                         <Tooltip title={"Can visualize for number of selected sets between 0 and 11 "}>
                             <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({name: '', overlapGenes: []}); setVisualization('SuperVenn')}} disabled={!(checked.length < 11 && checked.length > 0)}>
+                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('SuperVenn') }} disabled={!(checked.length < 11 && checked.length > 0)}>
                                     <Image
                                         src={superVennIcon}
                                         fill
@@ -300,7 +300,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                         </Tooltip>
                         <Tooltip title={"Can visualize for number of selected sets between 0 and 11 "}>
                             <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({name: '', overlapGenes: []}); setVisualization('UpSet')}} disabled={!(checked.length < 11 && checked.length > 0)}>
+                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('UpSet') }} disabled={!(checked.length < 11 && checked.length > 0)}>
                                     <Image
                                         src={upsetIconAlt}
                                         fill
@@ -312,7 +312,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                         </Tooltip>
                         <Tooltip title={"Can visualize for number of selected sets between 1 and 39 "}>
                             <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({name: '', overlapGenes: []}); setVisualization('Heatmap')}} disabled={!(checked.length > 1 && checked.length < 39)}>
+                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Heatmap') }} disabled={!(checked.length > 1 && checked.length < 39)}>
                                     <Image
                                         src={heatmapIcon}
                                         fill
@@ -324,7 +324,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                         </Tooltip>
                         <Tooltip title={"Can visualize for number of selected sets greater than 5 "}>
                             <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({name: '', overlapGenes: []}); setVisualization('UMAP')}} disabled={!(checked.length > 5)}>
+                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('UMAP') }} disabled={!(checked.length > 5)}>
                                     <Image
                                         src={umapIcon}
                                         fill
@@ -340,7 +340,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
                                 <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadPNG('visualization') }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn') } else { downloadSVG() } }} disabled={(visualization === 'SuperVenn')}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn') } else { downloadSVG() } }} disabled={(visualization === 'SuperVenn') || ((visualization === 'Heatmap'))}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
                                     <ClickAwayListener onClickAway={handleTooltipClose}>
                                         <div>

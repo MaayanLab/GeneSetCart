@@ -163,7 +163,7 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
                     }
                 />
                 <FormControlLabel
-                    label="Interative"
+                    label="Interactive"
                     control={
                 <Switch
                     color='secondary'

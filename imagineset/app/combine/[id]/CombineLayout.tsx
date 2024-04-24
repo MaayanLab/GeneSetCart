@@ -98,7 +98,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
         const genes = Object.keys(occurrences).filter((gene) => occurrences[gene] >= consensusNum)
 
         setDisplayedGenes(genes)
-        setGeneratedSetName('Consenus n=' + consensusNum + ' (' + genesetNames.join(' ∩ ') + ')')
+        setGeneratedSetName('Consensus n=' + consensusNum + ' (' + genesetNames.join(' ∩ ') + ')')
     }
 
     const handleAddToSets = React.useCallback(() => {

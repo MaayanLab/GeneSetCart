@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 type ColorLegendProps = {
   height: number;
   width: number;
-  colorScale: d3.ScaleLinear<string, string, never>;
+  colorScale: d3.ScaleSequential<string, never>;
   interactionData: InteractionData | null;
 };
 

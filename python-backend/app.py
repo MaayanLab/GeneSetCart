@@ -12,7 +12,7 @@ matplotlib.use('agg')
 from matplotlib import pyplot as plt
 import numpy as np
 from clustergrammer import Network
-from scipy.cluster.hierarchy import linkage, dendrogram
+from scipy.cluster.hierarchy import linkage, dendrogram, distance
 from collections import defaultdict
 
 
@@ -79,26 +79,24 @@ def createHeatmap():
     genesets_dict = data['genesets_dict']
     display_diagonal= data['display-diagonal']
     jindex_arrays = jaccard_similarity_multiple(genesets_dict)
-    alphabet = ["A", "B","C", "D","E","F","G", "H","I", "J","K", "L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
-
-    if len(genesets_dict.keys()) > 26: 
-        jindex_df = pd.DataFrame(jindex_arrays, columns=range(len(genesets_dict))) 
-        jindex_df = jindex_df.rename_axis("Gene Sets", axis='index')
-        jindex_df = jindex_df.rename_axis("Gene Sets", axis='columns')
-    else: 
-        alphabet_columnns = [alphabet[ind] for ind, x in enumerate(list(genesets_dict.keys()))]
-        jindex_df = pd.DataFrame(jindex_arrays, columns=alphabet_columnns)
-        jindex_df = jindex_df.set_axis([alphabet_columnns], axis='index')
-        jindex_df = jindex_df.rename_axis("Gene Sets", axis='index')
-        jindex_df = jindex_df.rename_axis("Gene Sets", axis='columns')
+    geneset_names = list(genesets_dict.keys())
+    jindex_df = pd.DataFrame(jindex_arrays, columns=geneset_names) 
+    jindex_df = jindex_df.set_axis(geneset_names, axis='index')
+    jindex_df = jindex_df.rename_axis("Gene Sets", axis='index')
+    jindex_df = jindex_df.rename_axis("Gene Sets", axis='columns')
     a = np.zeros((jindex_df.shape[0], jindex_df.shape[1]), int)
+    correlations_array = np.asarray(jindex_df)
+    row_linkage = linkage(
+        distance.pdist(correlations_array), method='average')
+    col_linkage = linkage(
+        distance.pdist(correlations_array.T), method='average')
     if display_diagonal: 
-        sns.clustermap(jindex_df, cmap='mako')
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap='viridis')
     else: 
         np.fill_diagonal(a, 5)
         mask = np.where(a == 5, True, False)
         plt.clf()
-        sns.clustermap(jindex_df, cmap='mako', mask=mask)
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap='viridis', mask=mask)
     # Save plot to a BytesIO object 
     img = io.BytesIO()
     plt.savefig(img, format='svg')
@@ -138,8 +136,8 @@ def createClusteredHeatmap():
     # get tf-df values
     X = tfidf.fit_transform(geneset_strings)
     # link = linkage(X.toarray(), metric='correlation', method='average')
-    link = linkage(jindex_arrays, metric='correlation', method='average')
-    den = dendrogram(link, labels=list(genesets_dict.keys()), no_plot=True)
+    link = linkage(jindex_arrays, metric='correlation', method='average', optimal_ordering=True)
+    den = dendrogram(link, labels=list(genesets_dict.keys()), no_plot=True, count_sort=True)
     # get clusters
     clustered_classes = get_cluster_classes(den)
     return {'clustered_classes': clustered_classes}

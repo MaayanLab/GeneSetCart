@@ -3,13 +3,15 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
-import { Collapse, Grid, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
+import { Collapse, Grid, Stack, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
 import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
 import { Badge } from '@mui/material'
 import { Gene, type GeneSet } from '@prisma/client';
 import { copyToClipboard } from '../assemble/fileUpload/DataTable';
 import { deleteGenesetByID, getGenesets } from './Header';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LaunchIcon from '@mui/icons-material/Launch';
+import { useParams } from 'next/navigation';
 
 
 export function CollapsibleButton({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
@@ -42,27 +44,27 @@ const GenesetInfo = ({ geneset }: {
         <>
             <TableRow>
                 <>
-                <TableCell>
-                    <Grid container direction='column' sx={{ width:250}}>
-                        <Grid item zeroMinWidth sx={{
-                        whiteSpace: 'normal',
-                        overflowWrap: 'anywhere', // Force text wrap
-                    }}>
-                            <Typography>{geneset.name}</Typography>
+                    <TableCell>
+                        <Grid container direction='column' sx={{ width: 250 }}>
+                            <Grid item zeroMinWidth sx={{
+                                whiteSpace: 'normal',
+                                overflowWrap: 'anywhere', // Force text wrap
+                            }}>
+                                <Typography>{geneset.name}</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography sx={{ fontSize: 12, color: 'gray' }}>
+                                    {'Added: ' + geneset.createdAt.toUTCString()}
+                                </Typography>
+                            </Grid>
                         </Grid>
-                        <Grid item>
-                            <Typography sx={{ fontSize: 12, color: 'gray' }}>
-                                {'Added: ' + geneset.createdAt.toUTCString()}
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                </TableCell>
-                <TableCell>
-                    <CollapsibleButton open={open} setOpen={setOpen} />
-                </TableCell>
-                <TableCell>
-                    <Button color='secondary' onClick={(evt) => deleteGeneset(geneset)}><DeleteIcon /></Button>
-                </TableCell>
+                    </TableCell>
+                    <TableCell>
+                        <CollapsibleButton open={open} setOpen={setOpen} />
+                    </TableCell>
+                    <TableCell>
+                        <Button color='secondary' onClick={(evt) => deleteGeneset(geneset)}><DeleteIcon /></Button>
+                    </TableCell>
                 </>
             </TableRow>
             <Collapse in={open} timeout="auto" unmountOnExit>
@@ -101,15 +103,24 @@ const DrawerInfo = ({ genesets }: {
         genes: Gene[];
     } & GeneSet)[] | null
 }) => {
+    const params = useParams()
+    const sessionId = params.id
     return (
         <Box
-            sx={{ width: 500}}
+            sx={{ width: 500 }}
             role="presentation"
         >
             <center>
                 <Typography variant='h4' sx={{ mt: 2, fontWeight: 'bold' }} color={'secondary'}> MY GENE SETS ({genesets?.length.toString()})</Typography>
             </center>
-            <Table sx={{ p: 2}}>
+            <Stack direction='row' sx={{ justifyContent: 'center', marginTop: 1 }} spacing={1}>
+                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/augment/${sessionId}`}> Augment &nbsp; <LaunchIcon fontSize={'small'} /></Button>
+                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/combine/${sessionId}`}>Combine  &nbsp; <LaunchIcon fontSize={'small'}/></Button>
+                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/visualize/${sessionId}`}>Visualize  &nbsp; <LaunchIcon fontSize={'small'}/></Button>
+                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/analyze/${sessionId}`}>Analyze  &nbsp; <LaunchIcon fontSize={'small'}/></Button>
+            </Stack>
+
+            <Table sx={{ p: 2 }}>
                 <TableBody>
                     {genesets?.map((geneset) =>
                         <GenesetInfo key={geneset.id} geneset={geneset} />

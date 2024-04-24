@@ -13,7 +13,7 @@ export function ClusteredHeatmap({ selectedSets, heatmapOptions }: {
     let genesetDict: { [key: string]: string[] } = {}
     selectedSets?.forEach((geneset) => {
         const genes = geneset.genes.map((gene) => gene.gene_symbol)
-        const genesetName = geneset.name
+        const genesetName = geneset.alphabet
         genesetDict[genesetName] = genes
     })
     

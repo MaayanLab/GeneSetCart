@@ -50,10 +50,11 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
     React.useEffect(() => {
         getClustermapClasses(legendSelectedSets)
             .then((clusteredClasses) => {
+                console.log(clusteredClasses)
                 if (legendSelectedSets) {
                     const yGroups: { [key: string]: string } = {}
                     legendSelectedSets.forEach((geneset, i) => {
-                        const cluster = Object.keys(clusteredClasses).filter((item) => clusteredClasses[item].includes(geneset.name))[0]
+                        const cluster = Object.keys(clusteredClasses).filter((item) => clusteredClasses[item].includes(geneset.alphabet))[0]
                         yGroups[geneset.alphabet] = cluster
                     })
                     setClusteredGroups(yGroups)
@@ -122,9 +123,11 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
     const max = d3.max(values) || 1;
 
     const colorScale = d3
-        .scaleLinear<string>()
+        // .scaleLinear<string>()
+        .scaleSequential()
+        .interpolator(d3.interpolateViridis)
         .domain([0, max])
-        .range(["lightblue", "purple"]);
+        // .range(["lightblue", "purple"]);
 
     return (
         <div style={{ position: "relative" }}>

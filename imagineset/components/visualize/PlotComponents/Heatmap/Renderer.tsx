@@ -12,7 +12,7 @@ type RendererProps = {
   data: { x: string; y: string; value: number, overlap: string[] }[];
   setHoveredCell: (hoveredCell: InteractionData | null) => void;
   setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
-  colorScale: d3.ScaleLinear<string, string, never>;
+  colorScale: d3.ScaleSequential<string, never>;
   clusterClasses: { [key: string]: number };
 };
 
@@ -65,15 +65,15 @@ export const Renderer = ({
       return (
         <rect
           key={i}
-          r={4}
+          // r={4}
           x={xScale(d.x)}
           y={yScale(d.y)}
           width={xScale.bandwidth()}
           height={yScale.bandwidth()}
           opacity={1}
-          fill={'gray'}
+          fill={'white'}
           // rx={5}
-          stroke={"white"}
+          // stroke={"white"}
           onMouseEnter={(e) => {
             setHoveredCell({
               xLabel: "Gene Set " + d.x,
@@ -93,7 +93,7 @@ export const Renderer = ({
     return (
       <rect
         key={i}
-        r={4}
+        // r={4}
         x={xScale(d.x)}
         y={yScale(d.y)}
         width={xScale.bandwidth()}
@@ -101,7 +101,7 @@ export const Renderer = ({
         opacity={1}
         fill={colorScale(d.value)}
         // rx={5}
-        stroke={"white"}
+        // stroke={"white"}
         onMouseEnter={(e) => {
           setHoveredCell({
             xLabel: "Gene set " + d.x,

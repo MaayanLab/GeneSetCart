@@ -40,7 +40,7 @@ export async function getClustermapClasses(legendSelectedSets: {
     let genesetDict: { [key: string]: string[] } = {}
     legendSelectedSets?.forEach((geneset) => {
         const genes = geneset.genes.map((gene) => gene.gene_symbol)
-        const genesetName = geneset.name
+        const genesetName = geneset.alphabet
         genesetDict[genesetName] = genes
     })
 

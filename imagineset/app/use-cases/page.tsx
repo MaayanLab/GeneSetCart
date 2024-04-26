@@ -46,7 +46,8 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                                     }}>
                                     {alexanderUseCase}
                                 </ReactMarkdown>}
-                                launchLink="https://g2sg.cfde.cloud/analyze/clv2phuo8002nvfpmq44m8iyf" />
+                                launchLink="https://g2sg.cfde.cloud/analyze/clve10831005o1p8osxg25ta5" /> //  public session in my account (so that users cant change it)
+                                // launchLink="https://g2sg.cfde.cloud/analyze/clv2phuo8002nvfpmq44m8iyf" />
                         }
                     />
                     <StyledAccordionComponent

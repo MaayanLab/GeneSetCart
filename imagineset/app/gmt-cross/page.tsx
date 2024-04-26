@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-export default async function GMTCross({ params }: { params: { id: string, share: string } }) {
+export default async function GMTCross({ params }: { params: { id: string } }) {
     const session = await getServerSession(authOptions)
     if (!session) {
         const anonymousUserId = process.env.PUBLIC_USER_ID

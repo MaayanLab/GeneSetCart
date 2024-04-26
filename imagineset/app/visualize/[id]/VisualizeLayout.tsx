@@ -421,9 +421,12 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
         }}>
             <ListSubheader>
                 My Gene Sets ({checked.length})
+                <Stack direction='row'>
+                    <Button color='secondary' onClick={() => setChecked(sessionInfo ? sessionInfo.gene_sets.map((geneset, i) => i) : [])}>Select All</Button>
+                    <Button color='secondary' onClick={() => setChecked([])}>Deselect All</Button>
+                </Stack>
             </ListSubheader>
-            <Button color='secondary' onClick={() => setChecked(sessionInfo ? sessionInfo.gene_sets.map((geneset, i) => i) : [])}>Select All</Button>
-            <Button color='secondary' onClick={() => setChecked([])}>Deselect All</Button>
+
             {sessionInfo?.gene_sets.map((geneset, i) => {
                 const labelId = `checkbox-list-label-${i}`;
                 if (legendIds.includes(geneset.id)) {

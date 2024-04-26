@@ -3,6 +3,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { MenuProps } from "@/app/combine/[id]/GeneSetCard";
 
 export const CFDELibraryOptions: { [key: string]: string } = {
     "LINCS L1000 CMAP Chemical Pertubation Consensus Signatures": 'LINCS',
@@ -36,6 +37,7 @@ export function GMTSelect({selectedLibs, setSelectedLibs, index, selectedDCCs, s
                 label="Common Fund GMT"
                 onChange={handleChange}
                 color="secondary"
+                MenuProps={MenuProps}
             >
                 {
                     Object.keys(CFDELibraryOptions).map((cfdeLib) =>

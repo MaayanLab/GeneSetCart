@@ -17,6 +17,7 @@ import { addToSessionSets, checkInSession } from '@/app/assemble/[id]/AssembleFu
 import CircularIndeterminate from '../../../components/misc/Loading';
 import Status from '../../../components/assemble/Status';
 import { addStatus } from '../../../components/assemble/fileUpload/SingleUpload';
+import { MenuProps } from '@/app/combine/[id]/GeneSetCard';
 
 export default function GenesetSelect({ sessionGenesets, selected, setSelected }: {
     sessionGenesets: {
@@ -43,6 +44,7 @@ export default function GenesetSelect({ sessionGenesets, selected, setSelected }
                     label="Gene Set"
                     onChange={handleChange}
                     color='secondary'
+                    MenuProps={MenuProps}
                 >
                     {sessionGenesets?.gene_sets.map((geneset, i) => {
                         return <MenuItem key={i} value={geneset.name}>{geneset.name}</MenuItem>

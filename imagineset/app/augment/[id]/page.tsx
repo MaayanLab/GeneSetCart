@@ -124,7 +124,7 @@ export default async function AugmentPage({ params }: { params: { id: string } }
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                         Augment your gene sets with co-expressed and co-mentioned genes
                     </Typography>
-                    <AugmentLayout sessionGenesets={anonymousUserSession} sessionId={params.id} />
+                    <AugmentLayout sessionGenesets={sessionInfo} sessionId={params.id} />
                 </Container>
             </Container>
         </>

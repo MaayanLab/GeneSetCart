@@ -68,6 +68,13 @@ export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, selecte
     )
 }
 
+export const MenuProps = {
+    sx: {
+      "&& .Mui-selected": {
+        backgroundColor: "#7187C3"
+      }
+    },
+}
 
 function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets, index }: {
     sessionGenesets: ({
@@ -118,6 +125,7 @@ function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets,
                         label="Gene Set"
                         onChange={handleChange}
                         color='secondary'
+                        MenuProps={MenuProps}
                     >
                         {sessionGenesets.map((geneset, i) => {
                             return <MenuItem key={i} value={geneset.name} disabled={selectedSets.map((selectedSet) => selectedSet.name).includes(geneset.name)}>{geneset.name}</MenuItem>

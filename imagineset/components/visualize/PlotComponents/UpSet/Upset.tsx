@@ -152,11 +152,12 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
     const margin = {
         top: 30,
         right: 0,
-        bottom: 350,
+        bottom: Math.max(250, 35 * soloSets.length),
         left: 50,
     };
     const width = (30 * data.length) + 100 + 60 + 200;
-    const height = 600;
+    // console.log(soloSets.length)
+    const height = Math.max(400, 60 * soloSets.length);
 
     // The bounds (=area inside the axis) is calculated by substracting the margins
     const boundsWidth = width - margin.right - margin.left;
@@ -194,7 +195,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
             />
             {/* Axis label*/}
             <text
-                x={(0 - margin.top) * 3}
+                x={(margin.bottom - height) / 2}
                 y={range[1] - margin.left}
                 textAnchor="middle"
                 dominantBaseline="middle"
@@ -274,7 +275,8 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
             fillColor = '#FFC000';
 
         } else {
-            fillColor = '#02577b';
+            // fillColor = '#02577b';
+            fillColor = '#000000';
         }
         return (
             <rect
@@ -362,7 +364,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
             fillColor = '#FFC000';
 
         } else {
-            fillColor = '#02577b';
+            fillColor = '#000000';
         }
         return (
             <rect
@@ -397,7 +399,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         return allSetNames.map((y, j) => {
             let fillColor
             if (x.setName.indexOf(y) !== -1) {
-                fillColor = '#02577b';
+                fillColor = '#000000';
             } else {
                 fillColor = 'silver';
             }
@@ -426,7 +428,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                     x2={i * (rad * 2.7)}
                     y1={allSetNames.indexOf(x.setName[0]) * (rad * 2.7)}
                     y2={allSetNames.indexOf(x.setName[x.setName.length - 1]) * (rad * 2.7)}
-                    stroke="#02577b"
+                    stroke="#000000"
                     strokeWidth={4}
                 />
             );

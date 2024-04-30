@@ -7,7 +7,7 @@ import { ColorLegend } from "./ColorLegend";
 import { COLOR_LEGEND_HEIGHT, THRESHOLDS } from "./Constants";
 import { Gene } from "@prisma/client";
 import { OverlapSelection } from "@/app/visualize/[id]/VisualizeLayout";
-import { getClustermap, getClustermapClasses } from "./getClustermap";
+import { getClustermapClasses } from "../../getImageData";
 
 // code adapted from https://www.react-graph-gallery.com/heatmap
 export type HeatmapProps = {

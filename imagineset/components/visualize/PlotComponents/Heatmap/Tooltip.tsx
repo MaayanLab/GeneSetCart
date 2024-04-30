@@ -1,4 +1,4 @@
-import { InteractionData } from "./Heatmap";
+import { InteractionData } from "./InteractiveHeatmap";
 import styles from "./tooltip.module.css";
 
 type TooltipProps = {

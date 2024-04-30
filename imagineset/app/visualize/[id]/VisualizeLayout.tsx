@@ -20,7 +20,7 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import html2canvas from 'html2canvas';
 import { UMAP } from '@/components/visualize/PlotComponents/Umap/Umap';
 import dynamic from 'next/dynamic'
-import { ClusteredHeatmap } from '@/components/visualize/PlotComponents/Heatmap/ClusteredHeatmap';
+import { ClusteredHeatmap } from '@/components/visualize/PlotComponents/Heatmap/StaticHeatmap';
 import { AdditionalOptions } from './AdditionalOptionsDisplay';
 const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), { ssr: false })
 import { useDebounce } from 'use-debounce';
@@ -31,7 +31,8 @@ import Status from '@/components/assemble/Status';
 import ShareIcon from '@mui/icons-material/Share';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { copyToClipboard } from '@/components/assemble/DCCFetch/CFDEDataTable';
-import { Heatmap } from '@/components/visualize/PlotComponents/Heatmap/Heatmap';
+import { Heatmap } from '@/components/visualize/PlotComponents/Heatmap/InteractiveHeatmap';
+import { getClustermap, getSuperVenn } from '@/components/visualize/getImageData';
 
 const scrollbarStyles = {
     'webkitAppearance': 'none',
@@ -44,9 +45,33 @@ const scrollbarThumb = {
     'WebkitBoxShadow': '0 0 1px rgba(255,255,255,.5)'
 }
 
+function downloadURI(uri: string, name: string) {
+    let element = document.createElement('a');
+    element.setAttribute('href', uri);
+    element.setAttribute('download', name);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
+
+
 const downloadLegend = (filename: string, text: string) => {
     downloadURI('data:text/plain;charset=utf-8,' + encodeURIComponent(text), filename)
 }
+
+
+function downloadPNG(divId: string) {
+    const div = document.getElementById(divId)
+    if (div) {
+        html2canvas(div).then(function (canvas: { toDataURL: (arg0: string) => any; }) {
+            let myImage = canvas.toDataURL("image/png");
+            downloadURI("data:" + myImage, "visualization.png");
+        }
+        );
+    }
+}
+
 
 const downloadSVG = () => {
     //get svg element.
@@ -68,28 +93,8 @@ const downloadSVG = () => {
     };
 }
 
-function downloadURI(uri: string, name: string) {
-    let element = document.createElement('a');
-    element.setAttribute('href', uri);
-    element.setAttribute('download', name);
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-}
 
-function downloadPNG(divId: string) {
-    const div = document.getElementById(divId)
-    if (div) {
-        html2canvas(div).then(function (canvas: { toDataURL: (arg0: string) => any; }) {
-            let myImage = canvas.toDataURL("image/png");
-            downloadURI("data:" + myImage, "visualization.png");
-        }
-        );
-    }
-}
-
-function downloadSVGHTML(divId: string) {
+function downloadSVGByDiv(divId: string) {
     const div = document.getElementById(divId)
     const svgEl = div?.firstChild
     if (svgEl) {
@@ -108,7 +113,6 @@ function downloadSVGHTML(divId: string) {
         downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), 'svg-visualization.svg')
     };
 }
-
 
 export const alphabet = [
     "A",
@@ -239,6 +243,36 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
         return ''
     }, [legendSelectedSets, visualization])
 
+    const downloadHeatmapSVG = React.useCallback(() =>  {
+        let genesetDict: { [key: string]: string[] } = {}
+        legendSelectedSets?.forEach((geneset) => {
+            const genes = geneset.genes.map((gene) => gene.gene_symbol)
+            const genesetName = geneset.alphabet
+            genesetDict[genesetName] = genes
+        })
+        getClustermap(genesetDict, heatmapOptions)
+        .then((heatmapImage) => {
+            const svgString = `data:image/svg+xml;utf8,${encodeURIComponent(heatmapImage)}`
+            downloadURI(svgString, 'svg-visualization.svg')
+        }).catch((err) => console.log(err))
+    }, [legendSelectedSets, heatmapOptions])
+
+    const downloadSuperVennSVG =  React.useCallback(() =>  {
+        let genesetDict: { [key: string]: string[] } = {}
+        legendSelectedSets?.forEach((geneset) => {
+            const genes = geneset.genes.map((gene) => gene.gene_symbol)
+            const genesetName = geneset.alphabet
+            genesetDict[genesetName] = genes
+        })
+        getSuperVenn(genesetDict)
+        .then((imgString) => {
+            console.log(imgString)
+            const svgString = `data:image/svg+xml;utf8,${encodeURIComponent(imgString)}`
+            downloadURI(svgString, 'svg-visualization.svg')
+        }).catch((err) => console.log(err))
+    }, [legendSelectedSets])
+
+
     return (
         <Grid container direction='row' spacing={1}>
             <Grid item xs={isMobile ? 12 : 3}>
@@ -340,7 +374,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
                                 <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadPNG('visualization') }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGHTML('venn') } else { downloadSVG() } }} disabled={(visualization === 'SuperVenn') || ((visualization === 'Heatmap'))}><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGByDiv('venn') } else if (visualization=== 'Heatmap') {downloadHeatmapSVG()} else if (visualization === 'SuperVenn') { downloadSuperVennSVG() } else { downloadSVG() } }} ><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
                                     <ClickAwayListener onClickAway={handleTooltipClose}>
                                         <div>

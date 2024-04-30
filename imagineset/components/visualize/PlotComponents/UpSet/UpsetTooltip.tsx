@@ -1,4 +1,4 @@
-import { InteractionData } from "../Heatmap/Heatmap";
+import { InteractionData } from "../Heatmap/InteractiveHeatmap";
 import styles from "../Heatmap/tooltip.module.css";
 
 export type UpsetInteractionData = {

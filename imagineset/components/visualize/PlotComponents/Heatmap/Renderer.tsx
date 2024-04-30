@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import * as d3 from "d3";
-import { InteractionData } from "./Heatmap";
+import { InteractionData } from "./InteractiveHeatmap";
 import { OverlapSelection } from "@/app/visualize/[id]/VisualizeLayout";
 
 const MARGIN = { top: 10, right: 10, bottom: 30, left: 30 };

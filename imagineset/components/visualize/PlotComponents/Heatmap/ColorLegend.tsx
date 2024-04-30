@@ -1,5 +1,5 @@
 import React from "react";
-import { InteractionData } from "./Heatmap";
+import { InteractionData } from "./InteractiveHeatmap";
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
 

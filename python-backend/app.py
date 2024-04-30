@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from scipy.cluster.hierarchy import linkage, dendrogram, distance
 from collections import defaultdict
+from supervenn import supervenn
 
 
 app = Flask(__name__)
@@ -140,6 +141,26 @@ def createClusteredHeatmap():
     # get clusters
     clustered_classes = get_cluster_classes(den)
     return {'clustered_classes': clustered_classes}
+
+@app.route('/api/get_supervenn', methods=['GET', 'POST']) 
+def get_supervenn():
+    if request.method == "POST":
+        data = request.get_json()
+        genesets_dict = data['genesets_dict']
+        geneset_names = list(genesets_dict.keys())
+        geneset_genes = list(genesets_dict.values())
+        geneset_genes = [set(genes) for genes in geneset_genes]
+        plt.clf()
+        supervenn(geneset_genes, geneset_names, side_plots=False, widths_minmax_ratio=0.1,
+        sets_ordering='minimize gaps', rotate_col_annotations=True, col_annotations_area_height=1.2)
+        # Save plot to a BytesIO object
+        img = io.BytesIO()
+        plt.savefig(img, format='svg')
+        img.seek(0)
+        # # Convert BytesIO object to base64 string
+        svg_data = img.getvalue().decode()
+        img.close()
+        return svg_data
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True, threading=True)

@@ -1,7 +1,7 @@
 import CircularIndeterminate from "@/components/misc/Loading";
 import { Gene, GeneSet } from "@prisma/client";
 import React from "react"
-import { getClustermap } from "./getClustermap";
+import { getClustermap } from "../../getImageData";
 
 export function ClusteredHeatmap({ selectedSets, heatmapOptions }: {
     selectedSets: ({

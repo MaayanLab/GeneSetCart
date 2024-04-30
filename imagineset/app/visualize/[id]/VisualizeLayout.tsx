@@ -274,7 +274,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             <Grid item xs={isMobile ? 12 : 9}>
                 <Stack direction='column' spacing={2} maxWidth={'100%'}>
                     <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
-                        <Tooltip title={"Can visualize for number of selected sets between 0 and 6 "}>
+                        <Tooltip title={"Can visualize 1 - 5 selected sets"}>
                             <div>
                                 <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Venn') }} disabled={!(checked.length < 6 && checked.length > 0)}>
                                     <Image
@@ -286,7 +286,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 </Button>
                             </div>
                         </Tooltip>
-                        <Tooltip title={"Can visualize for number of selected sets between 0 and 11 "}>
+                        <Tooltip title={"Can visualize 1 - 10 selected sets "}>
                             <div>
                                 <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('SuperVenn') }} disabled={!(checked.length < 11 && checked.length > 0)}>
                                     <Image
@@ -298,7 +298,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 </Button>
                             </div>
                         </Tooltip>
-                        <Tooltip title={"Can visualize for number of selected sets between 0 and 11 "}>
+                        <Tooltip title={"Can visualize 1 - 10 selected sets"}>
                             <div>
                                 <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('UpSet') }} disabled={!(checked.length < 11 && checked.length > 0)}>
                                     <Image
@@ -310,7 +310,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 </Button>
                             </div>
                         </Tooltip>
-                        <Tooltip title={"Can visualize for number of selected sets between 1 and 39 "}>
+                        <Tooltip title={"Can visualize 2 - 38 selected sets "}>
                             <div>
                                 <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Heatmap') }} disabled={!(checked.length > 1 && checked.length < 39)}>
                                     <Image
@@ -322,7 +322,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 </Button>
                             </div>
                         </Tooltip>
-                        <Tooltip title={"Can visualize for number of selected sets greater than 5 "}>
+                        <Tooltip title={"Can visualize > 5 selected sets "}>
                             <div>
                                 <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('UMAP') }} disabled={!(checked.length > 5)}>
                                     <Image

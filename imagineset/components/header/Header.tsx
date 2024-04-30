@@ -48,7 +48,10 @@ export async function getGenesets(sessionId: string) {
                 gene_sets: {
                     include: {
                         genes: true
-                    }
+                    },
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
                 }
             }
         })
@@ -76,7 +79,10 @@ export async function getSessionInfo(sessionId: string) {
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })
@@ -96,7 +102,10 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                 gene_sets: {
                     include: {
                         genes: true
-                    }
+                    },
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
                 }
             }
         })

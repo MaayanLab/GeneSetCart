@@ -22,7 +22,10 @@ export default async function VisualizePage(props: { params: { id: string }, sea
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })
@@ -70,7 +73,10 @@ export default async function VisualizePage(props: { params: { id: string }, sea
             gene_sets: {
                 include: {
                     genes: true
-                }
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })

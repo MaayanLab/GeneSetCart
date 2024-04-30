@@ -23,7 +23,10 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })
@@ -70,7 +73,10 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })

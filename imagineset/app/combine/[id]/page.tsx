@@ -24,7 +24,10 @@ export default async function CombinePage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })
@@ -72,7 +75,10 @@ export default async function CombinePage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })

@@ -23,7 +23,10 @@ export default async function AugmentPage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })
@@ -72,7 +75,10 @@ export default async function AugmentPage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })

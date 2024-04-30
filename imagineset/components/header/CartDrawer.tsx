@@ -179,7 +179,7 @@ export default function CartDrawer({ sessionInfo }: {
                 open={state}
                 onClose={toggleDrawer(false)}
             >
-                <DrawerInfo genesets={sessionGenesets ? sessionGenesets.sort((a, b) => a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0) : null} />
+                <DrawerInfo genesets={sessionGenesets ? sessionGenesets : null} />
             </Drawer>
         </div>
     );

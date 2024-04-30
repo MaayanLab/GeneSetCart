@@ -25,7 +25,10 @@ export default async function AssemblePage(props: { params: { id: string }, sear
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })
@@ -67,7 +70,10 @@ export default async function AssemblePage(props: { params: { id: string }, sear
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })

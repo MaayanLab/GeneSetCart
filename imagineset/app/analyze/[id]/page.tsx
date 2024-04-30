@@ -26,7 +26,10 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }
+                }, 
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })
@@ -75,7 +78,10 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
             }
         }
     })

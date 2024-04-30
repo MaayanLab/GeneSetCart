@@ -1,6 +1,5 @@
 'use client'
 import {
-  Box,
   Button, Container,
   Grid, Stack, TextField,
   Typography,
@@ -14,7 +13,6 @@ import React from "react";
 import { addToSessionSets, checkInSession, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
 import { LinearIndeterminate } from "../misc/Loading";
 import Status from "./Status";
-import { stat } from "fs";
 import { useParams } from "next/navigation";
 import { addStatus } from "./fileUpload/SingleUpload";
 import cache from "@/lib/cache";
@@ -98,12 +96,12 @@ export default function GeneshotSearch() {
   }, [])
 
   return (
-    <Container>
+    <Container maxWidth={false} sx={{width: '100%'}}>
       <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH GENE SETS FROM PUBMED</Typography>
-      <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-        Enter a search term to obtain all genes mentioned with that term in publications
+      <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 3 }}>
+        Enter a search term to obtain all genes mentioned with that term in publications according to GeneRIF
       </Typography>
-      <Stack direction='column' >
+      <Stack direction='column' width={'100%'} sx={{ ml: 3 }}> 
           {loading ? <LinearIndeterminate /> : <></>}
           <Search>
             <SearchIconWrapper>
@@ -147,7 +145,7 @@ export default function GeneshotSearch() {
           })
         }
         }>
-        <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center'>
+        <Grid direction='column' container item spacing={2} xs={isMobile ? 12 :5} justifyItems='center'>
           <Grid item>
             <TextField id="outlined-basic" required label="Gene Set Name" variant="outlined" name='name' />
           </Grid>
@@ -164,7 +162,7 @@ export default function GeneshotSearch() {
             />
           </Grid>
         </Grid>
-        <Grid direction='column' item container spacing={2} alignItems="center" justifyItems='center' xs={isMobile ? 12 : 6}>
+        <Grid direction='column' item container spacing={2} alignItems="center" justifyItems='center' xs={isMobile ? 12 : 5}>
           <Typography variant='body1' color='secondary' sx={{ mt: 2 }}> {foundGenes.length} genes</Typography>
           <Typography variant='body1' color='secondary'> {validGenes.length} valid genes found</Typography>
           <TextField

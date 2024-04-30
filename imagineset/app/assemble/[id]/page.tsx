@@ -7,48 +7,17 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Grid } from "@mui/material";
 import Header from "@/components/header/Header";
-import { addToSessionSetsGeneObj } from "./AssembleFunctions ";
-import { Gene, GeneSet, PipelineSession, User } from "@prisma/client";
-
-export async function shallowCopy(user: User,
-    sessionInfo:
-        (({
-            gene_sets: ({
-                genes: Gene[];
-            } & GeneSet)[]
-        } & PipelineSession | null)),
-    redirectPage: string,
-    anonUser: boolean
-) {
-    if (sessionInfo) {
-        if (sessionInfo.private === false) {
-            const sessionSets = sessionInfo.gene_sets // get gene sets of shared session
-            const newSession = await prisma.pipelineSession.create({
-                data: {
-                    user_id: user.id,
-                    private: !anonUser
-
-                },
-            })
-            await Promise.all(sessionSets.map(async (sessionGeneset) => await addToSessionSetsGeneObj(sessionGeneset.genes, newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : '', user)))
-            return redirect(`/${redirectPage}/${newSession.id}`)
-        } else {
-            return redirect('/') // redirect to homepage if session does not exist or is a private session
-        }
-    } else {
-        return redirect('/') // redirect to homepage if session does not exist or is a private session
-    }
-
-}
+import { shallowCopy } from "@/app/shallowcopy";
 
 
-export default async function AssemblePage({ params }: { params: { id: string } }) {
+export default async function AssemblePage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
+    const qs = props.searchParams
     const session = await getServerSession(authOptions)
 
     // if a public session created by a public user go there: 
     const anonymousUserSession = await prisma.pipelineSession.findFirst({
         where: {
-            id: params.id,
+            id: props.params.id,
             user_id: process.env.PUBLIC_USER_ID,
             private: false
         },
@@ -65,10 +34,10 @@ export default async function AssemblePage({ params }: { params: { id: string } 
             return (
                 <>
                     <Grid item>
-                        <Header sessionId={params.id} />
+                        <Header sessionId={props.params.id} />
                     </Grid>
                     <Container sx={{ mb: 4 }}>
-                        <ColorToggleButton sessionId={params.id} />
+                        <ColorToggleButton sessionId={props.params.id} />
                         <VerticalTabs />
                     </Container>
                 </>
@@ -82,8 +51,8 @@ export default async function AssemblePage({ params }: { params: { id: string } 
                     pipelineSessions: true
                 }
             })
-            if (user === null) return redirect(`/api/auth/signin?callbackUrl=/assemble/${params.id}`)
-            await shallowCopy(user, anonymousUserSession, 'assemble', false)
+            if (user === null) return redirect(`/api/auth/signin?callbackUrl=/assemble/${props.params.id}`)
+            await shallowCopy(user, anonymousUserSession, 'assemble', false, qs)
         }
     }
 
@@ -91,7 +60,7 @@ export default async function AssemblePage({ params }: { params: { id: string } 
     // get session information
     const sessionInfo = await prisma.pipelineSession.findFirst({
         where: {
-            id: params.id,
+            id: props.params.id,
             // private: false // session must be public
         },
         include: {
@@ -115,7 +84,7 @@ export default async function AssemblePage({ params }: { params: { id: string } 
                 name: 'Anonymous User',
             },
         })
-        await shallowCopy(anonymousUser, sessionInfo, 'assemble', true)
+        await shallowCopy(anonymousUser, sessionInfo, 'assemble', true, qs)
     } else { // if a public session but user is logged in then shallow copy to user's account
         const user = await prisma.user.findUnique({
             where: {
@@ -125,13 +94,13 @@ export default async function AssemblePage({ params }: { params: { id: string } 
                 pipelineSessions: true
             }
         })
-        if (user === null) return redirect(`/api/auth/signin?callbackUrl=/assemble/${params.id}`) // if user is not logged in redirect
+        if (user === null) return redirect(`/api/auth/signin?callbackUrl=/assemble/${props.params.id}`) // if user is not logged in redirect
         // get all users saved sessions
         const savedUserSessions = user.pipelineSessions.map((savedSession) => savedSession.id)
         // if session does not belong to currently logged in user then shallow copy session to user
-        if (!savedUserSessions.includes(params.id)) {
+        if (!savedUserSessions.includes(props.params.id)) {
             if (sessionInfo) { // if shared session exists
-                await shallowCopy(user, sessionInfo, 'assemble', false)
+                await shallowCopy(user, sessionInfo, 'assemble', false, qs)
             } else {
                 redirect('/') // redirect to home page because shared session does not exist
             }
@@ -142,10 +111,10 @@ export default async function AssemblePage({ params }: { params: { id: string } 
     return (
         <>
             <Grid item>
-                <Header sessionId={params.id} />
+                <Header sessionId={props.params.id} />
             </Grid>
             <Container sx={{ mb: 4 }}>
-                <ColorToggleButton sessionId={params.id} />
+                <ColorToggleButton sessionId={props.params.id} />
                 <VerticalTabs />
             </Container>
         </>

@@ -6,15 +6,16 @@ import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
-import { shallowCopy } from '@/app/assemble/[id]/page';
+import { shallowCopy } from '@/app/shallowcopy';
 
-export default async function GMTCross({ params }: { params: { id: string } }) {
+export default async function GMTCross(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
+    const qs = props.searchParams
     const session = await getServerSession(authOptions)
 
     // if a public session created by a public user go there: 
     const anonymousUserSession = await prisma.pipelineSession.findFirst({
         where: {
-            id: params.id,
+            id: props.params.id,
             user_id: process.env.PUBLIC_USER_ID,
             private: false
         },
@@ -31,7 +32,7 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
             return (
                 <>
                     <Grid item>
-                        <Header sessionId={params.id} />
+                        <Header sessionId={props.params.id} />
                     </Grid>
                     <Container>
                         <Container>
@@ -51,10 +52,10 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
                 },
                 include: {
                     pipelineSessions: true
-                }
+                } 
             })
-            if (user === null) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`)
-            await shallowCopy(user, anonymousUserSession, 'gmt-cross', false)
+            if (user === null) return redirect((qs.lib1 && qs.lib2) ? `/api/auth/signin?callbackUrl=/gmt-cross/${props.params.id}` : `/api/auth/signin?callbackUrl=/gmt-cross/`)
+            await shallowCopy(user, anonymousUserSession, 'gmt-cross', false, qs)
         }
     }
 
@@ -62,7 +63,7 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
     // get session information
     const sessionInfo = await prisma.pipelineSession.findFirst({
         where: {
-            id: params.id,
+            id: props.params.id,
             // private: false // session must be public
         },
         include: {
@@ -86,7 +87,7 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
                 name: 'Anonymous User',
             },
         })
-        await shallowCopy(anonymousUser, sessionInfo, 'gmt-cross', true)
+        await shallowCopy(anonymousUser, sessionInfo, 'gmt-cross', true, qs)
     } else { // if a public session but user is logged in then shallow copy to user's account
         const user = await prisma.user.findUnique({
             where: {
@@ -96,13 +97,13 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
                 pipelineSessions: true
             }
         })
-        if (user === null) return redirect(`/api/auth/signin?callbackUrl=/gmt-cross/${params.id}`) // if user is not logged in redirect
+        if (user === null) return redirect((qs.lib1 && qs.lib2) ? `/api/auth/signin?callbackUrl=/gmt-cross/${props.params.id}` : `/api/auth/signin?callbackUrl=/gmt-cross/`) // if user is not logged in redirect
         // get all users saved sessions
         const savedUserSessions = user.pipelineSessions.map((savedSession) => savedSession.id)
         // if session does not belong to currently logged in user then shallow copy session to user
-        if (!savedUserSessions.includes(params.id)) {
+        if (!savedUserSessions.includes(props.params.id)) {
             if (sessionInfo) { // if shared session exists
-                await shallowCopy(user, sessionInfo, 'gmt-cross', false)
+                await shallowCopy(user, sessionInfo, 'gmt-cross', false, qs)
             } else {
                 redirect('/') // redirect to home page because shared session does not exist
             }
@@ -113,7 +114,7 @@ export default async function GMTCross({ params }: { params: { id: string } }) {
     return (
         <>
             <Grid item>
-                <Header sessionId={params.id} />
+                <Header sessionId={props.params.id} />
             </Grid>
             <Container>
                 <Container>

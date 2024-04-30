@@ -33,20 +33,11 @@ export async function checkValidGenes(genes: string) {
 export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string, user: User) {
     // get gene objects
     if (genesetName === '') throw new Error('Empty gene set name')
-    const filteredList = gene_list.filter((item) => item !== null) 
+    const filteredList = gene_list.filter((item) => item !== null)
     const geneObjects = filteredList
 
     if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
     const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
-    // get user
-    // const session = await getServerSession(authOptions)
-    // if (!session) return redirect("/auth/signin?callbackUrl=/")
-    // const user = await prisma.user.findUnique({
-    //     where: {
-    //         id: session.user?.id
-    //     }
-    // })
-    // if (user === null) return redirect("/auth/signin?callbackUrl=/")
 
     // get sets that are already in session 
     const sessionOldSets = await prisma.pipelineSession.findUnique({
@@ -78,11 +69,10 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
         data: {
             gene_sets: {
                 connect: [...oldSetsArray, newGeneset].filter((geneset) => geneset.id !== undefined),
-                // set: [...oldSetsArray, newGeneset],
             },
             lastModified: new Date()
         },
-        include:{
+        include: {
             gene_sets: true
         }
     })
@@ -106,21 +96,11 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
 
     if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
     const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
-    // get user
-    // const session = await getServerSession(authOptions)
-    // if (!session) return redirect("/auth/signin?callbackUrl=/")
-    // const user = await prisma.user.findUnique({
-    //     where: {
-    //         id: session.user?.id
-    //     }
-    // })
-    // if (user === null) return redirect("/auth/signin?callbackUrl=/")
 
     // get sets that are already in session 
     const sessionOldSets = await prisma.pipelineSession.findUnique({
         where: {
             id: sessionId,
-            // user_id: user.id
         },
         select: {
             gene_sets: true
@@ -142,19 +122,14 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
     const updatedSession = await prisma.pipelineSession.update({
         where: {
             id: sessionId,
-            // user_id: user.id
         },
         data: {
             gene_sets: {
-                // set: [...oldSetsArray, newGeneset],
                 connect: [...oldSetsArray, newGeneset].filter((geneset) => geneset.id !== undefined),
             },
             lastModified: new Date()
         },
     })
-
-    console.log(updatedSession)
-
     revalidatePath('/')
     return 'success'
 }
@@ -220,8 +195,8 @@ export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[
             if (alreadyExists) {
                 return { code: 'error', message: `Gene set : ${row.genesetName} + (${row.dcc}) already in cart` }
             } else {
-            const validGenes = row.genes.map((gene) => gene.gene_symbol)
-            const added = await addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '')
+                const validGenes = row.genes.map((gene) => gene.gene_symbol)
+                const added = await addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '')
             }
         }
     }

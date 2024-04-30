@@ -78,7 +78,7 @@ export default function SingleUpload() {
                 Upload a single .txt file containing gene symbols, each on new line OR paste your gene set in
                 the text box below
             </Typography>
-            <Grid container sx={{ p: 2 }} display={isMobile ? 'block' : 'flex'} spacing={1} justifyContent="center" component={'form'}
+            <Grid container display={isMobile ? 'block' : 'flex'} spacing={1} justifyContent="center" component={'form'}
                 onSubmit={(evt) => {
                     evt.preventDefault();
                     const formData = new FormData(evt.currentTarget)
@@ -102,7 +102,7 @@ export default function SingleUpload() {
                     })
                 }
                 }>
-                <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 6} justifyItems='center' alignItems={'center'} justifyContent={'center'}>
+                <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 5} justifyItems='center' alignItems={'center'} justifyContent={'center'}>
                     <Grid item>
                         <TextField id="outlined-basic" required label="Gene Set Name" variant="outlined" name='name' />
                     </Grid>
@@ -146,7 +146,7 @@ export default function SingleUpload() {
                         </Stack>
                     </Grid>
                 </Grid>
-                <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 6}>
+                <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 5}>
                     <Grid item container justifyContent={'center'} alignItems={'center'} direction='column'>
                         <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography>
                         <TextField

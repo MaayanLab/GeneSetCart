@@ -7,15 +7,16 @@ import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
-import { shallowCopy } from '@/app/assemble/[id]/page';
+import { shallowCopy } from '@/app/shallowcopy';
 
-export default async function CombinePage({ params }: { params: { id: string } }) {
+export default async function CombinePage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
+    const qs = props.searchParams
     const session = await getServerSession(authOptions)
 
     // if a public session created by a public user go there: 
     const anonymousUserSession = await prisma.pipelineSession.findFirst({
         where: {
-            id: params.id,
+            id: props.params.id,
             user_id: process.env.PUBLIC_USER_ID,
             private: false
         },
@@ -32,16 +33,16 @@ export default async function CombinePage({ params }: { params: { id: string } }
             return (
                 <>
                     <Grid item>
-                        <Header sessionId={params.id} />
+                        <Header sessionId={props.params.id} />
                     </Grid>
                     <Container>
-                        <ColorToggleButton sessionId={params.id} />
+                        <ColorToggleButton sessionId={props.params.id} />
                         <Container sx={{ mb: 5 }}>
                             <Typography variant="h3" color="secondary.dark" className='p-5'>COMBINE YOUR GENE SETS</Typography>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                                 Combine your gene sets using set operations (intersect, union or consensus)
                             </Typography>
-                            <CombineLayout sessionInfo={anonymousUserSession} sessionId={params.id} />
+                            <CombineLayout sessionInfo={anonymousUserSession} sessionId={props.params.id} />
                         </Container>
                     </Container>
                 </>
@@ -55,8 +56,8 @@ export default async function CombinePage({ params }: { params: { id: string } }
                     pipelineSessions: true
                 }
             })
-            if (user === null) return redirect(`/api/auth/signin?callbackUrl=/combine/${params.id}`)
-            await shallowCopy(user, anonymousUserSession, 'combine', false)
+            if (user === null) return redirect(`/api/auth/signin?callbackUrl=/combine/${props.params.id}`)
+            await shallowCopy(user, anonymousUserSession, 'combine', false, qs)
         }
     }
 
@@ -64,7 +65,7 @@ export default async function CombinePage({ params }: { params: { id: string } }
     // get session information
     const sessionInfo = await prisma.pipelineSession.findFirst({
         where: {
-            id: params.id,
+            id: props.params.id,
             // private: false // session must be public
         },
         include: {
@@ -88,7 +89,7 @@ export default async function CombinePage({ params }: { params: { id: string } }
                 name: 'Anonymous User',
             },
         })
-        await shallowCopy(anonymousUser, sessionInfo, 'combine', true)
+        await shallowCopy(anonymousUser, sessionInfo, 'combine', true, qs)
     } else { // if a public session but user is logged in then shallow copy to user's account
         const user = await prisma.user.findUnique({
             where: {
@@ -98,13 +99,13 @@ export default async function CombinePage({ params }: { params: { id: string } }
                 pipelineSessions: true
             }
         })
-        if (user === null) return redirect(`/api/auth/signin?callbackUrl=/combine/${params.id}`) // if user is not logged in redirect
+        if (user === null) return redirect(`/api/auth/signin?callbackUrl=/combine/${props.params.id}`) // if user is not logged in redirect
         // get all users saved sessions
         const savedUserSessions = user.pipelineSessions.map((savedSession) => savedSession.id)
         // if session does not belong to currently logged in user then shallow copy session to user
-        if (!savedUserSessions.includes(params.id)) {
+        if (!savedUserSessions.includes(props.params.id)) {
             if (sessionInfo) { // if shared session exists
-                await shallowCopy(user, sessionInfo, 'combine', false)
+                await shallowCopy(user, sessionInfo, 'combine', false, qs)
             } else {
                 redirect('/') // redirect to home page because shared session does not exist
             }
@@ -115,16 +116,16 @@ export default async function CombinePage({ params }: { params: { id: string } }
     return (
         <>
             <Grid item>
-                <Header sessionId={params.id} />
+                <Header sessionId={props.params.id} />
             </Grid>
             <Container>
-                <ColorToggleButton sessionId={params.id} />
+                <ColorToggleButton sessionId={props.params.id} />
                 <Container sx={{ mb: 5 }}>
                     <Typography variant="h3" color="secondary.dark" className='p-5'>COMBINE YOUR GENE SETS</Typography>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                         Combine your gene sets using set operations (intersect, union or consensus)
                     </Typography>
-                    <CombineLayout sessionInfo={sessionInfo} sessionId={params.id} />
+                    <CombineLayout sessionInfo={sessionInfo} sessionId={props.params.id} />
                 </Container>
             </Container>
         </>

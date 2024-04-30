@@ -52,9 +52,6 @@ export default function VerticalTabs() {
   };
 
   return (
-    // <Box
-    //   sx={{ flexGrow: 1, display: 'flex', minHeight: '70vh', maxWidth: '100%' }}
-    // >
     <Grid container direction='row' sx={{ minHeight: '70vh', maxWidth: '100%' }}>
       <Grid item container xs={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
         <Tabs
@@ -88,6 +85,5 @@ export default function VerticalTabs() {
         </TabPanel>
       </Grid>
     </Grid>
-    // </Box>
   );
 }

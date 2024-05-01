@@ -36,7 +36,7 @@ export default function About({ params }: { params: { id: string } }) {
                 
                 Overall, Get-Gene-Set-Go is a useful resource to facilitate hypothesis generation across CF datasets and programs. 
                 <br></br>
-                Gene set libraries are regularly updated from the sets submitted by CFDE programs on the <Link  href='https://data.cfde.cloud/' color='secondary' target="_blank"> CFDE Data Portal </Link>. 
+                Gene set libraries are regularly updated from the GMT files submitted by CFDE programs on the <Link  href='https://data.cfde.cloud/' color='secondary' target="_blank"> CFDE Data Portal </Link>. 
                 <br></br>
                 G2SG is actively being developed by the <Link  href='https://labs.icahn.mssm.edu/maayanlab/' color='secondary' target="_blank"> Ma'ayan Lab </Link>. 
                

@@ -293,8 +293,8 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 onMouseEnter={(e) => {
                     setHoveredCell({
                         setLabel: d.name,
-                        xPos: invertedXrangeSet(d.num) + 50 + margin.left,
-                        yPos: boundsHeight + i * (rad * 2.7) + margin.top + 100,
+                        xPos: invertedXrangeSet(d.num) + 60 + margin.left,
+                        yPos: boundsHeight + i * (rad * 2.7) + margin.top + 30,
                         value: d.num,
                     });
                 }}

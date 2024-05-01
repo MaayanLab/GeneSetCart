@@ -31,7 +31,7 @@ export default function About({ params }: { params: { id: string } }) {
 
                 G2SG also has a GMT Crossing feature where users can cross CF sourced gene set libraries to can find gene sets with a
                 significant number of overlapping genes originated from different CF programs. The crossed pairs are displayed in an interactive table on the 
-                <Link href='/gmt-cross' color='secondary'> CFDE GMT Crossing page </Link>. Users can also view a GPT-4-generated hypothesis proposing a possile reason for the high overlap 
+                <Link href='/gmt-cross' color='secondary'> CFDE GMT Crossing page </Link>. Users can also view a GPT-4-generated hypothesis proposing a possible reason for the high overlap 
                 between these sets. 
                 
                 Overall, Get-Gene-Set-Go is a useful resource to facilitate hypothesis generation across CF datasets and programs. 

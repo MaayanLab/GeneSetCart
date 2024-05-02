@@ -38,20 +38,20 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
         if (!session) {
             return (
                 <>
-                <Grid item>
-                    <Header sessionId={props.params.id} />
-                </Grid>
-                <Container>
-                    <ColorToggleButton sessionId={props.params.id} />
-                    <Container sx={{ mb: 5 }}>
-                        <Typography variant="h3" color="secondary.dark" sx={{mb: 2, mt: 2}}>ANALYZE YOUR GENE SETS</Typography>
-                        <Typography variant="subtitle1" color="#666666" sx={{ mb: 3}}>
-                            Analyze your gene sets by sending them to Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
-                        </Typography>
-                        <PaginatedTable rows={rows} />
+                    <Grid item>
+                        <Header sessionId={props.params.id} />
+                    </Grid>
+                    <Container>
+                        <ColorToggleButton sessionId={props.params.id} />
+                        <Container sx={{ mb: 5 }}>
+                            <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>ANALYZE YOUR GENE SETS</Typography>
+                            <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
+                                Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
+                            </Typography>
+                            <PaginatedTable rows={rows} />
+                        </Container>
                     </Container>
-                </Container>
-            </>
+                </>
             )
         } else {
             const user = await prisma.user.findUnique({
@@ -121,25 +121,25 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
         }
     }
 
-        // get rows from sessionInfo and put in table
-        const rows = sessionInfo ? sessionInfo.gene_sets : []
+    // get rows from sessionInfo and put in table
+    const rows = sessionInfo ? sessionInfo.gene_sets : []
     // else if current user is the owner of session
     return (
         <>
-        <Grid item>
-            <Header sessionId={props.params.id} />
-        </Grid>
-        <Container>
-            <ColorToggleButton sessionId={props.params.id} />
-            <Container sx={{ mb: 5 }}>
-                <Typography variant="h3" color="secondary.dark" sx={{mb: 2, mt: 2}}>ANALYZE YOUR GENE SETS</Typography>
-                <Typography variant="subtitle1" color="#666666" sx={{ mb: 3}}>
-                    Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS.
-                </Typography>
-                <PaginatedTable rows={rows} />
+            <Grid item>
+                <Header sessionId={props.params.id} />
+            </Grid>
+            <Container>
+                <ColorToggleButton sessionId={props.params.id} />
+                <Container sx={{ mb: 5 }}>
+                    <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>ANALYZE YOUR GENE SETS</Typography>
+                    <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
+                        Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS.
+                    </Typography>
+                    <PaginatedTable rows={rows} />
+                </Container>
             </Container>
-        </Container>
-    </>
+        </>
     )
 }
 

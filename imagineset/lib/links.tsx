@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from "next/link"
 import { signIn, signOut } from 'next-auth/react'
+import Cookies from 'js-cookie'
 
 export function SignInLink({ children }: React.PropsWithChildren<{}>) {
   return <Link
@@ -18,6 +19,7 @@ export function SignOutLink({ children }: React.PropsWithChildren<{}>) {
     href="/api/auth/signout"
     onClick={evt => {
       evt.preventDefault()
+      Cookies.remove('session_id')
       signOut()
     }}>{children}</Link>
 }

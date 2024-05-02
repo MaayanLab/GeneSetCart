@@ -5,6 +5,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography'
 import { usePathname } from 'next/navigation'
 import { Container } from '@mui/material';
+import Cookies from 'js-cookie'
 
 export default function ColorToggleButton({sessionId}: {sessionId: string}) {
     const pathname = usePathname()
@@ -15,6 +16,9 @@ export default function ColorToggleButton({sessionId}: {sessionId: string}) {
     ) => {
         setMenuItem(newItem);
     };
+
+    const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
+    Cookies.set('session_id', sessionId, { secure: true, expires: inOneHour })
 
     return (
         <ToggleButtonGroup

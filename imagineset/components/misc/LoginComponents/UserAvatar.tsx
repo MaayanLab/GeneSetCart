@@ -78,9 +78,6 @@ export default function UserAvatar({ session }: { session: Session }) {
                     'aria-labelledby': 'user-button',
                 }}
             >
-                {/* <MenuItem onClick={handleClose}>
-                    <AccountLink>My account</AccountLink>
-                </MenuItem> */}
                 <MenuItem onClick={handleClose}>
                     <SignOutLink>Logout</SignOutLink>
                 </MenuItem>

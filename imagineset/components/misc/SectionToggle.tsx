@@ -17,8 +17,8 @@ export default function ColorToggleButton({sessionId}: {sessionId: string}) {
         setMenuItem(newItem);
     };
 
-    const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
-    Cookies.set('session_id', sessionId, { secure: true, expires: inOneHour })
+    const inOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+    Cookies.set('session_id', sessionId, { secure: true, expires: inOneDay })
 
     return (
         <ToggleButtonGroup

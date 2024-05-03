@@ -111,8 +111,8 @@ export default async function Header({ sessionId }: { sessionId: string  | undef
     }
    
     if (sessionId) {
-        const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
-        Cookies.set('session_id', sessionId, { secure: true, expires: inOneHour })
+        const inOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+        Cookies.set('session_id', sessionId, { secure: true, expires: inOneDay })
         const sessionInfo = await prisma.pipelineSession.findUnique({
             where: {
                 id: sessionId

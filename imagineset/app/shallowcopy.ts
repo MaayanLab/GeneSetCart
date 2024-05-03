@@ -29,7 +29,7 @@ export async function shallowCopy(user: User,
             await Promise.all(sessionSets.map(async (sessionGeneset) => await addToSessionSetsGeneObj(sessionGeneset.genes, newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : '', user)))
             const queryParamString = Object.keys(searchParams).map((key) => `${key}=${searchParams[key]}`).join('&')
             const inOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-            Cookies.set('session_id', newSession.id, { secure: true, expires: inOneDay })
+            Cookies.set('session_id', newSession.id, { secure: true, expires: inOneDay, sameSite: 'None' })
             return redirect(Object.values(searchParams).includes(undefined) ? `/${redirectPage}/${newSession.id}` : `/${redirectPage}/${newSession.id}?${queryParamString}`)
         } else {
             return redirect('/') // redirect to homepage if session does not exist or is a private session

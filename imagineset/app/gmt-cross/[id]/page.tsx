@@ -34,7 +34,7 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
     if (anonymousUserSession) {
         if (!session) {
             const inOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-            Cookies.set('session_id', props.params.id, { secure: true, expires: inOneDay })
+            Cookies.set('session_id', props.params.id, { secure: true, expires: inOneDay, sameSite: 'None' })
             return (
                 <>
                     <Grid item>
@@ -121,7 +121,7 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
 
     // else if current user is the owner of session
     const inOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-    Cookies.set('session_id', props.params.id, { secure: true, expires: inOneDay })
+    Cookies.set('session_id', props.params.id, { secure: true, expires: inOneDay, sameSite: 'None' })
     return (
         <>
             <Grid item>

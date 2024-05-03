@@ -18,7 +18,7 @@ export default function ColorToggleButton({sessionId}: {sessionId: string}) {
     };
 
     const inOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-    Cookies.set('session_id', sessionId, { secure: true, expires: inOneDay })
+    Cookies.set('session_id', sessionId, { secure: true, expires: inOneDay, sameSite: 'None' })
 
     return (
         <ToggleButtonGroup

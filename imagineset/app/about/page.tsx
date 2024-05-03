@@ -1,4 +1,3 @@
-import ColorToggleButton from "@/components/misc/SectionToggle";
 import { Typography, Grid, Link } from "@mui/material";
 import Container from "@mui/material/Container";
 import Header from '@/components/header/Header';

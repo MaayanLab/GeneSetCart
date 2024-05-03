@@ -9,7 +9,6 @@ import { Grid } from "@mui/material";
 import Header from "@/components/header/Header";
 import { shallowCopy } from "@/app/shallowcopy";
 
-
 export default async function AssemblePage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams
     const session = await getServerSession(authOptions)

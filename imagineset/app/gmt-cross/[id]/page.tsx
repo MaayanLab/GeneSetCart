@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
 import { shallowCopy } from '@/app/shallowcopy';
+import Cookies from 'js-cookie'
 
 export default async function GMTCross(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams
@@ -32,6 +33,8 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
     })
     if (anonymousUserSession) {
         if (!session) {
+            const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
+            Cookies.set('session_id', props.params.id, { secure: true, expires: inOneHour })
             return (
                 <>
                     <Grid item>
@@ -117,6 +120,8 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
     }
 
     // else if current user is the owner of session
+    const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
+    Cookies.set('session_id', props.params.id, { secure: true, expires: inOneHour })
     return (
         <>
             <Grid item>

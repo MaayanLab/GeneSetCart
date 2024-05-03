@@ -6,27 +6,11 @@ import { Typography } from '@mui/material';
 import { ElevatedIconButton } from '../styled/Buttons';
 import Image from 'next/image';
 import g2sgLogo from "@/public/img/g2sg-logo-nbg.png"
-import { usePathname } from 'next/navigation';
 import { Gene } from '@prisma/client';
 
 
-export default function AppTitle({ sessionId, sessionInfo }: {
-    sessionId: string,
-    sessionInfo: {
-        gene_sets: ({
-            genes: Gene[];
-        } & {
-            id: string;
-            name: string;
-            description: string | null;
-            session_id: string;
-            createdAt: Date;
-        })[];
-    } | null
-}) {
-    const pathname = usePathname()
+export default function AppTitle() {
 
-    if ((pathname === '/') || (pathname === '/use-cases') || (pathname === '/api-documentation') || (pathname === '/sessions')) {
         return (
             <Button className='flex items-center space-x-3' href='/'>
                 <div>
@@ -43,40 +27,3 @@ export default function AppTitle({ sessionId, sessionInfo }: {
             </Button>
         )
     }
-
-    if (sessionInfo && sessionInfo.gene_sets.length > 0){
-        return (
-                <Button className='flex items-center space-x-3' href={`/assemble/${sessionId}`}>
-                    <div>
-                        <ElevatedIconButton
-                            aria-label="menu"
-                            sx={{ width: 35, height: 35 }}
-                        >
-                            <Image style={{ padding: 2, objectFit: "contain" }} fill={true} alt="cfde-logo" src={g2sgLogo} />
-                        </ElevatedIconButton>
-                    </div>
-                    <div>
-                        <Typography variant='cfde' color={'secondary'}>{'Get-Gene-Set-Go'}</Typography>
-                    </div>
-                </Button>
-        );
-    } else {
-        return (
-                <Button className='flex items-center space-x-3' href='/'>
-                    <div>
-                        <ElevatedIconButton
-                            aria-label="menu"
-                            sx={{ width: 35, height: 35 }}
-                        >
-                            <Image style={{ padding: 2, objectFit: "contain" }} fill={true} alt="cfde-logo" src={g2sgLogo} />
-                        </ElevatedIconButton>
-                    </div>
-                    <div>
-                        <Typography variant='cfde' color={'secondary'}>{'Get-Gene-Set-Go'}</Typography>
-                    </div>
-                </Button>
-        );
-    }
-
-
-}

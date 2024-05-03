@@ -12,7 +12,7 @@ import { deleteGenesetByID, getGenesets } from './Header';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { useParams } from 'next/navigation';
-
+import Cookies from 'js-cookie'
 
 export function CollapsibleButton({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
     return (
@@ -104,7 +104,10 @@ const DrawerInfo = ({ genesets }: {
     } & GeneSet)[] | null
 }) => {
     const params = useParams()
-    const sessionId = params.id
+    let sessionId : string | string[] | undefined = params.id
+    if (!sessionId){
+        sessionId = Cookies.get('sessionId')
+    }
     return (
         <Box
             sx={{ width: 500 }}
@@ -115,9 +118,9 @@ const DrawerInfo = ({ genesets }: {
             </center>
             <Stack direction='row' sx={{ justifyContent: 'center', marginTop: 1 }} spacing={1}>
                 <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/augment/${sessionId}`}> Augment &nbsp; <LaunchIcon fontSize={'small'} /></Button>
-                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/combine/${sessionId}`}>Combine  &nbsp; <LaunchIcon fontSize={'small'}/></Button>
-                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/visualize/${sessionId}`}>Visualize  &nbsp; <LaunchIcon fontSize={'small'}/></Button>
-                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/analyze/${sessionId}`}>Analyze  &nbsp; <LaunchIcon fontSize={'small'}/></Button>
+                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/combine/${sessionId}`}>Combine  &nbsp; <LaunchIcon fontSize={'small'} /></Button>
+                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/visualize/${sessionId}`}>Visualize  &nbsp; <LaunchIcon fontSize={'small'} /></Button>
+                <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/analyze/${sessionId}`}>Analyze  &nbsp; <LaunchIcon fontSize={'small'} /></Button>
             </Stack>
 
             <Table sx={{ p: 2 }}>

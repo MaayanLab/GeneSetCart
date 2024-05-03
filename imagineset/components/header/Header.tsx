@@ -18,7 +18,8 @@ import dynamic from 'next/dynamic'
 import { ElevatedIconButton } from '../styled/Buttons'
 import { Button } from '@mui/material'
 import g2sgLogo from "@/public/img/g2sg-logo-nbg.png"
-
+import Cookies from 'js-cookie'
+import { cookies } from 'next/headers'
 
 const AppTitle = dynamic(() => import("./AppTitle"), {
     ssr: false, loading: () => <Button className='flex items-center space-x-3' href='/'>
@@ -90,10 +91,28 @@ export async function getSessionInfo(sessionId: string) {
     return sessionInfo
 }
 
-export default async function Header({ sessionId }: { sessionId: string }) {
-    // TO DO: add user authentication in header for cart drawer here
+export default async function Header({ sessionId }: { sessionId: string  | undefined }) {
     const session = await getServerSession(authOptions)
+    if (!sessionId) {
+        sessionId =  cookies().get('session_id')?.value
+    }
+    if (session && !sessionId ) { // if logged in but has no cookie, get most recently modified session
+        const sessionsRanked = await prisma.pipelineSession.findMany({
+            where: {
+                user_id: session.user.id
+            }, 
+            orderBy: {
+                lastModified: 'desc'
+                
+            }
+        })
+        const mostRecentSessionId = sessionsRanked[0].id
+        sessionId = mostRecentSessionId
+    }
+   
     if (sessionId) {
+        const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
+        Cookies.set('session_id', sessionId, { secure: true, expires: inOneHour })
         const sessionInfo = await prisma.pipelineSession.findUnique({
             where: {
                 id: sessionId
@@ -116,8 +135,7 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                     <Toolbar>
                         <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
                             <Grid item>
-                                {/* <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" /> */}
-                                <AppTitle sessionId={sessionId} sessionInfo={sessionInfo} />
+                                <AppTitle />
                             </Grid>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
@@ -146,7 +164,6 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                     <CartDrawer sessionInfo={sessionInfo} />
-                                    {/* <CurrentSession sessionId={sessionId} /> */}
                                     <GMTHeader sessionId={sessionId} />
                                     {session && <Link href="/sessions">
                                         <Typography variant="nav">MY SESSIONS</Typography>
@@ -171,8 +188,7 @@ export default async function Header({ sessionId }: { sessionId: string }) {
                     <Toolbar>
                         <Grid container justifyContent={"space-between"} alignItems={"center"} spacing={2}>
                             <Grid item>
-                                {/* <Logo href={`/`} title="Get-Gene-Set-Go" color="secondary" /> */}
-                                <AppTitle sessionId={sessionId} sessionInfo={null} />
+                                <AppTitle />
                             </Grid>
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>

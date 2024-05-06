@@ -10,6 +10,7 @@ import {
 import { addToSessionSets, checkInSession, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions ";
 import { useParams } from "next/navigation";
 import Status from "../Status";
+import { getGenesetInfo } from "@/app/shallowcopy";
 
 export type addStatus = {
     success?: boolean,
@@ -20,19 +21,31 @@ export type addStatus = {
     },
 }
 
+type genesetInfo = { name: string, genes: string, description: string | null }
 
-export default function SingleUpload() {
+export default function SingleUpload({ queryParams }: { queryParams: Record<string, string | string[] | undefined> }) {
     const theme = useTheme();
     const params = useParams<{ id: string }>()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const [genes, setGenes] = React.useState('')
     const [validGenes, setValidGenes] = React.useState<string[]>([])
     const [status, setStatus] = React.useState<addStatus>({})
+    const [genesetInfo, setGenesetInfo] = React.useState<genesetInfo>()
 
+    useEffect(() => {
+        const genesetId = queryParams.geneset_id
+        if (typeof (genesetId) === 'string') {
+            getGenesetInfo(genesetId).then((geneset) => {
+                if (geneset) {
+                    setGenesetInfo({ name: geneset.name, genes: geneset.genes.map((gene) => gene.gene_symbol).join('\n'), description: geneset.description })
+                }
+            })
+        }
+    }, [])
 
-    const getExample = () => {
-        loadTxtExample().then((response) => setGenes(response));
-    }
+    const getExample = React.useCallback(() => {
+        loadTxtExample().then((response) => setGenesetInfo(genesetInfo ? { ...genesetInfo, name: 'example gene set', genes: response } : { name: '', genes: '', description: '' }));
+    }, [genesetInfo])
+
 
     const downloadExample = React.useCallback(() => {
         loadTxtExample().then((response) => {
@@ -54,7 +67,7 @@ export default function SingleUpload() {
                 "load",
                 () => {
                     if (reader.result) {
-                        setGenes(reader.result.toString());
+                        setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: reader.result.toString() } : { name: '', genes: '', description: '' })
                     }
                 },
                 false,
@@ -64,12 +77,36 @@ export default function SingleUpload() {
                 reader.readAsText(fileList[0]);
             }
         }
-    }, [])
+    }, [genesetInfo])
 
 
     useEffect(() => {
-        checkValidGenes(genes).then((response) => setValidGenes(response))
-    }, [genes])
+        if (genesetInfo) {
+            checkValidGenes(genesetInfo.genes).then((response) => setValidGenes(response))
+        }
+    }, [genesetInfo])
+
+    const submitGeneset = React.useCallback((evt: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        evt.preventDefault();
+        const genesetName = genesetInfo?.name
+        let description = genesetInfo?.description
+        if (!genesetName) throw new Error('no gene set name')
+        if (!description) description = ''
+        const sessionId = params.id
+        checkInSession(sessionId, genesetName).then((response) => {
+            if (response) {
+                setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
+            } else {
+                addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => { setStatus({ success: true }) }).catch((err) => {
+                    if (err.message === 'No valid genes in gene set') {
+                        setStatus({ error: { selected: true, message: err.message } })
+                    } else {
+                        setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+                    }
+                })
+            }
+        })
+    }, [genesetInfo, validGenes])
 
     return (
         <Container>
@@ -78,44 +115,34 @@ export default function SingleUpload() {
                 Upload a single .txt file containing gene symbols, each on new line OR paste your gene set in
                 the text box below
             </Typography>
-            <Grid container display={isMobile ? 'block' : 'flex'} spacing={1} justifyContent="center" component={'form'}
-                onSubmit={(evt) => {
-                    evt.preventDefault();
-                    const formData = new FormData(evt.currentTarget)
-                    const genesetName = formData.get('name')?.toString()
-                    let description = formData.get('description')?.toString()
-                    if (!genesetName) throw new Error('no gene set name')
-                    if (!description) description = ''
-                    const sessionId = params.id
-                    checkInSession(sessionId, genesetName).then((response) => {
-                        if (response) {
-                            setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
-                        } else {
-                            addToSessionSets(validGenes, sessionId, genesetName, description ? description : '').then((result) => { setStatus({ success: true }) }).catch((err) => {
-                                if (err.message === 'No valid genes in gene set') {
-                                    setStatus({ error: { selected: true, message: err.message } })
-                                } else {
-                                    setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
-                                }
-                            })
-                        }
-                    })
-                }
-                }>
+            <Grid container display={isMobile ? 'block' : 'flex'} spacing={1} justifyContent="center"
+            >
                 <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 5} justifyItems='center' alignItems={'center'} justifyContent={'center'}>
                     <Grid item>
-                        <TextField id="outlined-basic" required label="Gene Set Name" variant="outlined" name='name' />
+                        <TextField
+                            id="outlined-basic"
+                            required label="Gene Set Name"
+                            variant="outlined"
+                            value={genesetInfo?.name}
+                            focused={genesetInfo ? true : false}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, name: event.target.value } : { name: '', genes: '', description: '' })
+                            }}
+                        />
                     </Grid>
                     <Grid item>
                         <TextField
                             id="outlined-basic"
                             label="Description"
                             variant="outlined"
-                            name='description'
                             rows={4}
                             multiline
                             placeholder="Gene Set Description (optional)"
-
+                            value={genesetInfo?.description}
+                            focused={genesetInfo ? true : false}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, description: event.target.value } : { name: '', genes: '', description: '' })
+                            }}
                         />
                     </Grid>
                     <Grid item>
@@ -154,9 +181,9 @@ export default function SingleUpload() {
                             multiline
                             rows={10}
                             placeholder="Paste gene symbols here"
-                            value={genes}
+                            value={genesetInfo?.genes}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setGenes(event.target.value);
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: '', description: '' })
                             }}
                         />
                     </Grid>
@@ -167,7 +194,7 @@ export default function SingleUpload() {
                             </Button>
                         </Grid>
                         <Grid item>
-                            <Button variant='outlined' color="secondary" type='submit'>
+                            <Button variant='outlined' color="secondary" onClick={(evt) => submitGeneset(evt)}>
                                 ADD TO SETS
                             </Button>
                         </Grid>

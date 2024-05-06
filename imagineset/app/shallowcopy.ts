@@ -38,3 +38,42 @@ export async function shallowCopy(user: User,
         return redirect('/') // redirect to homepage if session does not exist or is a private session
     }
 }
+
+export async function addToAddedGenesets(gene_list: string[], genesetName: string, description: string){
+        // get gene objects
+        if (genesetName === '') throw new Error('Empty gene set name')
+        const geneObjects = await Promise.all(gene_list.map(async (gene) => await prisma.gene.findFirst({
+            where: {
+                gene_symbol: {
+                    equals: gene,
+                    mode: 'insensitive'
+                }
+            }
+        })));
+    
+        if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
+        const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
+        const addedGeneset = await prisma.addedGeneset.create({
+            data: {
+                name: genesetName,
+                description: description,
+                genes: {
+                    connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
+                },
+            }
+        })
+
+        return addedGeneset.id
+}
+
+export async function getGenesetInfo (genesetId: string) {
+    const geneset = await prisma.addedGeneset.findUnique({
+        where: {
+            id: genesetId
+        }, 
+        include: {
+            genes: true
+        }
+    })
+    return geneset
+}

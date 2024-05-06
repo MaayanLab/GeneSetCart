@@ -106,7 +106,7 @@ const DrawerInfo = ({ genesets }: {
     const params = useParams()
     let sessionId : string | string[] | undefined = params.id
     if (!sessionId){
-        sessionId = Cookies.get('sessionId')
+        sessionId = Cookies.get('session_id') 
     }
     return (
         <Box

@@ -12,7 +12,6 @@ import { shallowCopy } from "@/app/shallowcopy";
 export default async function AssemblePage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams
     const session = await getServerSession(authOptions)
-
     // if a public session created by a public user go there: 
     const anonymousUserSession = await prisma.pipelineSession.findFirst({
         where: {
@@ -40,7 +39,7 @@ export default async function AssemblePage(props: { params: { id: string }, sear
                     </Grid>
                     <Container sx={{ mb: 4 }}>
                         <ColorToggleButton sessionId={props.params.id} />
-                        <VerticalTabs />
+                        <VerticalTabs queryParams={qs}/>
                     </Container>
                 </>
             )
@@ -120,7 +119,7 @@ export default async function AssemblePage(props: { params: { id: string }, sear
             </Grid>
             <Container sx={{ mb: 4 }}>
                 <ColorToggleButton sessionId={props.params.id} />
-                <VerticalTabs />
+                <VerticalTabs queryParams={qs}/>
             </Container>
         </>
     )

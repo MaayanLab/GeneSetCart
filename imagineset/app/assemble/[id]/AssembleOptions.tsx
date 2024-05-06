@@ -2,7 +2,6 @@
 import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import SingleUpload from '@/components/assemble/fileUpload/SingleUpload';
 import MultipleUpload from '@/components/assemble/fileUpload/MultipleUpload';
@@ -44,7 +43,7 @@ function a11yProps(index: number) {
   };
 }
 
-export default function VerticalTabs() {
+export default function VerticalTabs({queryParams}: {queryParams: Record<string, string | string[] | undefined>}) {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -72,7 +71,7 @@ export default function VerticalTabs() {
       </Grid>
       <Grid item container xs={10}>
         <TabPanel value={value} index={0} >
-          <SingleUpload />
+          <SingleUpload queryParams={queryParams}/>
         </TabPanel>
         <TabPanel value={value} index={1}>
           <MultipleUpload />

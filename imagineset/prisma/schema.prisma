@@ -66,6 +66,7 @@ model Gene {
   description String?
   genesets    GeneSet[]
   cfde_genesets cfdegeneset[]
+  addedGeneset  addedGeneset[]
 
   @@map("genes")
 }
@@ -131,4 +132,14 @@ model cfdegeneset {
 
   @@map("cfde_genesets")
   @@unique([term, library])
+}
+
+model addedGeneset {
+  id          String          @id @default(uuid())
+  name        String
+  description String?
+  genes       Gene[]
+  createdAt   DateTime        @default(now())
+
+  @@map("added_genesets")
 }

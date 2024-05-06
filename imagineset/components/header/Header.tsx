@@ -109,7 +109,6 @@ export default async function Header({ sessionId }: { sessionId: string  | undef
         const mostRecentSessionId = sessionsRanked[0].id
         sessionId = mostRecentSessionId
     }
-   
     if (sessionId) {
         const inOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
         Cookies.set('session_id', sessionId, { secure: true, expires: inOneDay, sameSite: 'None' })

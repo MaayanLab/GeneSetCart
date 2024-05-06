@@ -10,9 +10,6 @@ export async function POST(request: Request) {
     if (genes.length < 1) return NextResponse.json({ error: 'Empty gene set' }, { status: 400 })
     if (genesetName === '') return NextResponse.json({ error: 'No gene set name' }, { status: 400 })
     try {
-        // const sessionCookie = cookies().get('session_id')
-        // console.log('obtained_cookie', sessionCookie)
-        // get cookie for this site and check authentication here
         const anonymousUserId = process.env.PUBLIC_USER_ID
         const anonymousUser = await prisma.user.upsert({
             where: {
@@ -31,8 +28,6 @@ export async function POST(request: Request) {
 
             },
         })
-
-        // cookies().set('session_id', newSession.id, {sameSite: 'none'})
 
         await addToSessionSets(genes, newSession.id, genesetName, description)
         return NextResponse.json({ session_id: newSession.id }, {

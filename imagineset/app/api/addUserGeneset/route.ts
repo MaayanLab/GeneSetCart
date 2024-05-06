@@ -1,5 +1,4 @@
 import { addToAddedGenesets } from '@/app/shallowcopy';
-import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: Request) {

@@ -117,7 +117,7 @@ export default function VennPlot({ selectedSets, setOverlap }: {
                 margins={[3, 3, 3, 3]}
                 series={
                     <VennSeries
-                        colorScheme="cybertron"
+                    colorScheme="set2"
                         arc={<VennArc strokeWidth={3}
                             gradient={<Gradient />}
                             onClick={(evt) => setOverlap({ name: evt.value.sets.sort().toString(), overlapGenes: intersectionGeneDict[evt.value.sets.sort().toString()] })} />}

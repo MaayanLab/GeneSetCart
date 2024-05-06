@@ -24,6 +24,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - PYTHON_API_BASE=http://g2sg-flask:8000
       - PUBLIC_USER_ID=${PUBLIC_USER_ID}
+      - PUBLIC_URL=https://g2sg.cfde.cloud
 
   g2sg-postgres:
     image: postgres:16

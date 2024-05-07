@@ -10,23 +10,22 @@ export function ClusteredHeatmap({ selectedSets, heatmapOptions }: {
     } & GeneSet)[] | undefined;
     heatmapOptions: { diagonal: boolean, palette: string }
 }) {
-    let genesetDict: { [key: string]: string[] } = {}
-    selectedSets?.forEach((geneset) => {
-        const genes = geneset.genes.map((gene) => gene.gene_symbol)
-        const genesetName = geneset.alphabet
-        genesetDict[genesetName] = genes
-    })
-    
     const [heatmapImageString, setHeatmapImageString] = React.useState<string | null>(null)
 
     React.useEffect(() => {
+        let genesetDict: { [key: string]: string[] } = {}
+        selectedSets?.forEach((geneset) => {
+            const genes = geneset.genes.map((gene) => gene.gene_symbol)
+            const genesetName = geneset.alphabet
+            genesetDict[genesetName] = genes
+        })
         getClustermap(genesetDict, heatmapOptions)
         .then((heatmapImage) => {
             setHeatmapImageString(heatmapImage)
         }).catch((err) => console.log(err))
-    }, [heatmapOptions])
+    }, [heatmapOptions, selectedSets])
 
-    if (!genesetDict || !selectedSets) return <></>
+    if (!selectedSets) return <></>
     else {
         return  <div>
             {heatmapImageString ? <img alt='clustered-heatmap' src={`data:image/svg+xml;utf8,${encodeURIComponent(heatmapImageString)}`} /> : <CircularIndeterminate />}

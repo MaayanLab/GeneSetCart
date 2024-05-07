@@ -196,7 +196,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
         setOpen(true);
     };
 
-    const legendSelectedSets = React.useMemo(() => {
+    const currentlegendSelectedSets = React.useMemo(() => {
         // setVisualization('')
         setOverlap({ name: '', overlapGenes: [] })
         if ((checkedSets !== null) && (visType !== null)) {
@@ -223,6 +223,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             return []
         }
     }, [selectedSets])
+
+    const [legendSelectedSets] = useDebounce(currentlegendSelectedSets, 500); // Debounce after 500ms
 
     const addSelectedToCart = React.useCallback(() => {
         addToSessionSets(overlap.overlapGenes, sessionId, formatSelectionName(overlap.name), '').then((result) => setStatus({ success: true }))

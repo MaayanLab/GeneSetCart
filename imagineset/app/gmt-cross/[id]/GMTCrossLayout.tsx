@@ -262,6 +262,8 @@ export function GMTCrossLayout() {
                 return <RenderOverlapButton params={params} sessionId={sessionId} />
             },
             headerAlign: 'center',
+            type:'number',
+            sortComparator: (v1, v2) => parseInt(v1.length) - parseInt(v2.length)
         },
         {
             field: 'hypothesis',

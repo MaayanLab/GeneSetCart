@@ -97,7 +97,7 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap, heatmap
                 }
             })
             const dataArrays = sortedLegendSets.map((geneset, i) => {
-                let genesetRow: { x: string; y: string; value: number, overlap: string[] }[] = []
+                let genesetRow: { x: string; y: string; value: number, overlap: string[], xName: string, yName: string }[] = []
                 for (let [n, innerLoop] of sortedLegendSets.entries()) {
                     const x = geneset.name
                     const y = innerLoop.name
@@ -105,7 +105,7 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap, heatmap
                     const geneset1 = geneset.genes.map((gene) => gene.gene_symbol)
                     const geneset2 = innerLoop.genes.map((gene) => gene.gene_symbol)
                     const overlap = (x !== y) ? geneset1.filter((x) => geneset2.includes(x)) : (heatmapOptions.diagonal) ? geneset1 : []
-                    genesetRow.push({ x: geneset.alphabet, y: innerLoop.alphabet, value: xyJaccard, overlap: overlap })
+                    genesetRow.push({ x: geneset.alphabet, y: innerLoop.alphabet, value: xyJaccard, overlap: overlap, xName: geneset.name, yName: innerLoop.name })
                 }
                 return genesetRow
             })

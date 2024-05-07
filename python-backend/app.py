@@ -92,12 +92,12 @@ def createHeatmap():
     col_linkage = linkage(
         distance.pdist(correlations_array.T), method='average')
     if display_diagonal: 
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, vmin=0)
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, vmin=0, yticklabels=(len(genesets_dict.keys()) < 40), xticklabels=(len(genesets_dict.keys()) < 40))
     else: 
         np.fill_diagonal(a, 5)
         mask = np.where(a == 5, True, False)
         plt.clf()
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, mask=mask, vmin=0)
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, mask=mask, vmin=0, yticklabels=(len(genesets_dict.keys()) < 40), xticklabels=(len(genesets_dict.keys()) < 40))
     plt.rcParams["font.size"] = "12"
     # Save plot to a BytesIO object 
     img = io.BytesIO()

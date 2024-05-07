@@ -117,7 +117,7 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
 
   return (
     <div style={{ height: 400, width: '100%' }}>
-      {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <AddShoppingCartIcon /> &nbsp; ADD TO CART</Button>}
+      {selectedRows.length > 0 && <Button color='tertiary' variant='contained' onClick={addSets} sx={{marginBottom: 1}}> <AddShoppingCartIcon /> &nbsp; ADD TO CART</Button>}
       <DataGrid
         getRowHeight={() => 'auto'}
         rows={rows}

@@ -46,12 +46,12 @@ export default function MultipleUpload() {
             </Typography>
             <div className="flex justify-center">
             <Button
-                variant="contained"
+                variant="outlined"
                 component="label"
                 color="secondary"
-                sx={{mt: 3, }}
+                sx={{mt: 3}}
             >
-                Upload .gmt File
+                UPLOAD .GMT FILE
                 <input
                     type="file"
                     hidden

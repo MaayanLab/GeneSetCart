@@ -9,7 +9,7 @@ const MARGIN = { top: 10, right: 10, bottom: 30, left: 30 };
 type RendererProps = {
   width: number;
   height: number;
-  data: { x: string; y: string; value: number, overlap: string[] }[];
+  data: { x: string; y: string; value: number, overlap: string[], xName: string, yName: string }[];
   setHoveredCell: (hoveredCell: InteractionData | null) => void;
   setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
   colorScale: d3.ScaleSequential<string, never>;
@@ -75,8 +75,8 @@ export const Renderer = ({
           fill={heatmapOptions.diagonal ? colorScale(d.value) : 'white'}
           onMouseEnter={(e) => {
             setHoveredCell({
-              xLabel: "Gene Set " + d.x,
-              yLabel: "Gene Set " + d.y,
+              xLabel: d.xName,
+              yLabel: d.yName,
               xPos: x + xScale.bandwidth() + MARGIN.left,
               yPos: y + xScale.bandwidth() / 2 + MARGIN.top,
               value: Math.round(d.value * 100) / 100,
@@ -101,8 +101,8 @@ export const Renderer = ({
         fill={colorScale(d.value)}
         onMouseEnter={(e) => {
           setHoveredCell({
-            xLabel: "Gene set " + d.x,
-            yLabel: "Gene set " + d.y,
+            xLabel: d.xName,
+            yLabel: d.yName,
             xPos: x + xScale.bandwidth() + MARGIN.left,
             yPos: y + xScale.bandwidth() / 2 + MARGIN.top,
             value: Math.round(d.value * 100) / 100,
@@ -116,7 +116,7 @@ export const Renderer = ({
     );
   });
 
-  const xLabels = allXGroups.map((name, i) => {
+  const xLabels = allXGroups.length < 41 ? allXGroups.map((name, i) => {
     const x = xScale(name);
 
     if (!x) {
@@ -135,9 +135,9 @@ export const Renderer = ({
         {name}
       </text>
     );
-  });
+  }) : <></>;
 
-  const yLabels = allYGroups.map((name, i) => {
+  const yLabels =  allYGroups.length < 41 ? allYGroups.map((name, i) => {
     const y = yScale(name);
 
     if (!y) {
@@ -156,7 +156,7 @@ export const Renderer = ({
         {name}
       </text>
     );
-  });
+  }): <></>;
 
 
   const allSubgroups = Object.keys(clusterClasses);

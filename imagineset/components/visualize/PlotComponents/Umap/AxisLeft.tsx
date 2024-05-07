@@ -35,7 +35,7 @@ export const AxisLeft = ({ yScale, pixelsPerTick, width }: AxisLeftProps) => {
                 fontSize={12}
                 transform="rotate(-90)"
             >
-                UMAP2
+                UMAP-2
             </text>
             {/* Ticks and labels */}
             {ticks.map(({ value, yOffset }) => (

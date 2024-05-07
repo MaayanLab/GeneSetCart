@@ -39,7 +39,7 @@ export const AxisBottom = ({
                 fontSize={12}
                 // transform="rotate(-90)"
             >
-                UMAP1
+                UMAP-1
             </text>
             {/* Ticks and labels */}
             {ticks.map(({ value, xOffset }) => (

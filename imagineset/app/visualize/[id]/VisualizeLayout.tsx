@@ -24,7 +24,6 @@ import { ClusteredHeatmap } from '@/components/visualize/PlotComponents/Heatmap/
 import { AdditionalOptions } from './AdditionalOptionsDisplay';
 const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), { ssr: false })
 import { useDebounce } from 'use-debounce';
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
 import { addStatus } from '@/components/assemble/fileUpload/SingleUpload';
 import Status from '@/components/assemble/Status';
@@ -224,7 +223,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
         }
     }, [selectedSets])
 
-    const [legendSelectedSets] = useDebounce(currentlegendSelectedSets, 500); // Debounce after 500ms
+    const [legendSelectedSets] = useDebounce(currentlegendSelectedSets, 800); // Debounce after 500ms
 
     const addSelectedToCart = React.useCallback(() => {
         addToSessionSets(overlap.overlapGenes, sessionId, formatSelectionName(overlap.name), '').then((result) => setStatus({ success: true }))
@@ -350,7 +349,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                         </Tooltip>
                         <Tooltip title={"Can visualize 2 - 38 selected sets "}>
                             <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Heatmap') }} disabled={!(checked.length > 1 && checked.length < 39)}>
+                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Heatmap') }} disabled={!(checked.length > 1)}>
                                     <Image
                                         src={heatmapIcon}
                                         fill
@@ -402,8 +401,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             </Box>
                             <Box sx={{ justifyContent: 'center'}}>
                                 <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px'}}>
-                                    {(visualization === 'Heatmap' && checked.length < 39 && checked.length > 1 && heatmapOptions.interactive) && <Heatmap legendSelectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} width={700} height={700} setOverlap={setOverlap} />}
-                                    {(visualization === 'Heatmap' && checked.length > 1 && checked.length < 39 && !heatmapOptions.interactive) && <ClusteredHeatmap selectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} />}
+                                    {(visualization === 'Heatmap' && checked.length > 1 && heatmapOptions.interactive) && <Heatmap legendSelectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} width={700} height={700} setOverlap={setOverlap} />}
+                                    {(visualization === 'Heatmap' && checked.length > 1 && !heatmapOptions.interactive) && <ClusteredHeatmap selectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} />}
                                     {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}

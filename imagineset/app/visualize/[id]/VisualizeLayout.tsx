@@ -281,7 +281,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             <Grid item xs={isMobile ? 12 : 3}>
                 <Stack direction='column' spacing={2}>
                     <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
-                    <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, height: 350, boxShadow: 2, overflowY: 'scroll', wordWrap: 'break-word' }}>
+                    <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, minHeight: 350, boxShadow: 2, overflowY: 'scroll', wordWrap: 'break-word' }}>
                         <ListSubheader disableSticky={true}>
                             Genes ({overlap.overlapGenes === undefined ? 0 : overlap.overlapGenes.length})
                             <Button color='secondary' onClick={addSelectedToCart}>  <AddShoppingCartIcon /> &nbsp;  ADD TO CART</Button>
@@ -294,6 +294,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             sx={{ marginLeft: 2, marginRight: 2 }}
                             placeholder='Enter name of selected set'
                             onChange={(evt) => setOverlap({ name: evt.target.value, overlapGenes: overlap.overlapGenes })}
+                            multiline
+                            inputProps={{ style: { resize: "both" } }}
                         />
                         <TextField
                             multiline

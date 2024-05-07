@@ -8,7 +8,7 @@ export function ClusteredHeatmap({ selectedSets, heatmapOptions }: {
         alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined;
-    heatmapOptions: {diagonal: boolean}
+    heatmapOptions: { diagonal: boolean, palette: string }
 }) {
     let genesetDict: { [key: string]: string[] } = {}
     selectedSets?.forEach((geneset) => {

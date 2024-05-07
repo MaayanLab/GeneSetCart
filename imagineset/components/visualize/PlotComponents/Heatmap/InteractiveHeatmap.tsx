@@ -23,6 +23,7 @@ export type HeatmapProps = {
         createdAt: Date;
     }[];
     setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
+    heatmapOptions: { diagonal: boolean, palette: string }
 };
 
 export type InteractionData = {
@@ -44,13 +45,12 @@ function jaccard_similarity(set1: string[], set2: string[]) {
     return intersection.length / union.length
 }
 
-export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: HeatmapProps) => {
+export const Heatmap = ({ width, height, legendSelectedSets, setOverlap, heatmapOptions }: HeatmapProps) => {
     const [clusteredGroups, setClusteredGroups] = React.useState<{ [key: string]: string } | null>()
     const [clusterClassesCount, setClusteredClassesCount] = React.useState<{ [key: string]: number } | null>()
     React.useEffect(() => {
         getClustermapClasses(legendSelectedSets)
             .then((clusteredClasses) => {
-                console.log(clusteredClasses)
                 if (legendSelectedSets) {
                     const yGroups: { [key: string]: string } = {}
                     legendSelectedSets.forEach((geneset, i) => {
@@ -101,10 +101,10 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
                 for (let [n, innerLoop] of sortedLegendSets.entries()) {
                     const x = geneset.name
                     const y = innerLoop.name
-                    const xyJaccard = (x !== y) ? jaccard_similarity(geneset.genes.map((gene) => gene.gene_symbol), innerLoop.genes.map((gene) => gene.gene_symbol)) : 0
+                    const xyJaccard = (x !== y) ? jaccard_similarity(geneset.genes.map((gene) => gene.gene_symbol), innerLoop.genes.map((gene) => gene.gene_symbol)) : (heatmapOptions.diagonal) ? 1 : 0
                     const geneset1 = geneset.genes.map((gene) => gene.gene_symbol)
                     const geneset2 = innerLoop.genes.map((gene) => gene.gene_symbol)
-                    const overlap = (x !== y) ? geneset1.filter((x) => geneset2.includes(x)) : []
+                    const overlap = (x !== y) ? geneset1.filter((x) => geneset2.includes(x)) : (heatmapOptions.diagonal) ? geneset1 : []
                     genesetRow.push({ x: geneset.alphabet, y: innerLoop.alphabet, value: xyJaccard, overlap: overlap })
                 }
                 return genesetRow
@@ -113,21 +113,36 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
         } else {
             return []
         }
-    }, [legendSelectedSets, clusteredGroups])
+    }, [legendSelectedSets, clusteredGroups, heatmapOptions])
 
     const [hoveredCell, setHoveredCell] = React.useState<InteractionData | null>(null);
     // Color scale is computed here bc it must be passed to both the renderer and the legend
-    const values = data ? data
-        .map((d) => d.value)
-        .filter((d): d is number => d !== null) : [];
-    const max = d3.max(values) || 1;
 
-    const colorScale = d3
-        // .scaleLinear<string>()
-        .scaleSequential()
-        .interpolator(d3.interpolateViridis)
-        .domain([0, max])
-    // .range(["lightblue", "purple"]);
+    const values = React.useMemo(() => {return data ? data
+        .map((d) => d.value)
+        .filter((d): d is number => d !== null) : [];}, [heatmapOptions, data])
+
+    const max = React.useMemo(() => {return d3.max(values) || 1; }, [values])
+
+    const colorScale = React.useMemo(() => {
+        if (heatmapOptions.palette === 'viridis') {
+            return d3.scaleSequential()
+                .interpolator(d3.interpolateViridis)
+                .domain([0, max])
+        } else if (heatmapOptions.palette === 'inferno') {
+            return d3.scaleSequential()
+                .interpolator(d3.interpolateInferno)
+                .domain([0, max])
+        } else if (heatmapOptions.palette === 'magma') {
+            return d3.scaleSequential()
+                .interpolator(d3.interpolateMagma)
+                .domain([0, max])
+        } else {
+            return d3.scaleSequential()
+                .interpolator(d3.interpolatePlasma)
+                .domain([0, max])
+        }
+    }, [heatmapOptions, max])
 
     return (
         <div style={{ position: "relative" }}>
@@ -139,6 +154,7 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
                 setOverlap={setOverlap}
                 colorScale={colorScale}
                 clusterClasses={clusterClassesCount ? clusterClassesCount : {}}
+                heatmapOptions={heatmapOptions}
             />
             <Tooltip interactionData={hoveredCell} width={width} height={height} />
             <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
@@ -147,6 +163,7 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap }: Heatm
                     width={200}
                     colorScale={colorScale}
                     interactionData={hoveredCell}
+                    heatmapOptions={heatmapOptions}
                 />
             </div>
         </div>

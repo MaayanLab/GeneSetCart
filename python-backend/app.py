@@ -78,6 +78,7 @@ def createHeatmap():
     data = request.get_json()
     genesets_dict = data['genesets_dict']
     display_diagonal= data['display-diagonal']
+    color_palette = data['color-palette']
     jindex_arrays = jaccard_similarity_multiple(genesets_dict)
     geneset_names = list(genesets_dict.keys())
     jindex_df = pd.DataFrame(jindex_arrays, columns=geneset_names) 
@@ -91,12 +92,13 @@ def createHeatmap():
     col_linkage = linkage(
         distance.pdist(correlations_array.T), method='average')
     if display_diagonal: 
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap='viridis', vmin=0)
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, vmin=0)
     else: 
         np.fill_diagonal(a, 5)
         mask = np.where(a == 5, True, False)
         plt.clf()
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap='viridis', mask=mask, vmin=0)
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, mask=mask, vmin=0)
+    plt.rcParams["font.size"] = "12"
     # Save plot to a BytesIO object 
     img = io.BytesIO()
     plt.savefig(img, format='svg')

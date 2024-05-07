@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControlLabel, Stack, TextField, Switch, Tooltip } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, Stack, TextField, Switch, Tooltip, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { UMAPOptionsType } from './VisualizeLayout';
 import React from 'react';
 import { OptionsSlider } from './OptionsSlider';
@@ -10,10 +10,11 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
         visualization: string,
         umapOptions: UMAPOptionsType,
         setUmapOptions: React.Dispatch<React.SetStateAction<UMAPOptionsType>>,
-        heatmapOptions: { diagonal: boolean; interactive: boolean },
+        heatmapOptions: { diagonal: boolean; interactive: boolean, palette: string },
         setHeatmapOptions: React.Dispatch<React.SetStateAction<{
             diagonal: boolean;
             interactive: boolean;
+            palette: string
         }>>
     }) {
     const [switchChecked, setSwitchChecked] = React.useState(false)
@@ -72,7 +73,7 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
     if (visualization === 'UMAP') {
         return (
             <>
-                <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
+                <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 1 }}>
                     <FormControlLabel
                         label="Assign groups"
                         control={
@@ -128,7 +129,7 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
                 </Stack>
 
                 {switchChecked && <Stack direction='column' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
-                    <Stack sx={{ justifyContent: 'center', padding: 2, flexDirection: 'row' }}>
+                    <Stack sx={{ justifyContent: 'center', padding: 1, flexDirection: 'row' }}>
                         <OptionsSlider optionName='minDist' range={[0.1, 1]} step={0.1} defaultParam={umapOptions.minDist} umapOptions={umapOptions} setUmapOptions={setUmapOptions} />
                         <OptionsSlider optionName='spread' range={[0, 3]} step={0.01} defaultParam={umapOptions.spread} umapOptions={umapOptions} setUmapOptions={setUmapOptions} />
                         <OptionsSlider optionName='nNeighbors' range={[1, 50]} step={1} defaultParam={umapOptions.nNeighbors} umapOptions={umapOptions} setUmapOptions={setUmapOptions} />
@@ -149,14 +150,14 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
 
     if (visualization === 'Heatmap') {
         return (
-            <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
+            <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 1 }}>
                 <FormControlLabel
                     label="Mask Diagonal"
                     control={
                         <Checkbox
                             checked={!heatmapOptions.diagonal}
                             onChange={(evt) => {
-                                setHeatmapOptions({ diagonal: !heatmapOptions.diagonal, interactive: heatmapOptions.interactive })
+                                setHeatmapOptions({ diagonal: !heatmapOptions.diagonal, interactive: heatmapOptions.interactive, palette: heatmapOptions.palette })
                             }
                             }
                         />
@@ -165,15 +166,32 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
                 <FormControlLabel
                     label="Interactive"
                     control={
-                <Switch
-                    color='secondary'
-                    checked={heatmapOptions.interactive}
-                    onChange={(evt) => {
-                        setHeatmapOptions({ diagonal: heatmapOptions.diagonal, interactive: !heatmapOptions.interactive, })
-                    }}
-                />
+                        <Switch
+                            color='secondary'
+                            checked={heatmapOptions.interactive}
+                            onChange={(evt) => {
+                                setHeatmapOptions({ diagonal: heatmapOptions.diagonal, interactive: !heatmapOptions.interactive, palette: heatmapOptions.palette})
+                            }}
+                        />
                     }
                 />
+                <FormControl sx={{minWidth: 120}}>
+                    <InputLabel id="color-palette" color='secondary'>Color Palette</InputLabel>
+                    <Select
+                        labelId="color-palette"
+                        value={heatmapOptions.palette}
+                        label="Color Palette"
+                        onChange={(evt) => {
+                            setHeatmapOptions({ diagonal: heatmapOptions.diagonal, interactive: heatmapOptions.interactive, palette: evt.target.value})
+                        }}
+                        color='secondary'
+                    >
+                        <MenuItem value={'viridis'}>viridis</MenuItem>
+                        <MenuItem value={'inferno'}>inferno</MenuItem>
+                        <MenuItem value={'magma'}>magma</MenuItem>
+                        <MenuItem value={'plasma'}>plasma</MenuItem>
+                    </Select>
+                </FormControl>
             </Stack>
         )
     }

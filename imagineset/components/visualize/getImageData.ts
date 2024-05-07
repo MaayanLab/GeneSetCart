@@ -4,7 +4,7 @@ import { Gene } from "@prisma/client"
 
 export async function getClustermap(genesetDict: {
     [key: string]: string[];
-}, heatmapOptions: {diagonal: boolean}){
+}, heatmapOptions: { diagonal: boolean, palette: string }){
     const API_BASE_URL = process.env.PYTHON_API_BASE
     if (!API_BASE_URL) throw new Error('API_BASE_URL not found') 
     const req = await fetch(API_BASE_URL + '/api/getHeatmap', {
@@ -12,7 +12,7 @@ export async function getClustermap(genesetDict: {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 'genesets_dict': genesetDict, 'display-diagonal': heatmapOptions.diagonal }),
+        body: JSON.stringify({ 'genesets_dict': genesetDict, 'display-diagonal': heatmapOptions.diagonal, 'color-palette': heatmapOptions.palette }),
     })
     const response = await req.text()
     return response

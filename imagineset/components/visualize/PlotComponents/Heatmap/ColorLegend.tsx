@@ -8,6 +8,7 @@ type ColorLegendProps = {
   width: number;
   colorScale: d3.ScaleSequential<string, never>;
   interactionData: InteractionData | null;
+  heatmapOptions: { diagonal: boolean, palette: string }
 };
 
 const COLOR_LEGEND_MARGIN = { top: 0, right: 0, bottom: 50, left: 0 };
@@ -17,6 +18,7 @@ export const ColorLegend = ({
   colorScale,
   width,
   interactionData,
+  heatmapOptions
 }: ColorLegendProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -78,7 +80,7 @@ export const ColorLegend = ({
       context.fillStyle = colorScale((max * i) / boundsWidth);
       context.fillRect(i, 0, 1, boundsHeight);
     }
-  }, [width, height]);
+  }, [width, height, heatmapOptions]);
 
   return (
     <div style={{ width, height }}>

@@ -14,6 +14,7 @@ type RendererProps = {
   setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
   colorScale: d3.ScaleSequential<string, never>;
   clusterClasses: { [key: string]: number };
+  heatmapOptions: {diagonal: boolean}
 };
 
 
@@ -24,7 +25,8 @@ export const Renderer = ({
   setOverlap,
   setHoveredCell,
   colorScale,
-  clusterClasses
+  clusterClasses,
+  heatmapOptions
 }: RendererProps) => {
   // The bounds (=area inside the axis) is calculated by substracting the margins
   const boundsWidth = width - MARGIN.right - MARGIN.left;
@@ -65,15 +67,12 @@ export const Renderer = ({
       return (
         <rect
           key={i}
-          // r={4}
           x={xScale(d.x)}
           y={yScale(d.y)}
           width={xScale.bandwidth()}
           height={yScale.bandwidth()}
           opacity={1}
-          fill={'white'}
-          // rx={5}
-          // stroke={"white"}
+          fill={heatmapOptions.diagonal ? colorScale(d.value) : 'white'}
           onMouseEnter={(e) => {
             setHoveredCell({
               xLabel: "Gene Set " + d.x,
@@ -85,6 +84,7 @@ export const Renderer = ({
             });
           }}
           onMouseLeave={() => setHoveredCell(null)}
+          onMouseDown={() => setOverlap({ name: d.x + ',' + d.y, overlapGenes: d.overlap })}
           cursor="pointer"
         />
       );
@@ -93,15 +93,12 @@ export const Renderer = ({
     return (
       <rect
         key={i}
-        // r={4}
         x={xScale(d.x)}
         y={yScale(d.y)}
         width={xScale.bandwidth()}
         height={yScale.bandwidth()}
         opacity={1}
         fill={colorScale(d.value)}
-        // rx={5}
-        // stroke={"white"}
         onMouseEnter={(e) => {
           setHoveredCell({
             xLabel: "Gene set " + d.x,
@@ -133,7 +130,7 @@ export const Renderer = ({
         y={boundsHeight + 10}
         textAnchor="middle"
         dominantBaseline="middle"
-        fontSize={10}
+        fontSize={12}
       >
         {name}
       </text>
@@ -154,7 +151,7 @@ export const Renderer = ({
         y={y + yScale.bandwidth() / 2}
         textAnchor="end"
         dominantBaseline="middle"
-        fontSize={10}
+        fontSize={12}
       >
         {name}
       </text>

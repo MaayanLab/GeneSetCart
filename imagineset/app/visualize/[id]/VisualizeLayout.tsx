@@ -61,19 +61,21 @@ const downloadLegend = (filename: string, text: string) => {
 }
 
 
-function downloadPNG(divId: string) {
-    const div = document.getElementById(divId)
-    if (div) {
-        html2canvas(div).then(function (canvas: { toDataURL: (arg0: string) => any; }) {
-            let myImage = canvas.toDataURL("image/png");
-            downloadURI("data:" + myImage, "visualization.png");
+function downloadPNG(divId: string, filename: string) {
+    if (filename !== '') {
+        const div = document.getElementById(divId)
+        if (div) {
+            html2canvas(div).then(function (canvas: { toDataURL: (arg0: string) => any; }) {
+                let myImage = canvas.toDataURL("image/png");
+                downloadURI("data:" + myImage, filename + ".png");
+            }
+            );
         }
-        );
     }
 }
 
 
-const downloadSVG = () => {
+const downloadSVG = (filename: string) => {
     //get svg element.
     let svg = document.getElementById("svg");
     if (svg) {
@@ -94,7 +96,7 @@ const downloadSVG = () => {
 }
 
 
-function downloadSVGByDiv(divId: string) {
+function downloadSVGByDiv(divId: string, filename: string) {
     const div = document.getElementById(divId)
     const svgEl = div?.firstChild
     if (svgEl) {
@@ -178,7 +180,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
     const [assignGroups, setAssignGroups] = React.useState(false)
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
-    const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: false })
+    const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: false, palette: 'viridis' })
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -194,7 +196,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     };
 
     const legendSelectedSets = React.useMemo(() => {
-        setVisualization('')
+        // setVisualization('')
         setOverlap({ name: '', overlapGenes: [] })
         if ((checkedSets !== null) && (visType !== null)) {
             setVisualization(visType)
@@ -243,7 +245,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
         return ''
     }, [legendSelectedSets, visualization])
 
-    const downloadHeatmapSVG = React.useCallback(() =>  {
+    const downloadHeatmapSVG = React.useCallback(() => {
         let genesetDict: { [key: string]: string[] } = {}
         legendSelectedSets?.forEach((geneset) => {
             const genes = geneset.genes.map((gene) => gene.gene_symbol)
@@ -251,13 +253,13 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             genesetDict[genesetName] = genes
         })
         getClustermap(genesetDict, heatmapOptions)
-        .then((heatmapImage) => {
-            const svgString = `data:image/svg+xml;utf8,${encodeURIComponent(heatmapImage)}`
-            downloadURI(svgString, 'svg-visualization.svg')
-        }).catch((err) => console.log(err))
+            .then((heatmapImage) => {
+                const svgString = `data:image/svg+xml;utf8,${encodeURIComponent(heatmapImage)}`
+                downloadURI(svgString, 'Heatmap.svg')
+            }).catch((err) => console.log(err))
     }, [legendSelectedSets, heatmapOptions])
 
-    const downloadSuperVennSVG =  React.useCallback(() =>  {
+    const downloadSuperVennSVG = React.useCallback(() => {
         let genesetDict: { [key: string]: string[] } = {}
         legendSelectedSets?.forEach((geneset) => {
             const genes = geneset.genes.map((gene) => gene.gene_symbol)
@@ -265,11 +267,10 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
             genesetDict[genesetName] = genes
         })
         getSuperVenn(genesetDict)
-        .then((imgString) => {
-            console.log(imgString)
-            const svgString = `data:image/svg+xml;utf8,${encodeURIComponent(imgString)}`
-            downloadURI(svgString, 'svg-visualization.svg')
-        }).catch((err) => console.log(err))
+            .then((imgString) => {
+                const svgString = `data:image/svg+xml;utf8,${encodeURIComponent(imgString)}`
+                downloadURI(svgString, 'SuperVenn.svg')
+            }).catch((err) => console.log(err))
     }, [legendSelectedSets])
 
 
@@ -369,12 +370,12 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                             </div>
                         </Tooltip>
                     </Stack>
-                    <Box sx={{ boxShadow: 2, borderRadius: 2, minHeight: 400, minWidth: '400px', maxWidth: '100%' }}>
-                        <Stack direction='column' sx={{ p: 0 }}>
-                            <Box sx={{ backgroundColor: '#C9D2E9', minHeight: 50, minWidth: '100%' }}>
-                                <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 2 }}>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadPNG('visualization') }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGByDiv('venn') } else if (visualization=== 'Heatmap') {downloadHeatmapSVG()} else if (visualization === 'SuperVenn') { downloadSuperVennSVG() } else { downloadSVG() } }} ><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                    <Box sx={{ boxShadow: 2, borderRadius: 10, minHeight: 400, minWidth: '400px', maxWidth: '100%', backgroundColor: '#FFFFFF'}}>
+                        <Stack direction='column'>
+                            <Box sx={{ minHeight: 50, minWidth: '100%', backgroundColor: '#FFFFFF', borderRadius: 10 }}>
+                                <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 1, marginTop: 1 }}>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadPNG('visualization', visualization) }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGByDiv('venn', visualization) } else if (visualization === 'Heatmap') { downloadHeatmapSVG() } else if (visualization === 'SuperVenn') { downloadSuperVennSVG() } else { downloadSVG(visualization) } }} ><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
                                     <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
                                     <ClickAwayListener onClickAway={handleTooltipClose}>
                                         <div>
@@ -396,9 +397,9 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 </Stack>
                                 {<AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} heatmapOptions={heatmapOptions} setHeatmapOptions={setHeatmapOptions} />}
                             </Box>
-                            <Box sx={{ justifyContent: 'center' }}>
-                                <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%' }}>
-                                    {(visualization === 'Heatmap' && checked.length < 39 && checked.length > 1 && heatmapOptions.interactive) && <Heatmap legendSelectedSets={legendSelectedSets} width={700} height={700} setOverlap={setOverlap} />}
+                            <Box sx={{ justifyContent: 'center'}}>
+                                <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px'}}>
+                                    {(visualization === 'Heatmap' && checked.length < 39 && checked.length > 1 && heatmapOptions.interactive) && <Heatmap legendSelectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} width={700} height={700} setOverlap={setOverlap} />}
                                     {(visualization === 'Heatmap' && checked.length > 1 && checked.length < 39 && !heatmapOptions.interactive) && <ClusteredHeatmap selectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} />}
                                     {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}

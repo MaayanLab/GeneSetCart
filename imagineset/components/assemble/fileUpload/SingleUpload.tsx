@@ -11,6 +11,7 @@ import { addToSessionSets, checkInSession, checkValidGenes, loadTxtExample } fro
 import { useParams } from "next/navigation";
 import Status from "../Status";
 import { getGenesetInfo } from "@/app/shallowcopy";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 export type addStatus = {
     success?: boolean,
@@ -157,7 +158,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                                     }
                                 }}
                             >
-                                Upload File
+                                UPLOAD FILE
                                 <input
                                     id='single-file-input'
                                     hidden
@@ -168,7 +169,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             <Button
                                 variant="contained"
                                 onClick={downloadExample}>
-                                Download Example
+                                DOWNLOAD EXAMPLE
                             </Button>
                         </Stack>
                     </Grid>
@@ -189,13 +190,14 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                     </Grid>
                     <Grid container item spacing={2} sx={{ mt: 1 }} justifyContent={'center'}>
                         <Grid item>
-                            <Button onClick={getExample} variant='outlined' color="secondary">
+                            <Button onClick={getExample} variant='contained' color="primary">
                                 TRY EXAMPLE
                             </Button>
                         </Grid>
                         <Grid item>
-                            <Button variant='outlined' color="secondary" onClick={(evt) => submitGeneset(evt)}>
-                                ADD TO SETS
+                            <Button variant='contained' color="tertiary" onClick={(evt) => submitGeneset(evt)}>
+                            <AddShoppingCartIcon /> &nbsp; 
+                                ADD TO CART
                             </Button>
                         </Grid>
                     </Grid>

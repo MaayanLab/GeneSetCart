@@ -8,6 +8,7 @@ import { enrich } from "@/app/analyze/[id]/ViewGenesBtn";
 import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
 import { addStatus } from "@/components/assemble/fileUpload/SingleUpload";
 import Status from "@/components/assemble/Status";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 export const RenderGeneSet1 = ({ params, sessionId }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, sessionId: string }) => {
     const [open, setOpen] = React.useState(false);
@@ -91,6 +92,7 @@ export const RenderGeneSet1 = ({ params, sessionId }: { params: GridRenderCellPa
                                 })
                             }}
                         >
+                            <AddShoppingCartIcon /> &nbsp; 
                             ADD TO CART
                         </Button>
                     </Grid>
@@ -184,6 +186,7 @@ export const RenderGeneSet2 = ({ params, sessionId }: { params: GridRenderCellPa
                                 })
                             }}
                         >
+                            <AddShoppingCartIcon /> &nbsp; 
                             ADD TO CART
                         </Button>
                     </Grid>
@@ -268,6 +271,7 @@ export const RenderOverlapButton = ({ params, sessionId }: { params: GridRenderC
                                     })
                                 }}
                             >
+                                <AddShoppingCartIcon /> &nbsp; 
                                 ADD TO CART
                             </Button>
                         </Grid>

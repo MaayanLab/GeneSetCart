@@ -1,4 +1,4 @@
-import ColorToggleButton from "@/components/misc/SectionToggle";
+// import ColorToggleButton from "@/components/misc/SectionToggle";
 import VerticalTabs from "./AssembleOptions";
 import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
@@ -8,6 +8,9 @@ import { redirect } from "next/navigation";
 import { Grid } from "@mui/material";
 import Header from "@/components/header/Header";
 import { shallowCopy } from "@/app/shallowcopy";
+import dynamic from "next/dynamic";
+const ColorToggleButton = dynamic(() => import('../../../components/misc/SectionToggle'), { ssr: false })
+
 
 export default async function AssemblePage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams

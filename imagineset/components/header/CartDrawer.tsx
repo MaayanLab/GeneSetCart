@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
 import { Collapse, Grid, Stack, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
-import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
 import { Badge } from '@mui/material'
 import { Gene, type GeneSet } from '@prisma/client';
 import { copyToClipboard } from '../assemble/fileUpload/DataTable';
@@ -13,6 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { useParams } from 'next/navigation';
 import Cookies from 'js-cookie'
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 export function CollapsibleButton({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
     return (
@@ -174,7 +174,7 @@ export default function CartDrawer({ sessionInfo }: {
         <div>
             <Button onClick={toggleDrawer(true)}>
                 <Badge badgeContent={sessionGenesets ? sessionGenesets.length.toString() : '0'} color="primary">
-                    <CollectionsBookmarkIcon color='secondary' />
+                    <ShoppingCartIcon color='secondary' sx={{fontSize: 30}} />
                 </Badge>
             </Button>
             <Drawer

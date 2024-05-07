@@ -16,6 +16,7 @@ import Status from "./Status";
 import { useParams } from "next/navigation";
 import { addStatus } from "./fileUpload/SingleUpload";
 import cache from "@/lib/cache";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -173,8 +174,9 @@ export default function GeneshotSearch() {
             value={validGenes.toString().substring(1, validGenes.toString().length).replaceAll(',', '\n')}
           />
           <Grid item>
-            <Button variant='outlined' color="secondary" type='submit'>
-              ADD TO SETS
+            <Button variant='contained' color="tertiary" type='submit'>
+            <AddShoppingCartIcon /> &nbsp; 
+              ADD TO CART
             </Button>
           </Grid>
           <Grid item>

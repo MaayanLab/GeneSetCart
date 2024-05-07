@@ -7,7 +7,7 @@ import SingleUpload from '@/components/assemble/fileUpload/SingleUpload';
 import MultipleUpload from '@/components/assemble/fileUpload/MultipleUpload';
 import GeneshotSearch from '@/components/assemble/Pubmed';
 import { DCCPage } from '@/components/assemble/DCCFetch/DCCUpload';
-import { Grid } from '@mui/material';
+import { AppBar, Grid } from '@mui/material';
 
 
 interface TabPanelProps {
@@ -43,8 +43,15 @@ function a11yProps(index: number) {
   };
 }
 
+const tabIndexMapping : {[key: string]: number} = {
+  'single': 0,
+  'multiple': 1,
+  'cfde': 2, 
+  'pubmed': 3
+}
+
 export default function VerticalTabs({queryParams}: {queryParams: Record<string, string | string[] | undefined>}) {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState(typeof(queryParams['type']) === 'string' ? tabIndexMapping[queryParams['type']]: 0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -53,6 +60,7 @@ export default function VerticalTabs({queryParams}: {queryParams: Record<string,
   return (
     <Grid container direction='row' sx={{ minHeight: '70vh', maxWidth: '100%' }}>
       <Grid item container xs={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+      <AppBar position="static" sx={{border: 0.5, borderRadius: 1,  borderColor: 'divider'}}>
         <Tabs
           orientation="vertical"
           variant="scrollable"
@@ -63,11 +71,12 @@ export default function VerticalTabs({queryParams}: {queryParams: Record<string,
           indicatorColor='secondary'
           textColor='secondary'
         >
-          <Tab label="Upload .txt" {...a11yProps(0)} sx={{}} />
-          <Tab label=" Upload .gmt" {...a11yProps(1)} />
-          <Tab label="Search CFDE DCC Gene Sets" {...a11yProps(2)} />
+          <Tab label="Upload .txt" {...a11yProps(0)} sx={{borderBottom: 1, borderColor: 'divider'}} />
+          <Tab label=" Upload .gmt" {...a11yProps(1)} sx={{borderBottom: 1, borderColor: 'divider'}}/>
+          <Tab label="Search CFDE DCC Gene Sets" {...a11yProps(2)} sx={{borderBottom: 1, borderColor: 'divider'}}/>
           <Tab label="Search Gene Sets from Pubmed" {...a11yProps(3)} />
         </Tabs>
+        </AppBar>
       </Grid>
       <Grid item container xs={10}>
         <TabPanel value={value} index={0} >

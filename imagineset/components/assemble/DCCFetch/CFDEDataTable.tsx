@@ -15,6 +15,7 @@ import Status from '../Status';
 import { searchResultsType } from './DCCUpload';
 import { addStatus } from '../fileUpload/SingleUpload';
 import { Gene } from '@prisma/client';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 export function copyToClipboard(genesString: string) {
   navigator.clipboard.writeText(genesString);
@@ -115,7 +116,7 @@ export default function CFDEDataTable({ rows }: { rows: searchResultsType[] }) {
   return (
     <Stack direction='column' spacing={6}>
       <div style={{ minHeight: 200, width: '100%' }}>
-        {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> ADD TO CART</Button>}
+        {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <AddShoppingCartIcon /> &nbsp; ADD TO CART</Button>}
         <DataGrid
           getRowHeight={() => 'auto'}
           rows={rows}

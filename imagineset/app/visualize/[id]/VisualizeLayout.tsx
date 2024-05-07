@@ -33,6 +33,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { copyToClipboard } from '@/components/assemble/DCCFetch/CFDEDataTable';
 import { Heatmap } from '@/components/visualize/PlotComponents/Heatmap/InteractiveHeatmap';
 import { getClustermap, getSuperVenn } from '@/components/visualize/getImageData';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 const scrollbarStyles = {
     'webkitAppearance': 'none',
@@ -180,7 +181,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
     const [assignGroups, setAssignGroups] = React.useState(false)
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
-    const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: false, palette: 'viridis' })
+    const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: true, palette: 'viridis' })
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -282,7 +283,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                     <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, height: 350, boxShadow: 2, overflowY: 'scroll', wordWrap: 'break-word' }}>
                         <ListSubheader disableSticky={true}>
                             Genes ({overlap.overlapGenes === undefined ? 0 : overlap.overlapGenes.length})
-                            <Button color='secondary' onClick={addSelectedToCart}>  <LibraryAddIcon /> ADD TO CART</Button>
+                            <Button color='secondary' onClick={addSelectedToCart}>  <AddShoppingCartIcon /> &nbsp;  ADD TO CART</Button>
                         </ListSubheader>
                         <Status status={status} />
                         <TextField color='secondary'

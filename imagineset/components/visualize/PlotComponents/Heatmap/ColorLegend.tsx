@@ -45,7 +45,7 @@ export const ColorLegend = ({
         <text
           x={xScale(tick)}
           y={boundsHeight + 20}
-          fontSize={9}
+          fontSize={12}
           textAnchor="middle"
         >
           {tick}

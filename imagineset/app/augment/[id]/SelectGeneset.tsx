@@ -18,6 +18,7 @@ import CircularIndeterminate from '../../../components/misc/Loading';
 import Status from '../../../components/assemble/Status';
 import { addStatus } from '../../../components/assemble/fileUpload/SingleUpload';
 import { MenuProps } from '@/app/combine/[id]/GeneSetCard';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 export default function GenesetSelect({ sessionGenesets, selected, setSelected }: {
     sessionGenesets: {
@@ -213,7 +214,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
                             </Grid>
                             <Grid item xs={12}>
                                 <div className='flex justify-center'>
-                                <Button variant="contained" color='tertiary' onClick={handleAddToSets}>ADD TO SETS</Button>
+                                <Button variant="contained" color='tertiary' onClick={handleAddToSets}> <AddShoppingCartIcon /> &nbsp; ADD TO CART</Button>
                                 </div>
                             </Grid>
                             <Grid item xs={12} sx={{mt: 2}}>

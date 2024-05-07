@@ -14,6 +14,8 @@ import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { useParams } from 'next/navigation';
 import { addStatus } from './SingleUpload';
 import Status from '../Status';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+
 
 export function copyToClipboard(genesString: string) {
   navigator.clipboard.writeText(genesString);
@@ -115,7 +117,7 @@ export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
 
   return (
     <div style={{ height: 400, width: '100%' }}>
-      {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <LibraryAddIcon /> ADD TO CART</Button>}
+      {selectedRows.length > 0 && <Button color='tertiary' onClick={addSets}> <AddShoppingCartIcon /> &nbsp; ADD TO CART</Button>}
       <DataGrid
         getRowHeight={() => 'auto'}
         rows={rows}

@@ -9,6 +9,7 @@ import { copyToClipboard } from "../../../components/assemble/DCCFetch/CFDEDataT
 import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
 import { addStatus } from "../../../components/assemble/fileUpload/SingleUpload";
 import InfoIcon from '@mui/icons-material/Info';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 const scrollbarStyles = {
     'webkitAppearance': 'none',
@@ -190,8 +191,9 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                                 <Button variant='outlined' color="secondary" onClick={(event) => copyToClipboard(displayedGenes.toString().replaceAll(',', '\n'))}>
                                     COPY
                                 </Button>
-                                <Button variant='outlined' color="secondary" onClick={handleAddToSets}>
-                                    ADD TO SETS
+                                <Button variant='contained' color="tertiary" onClick={handleAddToSets}>
+                                    <AddShoppingCartIcon /> &nbsp; 
+                                    ADD TO CART
                                 </Button>
                             </Stack>
                             <Status status={status} />

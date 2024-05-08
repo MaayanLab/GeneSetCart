@@ -8,7 +8,7 @@ export function ClusteredHeatmap({ selectedSets, heatmapOptions }: {
         alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined;
-    heatmapOptions: { diagonal: boolean, palette: string }
+    heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean }
 }) {
     const [heatmapImageString, setHeatmapImageString] = React.useState<string | null>(null)
 

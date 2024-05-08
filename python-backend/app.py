@@ -79,6 +79,8 @@ def createHeatmap():
     genesets_dict = data['genesets_dict']
     display_diagonal= data['display-diagonal']
     color_palette = data['color-palette']
+    font_size = data['font-size']
+    disable_labels  = data['disable-labels']
     jindex_arrays = jaccard_similarity_multiple(genesets_dict)
     geneset_names = list(genesets_dict.keys())
     jindex_df = pd.DataFrame(jindex_arrays, columns=geneset_names) 
@@ -92,13 +94,13 @@ def createHeatmap():
     col_linkage = linkage(
         distance.pdist(correlations_array.T), method='average')
     if display_diagonal: 
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, vmin=0, yticklabels=(len(genesets_dict.keys()) < 40), xticklabels=(len(genesets_dict.keys()) < 40))
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels))
     else: 
         np.fill_diagonal(a, 5)
         mask = np.where(a == 5, True, False)
         plt.clf()
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, mask=mask, vmin=0, yticklabels=(len(genesets_dict.keys()) < 40), xticklabels=(len(genesets_dict.keys()) < 40))
-    plt.rcParams["font.size"] = "12"
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, mask=mask, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels))
+    plt.rcParams["font.size"] = font_size
     # Save plot to a BytesIO object 
     img = io.BytesIO()
     plt.savefig(img, format='svg')
@@ -133,11 +135,6 @@ def createClusteredHeatmap():
     for term, geneset in genesets_dict.items():
         geneset_string= str(geneset).replace(',', ' ')
         geneset_strings.append(geneset_string)
-    # create object
-    tfidf = TfidfVectorizer(max_df=1.0, min_df=1)
-    # get tf-df values
-    X = tfidf.fit_transform(geneset_strings)
-    # link = linkage(X.toarray(), metric='correlation', method='average')
     link = linkage(jindex_arrays, metric='correlation', method='average', optimal_ordering=True)
     den = dendrogram(link, labels=list(genesets_dict.keys()), no_plot=True, count_sort=True)
     # get clusters

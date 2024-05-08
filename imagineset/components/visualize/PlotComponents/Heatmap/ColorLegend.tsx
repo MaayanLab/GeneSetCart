@@ -8,7 +8,7 @@ type ColorLegendProps = {
   width: number;
   colorScale: d3.ScaleSequential<string, never>;
   interactionData: InteractionData | null;
-  heatmapOptions: { diagonal: boolean, palette: string }
+  heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean }
 };
 
 const COLOR_LEGEND_MARGIN = { top: 0, right: 0, bottom: 50, left: 0 };
@@ -45,7 +45,7 @@ export const ColorLegend = ({
         <text
           x={xScale(tick)}
           y={boundsHeight + 20}
-          fontSize={12}
+          fontSize={heatmapOptions.fontSize}
           textAnchor="middle"
         >
           {tick}

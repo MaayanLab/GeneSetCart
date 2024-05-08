@@ -180,7 +180,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
     const [assignGroups, setAssignGroups] = React.useState(false)
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
-    const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: true, palette: 'viridis' })
+    const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: true, palette: 'viridis', fontSize: 12, disableLabels: false })
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -208,6 +208,9 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                     newSet['alphabet'] = i.toString()
                     return newSet
                 })
+                if (selectedSets.length  > 40) {
+                    setHeatmapOptions({...heatmapOptions, disableLabels: true})
+                }
                 return dataArrays
             } else {
                 const dataArrays = selectedSets.map((geneset, i) => {
@@ -217,7 +220,6 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                 })
                 return dataArrays
             }
-
         } else {
             return []
         }
@@ -349,7 +351,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 </Button>
                             </div>
                         </Tooltip>
-                        <Tooltip title={"Can visualize 2 - 38 selected sets "}>
+                        <Tooltip title={"Can visualize > 1 selected sets "}>
                             <div>
                                 <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Heatmap') }} disabled={!(checked.length > 1)}>
                                     <Image
@@ -378,9 +380,9 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                         <Stack direction='column'>
                             <Box sx={{ minHeight: 50, minWidth: '100%', backgroundColor: '#FFFFFF', borderRadius: 10 }}>
                                 <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 1, marginTop: 1 }}>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadPNG('visualization', visualization) }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { if (visualization === 'Venn') { downloadSVGByDiv('venn', visualization) } else if (visualization === 'Heatmap') { downloadHeatmapSVG() } else if (visualization === 'SuperVenn') { downloadSuperVennSVG() } else { downloadSVG(visualization) } }} ><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height:25 }} onClick={() => { downloadPNG('visualization', visualization) }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height:25 }} onClick={() => { if (visualization === 'Venn') { downloadSVGByDiv('venn', visualization) } else if (visualization === 'Heatmap') { downloadHeatmapSVG() } else if (visualization === 'SuperVenn') { downloadSuperVennSVG() } else { downloadSVG(visualization) } }} ><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height:25 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
                                     <ClickAwayListener onClickAway={handleTooltipClose}>
                                         <div>
                                             <Tooltip
@@ -394,7 +396,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                                 disableTouchListener
                                                 title="Copied"
                                             >
-                                                <Button variant='outlined' color='secondary' sx={{ borderRadius: 2 }} disabled={sessionInfo?.private} onClick={() => { handleTooltipOpen(); copyToClipboard(`https://g2sg.cfde.cloud${pathname}?checked=${checked.toString()}&type=${visualization}`) }}><ShareIcon /> &nbsp;<Typography >Share</Typography></Button>
+                                                <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height:25 }} disabled={sessionInfo?.private} onClick={() => { handleTooltipOpen(); copyToClipboard(`https://g2sg.cfde.cloud${pathname}?checked=${checked.toString()}&type=${visualization}`) }}><ShareIcon /> &nbsp;<Typography >Share</Typography></Button>
                                             </Tooltip>
                                         </div>
                                     </ClickAwayListener>

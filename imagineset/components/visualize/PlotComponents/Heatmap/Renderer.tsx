@@ -14,7 +14,7 @@ type RendererProps = {
   setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
   colorScale: d3.ScaleSequential<string, never>;
   clusterClasses: { [key: string]: number };
-  heatmapOptions: {diagonal: boolean}
+  heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean }
 };
 
 
@@ -116,7 +116,7 @@ export const Renderer = ({
     );
   });
 
-  const xLabels = allXGroups.length < 41 ? allXGroups.map((name, i) => {
+  const xLabels = !heatmapOptions.disableLabels ? allXGroups.map((name, i) => {
     const x = xScale(name);
 
     if (!x) {
@@ -130,14 +130,14 @@ export const Renderer = ({
         y={boundsHeight + 10}
         textAnchor="middle"
         dominantBaseline="middle"
-        fontSize={12}
+        fontSize={heatmapOptions.fontSize}
       >
         {name}
       </text>
     );
   }) : <></>;
 
-  const yLabels =  allYGroups.length < 41 ? allYGroups.map((name, i) => {
+  const yLabels =  !heatmapOptions.disableLabels ? allYGroups.map((name, i) => {
     const y = yScale(name);
 
     if (!y) {
@@ -151,7 +151,7 @@ export const Renderer = ({
         y={y + yScale.bandwidth() / 2}
         textAnchor="end"
         dominantBaseline="middle"
-        fontSize={12}
+        fontSize={heatmapOptions.fontSize}
       >
         {name}
       </text>

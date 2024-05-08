@@ -1,20 +1,25 @@
-import { Button, Checkbox, FormControlLabel, Stack, TextField, Switch, Tooltip, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, Stack, TextField, Switch, Tooltip, FormControl, InputLabel, Select, MenuItem, InputAdornment } from '@mui/material';
 import { UMAPOptionsType } from './VisualizeLayout';
 import React from 'react';
 import { OptionsSlider } from './OptionsSlider';
 import { loadDataFileExample } from '@/components/visualize/PlotComponents/Umap/getUMAP';
 import InfoIcon from '@mui/icons-material/Info';
+import FormatSizeIcon from '@mui/icons-material/FormatSize';
+import FontDownloadOffIcon from '@mui/icons-material/FontDownloadOff';
+import FontDownloadIcon from '@mui/icons-material/FontDownload';
 
 export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, heatmapOptions, setHeatmapOptions }:
     {
         visualization: string,
         umapOptions: UMAPOptionsType,
         setUmapOptions: React.Dispatch<React.SetStateAction<UMAPOptionsType>>,
-        heatmapOptions: { diagonal: boolean; interactive: boolean, palette: string },
+        heatmapOptions: { diagonal: boolean; interactive: boolean, palette: string, fontSize: number, disableLabels: boolean },
         setHeatmapOptions: React.Dispatch<React.SetStateAction<{
             diagonal: boolean;
             interactive: boolean;
-            palette: string
+            palette: string;
+            fontSize: number;
+            disableLabels: boolean
         }>>
     }) {
     const [switchChecked, setSwitchChecked] = React.useState(false)
@@ -157,7 +162,7 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
                         <Checkbox
                             checked={!heatmapOptions.diagonal}
                             onChange={(evt) => {
-                                setHeatmapOptions({ diagonal: !heatmapOptions.diagonal, interactive: heatmapOptions.interactive, palette: heatmapOptions.palette })
+                                setHeatmapOptions({ ...heatmapOptions, diagonal: !heatmapOptions.diagonal })
                             }
                             }
                         />
@@ -170,19 +175,19 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
                             color='secondary'
                             checked={heatmapOptions.interactive}
                             onChange={(evt) => {
-                                setHeatmapOptions({ diagonal: heatmapOptions.diagonal, interactive: !heatmapOptions.interactive, palette: heatmapOptions.palette})
+                                setHeatmapOptions({ ...heatmapOptions, interactive: !heatmapOptions.interactive })
                             }}
                         />
                     }
                 />
-                <FormControl sx={{minWidth: 120}}>
+                <FormControl sx={{ minWidth: 120 }}>
                     <InputLabel id="color-palette" color='secondary'>Color Palette</InputLabel>
                     <Select
                         labelId="color-palette"
                         value={heatmapOptions.palette}
                         label="Color Palette"
                         onChange={(evt) => {
-                            setHeatmapOptions({ diagonal: heatmapOptions.diagonal, interactive: heatmapOptions.interactive, palette: evt.target.value})
+                            setHeatmapOptions({ ...heatmapOptions, palette: evt.target.value })
                         }}
                         color='secondary'
                     >
@@ -192,6 +197,39 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
                         <MenuItem value={'plasma'}>plasma</MenuItem>
                     </Select>
                 </FormControl>
+                <TextField
+                    id="input-with-icon-textfield"
+                    label="Font size"
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <FormatSizeIcon />
+                            </InputAdornment>
+                        ),
+                        type: 'number'
+                    }}
+                    variant="standard"
+                    sx={{ width: 80 }}
+                    color='secondary'
+                    value={heatmapOptions.fontSize}
+                    onChange={(evt) => setHeatmapOptions({ ...heatmapOptions, fontSize: parseInt(evt.target.value) })}
+                />
+                {heatmapOptions.disableLabels &&
+                    <Tooltip title={"Enable axis tick labels"}>
+                        <div>
+                            <Button>
+                                <FontDownloadOffIcon color='secondary' onClick={(evt) => setHeatmapOptions({ ...heatmapOptions, disableLabels: !heatmapOptions.disableLabels })} />
+                            </Button>
+                        </div>
+                    </Tooltip>}
+                {!heatmapOptions.disableLabels &&
+                    <Tooltip title={"Disable axis tick labels"}>
+                        <div>
+                            <Button>
+                                <FontDownloadIcon color='secondary' onClick={(evt) => setHeatmapOptions({ ...heatmapOptions, disableLabels: !heatmapOptions.disableLabels })} />
+                            </Button>
+                        </div>
+                    </Tooltip>}
             </Stack>
         )
     }

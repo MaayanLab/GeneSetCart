@@ -2,10 +2,11 @@
 
 import { Typography } from '@mui/material';
 import Link from 'next/link';
+import { TextNav } from './client';
 
 export default function GMTHeader({ sessionId }: { sessionId: string }) {
   return <Link href={`/gmt-cross/${sessionId}`}>
-    <Typography variant="nav">CFDE GMT CROSSING</Typography>
+     <TextNav title={"CFDE GMT CROSSING"} path={`/gmt-cross/${sessionId}`} />
   </Link>
 }
 

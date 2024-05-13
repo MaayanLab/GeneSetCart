@@ -10,6 +10,6 @@ export const StartButton = () => {
     }
 
     return (
-        <Button variant='contained' size='large' color="secondary" onClick={startSession} sx={{borderRadius: 5, marginTop: 3, height: '60px', width: '200px'}}> <Typography variant="h5">Start New Session</Typography></Button>
+        <Button variant='contained' size='large' color="secondary" onClick={startSession} sx={{borderRadius: 5, marginTop: 3, height: '60px', width: '200px'}}> <Typography variant="h5">Get Started</Typography></Button>
     )
 }

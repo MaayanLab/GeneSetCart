@@ -20,6 +20,7 @@ import { Button } from '@mui/material'
 import g2sgLogo from "@/public/img/g2sg-logo-nbg.png"
 import Cookies from 'js-cookie'
 import { cookies } from 'next/headers'
+import { TextNav } from './client'
 
 const AppTitle = dynamic(() => import("./AppTitle"), {
     ssr: false, loading: () => <Button className='flex items-center space-x-3' href='/'>
@@ -80,7 +81,7 @@ export async function getSessionInfo(sessionId: string) {
             gene_sets: {
                 include: {
                     genes: true
-                }, 
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -91,19 +92,19 @@ export async function getSessionInfo(sessionId: string) {
     return sessionInfo
 }
 
-export default async function Header({ sessionId }: { sessionId: string  | undefined }) {
+export default async function Header({ sessionId }: { sessionId: string | undefined }) {
     const session = await getServerSession(authOptions)
     if (!sessionId) {
-        sessionId =  cookies().get('session_id')?.value
+        sessionId = cookies().get('session_id')?.value
     }
-    if (session && !sessionId ) { // if logged in but has no cookie, get most recently modified session
+    if (session && !sessionId) { // if logged in but has no cookie, get most recently modified session
         const sessionsRanked = await prisma.pipelineSession.findMany({
             where: {
                 user_id: session.user.id
-            }, 
+            },
             orderBy: {
                 lastModified: 'desc'
-                
+
             }
         })
         const mostRecentSessionId = sessionsRanked[0].id
@@ -151,7 +152,7 @@ export default async function Header({ sessionId }: { sessionId: string  | undef
                                         <Typography variant="nav"> CFDE DATA PORTAL</Typography>
                                     </a>
                                     <Link href="/about">
-                                        <Typography variant="nav">ABOUT</Typography>
+                                        <TextNav title={"ABOUT"} path={"/about"} />
                                     </Link>
                                     <UserComponent session={session} />
                                 </Stack>
@@ -164,14 +165,14 @@ export default async function Header({ sessionId }: { sessionId: string  | undef
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                     <CartDrawer sessionInfo={sessionInfo} />
                                     <GMTHeader sessionId={sessionId} />
-                                    {session && <Link href="/sessions">
-                                        <Typography variant="nav">MY SESSIONS</Typography>
+                                    {session && <Link href={"/sessions"}>
+                                        <TextNav title={"MY SESSIONS"} path={"/sessions"} />
                                     </Link>}
-                                    <Link href="/use-cases">
-                                        <Typography variant="nav">USE CASES</Typography>
+                                    <Link href={"/use-cases"}>
+                                        <TextNav title={"USE CASES"} path={"/use-cases"} />
                                     </Link>
-                                    <Link href="/api-documentation">
-                                        <Typography variant="nav"> API </Typography>
+                                    <Link href={"/api-documentation"}>
+                                        <TextNav title={"API"} path={"/api-documentation"} />
                                     </Link>
                                 </Stack>
                             </Grid>
@@ -204,7 +205,7 @@ export default async function Header({ sessionId }: { sessionId: string  | undef
                                         <Typography variant="nav"> CFDE DATA PORTAL</Typography>
                                     </a>
                                     <Link href="/about">
-                                        <Typography variant="nav">ABOUT</Typography>
+                                        <TextNav title={"ABOUT"} path={"/about"} />
                                     </Link>
                                     <UserComponent session={session} />
                                 </Stack>
@@ -216,16 +217,16 @@ export default async function Header({ sessionId }: { sessionId: string  | undef
                             <Grid item>
                                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
                                     <Link href={"/gmt-cross"}>
-                                        <Typography variant="nav">CFDE GMT CROSSING</Typography>
+                                        <TextNav title={"CFDE GMT CROSSING"} path={"/gmt-cross"} />
                                     </Link>
-                                    {session && <Link href="/sessions">
-                                        <Typography variant="nav">MY SESSIONS</Typography>
+                                    {session && <Link href={"/sessions"}>
+                                        <TextNav title={"MY SESSIONS"} path={"/sessions"} />
                                     </Link>}
-                                    <Link href="/use-cases">
-                                        <Typography variant="nav">USE CASES</Typography>
+                                    <Link href={"/use-cases"}>
+                                        <TextNav title={"USE CASES"} path={"/use-cases"} />
                                     </Link>
-                                    <Link href="/api-documentation">
-                                        <Typography variant="nav"> API </Typography>
+                                    <Link href={"/api-documentation"}>
+                                        <TextNav title={"API"} path={"/api-documentation"} />
                                     </Link>
                                 </Stack>
                             </Grid>

@@ -80,6 +80,25 @@ export function CombineLayout({ sessionInfo, sessionId }: {
         setGeneratedSetName(genesetNames.join(' ∩ '))
     }
 
+    const subtractAction = () => {
+        let toSubtractGenes: string[] = []
+        let toSubtractGenesetNames: string[] = []
+        selectedSets.slice(1).forEach((set) => {
+            const setGenes = set.genes.map((gene) => gene.gene_symbol)
+            for (let geneSymbol of setGenes) {
+                if (!toSubtractGenes.includes(geneSymbol)) {
+                    toSubtractGenes.push(geneSymbol)
+                }
+            }
+            toSubtractGenesetNames.push(set.name)
+        })
+        const firstSelectedSet = selectedSets[0]
+        const subtractedGenes = firstSelectedSet.genes.filter((gene) => !(toSubtractGenes.includes(gene.gene_symbol))).map((gene) => gene.gene_symbol)
+        setDisplayedGenes(subtractedGenes)
+        setGeneratedSetName(firstSelectedSet.name + '- (' + toSubtractGenesetNames.join(' ∪ ') + ')')
+    }
+
+
     const consensusAction = () => {
         let allGenes: string[][] = []
         let genesetNames: string[] = []
@@ -112,11 +131,11 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                     .catch((err) => {
                         if (err.message === 'No valid genes in gene set') {
                             setStatus({ error: { selected: true, message: err.message } })
-                        }                        
+                        }
                         else if (err.message === 'Empty gene set name') {
                             setStatus({ error: { selected: true, message: err.message } })
                         }
-                         else {
+                        else {
                             setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
                         }
                     })
@@ -139,7 +158,16 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                         <Stack direction={'column'} spacing={3}>
                             <Button variant='outlined' color='tertiary' onClick={unionAction}>UNION</Button>
                             <Button variant='outlined' color='tertiary' onClick={intersectionAction}>INTERSECTION</Button>
-                            <Button variant='outlined' color='tertiary' onClick={consensusAction}>CONSENSUS</Button>
+                            <Tooltip title='Subtracts the union of other selected sets from the first selected set'>
+                                <div>
+                                    <Button variant='outlined' color='tertiary' fullWidth onClick={subtractAction}>SUBTRACT &nbsp; <InfoIcon /></Button>
+                                </div>
+                            </Tooltip>
+                            <Tooltip title='Returns genes that appear in at least N(Consensus Criteria) of the selected sets'>
+                                <div>
+                                    <Button variant='outlined' color='tertiary' fullWidth onClick={consensusAction}>CONSENSUS &nbsp; <InfoIcon /></Button>
+                                </div>
+                            </Tooltip>
                             <div>
                             </div>
                             <TextField
@@ -192,7 +220,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                                     COPY
                                 </Button>
                                 <Button variant='contained' color="tertiary" onClick={handleAddToSets}>
-                                    <AddShoppingCartIcon /> &nbsp; 
+                                    <AddShoppingCartIcon /> &nbsp;
                                     ADD TO CART
                                 </Button>
                             </Stack>

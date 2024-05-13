@@ -57,12 +57,12 @@ export default async function Footer() {
                             <Typography variant='footer' className='flex'>
                                 <b>Consortium</b>
                             </Typography>
-                            <Link href="https://data.cfde.cloud">
+                            <Link href="https://data.cfde.cloud" target='_blank'>
                                 <Typography variant='footer' className='flex'>
                                     Data Portal
                                 </Typography>
                             </Link>
-                            <Link href="https://info.cfde.cloud">
+                            <Link href="https://info.cfde.cloud" target='_blank'>
                                 <Typography variant='footer' className='flex'>
                                     Information Portal
                                 </Typography>

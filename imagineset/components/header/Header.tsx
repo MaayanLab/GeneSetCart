@@ -124,7 +124,7 @@ export default async function Header({ sessionId }: { sessionId: string  | undef
                     orderBy: {
                         createdAt: 'desc',
                     },
-                }
+                }, id: true
             }
         })
 

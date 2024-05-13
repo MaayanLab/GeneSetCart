@@ -8,15 +8,21 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import maayanLabLogo from '@/public/img/otherLogos/maayanlabLogo.png'
+import IconButton from "@mui/material/IconButton"
+import Email from "@/public/img/email.svg"
+import { Logo } from './styled/Logo';
+import { Divider } from '@mui/material';
 
 
 export default async function Footer() {
     return (
-        <Paper sx={{ background: "#336699", color: "#FFF", padding: 2, paddingTop: 5, borderRadius: 0, paddingBottom: 5}}>
+        <Paper sx={{ background: "#336699", color: "#FFF", padding: 2, paddingTop: 5, borderRadius: 0, paddingBottom: 5 }}>
             <Container maxWidth="lg">
                 <Grid container justifyContent={"space-around"}>
                     <Grid item>
                         <Stack direction={"column"} spacing={2}>
+                            <Logo title="Get-Gene-Set-Go" href="/" color="inherit" />
+                            <Divider sx={{ borderColor: "#FFF" }} />
                             <Link href="https://github.com/MaayanLab/G2SG/">
                                 <div className='flex items-center space-x-1'>
                                     <Icon path={mdiGithub} size={1} />
@@ -33,11 +39,34 @@ export default async function Footer() {
                                     </Typography>
                                 </div>
                             </Link>
+                            <Divider sx={{ borderColor: "#FFF" }} />
+                            <Link href="mailto:help@cfde.cloud">
+                                <div className='flex items-center space-x-1'>
+                                    <IconButton color={"secondary"}>
+                                        <Email />
+                                    </IconButton>
+                                    <Typography variant='subtitle2' className='flex'>
+                                        Contact
+                                    </Typography>
+                                </div>
+                            </Link>
                         </Stack>
                     </Grid>
                     <Grid item>
                         <Stack spacing={2}>
-                            <Link href='mailto:avi.maayan@mssm.edu' target='_blank'><Typography variant="subtitle1">Contact</Typography></Link>
+                            <Typography variant='footer' className='flex'>
+                                <b>Consortium</b>
+                            </Typography>
+                            <Link href="https://data.cfde.cloud">
+                                <Typography variant='footer' className='flex'>
+                                    Data Portal
+                                </Typography>
+                            </Link>
+                            <Link href="https://info.cfde.cloud">
+                                <Typography variant='footer' className='flex'>
+                                    Information Portal
+                                </Typography>
+                            </Link>
                         </Stack>
                     </Grid>
                     <Grid item>
@@ -45,12 +74,6 @@ export default async function Footer() {
                             <Link href="https://labs.icahn.mssm.edu/maayanlab/" target='_blank'><Image src={maayanLabLogo} alt="" width='100' height={'100'}></Image></Link>
                         </Stack>
                     </Grid>
-                    {/* <Grid item>
-                        <Stack spacing={2}>
-                            <Link href="/"><Typography variant="caption">Terms of Service</Typography></Link>
-                            <Link href="/"><Typography variant="caption">Privacy Policy</Typography></Link>
-                        </Stack>
-                    </Grid> */}
                 </Grid>
             </Container>
         </Paper>

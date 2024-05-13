@@ -98,7 +98,7 @@ export const DCCIcons = ({ selected }: { selected: string[] }) => {
         <Box
             sx={{
                 display: 'flex',
-                overflowX: 'scroll',
+                // overflowX: 'scroll',
                 justifyContent: 'center'
                 // maxWidth: '50vw'
             }}>

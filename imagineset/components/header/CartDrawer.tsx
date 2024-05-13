@@ -98,16 +98,12 @@ const GenesetInfo = ({ geneset }: {
 
     )
 }
-const DrawerInfo = ({ genesets }: {
+const DrawerInfo = ({ genesets, sessionId }: {
     genesets: ({
         genes: Gene[];
-    } & GeneSet)[] | null
+    } & GeneSet)[] | null; 
+    sessionId: string | null
 }) => {
-    const params = useParams()
-    let sessionId : string | string[] | undefined = params.id
-    if (!sessionId){
-        sessionId = Cookies.get('session_id') 
-    }
     return (
         <Box
             sx={{ width: 500 }}
@@ -142,6 +138,7 @@ const DrawerInfo = ({ genesets }: {
 
 export default function CartDrawer({ sessionInfo }: {
     sessionInfo: {
+        id: string;
         gene_sets: ({
             genes: Gene[];
         } & {
@@ -182,7 +179,7 @@ export default function CartDrawer({ sessionInfo }: {
                 open={state}
                 onClose={toggleDrawer(false)}
             >
-                <DrawerInfo genesets={sessionGenesets ? sessionGenesets : null} />
+                <DrawerInfo genesets={sessionGenesets ? sessionGenesets : null} sessionId={sessionInfo ? sessionInfo.id : null} />
             </Drawer>
         </div>
     );

@@ -11,7 +11,7 @@ import komp2Img from '@/public/img/DCCImg/KOMP2.png'
 import gteximg from '@/public/img/DCCImg/GTEx.png'
 import idgimg from '@/public/img/DCCImg/IDG.png'
 import motrpacimg from '@/public/img/DCCImg/motrpac_logo_copy.png'
-
+import hubmapimg from '@/public/img/DCCImg/HuBMAP.png'
 
 type dccsInfoType = {
     shortName: string;
@@ -54,6 +54,11 @@ export const dccInfo: dccsInfoType[] = [
         shortName: 'MoTrPAC',
         longName: 'Molecular Transducers of Physical Activity Consortium',
         imgString: motrpacimg.src
+    },
+    {
+        shortName: 'HuBMAP',
+        longName: 'The Human BioMolecular Atlas Program',
+        imgString: hubmapimg.src
     },
 
 ]

@@ -59,12 +59,12 @@ for index, row in cfde_genesets.iterrows():
             genes = line_content[1:]
             genes = [i for i in genes if i != '']
             if len(genes) > 0:
-                data.append([row['Library '], geneset_name, genes])
+                data.append([row['Library'], geneset_name, genes])
                 geneset_id = str(uuid.uuid4())
                 cur.execute('''INSERT INTO cfde_genesets (id, term, library) 
                                             VALUES  (%s, %s, %s)
                                             ON CONFLICT (term, library) 
-                                            DO NOTHING;''', (geneset_id, geneset_name, row['Library ']))
+                                            DO NOTHING;''', (geneset_id, geneset_name, row['Library']))
                 conn.commit()
 
             mask = genes_info['Symbol'].isin(genes)

@@ -57,10 +57,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 
-const DCCGenesetOptions = ["LINCS_L1000_Chem_Pert_Consensus_Sigs", "LINCS_L1000_CRISPR_KO_Consensus_Sigs", "GTEx_Tissues_V8_2023",
-  "GTEx_Aging_Signatures_2021", "Metabolomics_Workbench_Metabolites_2022", "IDG_Drug_Targets_2022",
-  "GlyGen_Glycosylated_Proteins_2022", "KOMP2_Mouse_Phenotypes_2022", "HuBMAP_ASCTplusB_augmented_2022", "MoTrPAC_2023"]
-
 export const genesetLibDCCMap: { [key: string]: string } = {
   'Glygen Glycosylated Proteins': 'GlyGen',
   'GTEx Tissue-Specific Aging Signatures': 'GTEx',
@@ -70,7 +66,8 @@ export const genesetLibDCCMap: { [key: string]: string } = {
   'LINCS L1000 CMAP Chemical Pertubation Consensus Signatures': "LINCS",
   'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures': "LINCS",
   'MoTrPAC Rat Endurance Exercise Training': 'MoTrPAC',
-  'Metabolomics Gene-Metabolite Associations': 'Metabolomics'
+  'Metabolomics Gene-Metabolite Associations': 'Metabolomics',
+  'Human BioMolecular Atlas Program Azimuth': 'HuBMAP'
 }
 
 const dccCheckedDisplay = Object.values(genesetLibDCCMap).filter((v, i, self) => i == self.indexOf(v))

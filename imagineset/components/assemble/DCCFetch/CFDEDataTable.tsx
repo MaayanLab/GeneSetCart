@@ -9,7 +9,6 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import { addMultipleSetsCFDE, checkValidGenes } from '@/app/assemble/[id]/AssembleFunctions ';
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { useParams } from 'next/navigation';
 import Status from '../Status';
 import { searchResultsType } from './DCCUpload';

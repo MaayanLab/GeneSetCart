@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack'
 import maayanLabLogo from '@/public/img/otherLogos/maayanlabLogo.png'
 import IconButton from "@mui/material/IconButton"
 import Email from "@/public/img/email.svg"
-import { Logo } from './styled/Logo';
+import { CFDELogo, Logo } from './styled/Logo';
 import { Divider } from '@mui/material';
 
 
@@ -21,7 +21,7 @@ export default async function Footer() {
                 <Grid container justifyContent={"space-around"}>
                     <Grid item>
                         <Stack direction={"column"} spacing={2}>
-                            <Logo title="Get-Gene-Set-Go" href="/" color="inherit" />
+                            <CFDELogo title="CFDE Workbench" href="/" color="inherit" />
                             <Divider sx={{ borderColor: "#FFF" }} />
                             <Link href="https://github.com/MaayanLab/G2SG/">
                                 <div className='flex items-center space-x-1'>

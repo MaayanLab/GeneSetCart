@@ -23,7 +23,7 @@ import rummageneLogo from "@/public/img/otherLogos/rummageneLogo.png"
 import rummageoLogo from "@/public/img/otherLogos/rummageoLogo.webp"
 import kea3Logo from "@/public/img/otherLogos/KEA3Logo.png"
 import chea3logo from "@/public/img/otherLogos/chea3Logo.png"
-import sigcomLincsLogo from "@/public/img/otherLogos/sigcomLincsLogo.svg"
+import SigcomLincsLogo from "@/public/img/otherLogos/sigcomLincsLogo.svg"
 import cfdeLogo from "@/public/img/favicon.png" 
 import { getEnrichrShortId, getRummageneLink, getRummageoLink, getSigComLINCSId } from "@/app/analyze/[id]/AnalyzeFunctions";
 import { deleteGenesetByID } from "@/components/header/Header";
@@ -125,7 +125,7 @@ export function enrich(options: any) {
 
 const options = [<>
     <div>
-        <Image src={sigcomLincsLogo} width={30} alt="chea3 logo"></Image>
+        <SigcomLincsLogo style={{width:20,height:20}}/>
     </div>&nbsp;<Typography sx={{ color: "#000000", fontSize: 13 }}>SigCom LINCS</Typography></>,
     <>
     <div>

@@ -44,8 +44,8 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     }, [])
 
     const getExample = React.useCallback(() => {
-        loadTxtExample().then((response) => setGenesetInfo(genesetInfo ? { ...genesetInfo, name: 'example gene set', genes: response } : { name: '', genes: '', description: '' }));
-    }, [genesetInfo])
+       loadTxtExample().then((response) => setGenesetInfo({name: 'example gene set', genes: response, description: '' }));
+    }, [genesetInfo, setGenesetInfo])
 
 
     const downloadExample = React.useCallback(() => {

@@ -14,7 +14,8 @@ export const CFDELibraryOptions: { [key: string]: string } = {
     'IDG Drug Targets': 'IDG',
     'Glygen Glycosylated Proteins': 'GlyGen',
     'KOMP2 Mouse Phenotypes': 'KOMP2',
-    'MoTrPAC Rat Endurance Exercise Training': 'MoTrPAC'
+    'MoTrPAC Rat Endurance Exercise Training': 'MoTrPAC',
+    'Human BioMolecular Atlas Program Azimuth': 'HuBMAP'
 }
 
 export function GMTSelect({selectedLibs, setSelectedLibs, index, selectedDCCs, setSelectedDCCs} : {selectedLibs: string[], setSelectedLibs: React.Dispatch<React.SetStateAction<string[]>>, index: number, selectedDCCs: string[], setSelectedDCCs: React.Dispatch<React.SetStateAction<string[]>>}) {

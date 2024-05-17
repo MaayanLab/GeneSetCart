@@ -118,11 +118,13 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap, heatmap
     const [hoveredCell, setHoveredCell] = React.useState<InteractionData | null>(null);
     // Color scale is computed here bc it must be passed to both the renderer and the legend
 
-    const values = React.useMemo(() => {return data ? data
-        .map((d) => d.value)
-        .filter((d): d is number => d !== null) : [];}, [heatmapOptions, data])
+    const values = React.useMemo(() => {
+        return data ? data
+            .map((d) => d.value)
+            .filter((d): d is number => d !== null) : [];
+    }, [heatmapOptions, data])
 
-    const max = React.useMemo(() => {return d3.max(values) || 1; }, [values])
+    const max = React.useMemo(() => { return d3.max(values) || 1; }, [values])
 
     const colorScale = React.useMemo(() => {
         if (heatmapOptions.palette === 'viridis') {

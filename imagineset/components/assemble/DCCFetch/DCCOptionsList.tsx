@@ -19,7 +19,8 @@ export const genesetLibDCCMap: { [key: string]: string } = {
   'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures': "LINCS",
   'MoTrPAC Rat Endurance Exercise Training' : 'MoTrPAC',
   'Metabolomics Gene-Metabolite Associations': 'Metabolomics',
-  'Human BioMolecular Atlas Program Azimuth': 'HuBMAP'}
+  // 'Human BioMolecular Atlas Program Azimuth': 'HuBMAP'
+}
 
 
 export const DCCList = ({dccs, checked, setChecked} : {dccs:string[], checked: number[], setChecked: React.Dispatch<React.SetStateAction<number[]>>}) => {

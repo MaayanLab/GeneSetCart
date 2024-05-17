@@ -124,7 +124,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             id="outlined-basic"
                             required label="Gene Set Name"
                             variant="outlined"
-                            value={genesetInfo?.name}
+                            value={genesetInfo ? genesetInfo?.name : ''}
                             focused={genesetInfo ? true : false}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setGenesetInfo(genesetInfo ? { ...genesetInfo, name: event.target.value } : { name: '', genes: '', description: '' })
@@ -139,7 +139,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             rows={4}
                             multiline
                             placeholder="Gene Set Description (optional)"
-                            value={genesetInfo?.description}
+                            value={genesetInfo ? genesetInfo?.description : ''}
                             focused={genesetInfo ? true : false}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setGenesetInfo(genesetInfo ? { ...genesetInfo, description: event.target.value } : { name: '', genes: '', description: '' })
@@ -182,7 +182,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             multiline
                             rows={10}
                             placeholder="Paste gene symbols here"
-                            value={genesetInfo?.genes}
+                            value={genesetInfo ? genesetInfo?.genes: ''}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: '', description: '' })
                             }}

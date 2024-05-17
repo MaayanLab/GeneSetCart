@@ -91,7 +91,8 @@ dataframe_names = ['GlyGen_Glycosylated_Proteins',
  'LINCS_L1000_Chem_Pert_Consensus_Sigs', 
  'LINCS_L1000_CRISPR_KO_Consensus_Sigs',
  'MoTrPAC', 
- 'Metabolomics_Workbench_Metabolites']
+ 'Metabolomics_Workbench_Metabolites', 
+ 'HubMAP_Azimuth_2023_Augmented']
 
 CFDE_Lib_Full = {
     "LINCS_L1000_Chem_Pert_Consensus_Sigs": "LINCS L1000 CMAP Chemical Pertubation Consensus Signatures",
@@ -102,7 +103,8 @@ CFDE_Lib_Full = {
     "IDG_Drug_Targets": 'IDG Drug Targets',
     "GlyGen_Glycosylated_Proteins": 'Glygen Glycosylated Proteins',
     "KOMP2_Mouse_Phenotypes": 'KOMP2 Mouse Phenotypes',
-    "MoTrPAC": 'MoTrPAC Rat Endurance Exercise Training'
+    "MoTrPAC": 'MoTrPAC Rat Endurance Exercise Training',
+    "HuBMAP": "Human BioMolecular Atlas Program Azimuth"
 }
 
 for lib in dataframe_names: 
@@ -142,7 +144,7 @@ for lib in dataframe_names:
                 try:
                     crossed_dataframe_file = f'{s3_bucket}/crossed_sets/LINCS Top Pairs/{lib}_{inner_lib}.csv'
                     crossed_dataframe = pd.read_csv(s3.open(crossed_dataframe_file), index_col=0)
-                    filtered_dataframe = crossed_dataframe[crossed_dataframe['P-value'] < 0.001]
+                    filtered_dataframe = crossed_dataframe[crossed_dataframe['P-value'] < 0.001].iloc[:5000]
                     for index, row in tqdm(filtered_dataframe.iterrows(), total=filtered_dataframe.shape[0]):
                         n_genes1 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_1']) & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib1']])]['Genes'].item())
                         n_genes2 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_2'])  & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib2']])]['Genes'].item())

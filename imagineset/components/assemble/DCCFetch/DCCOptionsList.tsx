@@ -7,20 +7,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import { ListSubheader } from '@mui/material';
-
-
-export const genesetLibDCCMap: { [key: string]: string } = {
-  'Glygen Glycosylated Proteins': 'GlyGen',
-  'GTEx Tissue-Specific Aging Signatures': 'GTEx',
-  'GTEx Tissue Gene Expression Profiles': 'GTEx',
-  'IDG Drug Targets': 'IDG',
-  'KOMP2 Mouse Phenotypes': 'KOMP2',
-  'LINCS L1000 CMAP Chemical Pertubation Consensus Signatures': "LINCS",
-  'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures': "LINCS",
-  'MoTrPAC Rat Endurance Exercise Training' : 'MoTrPAC',
-  'Metabolomics Gene-Metabolite Associations': 'Metabolomics',
-  // 'Human BioMolecular Atlas Program Azimuth': 'HuBMAP'
-}
+import {genesetLibDCCMap} from './DCCUpload'
 
 
 export const DCCList = ({dccs, checked, setChecked} : {dccs:string[], checked: number[], setChecked: React.Dispatch<React.SetStateAction<number[]>>}) => {

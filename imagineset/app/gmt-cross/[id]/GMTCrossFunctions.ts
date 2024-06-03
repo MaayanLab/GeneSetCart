@@ -22,7 +22,7 @@ const libMap : {[key: string]: string} = {
     'IDG Drug Targets': 'IDG_Drug_Targets',
     'Glygen Glycosylated Proteins': 'GlyGen_Glycosylated_Proteins',
     'KOMP2 Mouse Phenotypes': 'KOMP2_Mouse_Phenotypes',
-    // "HuBMAP_ASCTplusB_augmented_2022": 'HuBMAP Anatomical Structures, Cell Types, and Biomarkers (ASCT+B)',
+    'Human BioMolecular Atlas Program Azimuth': 'HubMAP_Azimuth_2023_Augmented',
     'MoTrPAC Rat Endurance Exercise Training': 'MoTrPAC'
 }
 
@@ -34,6 +34,7 @@ export async function fetchCrossPairs(lib1: string, lib2: string) {
             lib_2: libMap[lib2]
         }
     });
+    console.log(1, rows.length)
     if (rows.length === 0) {
         const rows = await prisma.cFDECrossPair.findMany({
             where: {
@@ -41,6 +42,7 @@ export async function fetchCrossPairs(lib1: string, lib2: string) {
                 lib_2: libMap[lib1]
             }
         })
+        console.log(2, rows.length)
         return rows
     } 
     return rows
@@ -214,7 +216,7 @@ export async function generateHypothesis(row: any ) {
     Cascades WP558, not Complement And Coagulation Cascades).
     Specified Abstracts for gene sets: ${abstractsList}
     The overlapping genes are ${overlapGeneSet.toString().replaceAll("'", '')}
-    Do not include 'Hypothesis: ' at the beginning of your response
+    Do not include 'Hypothesis: ' at the beginning of your response.
     `
     try {
         const cachedHypothesis = cache.get( term1+term2 );

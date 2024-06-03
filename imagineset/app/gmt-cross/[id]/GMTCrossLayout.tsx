@@ -50,7 +50,8 @@ const CFDELibHeaders: { [key: string]: string } = {
     "IDG_Drug_Targets": 'IDG Drugs',
     "GlyGen_Glycosylated_Proteins": 'Glycans',
     "KOMP2_Mouse_Phenotypes": 'Phenotypes',
-    "MoTrPAC": 'MoTrPAC Gene Sets'
+    "MoTrPAC": 'MoTrPAC Gene Sets',
+    "HubMAP_Azimuth_2023_Augmented": 'Cells'
 }
 
 const CFDE_Lib_Full: { [key: string]: string } = {
@@ -62,7 +63,8 @@ const CFDE_Lib_Full: { [key: string]: string } = {
     "IDG_Drug_Targets": 'IDG Drug Targets',
     "GlyGen_Glycosylated_Proteins": 'GlyGen Glycosylated Proteins',
     "KOMP2_Mouse_Phenotypes": 'KOMP2 Mouse Phenotypes',
-    "MoTrPAC": 'MoTrPAC Rat Endurance Exercise Training'
+    "MoTrPAC": 'MoTrPAC Rat Endurance Exercise Training',
+    "HubMAP_Azimuth_2023_Augmented": 'Human BioMolecular Atlas Program Azimuth'
 }
 
 const sortDict = (dict: { [key: string]: number[][] }) => {
@@ -90,22 +92,28 @@ const generateHypothesisTooltip = (hypothesisString: string, substringIndices: {
         let termEnd = term[1][1]
         splittedStrings.push(<Typography display="inline">{hypothesisString.substring(prevStart, termStart)}</Typography>);
         splittedStrings.push(
-            <Tooltip title={
-                <React.Fragment>
-                    <Typography color="inherit"> Enrichment Analysis</Typography>
-                    Library: {topEnrichmentResults[termWords][9]}
-                    <br></br>
-                    Rank: {topEnrichmentResults[termWords][0]}
-                    <br></br>
-                    P-value: {topEnrichmentResults[termWords][2].toExponential(2)}
-                    <br></br>
-                    Odds Ratio: {topEnrichmentResults[termWords][3].toFixed(4)}
-                </React.Fragment>
-            } placement="right" >
-                <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
-                    {hypothesisString.substring(termStart, termEnd)}
+            <>
+                <Tooltip title={
+                    <React.Fragment>
+                        <Typography color="inherit"> Enrichment Analysis</Typography>
+                        Library: {topEnrichmentResults[termWords][9]}
+                        <br></br>
+                        Rank: {topEnrichmentResults[termWords][0]}
+                        <br></br>
+                        P-value: {topEnrichmentResults[termWords][2].toExponential(2)}
+                        <br></br>
+                        Odds Ratio: {topEnrichmentResults[termWords][3].toFixed(4)}
+                    </React.Fragment>
+                } placement="right" >
+                    <Typography color='secondary' sx={{ textDecoration: 'underline' }} display="inline">
+                        {hypothesisString.substring(termStart, termEnd)}
+                    </Typography>
+                </Tooltip>
+                {" "}
+                <Typography color='black' display="inline">
+                    ({topEnrichmentResults[termWords][9]}, p = {topEnrichmentResults[termWords][2].toExponential(2)} )
                 </Typography>
-            </Tooltip>
+            </>
         )
         prevStart = termEnd
     }
@@ -114,6 +122,7 @@ const generateHypothesisTooltip = (hypothesisString: string, substringIndices: {
         {splittedStrings}
     </React.Fragment>
 }
+
 
 export function GMTCrossLayout() {
     // get query parameters
@@ -154,7 +163,6 @@ export function GMTCrossLayout() {
             }).catch((err) => setLoading(false))
         }
     }, [])
-
 
     const getCrossData = React.useCallback(() => {
         router.push("/gmt-cross/" + params.id + "?" + createQueryString("lib1", selectedLibs[0]) + "&" + createQueryString("lib2", selectedLibs[1]));
@@ -262,7 +270,7 @@ export function GMTCrossLayout() {
                 return <RenderOverlapButton params={params} sessionId={sessionId} />
             },
             headerAlign: 'center',
-            type:'number',
+            type: 'number',
             sortComparator: (v1, v2) => parseInt(v1.length) - parseInt(v2.length)
         },
         {

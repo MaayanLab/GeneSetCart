@@ -55,11 +55,11 @@ export const dccInfo: dccsInfoType[] = [
         longName: 'Molecular Transducers of Physical Activity Consortium',
         imgString: motrpacimg.src
     },
-    // {
-    //     shortName: 'HuBMAP',
-    //     longName: 'The Human BioMolecular Atlas Program',
-    //     imgString: hubmapimg.src
-    // },
+    {
+        shortName: 'HuBMAP',
+        longName: 'The Human BioMolecular Atlas Program',
+        imgString: hubmapimg.src
+    },
 
 ]
 

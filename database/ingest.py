@@ -46,7 +46,6 @@ for index, row in library_abstracts.iterrows():
 # ingest all GMT data
 cfde_genesets_file = f'{s3_bucket}/CFDE Genesets.tsv'
 cfde_genesets = pd.read_csv(s3.open(cfde_genesets_file), sep='\t')
-CFDE_geneset_df = pd.DataFrame([], columns=['Library', 'Geneset', 'Genes'])
 
 # for each line, open with file link and populate database
 data = []
@@ -104,8 +103,13 @@ CFDE_Lib_Full = {
     "GlyGen_Glycosylated_Proteins": 'Glygen Glycosylated Proteins',
     "KOMP2_Mouse_Phenotypes": 'KOMP2 Mouse Phenotypes',
     "MoTrPAC": 'MoTrPAC Rat Endurance Exercise Training',
-    "HuBMAP": "Human BioMolecular Atlas Program Azimuth"
+    "HubMAP_Azimuth_2023_Augmented": "Human BioMolecular Atlas Program Azimuth"
 }
+
+# delete old LINCS entries
+cur.execute('''DELETE from cfde_cross_pair
+WHERE lib_1 = 'LINCS_L1000_Chem_Pert_Consensus_Sigs' AND lib_2 = 'LINCS_L1000_CRISPR_KO_Consensus_Sigs';''')
+conn.commit()
 
 for lib in dataframe_names: 
     for inner_lib in dataframe_names:
@@ -117,22 +121,25 @@ for lib in dataframe_names:
                         crossed_dataframe = pd.read_csv(s3.open(crossed_dataframe_file), index_col=0)
                         filtered_dataframe = crossed_dataframe[crossed_dataframe['P-value'] < 0.001].iloc[:5000]
                         for index, row in tqdm(filtered_dataframe.iterrows(), total=filtered_dataframe.shape[0]):
-                            n_genes1 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_1']) & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib1']])]['Genes'].item())
-                            n_genes2 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_2'])  & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib2']])]['Genes'].item())
-                            if row['Odds_Ratio'] == math.inf:
-                                row['Odds_Ratio'] = 999999999999999.99
-                            cur.execute('''INSERT INTO cfde_cross_pair (id, lib_1, lib_2, geneset_1, geneset_2, odds_ratio, pvalue, n_overlap, overlap, n_genes1, n_genes2) 
-                                            VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                                            ON CONFLICT (lib_1, lib_2, geneset_1, geneset_2) 
-                                            DO UPDATE 
-                                            SET 
-                                            odds_ratio=EXCLUDED.odds_ratio,
-                                            pvalue=EXCLUDED.pvalue,
-                                            n_overlap=EXCLUDED.n_overlap,
-                                            overlap=EXCLUDED.overlap,
-                                            n_genes1=EXCLUDED.n_genes1,
-                                            n_genes2=EXCLUDED.n_genes2;''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', '), n_genes1, n_genes2))
-                            conn.commit()
+                            try:
+                                n_genes1 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_1']) & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib1']])]['Genes'].item())
+                                n_genes2 = len(CFDE_geneset_df.loc[(CFDE_geneset_df['Geneset'] == row['Geneset_2'])  & (CFDE_geneset_df['Library'] == CFDE_Lib_Full[row['Lib2']])]['Genes'].item())
+                                if row['Odds_Ratio'] == math.inf:
+                                    row['Odds_Ratio'] = 999999999999999.99
+                                cur.execute('''INSERT INTO cfde_cross_pair (id, lib_1, lib_2, geneset_1, geneset_2, odds_ratio, pvalue, n_overlap, overlap, n_genes1, n_genes2) 
+                                                VALUES  (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                                ON CONFLICT (lib_1, lib_2, geneset_1, geneset_2) 
+                                                DO UPDATE 
+                                                SET 
+                                                odds_ratio=EXCLUDED.odds_ratio,
+                                                pvalue=EXCLUDED.pvalue,
+                                                n_overlap=EXCLUDED.n_overlap,
+                                                overlap=EXCLUDED.overlap,
+                                                n_genes1=EXCLUDED.n_genes1,
+                                                n_genes2=EXCLUDED.n_genes2;''', (str(uuid.uuid4()), row['Lib1'], row['Lib2'], row['Geneset_1'], row['Geneset_2'], row['Odds_Ratio'], row['P-value'], row['n_Overlap'], row['Overlap'].strip('][').split(', '), n_genes1, n_genes2))
+                                conn.commit()
+                            except: 
+                                print(row)
                     except Exception as e: print(e)
 
 

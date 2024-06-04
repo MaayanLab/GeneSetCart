@@ -112,12 +112,12 @@ export async function getSigComLINCSId(genesetName: string, genes: string[]) {
                         'meta.symbol': {
                             'inq': genes
                         }
-                    }, 
+                    },
                     {
                         'meta.ensemblid': {
                             'inq': genes
                         }
-                    }], 
+                    }],
 
             }
         }
@@ -132,9 +132,9 @@ export async function getSigComLINCSId(genesetName: string, genes: string[]) {
     const LINCS_USER_INPUT_URL = 'https://maayanlab.cloud/sigcom-lincs/metadata-api/user_input'
     const genesetId = await axios.post(LINCS_USER_INPUT_URL, {
         'meta': {
-            "$validator" : "/dcic/signature-commons-schema/v6/meta/user_input/user_input.json",
-            'description' : genesetName, 
-            'entities': gene_ids, 
+            "$validator": "/dcic/signature-commons-schema/v6/meta/user_input/user_input.json",
+            'description': genesetName,
+            'entities': gene_ids,
             'type': "signatures"
         }
     }, {
@@ -145,3 +145,21 @@ export async function getSigComLINCSId(genesetName: string, genes: string[]) {
     return genesetId.data.id
 }
 
+export async function getPlaybookLink(genesetName: string, genes: string[]) {
+    const requestBody = {
+        data: { gene_set: { type: "Input[Set[Gene]]", value: { set: genes, description: genesetName } } },
+        workflow: [
+            { id: "input_gene_set", type: "Input[Set[Gene]]", data: { id: "gene_set" } },
+        ],
+    }
+    const req = await fetch('https://playbook-workflow-builder.cloud/api/db/fpl', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+    })
+    const res = await req.json()
+    return `https://playbook-workflow-builder.cloud/graph/${res}`
+}

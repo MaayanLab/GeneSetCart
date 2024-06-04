@@ -24,8 +24,9 @@ import rummageoLogo from "@/public/img/otherLogos/rummageoLogo.webp"
 import kea3Logo from "@/public/img/otherLogos/KEA3Logo.png"
 import chea3logo from "@/public/img/otherLogos/chea3Logo.png"
 import SigcomLincsLogo from "@/public/img/otherLogos/sigcomLincsLogo.svg"
-import cfdeLogo from "@/public/img/favicon.png" 
-import { getEnrichrShortId, getRummageneLink, getRummageoLink, getSigComLINCSId } from "@/app/analyze/[id]/AnalyzeFunctions";
+import playbookLogo from "@/public/img/otherLogos/playbook-workflow-builder.png"
+import cfdeLogo from "@/public/img/favicon.png"
+import { getEnrichrShortId, getPlaybookLink, getRummageneLink, getRummageoLink, getSigComLINCSId } from "@/app/analyze/[id]/AnalyzeFunctions";
 import { deleteGenesetByID } from "@/components/header/Header";
 
 
@@ -125,12 +126,17 @@ export function enrich(options: any) {
 
 const options = [<>
     <div>
-        <SigcomLincsLogo style={{width:20,height:20}}/>
+        <SigcomLincsLogo style={{ width: 20, height: 20 }} />
     </div>&nbsp;<Typography sx={{ color: "#000000", fontSize: 13 }}>SigCom LINCS</Typography></>,
-    <>
+<>
     <div>
-        <Image src={cfdeLogo} width={30} alt="rummagene logo"></Image>
+        <Image src={cfdeLogo} width={30} alt="cfde-gse logo"></Image>
     </div>&nbsp;<Typography sx={{ fontSize: 13 }}>CFDE GSE</Typography>
+</>,
+<>
+    <div>
+        <Image src={playbookLogo} width={30} alt="playbook logo"></Image>
+    </div>&nbsp;<Typography sx={{ fontSize: 13 }}>Playbook</Typography>
 </>,
 <>
     <div>
@@ -139,7 +145,7 @@ const options = [<>
 </>,
 <>
     <div>
-        <Image src={rummageoLogo} width={30} alt="rummagene logo"></Image>
+        <Image src={rummageoLogo} width={30} alt="rummageo logo"></Image>
     </div>&nbsp;<Typography sx={{ fontSize: 13 }}>Rummageo</Typography>
 </>,
 <>
@@ -147,13 +153,13 @@ const options = [<>
         <Image src={kea3Logo} width={20} alt="kea3 logo"></Image>
     </div>&nbsp;<Typography sx={{ fontSize: 13 }}>KEA3</Typography>
 </>,
- <>
+<>
     <div>
         <Image src={chea3logo} width={30} alt="chea3 logo"></Image>
     </div>&nbsp;<Typography sx={{ color: "#000000", fontSize: 13 }}>ChEA3</Typography></>,
-     <>
+<>
     <div>
-        <Image src={enrichrKgLogo} width={30} alt="enrichr=kg logo"></Image>
+        <Image src={enrichrKgLogo} width={30} alt="enrichr-kg logo"></Image>
     </div>&nbsp;<Typography sx={{ fontSize: 13 }}>Enrichr-KG</Typography>
 </>,
 <>
@@ -165,7 +171,7 @@ const options = [<>
 </>
 ];
 
-const buttonOptions = ['SigCom LINCS', 'CFDE GSE', 'Rummagene', 'Rummageo', 'KEA3', 'ChEA3', 'Enrichr-KG', 'Enrichr']
+const buttonOptions = ['SigCom LINCS', 'CFDE GSE', 'Playbook', 'Rummagene', 'Rummageo', 'KEA3', 'ChEA3', 'Enrichr-KG', 'Enrichr']
 
 export function SplitButton({ row }: {
     row: {
@@ -205,10 +211,12 @@ export function SplitButton({ row }: {
         else if (selectedButton === 'SigCom LINCS') {
             const genes = row.genes.map((gene) => gene.gene_symbol)
             getSigComLINCSId(row.name, genes).then((datasetId) => window.open('https://maayanlab.cloud/sigcom-lincs/#/SignatureSearch/Set/' + datasetId, "_blank"))
-        } else if (selectedButton  === 'CFDE GSE') {
+        } else if (selectedButton === 'CFDE GSE') {
             const genes = row.genes.map((gene) => gene.gene_symbol)
             const newSetName = row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION')
             getEnrichrShortId(newSetName, genes).then((userListId) => window.open(`https://gse.cfde.cloud/?q={%22min_lib%22:1,%22libraries%22:[{%22name%22:%22LINCS_L1000_Chem_Pert_Consensus_Sigs%22,%22limit%22:5},{%22name%22:%22HuBMAP_ASCTplusB_augmented_2022%22,%22limit%22:5}],%22userListId%22:%22${userListId}%22,%22search%22:true}`, "_blank"))
+        } else if (selectedButton === 'Playbook') {
+            getPlaybookLink(row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION'), row.genes.map((gene) => gene.gene_symbol)).then((link) => window.open(link, '_blank'))
         }
     };
 

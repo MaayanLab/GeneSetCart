@@ -7,10 +7,9 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import { ListSubheader } from '@mui/material';
-import {genesetLibDCCMap} from './DCCUpload'
 
 
-export const DCCList = ({dccs, checked, setChecked} : {dccs:string[], checked: number[], setChecked: React.Dispatch<React.SetStateAction<number[]>>}) => {
+export const LibraryList = ({libraries, checked, setChecked} : {libraries:string[], checked: number[], setChecked: React.Dispatch<React.SetStateAction<number[]>>}) => {
 
     const handleToggle = (value: number) => () => {
       const currentIndex = checked.indexOf(value);
@@ -25,17 +24,16 @@ export const DCCList = ({dccs, checked, setChecked} : {dccs:string[], checked: n
     };
     
     return (
-        <List sx={{ maxWidth: 250, bgcolor: 'background.paper', overflow:'scroll' }}>
+        <List sx={{ maxWidth: 250, maxHeight: 400, bgcolor: 'background.paper', overflow:'scroll', wordBreak:'break-word' }}>
           <ListSubheader>
-            Results found ({dccs.length})
+            Results found ({libraries.length})
           </ListSubheader>
-        {Object.values(genesetLibDCCMap).filter((v, i, self) => i == self.indexOf(v)).map((dcc, value) => {
+        {libraries.map((library, value) => {
           const labelId = `checkbox-list-label-${value}`;
           return (
             <ListItem
               key={value}
               disablePadding
-              disabled={!(dccs.includes(dcc))}
             >
               <ListItemButton onClick={handleToggle(value)} dense>
                 <ListItemIcon>
@@ -47,7 +45,7 @@ export const DCCList = ({dccs, checked, setChecked} : {dccs:string[], checked: n
                     inputProps={{ 'aria-labelledby': labelId }}
                   />
                 </ListItemIcon>
-                <ListItemText id={labelId} primary={dcc} />
+                <ListItemText id={labelId} primary={library} />
               </ListItemButton>
             </ListItem>
           );

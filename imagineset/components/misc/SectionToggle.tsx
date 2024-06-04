@@ -54,6 +54,7 @@ export default function ColorToggleButton({ sessionId }: { sessionId: string }) 
                 <MenuItem component={Link} href={`/assemble/${sessionId}?type=multiple`}>Upload .gmt</MenuItem>
                 <MenuItem component={Link} href={`/assemble/${sessionId}?type=cfde`}>Search CFDE DCC gene sets</MenuItem>
                 <MenuItem component={Link} href={`/assemble/${sessionId}?type=pubmed`}>Search gene sets from PubMed </MenuItem>
+                <MenuItem component={Link} href={`/assemble/${sessionId}?type=enrichr`}>Search Enrichr gene sets </MenuItem>
             </Menu>
             <ToggleButton value="/augment" href={`/augment/${sessionId}`}>
                 <Typography variant="nav" align='center'>AUGMENT</Typography>

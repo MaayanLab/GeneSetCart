@@ -8,6 +8,7 @@ import MultipleUpload from '@/components/assemble/fileUpload/MultipleUpload';
 import GeneshotSearch from '@/components/assemble/Pubmed';
 import { DCCPage } from '@/components/assemble/DCCFetch/DCCUpload';
 import { AppBar, Grid } from '@mui/material';
+import { EnrichrPage } from '@/components/assemble/Enrichr/EnrichrLayout';
 
 
 interface TabPanelProps {
@@ -47,7 +48,8 @@ const tabIndexMapping : {[key: string]: number} = {
   'single': 0,
   'multiple': 1,
   'cfde': 2, 
-  'pubmed': 3
+  'pubmed': 3,
+  'enrichr': 4
 }
 
 export default function VerticalTabs({queryParams}: {queryParams: Record<string, string | string[] | undefined>}) {
@@ -74,7 +76,8 @@ export default function VerticalTabs({queryParams}: {queryParams: Record<string,
           <Tab label="Upload .txt" {...a11yProps(0)} sx={{borderBottom: 1, borderColor: 'divider'}} />
           <Tab label=" Upload .gmt" {...a11yProps(1)} sx={{borderBottom: 1, borderColor: 'divider'}}/>
           <Tab label="Search CFDE DCC Gene Sets" {...a11yProps(2)} sx={{borderBottom: 1, borderColor: 'divider'}}/>
-          <Tab label="Search Gene Sets from Pubmed" {...a11yProps(3)} />
+          <Tab label="Search Gene Sets from Pubmed" {...a11yProps(3)} sx={{borderBottom: 1, borderColor: 'divider'}}/>
+          <Tab label="Search Enrichr Gene Sets" {...a11yProps(4)} />
         </Tabs>
         </AppBar>
       </Grid>
@@ -90,6 +93,9 @@ export default function VerticalTabs({queryParams}: {queryParams: Record<string,
         </TabPanel>
         <TabPanel value={value} index={3}>
           <GeneshotSearch />
+        </TabPanel>
+        <TabPanel value={value} index={4}>
+          <EnrichrPage />
         </TabPanel>
       </Grid>
     </Grid>

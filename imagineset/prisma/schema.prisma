@@ -143,3 +143,15 @@ model addedGeneset {
 
   @@map("added_genesets")
 }
+
+model paperContacts {
+  id  String  @id @default(uuid())
+  pmcid String
+  article_title String
+  surname String
+  given_name  String
+  email String
+
+@@map("paper_contacts")
+@@unique([pmcid, email])
+}

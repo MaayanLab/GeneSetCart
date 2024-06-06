@@ -124,7 +124,7 @@ export function EnrichrPage() {
         </Grid>
         <Grid container item spacing={2} xs={12}>
           <Grid container item xs={3}>
-            <LibraryList libraries={libraries} checked={checked} setChecked={setChecked} />
+            <LibraryList libraries={libraries} checked={checked} setChecked={setChecked} genesetCount={searchResults.length}/>
           </Grid>
           <Grid container item xs={9}>
           <EnrichrTable rows={rows} />

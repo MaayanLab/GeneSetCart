@@ -9,7 +9,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { ListSubheader } from '@mui/material';
 
 
-export const LibraryList = ({libraries, checked, setChecked} : {libraries:string[], checked: number[], setChecked: React.Dispatch<React.SetStateAction<number[]>>}) => {
+export const LibraryList = ({libraries, checked, setChecked, genesetCount} : {libraries:string[], checked: number[], setChecked: React.Dispatch<React.SetStateAction<number[]>>, genesetCount: number}) => {
 
     const handleToggle = (value: number) => () => {
       const currentIndex = checked.indexOf(value);
@@ -26,7 +26,7 @@ export const LibraryList = ({libraries, checked, setChecked} : {libraries:string
     return (
         <List sx={{ maxWidth: 250, maxHeight: 400, bgcolor: 'background.paper', overflow:'scroll', wordBreak:'break-word' }}>
           <ListSubheader>
-            Results found ({libraries.length})
+            Results found ( {genesetCount} gene sets from {libraries.length} libraries)
           </ListSubheader>
         {libraries.map((library, value) => {
           const labelId = `checkbox-list-label-${value}`;

@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 import uuid
 import s3fs
+from df2pg import OnConflictSpec, copy_from_records
 
 load_dotenv()
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -20,9 +21,11 @@ s3 = s3fs.S3FileSystem(anon=True, client_kwargs={'endpoint_url': s3_endpoint })
 s3_bucket = os.environ.get('S3_BUCKET')
 contacts_info_file = f'{s3_bucket}/filtered-paper-contacts.csv'
 contacts_info =  pd.read_csv(s3.open(contacts_info_file))
-for index, row in tqdm(contacts_info.iterrows(), total=contacts_info.shape[0]):
-    cur.execute('''INSERT INTO paper_contacts (id, pmcid, article_title, surname, given_name, email) 
-                    VALUES  (%s, %s, %s, %s, %s, %s)
-                    ON CONFLICT (pmcid, email)
-                    DO NOTHING;''', (str(uuid.uuid4()), row['pmcid'], row['article_title'], row['surname'], row['given_name'], row['email']))
-conn.commit()
+contacts_info = contacts_info.drop_duplicates(subset=['pmcid', 'email', 'article_title'])
+copy_from_records(conn, 'paper_contacts', ['id', 'pmcid', 'article_title', 'surname', 'given_name', 'email'], (
+  dict(id=str(uuid.uuid4()), pmcid=row['pmcid'], article_title=row['article_title'], surname=row['surname'], given_name=row['given_name'], email=row['email'])
+    for index, row in tqdm(contacts_info.iterrows(), total=contacts_info.shape[0])
+), on=OnConflictSpec(conflict=('pmcid', 'email'), update=('surname', 'given_name',)))
+
+conn.close()
+cur.close()

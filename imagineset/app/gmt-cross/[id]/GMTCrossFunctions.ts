@@ -34,7 +34,6 @@ export async function fetchCrossPairs(lib1: string, lib2: string) {
             lib_2: libMap[lib2]
         }
     });
-    console.log(1, rows.length)
     if (rows.length === 0) {
         const rows = await prisma.cFDECrossPair.findMany({
             where: {
@@ -42,7 +41,6 @@ export async function fetchCrossPairs(lib1: string, lib2: string) {
                 lib_2: libMap[lib1]
             }
         })
-        console.log(2, rows.length)
         return rows
     } 
     return rows

@@ -75,15 +75,9 @@ copy_from_records(conn, 'cfde_genesets', ['id', 'term', 'library'], (
     for index, row in tqdm(CFDE_geneset_df.iterrows(), total=CFDE_geneset_df.shape[0])
 ), on=OnConflictSpec(conflict=('term', 'library',), update=('id',)))
 
-
-data_list = []
-for index, row in tqdm(CFDE_gene_df.iterrows(), total=CFDE_gene_df.shape[0]):
-    data_dict = dict(A=row['geneId'], B=row['geneset_id'])
-    cur.execute(f'''SELECT COUNT(id) FROM cfde_genesets WHERE  id='{row['geneset_id']}';''')
-    if cur.fetchone()[0] > 0:
-        data_list.append(data_dict)
-print(CFDE_gene_df.shape[0],len(data_list))
-copy_from_records(conn, '"_GeneTocfdegeneset"', ['A', 'B'], data_list, on=OnConflictSpec(conflict=('A', 'B',), update=()))
+copy_from_records(conn, '"_GeneTocfdegeneset"', ['A', 'B'], (dict(A=row['geneId'], B=row['geneset_id'])
+                                                             for index, row in tqdm(CFDE_gene_df.iterrows(), total=CFDE_gene_df.shape[0])), 
+                                                             on=OnConflictSpec(conflict=('A', 'B',), update=()))
 
 
 #Ingest GMT crossing data

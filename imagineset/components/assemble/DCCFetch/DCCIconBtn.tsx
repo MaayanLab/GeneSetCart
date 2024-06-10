@@ -2,7 +2,7 @@ import React from "react";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardMedia from "@mui/material/CardMedia";
-import { Box, Stack } from "@mui/material";
+import { Box, Grid, Stack } from "@mui/material";
 import Image from 'next/image'
 import LINCSImg from '@/public/img/DCCImg/LINCS-logo.png'
 import glygenImg from '@/public/img/DCCImg/glygen.png'
@@ -68,17 +68,19 @@ const CustomCard = ({
     image,
     title,
     subtitle,
-    selected
+    selected,
 }: {
     image: string;
     title: string;
     subtitle: string;
-    selected: string[]
+    selected: string[];
+    
 }) => (
     <Card sx={{
         flexShrink: 0,
         height: '100px',
-        width: '120px',
+        // width: '120px',
+        width: `calc(80% / ${8})`,
         margin: 1,
         backgroundColor: selected.includes(title) ? 'lightblue' : 'white'
     }} >
@@ -103,11 +105,10 @@ export const DCCIcons = ({ selected }: { selected: string[] }) => {
         <Box
             sx={{
                 display: 'flex',
-                // overflowX: 'scroll',
-                justifyContent: 'center'
-                // maxWidth: '50vw'
+                justifyContent: 'center',
+                flexWrap: 'wrap',
             }}>
-            <Stack direction='row' useFlexGap flexWrap="wrap">
+            <Stack direction='row' useFlexGap flexWrap="wrap" spacing={0.5} width={'100%'}>
                 {dccInfo.map((dcc, i) => (
                     <CustomCard key={dcc.shortName} image={dcc.imgString} title={dcc.shortName} subtitle={dcc.longName} selected={selected} />
                 ))}

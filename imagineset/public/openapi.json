@@ -1,0 +1,288 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Get-Gene-Set-Go - OpenAPI 3.0",
+    "description": "Get-Gene-Set-Go is an interactive web-based application that enables users to fetch gene sets from various Common Fund programs data sources, augment these sets with gene-gene co-expression correlations or protein-protein interactions, perform set operations such as union, consensus, and intersection on multiple sets, and visualize and analyze these gene sets in a single session. ",
+    "contact": {
+      "email": "avi.maayan@mssm.edu"
+    },
+    "version": "1.0.11"
+  },
+  "externalDocs": {
+    "description": "Find out more about G2SG",
+    "url": "http://g2sg.cfde.cloud"
+  },
+  "servers": [
+    {
+      "url": "https://g2sg.cfde.cloud/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "default",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/addUserGeneset": {
+      "post": {
+        "tags": [
+          "default"
+        ],
+        "summary": "Add a new gene set to the shopping cart",
+        "description": "Add a new gene set to the shopping cart",
+        "operationId": "addUserGeneset",
+        "requestBody": {
+          "description": "Add a new gene set to the shopping cart",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneSet"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneSet"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/addGenesetURLResponse"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/addGenesetURLResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/addMultipleGenesets": {
+      "post": {
+        "tags": [
+          "default"
+        ],
+        "summary": "Add multiple gene sets to the shopping cart of a session",
+        "description": "Add multiple gene sets to the shopping cart of a session",
+        "operationId": "addMultipleGenesets",
+        "requestBody": {
+          "description": "Add multiple gene sets to the shopping cart of a session",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GeneSet"
+                },
+                "example": [
+                  {
+                    "term": "test set 1",
+                    "genes": [
+                      "FAM83E",
+                      "TJP3",
+                      "HEPACAM2",
+                      "GCNT3",
+                      "NXPE2",
+                      "LRRC31"
+                    ],
+                    "description": "First gene set"
+                  },
+                  {
+                    "term": "test set 2",
+                    "genes": [
+                      "ACTB",
+                      "ACTG1",
+                      "ADAR",
+                      "PARP1",
+                      "FAM83E",
+                      "AGXT",
+                      "ALDOA"
+                    ],
+                    "description": "Second gene set"
+                  }
+                ]
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GeneSet"
+                },
+                "example": [
+                  {
+                    "term": "test set 1",
+                    "genes": [
+                      "FAM83E",
+                      "TJP3",
+                      "HEPACAM2",
+                      "GCNT3",
+                      "NXPE2",
+                      "LRRC31"
+                    ],
+                    "description": "First gene set"
+                  },
+                  {
+                    "term": "test set 2",
+                    "genes": [
+                      "ACTB",
+                      "ACTG1",
+                      "ADAR",
+                      "PARP1",
+                      "FAM83E",
+                      "AGXT",
+                      "ALDOA"
+                    ],
+                    "description": "Second gene set"
+                  }
+                ],
+                "xml": {
+                  "name": "##default"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session_id": {
+                      "type": "string",
+                      "example": "clu1gfzj6003212xxhzuw8617"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session_id": {
+                      "type": "string",
+                      "example": "clu1gfzj6003212xxhzuw8617"
+                    }
+                  },
+                  "xml": {
+                    "name": "##default"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GeneSet": {
+        "required": [
+          "term",
+          "genes",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "term": {
+            "type": "string",
+            "example": "Increased Red Blood Cell Distribution Width (MP:0010067)"
+          },
+          "genes": {
+            "type": "array",
+            "xml": {
+              "wrapped": true
+            },
+            "items": {
+              "type": "string",
+              "xml": {
+                "name": "genes"
+              }
+            },
+            "example": [
+              "TRIM16",
+              "CRLF3",
+              "TEX261",
+              "ELOVL6",
+              "GSTA4",
+              "FGB",
+              "DDX55",
+              "DBN1",
+              "SLC29A3",
+              "VPS33A",
+              "CHST10"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "example": "A gene set from KOMP2 Mouse Phenotypes 2022 provided by KOMP2"
+          }
+        },
+        "xml": {
+          "name": "geneset"
+        }
+      },
+      "addGenesetURLResponse": {
+        "type": "object",
+        "properties": {
+          "geneset_url": {
+            "type": "string",
+            "example": "http://g2sg.cfde.cloud/assemble?type=single&geneset_id=1df6207f-61e3-4ea6-8003-5cf15bbd7a04"
+          }
+        },
+        "xml": {
+          "name": "##default"
+        }
+      }
+    },
+    "requestBodies": {
+      "GeneSet": {
+        "description": "Information about gene set to add to G2SG",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/GeneSet"
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/GeneSet"
+            }
+          }
+        }
+      }
+    }
+  }
+}

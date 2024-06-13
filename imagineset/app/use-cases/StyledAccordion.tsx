@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
+const usecases = ['alexander', 'gtex-motrpac-crossing']
+
 export const StyledAccordion = styled((props: AccordionProps) => (
     <Accordion sx={{ ml: 3, mb: 1 }} elevation={0} disableGutters {...props} />
 ))(({ theme }) => ({
@@ -38,9 +40,32 @@ export const StyledAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
 }));
 
 
-export function StyledAccordionComponent({ heading, content }: { heading: string, content: React.ReactElement }) {
+export function StyledAccordionComponent({ heading, content, label }: { heading: string, content: React.ReactElement, label: string }) {
+    const [expanded, setExpanded] = React.useState('');
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    React.useLayoutEffect(() => {
+        const anchor = window.location.hash.split('#')[1];
+        if (anchor) {
+          const accExists = usecases.find(q => q === anchor)
+          if (accExists) {
+            setExpanded(anchor);
+            setIsExpanded(true)
+            const anchorEl = document.getElementById(anchor);
+            anchorEl?.scrollIntoView();
+          }
+        }
+    }, []);
+
+    const handleChange = (panel: string) => {
+        setExpanded(panel);
+        setIsExpanded(!isExpanded)
+      };
+
     return (
-        <StyledAccordion>
+        <StyledAccordion       
+        id={label}
+        expanded={expanded === label && isExpanded}
+        onChange={(evt)=> handleChange(label)}>
             <StyledAccordionSummary
                 expandIcon={<ArrowDownwardIcon />}
             >

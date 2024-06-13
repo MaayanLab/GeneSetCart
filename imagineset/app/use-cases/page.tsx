@@ -19,9 +19,7 @@ const gtexAgingMotrpac = readFileSync(
     { encoding: 'utf8', flag: 'r' }
 )
 
-
 export default async function UseCases({ params }: { params: { id: string } }) {
-    //TODO: change launch link to my private account session that cannot be deleted so that only copies are made of it. 
     return (
         <>
             <Grid item>
@@ -48,7 +46,9 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                                 </ReactMarkdown>}
                                 launchLink="https://g2sg.cfde.cloud/analyze/clve10831005o1p8osxg25ta5" /> //  public session in my account (so that users cant change it)
                                 // launchLink="https://g2sg.cfde.cloud/analyze/clv2phuo8002nvfpmq44m8iyf" />
+                                
                         }
+                        label={'alexander'}
                     />
                     <StyledAccordionComponent
                         heading="CFDE GMT Crossing: GTEx Aging Signatures vs MoTrPAC Exercise Gene Sets"
@@ -65,6 +65,7 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                                 </ReactMarkdown>}
                                 launchLink="https://g2sg.cfde.cloud/gmt-cross/clv2p3a4o002hvfpmgbsuf8p3?lib1=GTEx+Tissue-Specific+Aging+Signatures&lib2=MoTrPAC+Rat+Endurance+Exercise+Training" />
                         }
+                        label={'gtex-motrpac-crossing'}
                     />
                 </Container>
             </Container>

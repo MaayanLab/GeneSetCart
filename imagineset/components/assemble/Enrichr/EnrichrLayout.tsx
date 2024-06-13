@@ -103,7 +103,7 @@ export function EnrichrPage() {
 
   return (
     <Container>
-      <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH CFDE DCC GENE SETS</Typography>
+      <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH ENRICHR GENE SETS</Typography>
       <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
         Search for Enrichr gene sets related to a term.
       </Typography>

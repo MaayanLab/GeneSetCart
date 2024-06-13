@@ -1,5 +1,6 @@
 'use client'
 import {
+  Box,
   Container, Grid,
   Typography,
 } from "@mui/material";;
@@ -12,6 +13,7 @@ import { DCCIcons } from "./DCCIconBtn";
 import CFDEDataTable from "./CFDEDataTable";
 import { termSearch } from "./DCCFetchFunc";
 import { Gene } from "@prisma/client";
+import CircularIndeterminate, { LinearIndeterminate } from "@/components/misc/Loading";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -84,6 +86,7 @@ export type searchResultsType = {
 export function DCCPage() {
   const [searchResults, setSearchResults] = React.useState<searchResultsType[]>([])
   const [checked, setChecked] = React.useState<number[]>(dccCheckedDisplay.map((dcc, i) => i));
+  const [loading, setLoading] = React.useState(false);
 
   const searchDCCs = React.useMemo(() => {
     return searchResults.map((result) => result.dcc).filter((v, i, self) => i == self.indexOf(v))
@@ -100,8 +103,10 @@ export function DCCPage() {
   const handleSearch = React.useCallback((
     query: string
   ) => {
+    setLoading(true)
     termSearch(query)
       .then((data) => {
+        setLoading(false)
         setSearchResults(data.map((row, i) => ({
           id: i,
           dcc: genesetLibDCCMap[row.library],
@@ -135,14 +140,25 @@ export function DCCPage() {
             />
           </Search>
         </Grid>
+        {loading ?
+        <Grid container item spacing={2} xs={12}>
+        <Grid container item xs={3}>
+          <DCCList dccs={searchDCCs} checked={checked} setChecked={setChecked} />
+        </Grid>
+          <Grid container item xs={9}>
+            <LinearIndeterminate />
+            <CFDEDataTable rows={[]} />
+          </Grid>
+      </Grid>
+            :
         <Grid container item spacing={2} xs={12}>
           <Grid container item xs={3}>
             <DCCList dccs={searchDCCs} checked={checked} setChecked={setChecked} />
           </Grid>
-          <Grid container item xs={9}>
-            <CFDEDataTable rows={rows} />
-          </Grid>
-        </Grid>
+            <Grid container item xs={9}>
+              <CFDEDataTable rows={rows} />
+            </Grid>
+        </Grid>}
       </Grid>
     </Container>
   )

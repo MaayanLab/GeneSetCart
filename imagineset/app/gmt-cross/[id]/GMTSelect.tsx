@@ -42,7 +42,7 @@ export function GMTSelect({selectedLibs, setSelectedLibs, index, selectedDCCs, s
             >
                 {
                     Object.keys(CFDELibraryOptions).map((cfdeLib) =>
-                         <MenuItem key={cfdeLib} value={cfdeLib} disabled={(selectedLibs.includes(cfdeLib)) || (cfdeLib === 'Human BioMolecular Atlas Program Azimuth')}>
+                         <MenuItem key={cfdeLib} value={cfdeLib} disabled={selectedLibs.includes(cfdeLib)}>
                             {cfdeLib}
                         </MenuItem>)
                 }

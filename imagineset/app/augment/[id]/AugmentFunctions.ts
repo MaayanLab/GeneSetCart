@@ -16,8 +16,8 @@ export async function getGeneshotPredGenes(gene_list: string[], augmentWith: str
     });
     const responseJson = await response.json()
     const associationData = responseJson.association
-    const topAssociation = Object.keys(associationData).map((gene) => ({'gene': gene, 'simScore': associationData[gene].simScore}))
-    const topGenes= topAssociation.sort(function(a, b) { 
+    const topAssociation = Object.keys(associationData).map((gene) => ({ 'gene': gene, 'simScore': associationData[gene].simScore }))
+    const topGenes = topAssociation.sort(function (a, b) {
         return a.simScore - b.simScore;
     }).map((geneInfo) => geneInfo.gene)
     const validTopGenes = await checkValidGenes(topGenes.toString().replaceAll(',', '\n'))
@@ -25,46 +25,22 @@ export async function getGeneshotPredGenes(gene_list: string[], augmentWith: str
 
 }
 
+
 export async function getPPIGenes(gene_list: string[]) {
-const payload = {
-    'geneset' : gene_list, 
-             'biogrid': true,
-             'bioplex': true, 
-             'string': true,
-             'iid': true, 
-             'ht' : true,
-             'ci' : 0.85,
-             'pred' : true,
-             'ortho' : true,
-             }
-
-const response = await fetch('https://g2nkg.dev.maayanlab.cloud/api/knowledge_graph/ppi_kg', {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-});
-
-let ppiGenes : string[] = []
-if (response.status === 200) {
-    const responseJson = await response.json()
-    // loop through edges for PPI network
-    
-    responseJson.forEach((networkItem: { data: { kind: string; properties: { target_label: any; source_label: any; }; }; }) => {
-        if  (networkItem.data.kind === 'Relation') {
-            const possibleGene1= networkItem.data.properties.target_label
-            const possibleGene2= networkItem.data.properties.source_label
-            if ((!gene_list.includes(possibleGene1)) && (!ppiGenes.includes(possibleGene1))){
-                ppiGenes.push(possibleGene1)
-            }
-            if ((!gene_list.includes(possibleGene2)) && (!ppiGenes.includes(possibleGene2))){
-                ppiGenes.push(possibleGene2)
-            }
-        } 
+    const API_BASE_URL = process.env.PYTHON_API_BASE
+    if (!API_BASE_URL) throw new Error('API_BASE_URL not found')
+    const req = await fetch(API_BASE_URL + '/api/get_PPI_genes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 'input_genes': gene_list }),
     })
-}
+    const responseJSON = await req.json()
+    if (req.status === 200){
+        const validGenes = await checkValidGenes(responseJSON['ppi_genes'].toString().replaceAll(',', '\n'))
+        return validGenes
+    } 
+    else return []
+    }
 
-const validGenes = await checkValidGenes(ppiGenes.toString().replaceAll(',', '\n'))
-    return validGenes
-}

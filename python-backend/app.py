@@ -14,6 +14,7 @@ import numpy as np
 from scipy.cluster.hierarchy import linkage, dendrogram, distance
 from collections import defaultdict
 from supervenn import supervenn
+import requests
 
 
 app = Flask(__name__)
@@ -160,6 +161,32 @@ def get_supervenn():
         svg_data = img.getvalue().decode()
         img.close()
         return svg_data
+    
+@app.route('/api/get_PPI_genes', methods=['GET', 'POST']) 
+def getPPIGenes():
+    if request.method == "POST":
+        data = request.get_json()
+        input_genes = data['input_genes']
+        G2N_URL = 'https://maayanlab.cloud/G2N/api'
+        defaults = {
+        'text-genes': (None, '\n'.join(input_genes)),
+        'min_network_size': (None, 10),
+        'path_length': (None, 2),
+        'min_number_of_articles_supporting_interaction': (None, 10),
+        'max_number_of_interactions_per_protein': (None, 200),
+        'max_number_of_interactions_per_article': (None, 100),
+        'enable_BioGRID': (None, True),
+        'enable_IntAct': (None, True),
+        'enable_MINT': (None, True),
+        'enable_ppid': (None, True),
+        'enable_Stelzl': (None, True)
+        }
+
+        response = requests.post(G2N_URL, files=defaults)
+        json_response = response.json()
+        nodes = json.loads(json_response['G2N'])['network']['nodes']
+        ppi_genes = [node['name'] for node in nodes]
+        return {'ppi_genes': ppi_genes}
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True, threading=True)

@@ -13,7 +13,7 @@ export type PairsData = {
 }
 
 
-const libMap : {[key: string]: string} = {
+const libMap: { [key: string]: string } = {
     'LINCS L1000 CMAP Chemical Pertubation Consensus Signatures': 'LINCS_L1000_Chem_Pert_Consensus_Sigs',
     'LINCS L1000 CMAP CRISPR Knockout Consensus Signatures': 'LINCS_L1000_CRISPR_KO_Consensus_Sigs',
     'GTEx Tissue Gene Expression Profiles': 'GTEx_Tissues',
@@ -30,27 +30,27 @@ const libMap : {[key: string]: string} = {
 export async function fetchCrossPairs(lib1: string, lib2: string) {
     const rows = await prisma.cFDECrossPair.findMany({
         where: {
-            lib_1: libMap[lib1], 
+            lib_1: libMap[lib1],
             lib_2: libMap[lib2]
         }
     });
     if (rows.length === 0) {
         const rows = await prisma.cFDECrossPair.findMany({
             where: {
-                lib_1: libMap[lib2], 
+                lib_1: libMap[lib2],
                 lib_2: libMap[lib1]
             }
         })
         return rows
-    } 
+    }
     return rows
 }
 
 export async function fetchGenes(term: string) {
     const result = await prisma.cfdegeneset.findFirst({
-        where : {
+        where: {
             term: term
-        }, 
+        },
         select: {
             genes: true
         }
@@ -62,7 +62,7 @@ export async function fetchGenes(term: string) {
     } else {
         return []
     }
-    
+
 }
 
 async function getEnrichmentTerms(overlapGenes: string[]) {
@@ -77,17 +77,17 @@ async function getEnrichmentTerms(overlapGenes: string[]) {
         }
     }
     )
-    const userListId = data.userListId 
-    const libraries = ['WikiPathway_2023_Human', 'GWAS_Catalog_2023', 'GO_Biological_Process_2023', 'MGI_Mammalian_Phenotype_Level_4_2021', ]
+    const userListId = data.userListId
+    const libraries = ['WikiPathway_2023_Human', 'GWAS_Catalog_2023', 'GO_Biological_Process_2023', 'MGI_Mammalian_Phenotype_Level_4_2021',]
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    let enrichedTerms : string[] = []
-    let topEnrichmentResults : {[key: string]: any[]} = {}
+    let enrichedTerms: string[] = []
+    let topEnrichmentResults: { [key: string]: any[] } = {}
     for (let lib of libraries) {
         const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}`)
         if (response.status === 200) {
-            const enrichmentResults = await response.json() 
+            const enrichmentResults = await response.json()
             const topResults = enrichmentResults[lib].slice(0, 5)
-            for (let termInd in topResults){
+            for (let termInd in topResults) {
                 const termResults = topResults[termInd]
                 const term = topResults[termInd][1]
                 topEnrichmentResults[term] = [...termResults, lib]
@@ -96,9 +96,9 @@ async function getEnrichmentTerms(overlapGenes: string[]) {
         } else {
             await sleep(10)
             const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}`)
-            const enrichmentResults = await response.json() 
+            const enrichmentResults = await response.json()
             const topResults = enrichmentResults[lib].slice(0, 5)
-            for (let termInd in topResults){
+            for (let termInd in topResults) {
                 const termResults = topResults[termInd]
                 const term = topResults[termInd][1]
                 topEnrichmentResults[term] = [...termResults, lib]
@@ -106,7 +106,7 @@ async function getEnrichmentTerms(overlapGenes: string[]) {
             }
         }
     }
-    return {enrichedTerms: enrichedTerms, topEnrichmentResults: topEnrichmentResults}
+    return { enrichedTerms: enrichedTerms, topEnrichmentResults: topEnrichmentResults }
 }
 
 export async function getSpecifiedAbstracts(term1: string, term2: string, abstract1: string, abstract2: string) {
@@ -122,8 +122,8 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
     where each abstract is a string containing the specified abstracts with no extra words/characters.
     `
     try {
-        const cachedAbstracts = cache.get( term1+ term2 + abstract1+ abstract2 );
-        if ( cachedAbstracts === undefined ){
+        const cachedAbstracts = cache.get(term1 + term2 + abstract1 + abstract2);
+        if (cachedAbstracts === undefined) {
             const openaiKey = process.env.OPENAI_API_KEY
             if (!openaiKey) throw new Error('no OPENAI_API_KEY')
             const tagLine = await fetch(`https://api.openai.com/v1/chat/completions`, {
@@ -144,7 +144,7 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
             })
             const tagLineParsed = await tagLine.json()
             const abstracts: string = tagLineParsed.choices[0].message.content
-            const success = cache.set( term1+ term2 + abstract1+ abstract2, abstracts, 600000)
+            const success = cache.set(term1 + term2 + abstract1 + abstract2, abstracts, 600000)
             return {
                 response: abstracts,
                 status: 200,
@@ -166,10 +166,12 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
 }
 
 
-export async function generateHypothesis(row: any ) {
+export async function generateHypothesis(row: any) {
     const enrichedResults = await getEnrichmentTerms(row.overlap)
     const enrichedTerms = enrichedResults.enrichedTerms
     const topEnrichmentResults = enrichedResults.topEnrichmentResults
+    row.lib_1 = (row.lib_1 === "HubMAP_Azimuth_2023_Augmented") ? "HubMAP_Azimuth_2023_Augmented-" + row.geneset_1.substring(0, row.geneset_1.indexOf('-')) : row.lib_1
+    row.lib_2 = (row.lib_2 === "HubMAP_Azimuth_2023_Augmented") ? "HubMAP_Azimuth_2023_Augmented-" + row.geneset_2.substring(0, row.geneset_2.indexOf('-')) : row.lib_2
     const abstract1 = await prisma.libAbstracts.findFirst({
         where: {
             lib: row.lib_1
@@ -182,7 +184,7 @@ export async function generateHypothesis(row: any ) {
     const abstract2 = await prisma.libAbstracts.findFirst({
         where: {
             lib: row.lib_2
-        }, 
+        },
         select: {
             abstract: true
         }

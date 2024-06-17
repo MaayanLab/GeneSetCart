@@ -91,7 +91,7 @@ const downloadSVG = (filename: string) => {
         }
         //add xml declaration
         source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), 'svg-visualization.svg')
+        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), filename+'.svg')
     };
 }
 
@@ -112,7 +112,7 @@ function downloadSVGByDiv(divId: string, filename: string) {
         }
         //add xml declaration
         source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), 'svg-visualization.svg')
+        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), filename+'.svg')
     };
 }
 
@@ -181,6 +181,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [assignGroups, setAssignGroups] = React.useState(false)
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
     const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: true, palette: 'viridis', fontSize: 12, disableLabels: false })
+    const [vennOptions, setVennOptions] = React.useState({ palette: 'Viridis'})
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -401,13 +402,13 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                         </div>
                                     </ClickAwayListener>
                                 </Stack>
-                                {<AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} heatmapOptions={heatmapOptions} setHeatmapOptions={setHeatmapOptions} />}
+                                {<AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} heatmapOptions={heatmapOptions} setHeatmapOptions={setHeatmapOptions} vennOptions={vennOptions} setVennOptions={setVennOptions} />}
                             </Box>
                             <Box sx={{ justifyContent: 'center'}}>
                                 <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px'}}>
                                     {(visualization === 'Heatmap' && checked.length > 1 && heatmapOptions.interactive) && <Heatmap legendSelectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} width={700} height={700} setOverlap={setOverlap} />}
                                     {(visualization === 'Heatmap' && checked.length > 1 && !heatmapOptions.interactive) && <ClusteredHeatmap selectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} />}
-                                    {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
+                                    {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} vennOptions={vennOptions}/>}
                                     {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
                                     {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} />}
                                     {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={debouncedUmapOptions} />}

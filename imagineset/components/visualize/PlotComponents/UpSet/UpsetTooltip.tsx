@@ -1,5 +1,4 @@
-import { InteractionData } from "../Heatmap/InteractiveHeatmap";
-import styles from "../Heatmap/tooltip.module.css";
+import styles from "../Umap/tooltip.module.css"
 
 export type UpsetInteractionData = {
     setLabel: string;
@@ -38,6 +37,7 @@ export const UpsetTooltip = ({ interactionData, width, height }: TooltipProps) =
           position: "absolute",
           left: interactionData.xPos,
           top: interactionData.yPos,
+          width: 150
         }}
       >
         <TooltipRow label={"Gene Set"} value={interactionData.setLabel} />
@@ -53,9 +53,8 @@ type TooltipRowProps = {
 };
 
 const TooltipRow = ({ label, value }: TooltipRowProps) => (
-  <div>
+  <div className={styles.row}>
     <b>{label}</b>
-    <span>: </span>
     <span>{value}</span>
   </div>
 );

@@ -1,5 +1,6 @@
 import { InteractionData } from "./InteractiveHeatmap";
-import styles from "./tooltip.module.css";
+import styles from "../Umap/tooltip.module.css"
+
 
 type TooltipProps = {
   interactionData: InteractionData | null;
@@ -31,6 +32,7 @@ export const Tooltip = ({ interactionData, width, height }: TooltipProps) => {
           position: "absolute",
           left: interactionData.xPos,
           top: interactionData.yPos,
+          wordBreak: 'break-word'
         }}
       >
         <TooltipRow label={"x"} value={interactionData.xLabel} />
@@ -47,9 +49,8 @@ type TooltipRowProps = {
 };
 
 const TooltipRow = ({ label, value }: TooltipRowProps) => (
-  <div>
+  <div className={styles.row}>
     <b>{label}</b>
-    <span>: </span>
-    <span>{value}</span>
+    <span style={{marginLeft: 10}}>{value}</span>
   </div>
 );

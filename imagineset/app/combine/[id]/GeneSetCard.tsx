@@ -25,7 +25,7 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
 
     return (
         <Box sx={{ maxWidth: 300 }}>
-            <Card variant="outlined" sx={{minHeight: 400, maxHeight: 500, overflowY: 'scroll'}}>
+            <Card variant="outlined" sx={{minHeight: 400, height: '100%', overflowY: 'scroll'}}>
                 <CardHeader
                     title="Select Sets to Combine"
                     titleTypographyProps={{color:'secondary.dark', fontSize: 18 }}
@@ -117,10 +117,9 @@ function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets,
         <Grid container direction={'row'}>
             <Grid item xs={10}>
                 <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label" sx={{ fontSize: 16 }} color='secondary'>Gene Set</InputLabel>
+                    <InputLabel id="combine-select-label" sx={{ fontSize: 16 }} color='secondary'>Gene Set</InputLabel>
                     <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
+                        labelId="combine-select-label"
                         value={selected}
                         label="Gene Set"
                         onChange={handleChange}

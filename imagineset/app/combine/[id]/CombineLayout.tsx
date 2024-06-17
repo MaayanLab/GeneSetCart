@@ -148,7 +148,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
         <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'} useFlexGap flexWrap="wrap">
             <SelectGenesetsCard sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
             <Box sx={{ minWidth: 100 }}>
-                <Card variant="outlined" sx={{ minHeight: 400, maxHeight: 500, overflowY: 'scroll' }}>
+                <Card variant="outlined" sx={{ minHeight: 400, height: '100%', overflowY: 'scroll' }}>
                     <CardHeader
                         title="Select Set Operation"
                         titleTypographyProps={{ color: 'secondary.dark', fontSize: 18 }}
@@ -193,20 +193,29 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                     </CardContent>
                 </Card>
             </Box>
-            <Box sx={{ maxWidth: 500 }}>
+            <Box sx={{ maxWidth: 500}}>
                 <Card variant="outlined" sx={{
-                    minHeight: 400, overflowY: 'scroll',
+                    minHeight: 400, height: '100%', overflowY: 'scroll',
                     '&::-webkit-scrollbar': { ...scrollbarStyles },
                     '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }
                 }}>
                     <CardHeader
                         title="Generated Set"
-                        subheader={generatedSetName}
                         titleTypographyProps={{ color: 'secondary.dark', fontSize: 18 }}
                         style={{ textAlign: 'center' }}
                     />
                     <CardContent>
                         <Stack direction={'column'} spacing={2}>
+                        <TextField color='secondary'
+                            variant='outlined'
+                            size='small'
+                            value={generatedSetName}
+                            sx={{ marginLeft: 2, marginRight: 2 }}
+                            placeholder='Enter name of selected set'
+                            onChange={(evt) => setGeneratedSetName(evt.target.value)}
+                            multiline
+                            inputProps={{ style: { resize: "both" } }}
+                        />
                             <Typography variant='body1' color='secondary' style={{ textAlign: 'center' }}> {displayedGenes.length} valid genes found</Typography>
                             <TextField
                                 id="standard-multiline-static"

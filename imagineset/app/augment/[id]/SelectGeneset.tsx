@@ -37,10 +37,9 @@ export default function GenesetSelect({ sessionGenesets, selected, setSelected }
     return (
         <Box sx={{ minWidth: 120 }}>
             <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label" sx={{ fontSize: 16 }} color='secondary'>Gene Set</InputLabel>
+                <InputLabel id="augment-geneset-select-label" sx={{ fontSize: 16 }} color='secondary'>Gene Set</InputLabel>
                 <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
+                    labelId="augment-geneset-select-label"
                     value={selected}
                     label="Gene Set"
                     onChange={handleChange}

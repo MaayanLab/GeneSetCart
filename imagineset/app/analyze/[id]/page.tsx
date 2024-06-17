@@ -134,7 +134,7 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
                 <Container sx={{ mb: 5 }}>
                     <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>ANALYZE YOUR GENE SETS</Typography>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
-                        Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS.
+                        Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Playbook Workflow Builder, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS.
                     </Typography>
                     <PaginatedTable rows={rows} />
                 </Container>

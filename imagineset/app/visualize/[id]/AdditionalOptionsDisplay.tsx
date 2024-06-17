@@ -8,7 +8,7 @@ import FormatSizeIcon from '@mui/icons-material/FormatSize';
 import FontDownloadOffIcon from '@mui/icons-material/FontDownloadOff';
 import FontDownloadIcon from '@mui/icons-material/FontDownload';
 
-export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, heatmapOptions, setHeatmapOptions }:
+export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, heatmapOptions, setHeatmapOptions, vennOptions, setVennOptions }:
     {
         visualization: string,
         umapOptions: UMAPOptionsType,
@@ -20,6 +20,10 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
             palette: string;
             fontSize: number;
             disableLabels: boolean
+        }>>,
+        vennOptions: { palette: string },
+        setVennOptions: React.Dispatch<React.SetStateAction<{
+            palette: string;
         }>>
     }) {
     const [switchChecked, setSwitchChecked] = React.useState(false)
@@ -230,6 +234,37 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
                             </Button>
                         </div>
                     </Tooltip>}
+            </Stack>
+        )
+    }
+
+    if (visualization === 'Venn') {
+        return (
+            <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 1 }}>
+                <FormControl sx={{ minWidth: 120 }}>
+                    <InputLabel id="color-palette" color='secondary'>Color Palette</InputLabel>
+                    <Select
+                        labelId="color-palette"
+                        value={vennOptions.palette}
+                        label="Color Palette"
+                        onChange={(evt) => {
+                            setVennOptions({ ...vennOptions, palette: evt.target.value })
+                        }}
+                        color='secondary'
+                    >
+                        <MenuItem value={'Viridis'}>Viridis</MenuItem>
+                        <MenuItem value={'Spectral'}>Spectral</MenuItem>
+                        <MenuItem value={'RdYlGn'}>RdYlGn</MenuItem>
+                        <MenuItem value={'RdBu'}>RdBu</MenuItem>
+                        <MenuItem value={'PiYG'}>PiYG</MenuItem>
+                        <MenuItem value={'PRGn'}>PRGn</MenuItem>
+                        <MenuItem value={'RdYlBu'}>RdYlBu</MenuItem>
+                        <MenuItem value={'BrBG'}>BrBG</MenuItem>
+                        <MenuItem value={'RdGy'}>RdGy</MenuItem>
+                        <MenuItem value={'PuOr'}>PuOr</MenuItem>
+                        <MenuItem value={'Set2'}>Set2</MenuItem>
+                    </Select>
+                </FormControl>
             </Stack>
         )
     }

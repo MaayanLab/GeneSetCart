@@ -85,12 +85,13 @@ function calculateIntersections(possibleSubsets: ({
 }
 
 
-export default function VennPlot({ selectedSets, setOverlap }: {
+export default function VennPlot({ selectedSets, setOverlap, vennOptions }: {
     selectedSets: ({
         alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined,
-    setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
+    setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>,
+    vennOptions: { palette: string }
 }) {
     const [intersectionGeneDict, setIntersectionGeneDict] = React.useState<VennGeneProps>({})
 
@@ -117,7 +118,7 @@ export default function VennPlot({ selectedSets, setOverlap }: {
                 margins={[3, 3, 3, 3]}
                 series={
                     <VennSeries
-                    colorScheme="set2"
+                    colorScheme={vennOptions.palette}
                         arc={<VennArc strokeWidth={3}
                             gradient={<Gradient />}
                             onClick={(evt) => setOverlap({ name: evt.value.sets.sort().toString(), overlapGenes: intersectionGeneDict[evt.value.sets.sort().toString()] })} />}

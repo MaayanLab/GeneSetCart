@@ -133,7 +133,7 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
                     'Authorization': `Bearer ${openaiKey}`,
                 },
                 body: JSON.stringify({
-                    model: 'gpt-4',
+                    model: 'gpt-4o',
                     messages: [
                         { "role": "system", "content": "You are a biologist who attempts parse a term and create a specified abstract based on an abstract template" },
                         { "role": "user", "content": input }
@@ -216,7 +216,9 @@ export async function generateHypothesis(row: any) {
     Cascades WP558, not Complement And Coagulation Cascades).
     Specified Abstracts for gene sets: ${abstractsList}
     The overlapping genes are ${overlapGeneSet.toString().replaceAll("'", '')}
-    Do not include 'Hypothesis: ' at the beginning of your response.
+    Do not include 'Hypothesis: ' at the beginning of your response and please
+    mesh the enrichment analysis results seamlessly into the explanation in a 
+    paragraph like format. Limit your response to about 12 sentences.
     `
     try {
         const cachedHypothesis = cache.get( term1+term2 );
@@ -230,12 +232,11 @@ export async function generateHypothesis(row: any) {
                 'Authorization': `Bearer ${openaiKey}`,
             },
             body: JSON.stringify({
-                model: 'gpt-4',
+                model: 'gpt-4o',
                 messages: [
                     { "role": "system", "content": "You are a biologist who attempts to create a hypothesis about why two gene sets, which are lists of genes, may have a high overlap" },
                     { "role": "user", "content": input }
                 ],
-                // max_tokens: 20,
                 temperature: 0
             })
         })

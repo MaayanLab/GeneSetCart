@@ -208,7 +208,7 @@ export function GMTCrossLayout() {
                     }}
                 >
                     <Typography sx={{ fontSize: 10, textWrap: 'wrap' }}>
-                        GPT-4 Hypothesis
+                        GPT-4o Hypothesis
                     </Typography>
                 </Button>
             </React.Fragment>
@@ -275,7 +275,7 @@ export function GMTCrossLayout() {
         },
         {
             field: 'hypothesis',
-            headerName: 'Form Hypothesis with GPT-4',
+            headerName: 'Form Hypothesis with GPT-4o',
             flex: 0.5,
             minWidth: 100,
             renderCell: RenderHypothesisButton,

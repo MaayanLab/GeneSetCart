@@ -259,7 +259,7 @@
         "properties": {
           "geneset_url": {
             "type": "string",
-            "example": "http://g2sg.cfde.cloud/assemble?type=single&geneset_id=1df6207f-61e3-4ea6-8003-5cf15bbd7a04"
+            "example": "http://g2sg.cfde.cloud/assemble?type=single&geneset_id=1df6207f-61e3-4ea6-8003-5cf15bbd7a04&add=true"
           }
         },
         "xml": {

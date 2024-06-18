@@ -222,3 +222,32 @@ export async function checkInSession(currentSessionId: string, newGeneSetName: s
     return false
 }
 
+export async function addToSessionByGenesetId (sessionId : string, geneset: {
+    genes: {
+        id: string;
+        gene_symbol: string;
+        synonyms: string;
+        description: string | null;
+    }[];
+} & {
+    id: string;
+    name: string;
+    description: string | null;
+    createdAt: Date;
+} ) {
+    const response = await checkInSession(sessionId, geneset.name);
+    if (response) {
+        return {error: "Gene set already exists in this session!" }
+    } else {
+        try {
+            const result = await addToSessionSets(geneset.genes.map((gene) => gene.gene_symbol), sessionId, geneset.name, geneset.description ? geneset.description : '')
+            return {success : "Added"}
+        } catch (err : any) {
+            if (err.message === 'No valid genes in gene set') {
+                return {error: err.message}
+            } else {
+                return {error: "Error in adding gene set!"}
+            }
+        }
+    }
+}

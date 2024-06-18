@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 export default async function Page(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const sessionId = cookies().get('session_id')
     if (sessionId) {
-        redirect(`/assemble/${sessionId.value}?type=single&geneset_id=${props.searchParams.geneset_id}`)
+        redirect(`/assemble/${sessionId.value}?type=single&geneset_id=${props.searchParams.geneset_id}&add=${props.searchParams.add}`)
     }
     // if user is not logged in and there is no session id cookie => make new session
     const session = await getServerSession(authOptions)

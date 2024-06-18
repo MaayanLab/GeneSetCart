@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     if (genesetName === '') return NextResponse.json({ error: 'No gene set name' }, { status: 400 })
     try {
         const addedGenesetId = await addToAddedGenesets(genes, genesetName, description)
-        return NextResponse.json({ geneset_url: process.env.PUBLIC_URL + `/assemble?type=single&geneset_id=${addedGenesetId}`}, {
+        return NextResponse.json({ geneset_url: process.env.PUBLIC_URL + `/assemble?type=single&geneset_id=${addedGenesetId}&add=true`}, {
             status: 200,
             headers: {
                 "Access-Control-Allow-Origin": "*",

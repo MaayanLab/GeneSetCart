@@ -7,8 +7,8 @@ import {
     Typography, useMediaQuery,
     useTheme
 } from "@mui/material";
-import { addToSessionSets, checkInSession, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions ";
-import { useParams } from "next/navigation";
+import { addToSessionByGenesetId, addToSessionSets, checkInSession, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions ";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import Status from "../Status";
 import { getGenesetInfo } from "@/app/shallowcopy";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
@@ -32,19 +32,39 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     const [status, setStatus] = React.useState<addStatus>({})
     const [genesetInfo, setGenesetInfo] = React.useState<genesetInfo>()
 
+    const searchParams = useSearchParams();
+    const urlParams = new URLSearchParams(searchParams);
+    const pathname = usePathname();
+    const router = useRouter();
+
     useEffect(() => {
         const genesetId = queryParams.geneset_id
+        const add = queryParams.add
         if (typeof (genesetId) === 'string') {
+            const sessionId = params.id
             getGenesetInfo(genesetId).then((geneset) => {
                 if (geneset) {
                     setGenesetInfo({ name: geneset.name, genes: geneset.genes.map((gene) => gene.gene_symbol).join('\n'), description: geneset.description })
+                    if (add === 'true') {
+                        addToSessionByGenesetId(sessionId, geneset).then((response) => {
+                            if (response.success) {
+                                setStatus({ success: true })
+                            } else {
+                                setStatus({ error: { selected: true, message: response.error} })
+                            }
+                            urlParams.set('add', 'false')
+                            const queryString = urlParams.toString();
+                            const updatedPath = queryString ? `${pathname}?${queryString}` : pathname;
+                            router.push(updatedPath);
+                        })
+                    }
                 }
             })
         }
     }, [])
 
     const getExample = React.useCallback(() => {
-       loadTxtExample().then((response) => setGenesetInfo({name: 'example gene set', genes: response, description: '' }));
+        loadTxtExample().then((response) => setGenesetInfo({ name: 'example gene set', genes: response, description: '' }));
     }, [genesetInfo])
 
 
@@ -182,7 +202,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             multiline
                             rows={10}
                             placeholder="Paste gene symbols here"
-                            value={genesetInfo ? genesetInfo?.genes: ''}
+                            value={genesetInfo ? genesetInfo?.genes : ''}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: '', description: '' })
                             }}
@@ -196,7 +216,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                         </Grid>
                         <Grid item>
                             <Button variant='contained' color="tertiary" onClick={(evt) => submitGeneset(evt)}>
-                            <AddShoppingCartIcon /> &nbsp; 
+                                <AddShoppingCartIcon /> &nbsp;
                                 ADD TO CART
                             </Button>
                         </Grid>

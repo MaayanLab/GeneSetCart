@@ -114,13 +114,13 @@ const insertSoloDataOutersect = (intersections: SoloIntersectionType[], soloSets
 
 
 
-export function UpsetPlotV2({ selectedSets, setOverlap }: {
+export function UpsetPlotV2({ selectedSets, setOverlap, upSetOptions }: {
     selectedSets: ({
         alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined;
     setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
-
+    upSetOptions: {color: string}
 }) {
     const [hoveredCell, setHoveredCell] = React.useState<UpsetInteractionData | null>(null);
 
@@ -276,7 +276,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
 
         } else {
             // fillColor = '#02577b';
-            fillColor = '#000000';
+            fillColor = upSetOptions.color;
         }
         return (
             <rect
@@ -288,7 +288,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                 width={Math.abs(xrangeSet(d.num))}
                 height={(rad * 2.7) - 9}
                 opacity={1}
-                fill={fillColor}
+                fill={upSetOptions.color}
                 stroke={"white"}
                 onMouseEnter={(e) => {
                     setHoveredCell({
@@ -364,7 +364,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
             fillColor = '#FFC000';
 
         } else {
-            fillColor = '#000000';
+            fillColor = upSetOptions.color;
         }
         return (
             <rect
@@ -399,7 +399,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
         return allSetNames.map((y, j) => {
             let fillColor
             if (x.setName.indexOf(y) !== -1) {
-                fillColor = '#000000';
+                fillColor = upSetOptions.color;
             } else {
                 fillColor = 'silver';
             }
@@ -428,7 +428,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap }: {
                     x2={i * (rad * 2.7)}
                     y1={allSetNames.indexOf(x.setName[0]) * (rad * 2.7)}
                     y2={allSetNames.indexOf(x.setName[x.setName.length - 1]) * (rad * 2.7)}
-                    stroke="#000000"
+                    stroke={upSetOptions.color}
                     strokeWidth={4}
                 />
             );

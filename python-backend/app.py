@@ -179,7 +179,8 @@ def getPPIGenes():
         'enable_IntAct': (None, True),
         'enable_MINT': (None, True),
         'enable_ppid': (None, True),
-        'enable_Stelzl': (None, True)
+        'enable_Stelzl': (None, True),
+        'enable_BioPlex': (None, True)
         }
 
         response = requests.post(G2N_URL, files=defaults)

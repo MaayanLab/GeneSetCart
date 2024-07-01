@@ -39,8 +39,8 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                                     rehypePlugins={[rehypeRaw]}
                                     remarkPlugins={[remarkGfm]}
                                     components={{
-                                        img: ({ node, ...props }) => <img style={{ maxWidth: '60%', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}{...props} />,
-                                        h5: ({ node, ...props }) => <h5 style={{ fontSize: 11 }}{...props} />,
+                                        img: ({ node, ...props }) => <img style={{ maxWidth: '90%', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}{...props} />,
+                                        h5: ({ node, ...props }) => <h5 style={{ fontSize: 12 }}{...props} />,
                                     }}>
                                     {alexanderUseCase}
                                 </ReactMarkdown>}
@@ -58,8 +58,8 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                                     rehypePlugins={[rehypeRaw]}
                                     remarkPlugins={[remarkGfm]}
                                     components={{
-                                        img: ({ node, ...props }) => <img style={{ maxWidth: '50%', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}{...props} />,
-                                        h5: ({ node, ...props }) => <h5 style={{ fontSize: 11 }}{...props} />
+                                        img: ({ node, ...props }) => <img style={{ maxWidth: '90%', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}{...props} />,
+                                        h5: ({ node, ...props }) => <h5 style={{ fontSize: 12 }}{...props} />
                                     }}>
                                     {gtexAgingMotrpac}
                                 </ReactMarkdown>}

@@ -1,6 +1,6 @@
 <u> **BACKGROUND** </u>
 
-Alexander disease (AxD) is a rare neurodegenerative disease caused by a mutation in the GFAP gene that codes for the glial fibrillary acidic protein (GFAP)[1]. GFAP protein supports the brain's white matter (the myelin sheath) at normal levels but in Alexander disease, the gain-of-function mutation of the GFAP gene causes this protein to accumulate. Instead of helping maintain myelin, the extra GFAP kills other cells and damages the myelin. The overexpression of GFAP also results in the appearance and growth of Rosenthal fibers (RFs) which are protein aggregates in the cytoplasm of astrocytes [2].
+Alexander disease (AxD) is a rare neurodegenerative disease caused by a mutation in the GFAP gene that codes for the glial fibrillary acidic protein (GFAP)[1]. GFAP protein supports the brain's white matter (the myelin sheath) at normal levels but in Alexander disease, the gain-of-function mutation of the GFAP gene causes this protein to accumulate. Instead of helping maintain myelin, the extra GFAP kills other cells and damages the myelin. The overexpression of GFAP also results in the appearance and accumulation of Rosenthal fibers (RFs), protein aggregates in the cytoplasm of astrocytes [2], in subpial and white matter central nervous system areas which have typically high GFAP expression. Other than RF fiber build-up, astrocytes in Alexander disease also have abnormal cell shape and functionality. Therefore, Alexander disease is marked by this astrocyte phenotype which has physiological manifestations such as seizures. .
 
 <br />
 
@@ -8,28 +8,42 @@ The Gene Expression Omnibus (GEO) is a major open biomedical research repository
 
 <br />
 
+![Alexander Disease Use Case Workflow](/img/markdownImg/alexander_disease_workflow.png)
+<h5> Fig 1: Alexander Disease Use Case Workflow </h5>
+<br />
+
+
  <u> **METHODS** </u>
 
-To obtain signatures, we perform differential gene expression analysis on RNA-seq gene expression samples from three GEO studies that compare control or wild type to Alexander disease samples (GSE198817, GSE197044, GSE116327). Differentially expressed genes between WT vs. disease samples for each study are computed using the limma method. This analysis was done using the Bulk RNA-seq analysis pipeline appyter [4]. 
+To obtain disease signatures, we perform differential gene expression analysis on RNA-seq gene expression samples from three GEO studies that compare control or wild type to Alexander disease samples (GSE198817 , GSE197044, GSE116327) [4]. The GSE198817 study contains gene expression samples from hippocampus and corpus callosum tissue of Gfap+/+, Gfap+/R236H, and mGFAPTg170-2 transgenic mice. The GSE197044 study contains RNA-seq profiles from hippocampus and corpus callosum tissue of male Gfap+/R236H and Gfap+/+ mice in FVB/N-Tac at 8 weeks of age. The GSE116327 study contains gene expression profiles of healthy control and AxD patient iPSC-derived astrocytes and post-mortem brain tissues. Differentially expressed genes between WT vs. disease samples for each study are computed using the limma method. This analysis was done using the Bulk RNA-seq analysis pipeline appyter [5]. 
 
 <br />
 
-We group these differentially expressed genes into up and down genes with up genes having a log2 fold change (logFC) > 0 and down genes having logFC < 0. The top 100 differentially expressed up and down genes based on t-statistic scores were then used to create the up and down gene sets for each study. These up and down genes from each sample were used to create a single .gmt file called the alexander_disease.gmt. The .gmt file was uploaded into the G2SG application for further integrative analysis using the “Upload GMT” option in the Assemble step of the platform.
+We group these differentially expressed genes into up and down genes with up genes having a logFC > 0 and down genes having logFC < 0. The top 100 differentially expressed up and down genes based on t-statistic scores were then used to create the up and down gene sets for each study. These up and down genes from each sample were then used to create a single .gmt file called the alexander_disease.gmt. The .gmt file was uploaded into the G2SG application for further integrative analysis using the “Upload GMT” option in the Assemble step of the platform. Using the G2SG pipeline, we found consensus up and down signatures which are genes that appear in the majority of all up or down gene sets. We analyze potential drugs that could reverse the gene expression changes by sending the consensus gene sets to SigCom LINCS [6]. We also perform gene set enrichment analysis on the consensus signatures by sending them to Enrichr [1].
 
 <br />
 
-Taking the consensus of all up gene sets (with a consensus cut-off of 6) yields seven genes that appear in at least 6 of the 10 up gene sets. We can analyze potential drugs that could reverse the gene expression changes by sending the consensus gene set to SigCom LINCS [5]. 
+Taking the consensus of all up gene sets (with a consensus cut-off of 6) yields seven genes that appear in at least 6 of the 10 up gene sets. We can analyze potential drugs that could reverse the gene expression changes by sending the consensus gene set to SigCom LINCS [6]. 
 
 <br />
 
 <u> **RESULTS AND DISCUSSION** </u>
 
-Here we see some potential chemical perturbagens for example lovastatin and vicamine that would down-regulate the expression of genes upregulated in Alexander disease according to our DGE analysis. Some perturbagens are are consistent with literature, for example Lovastatin which is a drug that is prescribed for the treatment of high cholesterol but has been found to correct excess hippocampal protein synthesis in the mouse model of Fragile X Syndrome [6]and is able to permeate the blood brain barrier [7]. Another study also shows that GFAP positive cells are significantly decreased in lovastatin treated groups [8], thus making it a potential drug that could treat the excess synthesis of GFAP protein in the brain. Vincamine, another chemical perturbagen in a reverser signature, has also been found to reduce GFAP expression [9] and shows ability to cross the blood brain barrier [10]. 
+Choosing the consensus criteria of 3, our consensus up signature contains 65 genes while our consensus down signature contains 20 genes.  The enrichment results are presented as bar charts along with links to the reports in Enrichr. The upregulated genes (consensus up signature) are enriched for brain related terms such as complement system in neuronal development and plasticity, spinal cord injury and TYROBP causal network in microglia. The downregulated genes are also enriched for neurobiological terms such as phosphodiesterases in neuronal function and neuroinflammation and glutamatergic signaling. 
 
 <br />
 
-![Reverser and Mimicker Signatures of Consensus Up Gene Set from LINCS Chemical Pertubtions](/img/markdownImg/chemical_sig_alexander_disease.png)
-<h5> Fig 1: Bar plots showing mimicker and reverser signatures to Consensus n=6 (WT vs mGFAPTg170-2 cc (GSE198817) up ∩ WT vs R236H cc (GSE198817) up ∩ WT vs mGFAPTg170-2 hip (GSE198817) up ∩ WT vs R236H hip (GSE198817) up ∩ WT vs R236H all (GSE197044) up ∩ WT vs R236H hip (GSE197044) up ∩ WT vs R236H cc (GSE197044) up ∩ Control vs AxD all (GSE116327) up ∩ Control vs AxD postmortem (GSE116327) up ∩ Control vs AxD astrocyte (GSE116327) up) gene set in SigCom LINCS. </h5>
+![Enrichment analysis of consensus up and down signature gene sets in Enrichr](/img/markdownImg/alexander_disease_enrichment.png)
+<h5> Fig 2: Enrichment analysis of consensus up and down signature gene sets in Enrichr. (A) Top enriched terms from WikiPathway 2023 Human library of  consensus up signature gene set in Enrichr.  Consensus signature is consensus n=3 of up signatures. Plot from: https://maayanlab.cloud/Enrichr/enrich?dataset=c24d601f51ffb6f071642514d1b3a02f (B) Top enriched terms from WikiPathway 2023 Human library of consensus down signature gene set in Enrichr. Consensus signature is consensus n=3 of down signature gene sets. Plot from: https://maayanlab.cloud/Enrichr/enrich?dataset=425ca9fd10bf9f97577a8b8620681d79 
+</h5>
+<br />
+
+Using the SigCOM LINCS API, we queried the consensus (n=3) up and down gene sets against all the LINCS L1000 chemical perturbation signatures to find drugs that reverse the consensus disease signature. This returns drug signatures with the z-sum and rank of each signature. Reversers (signatures that have up-regulated genes more similar to the input down genes, and the down-regulated genes more similar to the input up genes) have negative z-sums and mimickers (signatures that have similar up-regulated genes to the input up gene list, and down-regulated genes to the down gene list) have positive z-sums. Therefore, with the ranking of signatures done with the most positive z-sums being higher and most negative z-sums being lower, reversers are ranked towards the end. For each drug, we compute the Kolmogorov–Smirnov statistic using Scipy python library by (i) comparing the observed z-sum scores of its signatures to a normal distribution and (ii) comparing the observed ranks to the uniform distribution. These are used to rank the drugs based on a KS-score to find the drugs with the highest concentration of signatures at the bottom of the ranked list. There are 7 drugs that appear in both the top 10 ranked drugs from both methods: bortezomib, MG-132, vorinostat, panobinostat, GSK-1059615, BI-2536 and brefeldin-a. 
+
+<br />
+
+Vorinostat, a member of a class of drugs known as histone deacetylase (HDAC) inhibitors, is an FDA-approved drug for cutaneous T-cell lymphoma (CTCL). The drug has been found to decrease GFAP expression in glioblastoma cells [7]. Other studies have shown that the inhibition of histone deacetylases (HDACs) with trichostatin A or sodium butyrate reduced GFAP expression in primary human astrocytes and astrocytoma cells [8]. Another highly ranked reverser found was panobinostat, also an FDA-approved histone deacetylase (HDAC) inhibitor which is used to treat multiple myeloma in combination with bortezomib and dexamethasone [9]. With a main mechanism of action similar to vorinostat of inhibiting HDAC, panobinostat may also be a potential drug to treat Alexander disease. Another potential therapeutic agent is BI-2536. BI-2536  is a polo-like kinase 1 (PLK1) inhibitor and studies show that PLK1 inhibition induces cell autophagy and that it results in mTOR dephosphorylation [10]. Therefore, BI-2536 may potentially serve as a therapeutic agent for treating Alexander's disease because autophagic clearance of accumulated GFAP protein is regulated by the p38/MAPK and mTOR signaling pathways [11], which the drug has been found to inhibit.
+
 <br />
 
 <u> **CONCLUSION** </u>
@@ -46,16 +60,18 @@ Here, we use the G2SG Assemble-Augment-Combine-Visualize-Analyze pipeline to exp
 
 - [3]	T. Barrett et al., “NCBI GEO: archive for functional genomics data sets--update,” Nucleic Acids Res., vol. 41, no. Database issue, pp. D991–5, Jan. 2013.
 
-- [4]	D. J. B. Clarke et al., “Appyters: Turning Jupyter Notebooks into data-driven web apps,” Patterns (N Y), vol. 2, no. 3, p. 100213, Mar. 2021.
+- [4]	S. C. Gammie, A. Messing, M. A. Hill, C. A. Kelm-Nelson, and T. L. Hagemann, “Large-scale gene expression changes in APP/PSEN1 and GFAP mutation models exhibit high congruence with Alzheimer’s disease,” PLoS One, vol. 19, no. 1, p. e0291995, Jan. 2024.
 
-- [5]	J. E. Evangelista et al., “SigCom LINCS: data and metadata search engine for a million gene expression signatures,” Nucleic Acids Res., vol. 50, no. W1, pp. W697–W709, Jul. 2022.
+- [5]	D. J. B. Clarke et al., “Appyters: Turning Jupyter Notebooks into data-driven web apps,” Patterns (N Y), vol. 2, no. 3, p. 100213, Mar. 2021.
 
-- [6]	E. K. Osterweil et al., “Lovastatin corrects excess protein synthesis and prevents epileptogenesis in a mouse model of fragile X syndrome,” Neuron, vol. 77, no. 2, pp. 243–250, Jan. 2013.
+- [6]	J. E. Evangelista et al., “SigCom LINCS: data and metadata search engine for a million gene expression signatures,” Nucleic Acids Res., vol. 50, no. W1, pp. W697–W709, Jul. 2022.
 
-- [7]	F. Guillot, P. Misslin, and M. Lemaire, “Comparison of fluvastatin and lovastatin blood-brain barrier transfer using in vitro and in vivo methods,” J. Cardiovasc. Pharmacol., vol. 21, no. 2, pp. 339–346, Feb. 1993.
+- [7]	T. Perez, R. Berges, H. Maccario, D. Braguer, and S. Honoré, “P11.06 Non epigenetic effect of vorinostat in glioblastoma cells,” Neuro. Oncol., vol. 21, no. Suppl 3, p. iii43, Sep. 2019.
 
-- [8]	J. Mirzaie et al., “Neuroprotective effects of lovastatin against traumatic spinal cord injury in rats,” J. Chem. Neuroanat., vol. 125, p. 102148, Nov. 2022.
+- [9]	R. Kanski et al., “Histone acetylation in astrocytes suppresses GFAP and stimulates a reorganization of the intermediate filament network,” J. Cell Sci., vol. 127, no. Pt 20, pp. 4368–4380, Oct. 2014.
 
-- [9]	P. Wang, C. Chen, and M. Shan, “Vincamine alleviates brain injury by attenuating neuroinflammation and oxidative damage in a mouse model of Parkinson’s disease through the NF-κB and Nrf2/HO-1 signaling pathways,” J. Biochem. Mol. Toxicol., vol. 38, no. 5, p. e23714, May 2024.
+- [9]	K. Wahaib, A. E. Beggs, H. Campbell, L. Kodali, and P. D. Ford, “Panobinostat: A histone deacetylase inhibitor for the treatment of relapsed or refractory multiple myeloma,” Am. J. Health. Syst. Pharm., vol. 73, no. 7, pp. 441–450, Apr. 2016.
 
-- [10]	P. Sprumont and J. Lintermans, “[Autoradiographic demonstration of the passage of vincamin through the blood-brain barrier],” Fortschr. Med., vol. 100, no. 11, pp. 471–475, Mar. 1982.
+- [10]	Y.-F. Tao et al., “Inhibiting PLK1 induces autophagy of acute myeloid leukemia cells via mammalian target of rapamycin pathway dephosphorylation,” Oncol. Rep., vol. 37, no. 3, pp. 1419–1429, Mar. 2017.
+
+- [11]	G. Tang et al., “Autophagy induced by Alexander disease-mutant GFAP accumulation is regulated by p38/MAPK and mTOR signaling pathways,” Hum. Mol. Genet., vol. 17, no. 11, pp. 1540–1555, Jun. 2008.

@@ -1,5 +1,5 @@
 import { authOptions } from '@/lib/auth/authOptions'
-import GenesetSelect, { AugmentLayout } from "@/app/augment/[id]/SelectGeneset";
+import GenesetSelect from "@/app/augment/[id]/SelectGeneset";
 import ColorToggleButton from "@/components/misc/SectionToggle";
 import prisma from "@/lib/prisma";
 import { TextField, Typography, Grid } from "@mui/material";
@@ -8,6 +8,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
 import { shallowCopy } from '@/app/shallowcopy';
+import { AugmentLayout } from './AugmentLayout';
 
 export default async function AugmentPage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams

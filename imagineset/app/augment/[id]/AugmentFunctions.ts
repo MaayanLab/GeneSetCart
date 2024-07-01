@@ -38,7 +38,8 @@ export async function getPPIGenes(gene_list: string[]) {
     })
     const responseJSON = await req.json()
     if (req.status === 200){
-        const validGenes = await checkValidGenes(responseJSON['ppi_genes'].toString().replaceAll(',', '\n'))
+        let validGenes = await checkValidGenes(responseJSON['ppi_genes'].toString().replaceAll(',', '\n'))
+        validGenes = validGenes.filter((gene) => !(gene_list.includes(gene)))
         return validGenes
     } 
     else return []

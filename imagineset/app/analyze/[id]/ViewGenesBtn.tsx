@@ -48,7 +48,7 @@ export const ViewGenesBtn = ({ row }: {
             <Dialog
                 onClose={handleClose}
                 open={open}>
-                <DialogTitle>{row.name}</DialogTitle>
+                <DialogTitle sx={{wordBreak: 'break-word'}}>{row.name}</DialogTitle>
                 <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
                     <Grid item>
                         <Typography variant='body1' color='secondary'> {row.genes.length} genes</Typography>

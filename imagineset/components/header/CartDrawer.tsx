@@ -13,6 +13,9 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import { useParams } from 'next/navigation';
 import Cookies from 'js-cookie'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import DownloadIcon from '@mui/icons-material/Download';
+import { downloadURI } from '@/app/visualize/[id]/VisualizeLayout';
+
 
 export function CollapsibleButton({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
     return (
@@ -98,19 +101,30 @@ const GenesetInfo = ({ geneset }: {
 
     )
 }
-const DrawerInfo = ({ genesets, sessionId }: {
+const DrawerInfo = ({ genesets, sessionId, sessionName }: {
     genesets: ({
         genes: Gene[];
     } & GeneSet)[] | null; 
     sessionId: string | null
+    sessionName: string | null
 }) => {
+    const downloadSessionSets = () => {
+        let gmtContent = "data:text/gmt;charset=utf-8," 
+        + genesets?.map((gene_set, index) => {
+            const genes = gene_set?.genes.map((gene) => gene.gene_symbol)
+            const GMTInfo = (index === 0) ? gene_set?.name + '\t' + genes?.join('\t') : '\n' + gene_set?.name + '\t' + genes?.join('\t')
+            return GMTInfo
+        })
+        downloadURI(gmtContent, sessionName ? sessionName : 'Unnamed_GMT' + '.gmt')
+    }
+
     return (
         <Box
             sx={{ width: 500 }}
             role="presentation"
         >
             <center>
-                <Typography variant='h4' sx={{ mt: 2, fontWeight: 'bold' }} color={'secondary'}> MY GENE SETS ({genesets?.length.toString()})</Typography>
+                <Typography variant='h4' sx={{ mt: 2, fontWeight: 'bold' }} color={'secondary'}> MY GENE SETS ({genesets?.length.toString()}) <Button color='secondary' onClick={(evt) => {downloadSessionSets()}}><DownloadIcon /></Button></Typography> 
             </center>
             <Stack direction='row' sx={{ justifyContent: 'center', marginTop: 1 }} spacing={1}>
                 <Button variant='outlined' color='secondary' sx={{ borderRadius: 4 }} size='small' href={`/augment/${sessionId}`}> Augment &nbsp; <LaunchIcon fontSize={'small'} /></Button>
@@ -139,6 +153,7 @@ const DrawerInfo = ({ genesets, sessionId }: {
 export default function CartDrawer({ sessionInfo }: {
     sessionInfo: {
         id: string;
+        session_name: string | null
         gene_sets: ({
             genes: Gene[];
         } & {
@@ -179,7 +194,7 @@ export default function CartDrawer({ sessionInfo }: {
                 open={state}
                 onClose={toggleDrawer(false)}
             >
-                <DrawerInfo genesets={sessionGenesets ? sessionGenesets : null} sessionId={sessionInfo ? sessionInfo.id : null} />
+                <DrawerInfo genesets={sessionGenesets ? sessionGenesets : null} sessionId={sessionInfo ? sessionInfo.id : null} sessionName={sessionInfo ? sessionInfo.session_name : null}/>
             </Drawer>
         </div>
     );

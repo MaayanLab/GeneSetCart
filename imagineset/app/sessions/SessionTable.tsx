@@ -2,9 +2,9 @@
 import { Table, TableBody, TableFooter, TablePagination, TableRow  } from "@mui/material";
 import React from "react";
 import { SessionRow } from "./SessionRow";
-import { GeneSet, PipelineSession} from "@prisma/client";
+import { Gene, GeneSet, PipelineSession} from "@prisma/client";
 
-export default function SessionTable({sessions}: { sessions: (PipelineSession & { gene_sets: GeneSet[] })[]}){
+export default function SessionTable({sessions}: { sessions: (PipelineSession & { gene_sets: GeneSet[] }  & { genesets_full: (({genes: Gene[]} & GeneSet) | null)[];})[]}){
     const [page, setPage] = React.useState(0)
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const handleChangePage = (

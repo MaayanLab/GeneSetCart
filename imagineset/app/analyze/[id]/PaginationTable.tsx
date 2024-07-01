@@ -66,7 +66,7 @@ export default function PaginatedTable({ rows }: {
                         >
                             <TableCell component="th" scope="row">
                                 <Grid container direction='column'>
-                                    <Grid item>
+                                    <Grid item sx={{wordBreak: 'break-word'}}>
                                         {row.name}
                                     </Grid>
                                     <Grid item>

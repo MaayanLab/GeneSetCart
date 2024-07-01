@@ -45,7 +45,7 @@ const scrollbarThumb = {
     'WebkitBoxShadow': '0 0 1px rgba(255,255,255,.5)'
 }
 
-function downloadURI(uri: string, name: string) {
+export function downloadURI(uri: string, name: string) {
     let element = document.createElement('a');
     element.setAttribute('href', uri);
     element.setAttribute('download', name);

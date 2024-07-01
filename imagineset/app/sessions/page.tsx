@@ -17,7 +17,7 @@ export default async function SessionsPage({ params }: { params: { id: string } 
     })
     if (user === null) return redirect("/api/auth/signin?callbackUrl=/")
 
-    const sessions = await prisma.pipelineSession.findMany({
+    let sessions = await prisma.pipelineSession.findMany({
         where: {
             user_id: user.id
         },
@@ -25,6 +25,18 @@ export default async function SessionsPage({ params }: { params: { id: string } 
             gene_sets: true
         }
     })
+
+    const fullSessions = await Promise.all(sessions.map(async (session) => {
+        const sessionGenesets = await Promise.all(session.gene_sets.map(async (gene_set) => {return await prisma.geneSet.findUnique({
+            where: {
+                id: gene_set.id
+            }, 
+            include: {
+                genes: true
+            }
+        })}))
+        return {...session, genesets_full: sessionGenesets}
+    }))
 
     const SessionTable = dynamic(() => import("./SessionTable"), { ssr: false })
 
@@ -37,7 +49,7 @@ export default async function SessionsPage({ params }: { params: { id: string } 
             <Typography variant="h3" color="secondary.dark" className='p-5'>MY PREVIOUS SESSIONS</Typography>
             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
             </Typography>
-            <SessionTable sessions={sessions} />
+            <SessionTable sessions={fullSessions} />
         </Container>
         </>
     )

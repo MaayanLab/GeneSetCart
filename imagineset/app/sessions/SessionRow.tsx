@@ -1,7 +1,7 @@
 'use client'
 
 import { TableRow, TableCell, Grid, Button, Typography, Link, TextField, ClickAwayListener, Tooltip, Chip } from "@mui/material";
-import { GeneSet, PipelineSession } from "@prisma/client";
+import { Gene, GeneSet, PipelineSession } from "@prisma/client";
 import DeleteIcon from '@mui/icons-material/Delete';
 import React from "react";
 import { deleteSessionByID, updatePrivacyAccess, updateSessionName } from "./sessionFunctions";
@@ -10,8 +10,12 @@ import ShareIcon from '@mui/icons-material/Share';
 import { copyToClipboard } from "@/components/assemble/fileUpload/DataTable";
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+import DownloadIcon from '@mui/icons-material/Download';
+import { downloadURI } from "../visualize/[id]/VisualizeLayout";
 
-export function SessionRow({ session }: { session: PipelineSession & { gene_sets: GeneSet[] } }) {
+export function SessionRow({ session }: { session: PipelineSession & { gene_sets: GeneSet[] } & { genesets_full: (({genes: Gene[]} & GeneSet) | null)[];} }) {
+
+
     const deleteSession = React.useCallback((session: PipelineSession & { gene_sets: GeneSet[] }) => {
         deleteSessionByID(session.id).then((result) => console.log('deleted'))
     }, [])
@@ -26,6 +30,16 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
         setOpen(true);
     };
 
+
+    const downloadSessionSets = () => {
+        let gmtContent = "data:text/gmt;charset=utf-8," 
+        + session.genesets_full.map((gene_set, index) => {
+            const genes = gene_set?.genes.map((gene) => gene.gene_symbol)
+            const GMTInfo = (index === 0) ? gene_set?.name + '\t' + genes?.join('\t') : '\n' + gene_set?.name + '\t' + genes?.join('\t')
+            return GMTInfo
+        })
+        downloadURI(gmtContent, session.session_name ? session.session_name : 'Unnamed_GMT' + '.gmt')
+    }
 
     return (
         <TableRow>
@@ -49,6 +63,9 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
             </TableCell>
             <TableCell>
                 <Chip label={session.private ? 'Private' : 'Public'} variant="outlined" />
+            </TableCell>
+            <TableCell>
+                <Button color='secondary' onClick={(evt) => {downloadSessionSets()}}><DownloadIcon /></Button>
             </TableCell>
             <TableCell>
                 <ClickAwayListener onClickAway={handleTooltipClose}>

@@ -125,7 +125,9 @@ export default async function Header({ sessionId }: { sessionId: string | undefi
                     orderBy: {
                         createdAt: 'desc',
                     },
-                }, id: true
+                }, 
+                id: true, 
+                session_name: true
             }
         })
 

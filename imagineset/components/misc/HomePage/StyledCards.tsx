@@ -27,12 +27,12 @@ export default function StyledCard() {
 
     return (
             <Grid container spacing={4}>
-                <Grid item xs={4}>
+                <Grid item xs={6} md={4}>
                     <Item elevation={3}>
-                        <Typography variant='h4' color='secondary.dark' sx={{fontWeight: 600}}>
+                        <Typography sx={{ typography: { sm: 'h4', xs: 'body2', fontWeight: 600 } }} color='secondary.dark' >
                             ASSEMBLE
                         </Typography>
-                        <div className="flex justify-center align-center mt-6">
+                        <div className="flex justify-center align-center mt-5">
                             <div className="flex w-5/12">
                                 <Image src={assembleIcon} alt="" layout="fit"></Image>
                             </div>
@@ -40,9 +40,9 @@ export default function StyledCard() {
                     </Item>
                 </Grid>
 
-                <Grid item xs={4}>
+                <Grid item xs={6} md={4}>
                     <Item elevation={3}>
-                        <Typography variant='h4' color='secondary.dark'  sx={{fontWeight: 600}}>
+                        <Typography sx={{ typography: { sm: 'h4', xs: 'body2', fontWeight: 600 } }} color='secondary.dark'>
                             AUGMENT
                         </Typography>
                         <div className="flex justify-center align-center mt-5">
@@ -53,9 +53,9 @@ export default function StyledCard() {
                     </Item>
                 </Grid>
 
-                <Grid item xs={4}>
+                <Grid item xs={6} md={4}>
                     <Item elevation={3}>
-                        <Typography variant='h4' color='secondary.dark'  sx={{fontWeight: 600}}>
+                        <Typography sx={{ typography: { sm: 'h4', xs: 'body2', fontWeight: 600 } }} color='secondary.dark'>
                             COMBINE
                         </Typography>
                         <div className="flex justify-center align-center mt-5">
@@ -66,26 +66,26 @@ export default function StyledCard() {
                     </Item>
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid item xs={6} md={6}>
                     <Item elevation={3}>
-                        <Typography variant='h4' color='secondary.dark'  sx={{fontWeight: 600}}>
+                        <Typography sx={{ typography: { sm: 'h4', xs: 'body2', fontWeight: 600 } }} color='secondary.dark'>
                             VISUALIZE
                         </Typography>
                         <div className="flex justify-center align-center mt-5">
-                            <div className="flex w-3/12">
+                            <div className="flex w-5/12 md:w-3/12" >
                                 <Image src={visualizeIcon} alt="" layout="cover"></Image>
                             </div>
                         </div>
                     </Item>
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid item xs={12} md={6}>
                     <Item elevation={3}>
-                        <Typography variant='h4' color='secondary.dark'  sx={{fontWeight: 600}}>
+                        <Typography sx={{ typography: { sm: 'h4', xs: 'body2', fontWeight: 600 } }} color='secondary.dark'>
                             ANALYZE
                         </Typography>
                         <div className="flex justify-center align-center mt-5">
-                            <div className="flex w-3/12">
+                            <div className="flex w-5/12 md:w-3/12">
                                 <Image src={analyzeIcon} alt="" layout="fit"></Image>
                             </div>
                         </div>

@@ -120,7 +120,7 @@ const DrawerInfo = ({ genesets, sessionId, sessionName }: {
 
     return (
         <Box
-            sx={{ width: 500 }}
+            sx={{ width: {xs:200, md: 500}}}
             role="presentation"
         >
             <center>

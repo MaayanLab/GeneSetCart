@@ -10,8 +10,7 @@ import { copyToClipboard } from '../assemble/fileUpload/DataTable';
 import { deleteGenesetByID, getGenesets } from './Header';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LaunchIcon from '@mui/icons-material/Launch';
-import { useParams } from 'next/navigation';
-import Cookies from 'js-cookie'
+
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DownloadIcon from '@mui/icons-material/Download';
 import { downloadURI } from '@/app/visualize/[id]/VisualizeLayout';
@@ -43,6 +42,7 @@ const GenesetInfo = ({ geneset }: {
     } & GeneSet)) => {
         deleteGenesetByID(geneset.id).then((result) => console.log('deleted'))
     }, [])
+    const displayedSymbols = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
     return (
         <>
             <TableRow>
@@ -76,19 +76,19 @@ const GenesetInfo = ({ geneset }: {
                         <TableCell colSpan={2}>
                             <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
                                 <Grid item>
-                                    <Typography variant='body1' color='secondary'> {geneset.genes.map((gene) => gene.gene_symbol).length.toString()} genes found</Typography>
+                                    <Typography variant='body1' color='secondary'> {displayedSymbols.length.toString()} {geneset.isHumanGenes ? 'genes' : 'items'}  found</Typography>
                                 </Grid>
                                 <Grid item>
                                     <TextField
                                         id="standard-multiline-static"
                                         multiline
                                         rows={10}
-                                        value={geneset.genes.map((gene) => gene.gene_symbol).toString().replaceAll(',', '\n')}
+                                        value={displayedSymbols.toString().replaceAll(',', '\n')}
                                         disabled
                                     />
                                 </Grid>
                                 <Grid item sx={{ mt: 2 }}>
-                                    <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(geneset.genes.map((gene) => gene.gene_symbol).toString().replaceAll(',', '\n'))}>
+                                    <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(displayedSymbols.toString().replaceAll(',', '\n'))}>
                                         COPY TO CLIPBOARD
                                     </Button>
                                 </Grid>
@@ -153,7 +153,7 @@ const DrawerInfo = ({ genesets, sessionId, sessionName }: {
 export default function CartDrawer({ sessionInfo }: {
     sessionInfo: {
         id: string;
-        session_name: string | null
+        session_name: string | null;
         gene_sets: ({
             genes: Gene[];
         } & {
@@ -162,6 +162,8 @@ export default function CartDrawer({ sessionInfo }: {
             description: string | null;
             session_id: string;
             createdAt: Date;
+            isHumanGenes: boolean; 
+            otherSymbols: string[];
         })[];
     } | null
 }) {

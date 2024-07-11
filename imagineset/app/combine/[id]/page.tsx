@@ -129,7 +129,7 @@ export default async function CombinePage(props: { params: { id: string }, searc
                 <Container sx={{ mb: 5 }}>
                     <Typography variant="h3" color="secondary.dark" className='p-5'>COMBINE YOUR GENE SETS</Typography>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                        Combine your gene sets using set operations (intersect, union or consensus)
+                        Combine your sets using set operations (intersect, union, subtract or consensus)
                     </Typography>
                     <CombineLayout sessionInfo={sessionInfo} sessionId={props.params.id} />
                 </Container>

@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
@@ -60,11 +60,11 @@ model VerificationToken {
 }
 
 model Gene {
-  id          String    @id @default(cuid())
-  gene_symbol String
-  synonyms    String
-  description String?
-  genesets    GeneSet[]
+  id            String         @id @default(cuid())
+  gene_symbol   String
+  synonyms      String
+  description   String?
+  genesets      GeneSet[]
   cfde_genesets cfdegeneset[]
   addedGeneset  addedGeneset[]
 
@@ -72,14 +72,15 @@ model Gene {
 }
 
 model GeneSet {
-  id          String          @id @default(cuid())
-  name        String
-  description String?
-  session     PipelineSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
-  session_id  String
-  genes       Gene[]
-  createdAt   DateTime        @default(now())
-  
+  id           String          @id @default(cuid())
+  name         String
+  description  String?
+  session      PipelineSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  session_id   String
+  genes        Gene[]
+  createdAt    DateTime        @default(now())
+  isHumanGenes Boolean          @default(true)
+  otherSymbols String[]         @default([])
 
   @@map("gene_lists")
 }
@@ -91,67 +92,67 @@ model PipelineSession {
   createdAt    DateTime  @default(now())
   lastModified DateTime  @default(now())
   gene_sets    GeneSet[]
-  session_name  String?  
-  private       Boolean @default(true)
+  session_name String?
+  private      Boolean   @default(true)
 
   @@map("user_sessions")
 }
 
 model CFDECrossPair {
-  id           String    @id @default(cuid())
-  lib_1        String
-  lib_2         String
-  geneset_1    String
-  geneset_2     String
-  odds_ratio    Float
-  pvalue        Float
-  n_overlap     Int
-  overlap       String[]
-  n_genes1      Int
-  n_genes2      Int
+  id         String   @id @default(cuid())
+  lib_1      String
+  lib_2      String
+  geneset_1  String
+  geneset_2  String
+  odds_ratio Float
+  pvalue     Float
+  n_overlap  Int
+  overlap    String[]
+  n_genes1   Int
+  n_genes2   Int
 
-@@map("cfde_cross_pair")
-@@unique([lib_1, lib_2, geneset_1, geneset_2])
+  @@unique([lib_1, lib_2, geneset_1, geneset_2])
+  @@map("cfde_cross_pair")
 }
 
 model LibAbstracts {
-  id      String @id @default(cuid())
-  lib     String 
-  abstract  String 
+  id       String @id @default(cuid())
+  lib      String
+  abstract String
 
-  @@map("lib_abstracts")
   @@unique([lib])
+  @@map("lib_abstracts")
 }
 
 model cfdegeneset {
-  id          String          @id @default(cuid())
+  id          String  @id @default(cuid())
   term        String
   library     String
   description String?
   genes       Gene[]
 
-  @@map("cfde_genesets")
   @@unique([term, library])
+  @@map("cfde_genesets")
 }
 
 model addedGeneset {
-  id          String          @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
   genes       Gene[]
-  createdAt   DateTime        @default(now())
+  createdAt   DateTime @default(now())
 
   @@map("added_genesets")
 }
 
 model paperContacts {
-  id  String  @id @default(uuid())
-  pmcid String
+  id            String @id @default(uuid())
+  pmcid         String
   article_title String
-  surname String
-  given_name  String
-  email String
+  surname       String
+  given_name    String
+  email         String
 
-@@map("paper_contacts")
-@@unique([pmcid, email])
+  @@unique([pmcid, email])
+  @@map("paper_contacts")
 }

@@ -11,14 +11,16 @@ import { FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Tex
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
-export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedSets }: {
+export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedSets, disable }: {
     sessionGeneSets: ({
         genes: Gene[];
     } & GeneSet)[], selectedSets: ({
         genes: Gene[];
-    } & GeneSet)[], setSelectedSets: React.Dispatch<React.SetStateAction<({
+    } & GeneSet)[], 
+    setSelectedSets: React.Dispatch<React.SetStateAction<({
         genes: Gene[];
-    } & GeneSet)[]>>
+    } & GeneSet)[]>>,
+    disable: string
 }) {
 
     const [numSelectOptions, setNumSelectOptions] = React.useState(1)
@@ -32,7 +34,7 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
                     style={{ textAlign: 'center' }}
                 />
                 <CardContent>
-                    <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
+                    <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} selectedSets={selectedSets} setSelectedSets={setSelectedSets} disable={disable} />
                     <div className="flex justify-center">
                     <Button onClick={() =>{setNumSelectOptions(oldNum => oldNum + 1)}} color="tertiary"><AddCircleIcon /></Button>
                     </div>
@@ -45,16 +47,18 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
 
 
 
-export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, selectedSets, setSelectedSets  }: {
+export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, selectedSets, setSelectedSets, disable  }: {
     sessionGeneSets: ({
         genes: Gene[];
     } & GeneSet)[],
     numSelectOptions: number,
     selectedSets: ({
         genes: Gene[];
-    } & GeneSet)[], setSelectedSets: React.Dispatch<React.SetStateAction<({
+    } & GeneSet)[], 
+    setSelectedSets: React.Dispatch<React.SetStateAction<({
         genes: Gene[];
-    } & GeneSet)[]>>
+    } & GeneSet)[]>>,
+    disable: string
 }) {
 
     let dropDownCountArray = [];
@@ -63,7 +67,7 @@ export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, selecte
     }
     return (
         <Stack spacing={2}>
-            {dropDownCountArray.map((i) => <GenesetSelectDropDown key={i} sessionGenesets={sessionGeneSets} selectedSets={selectedSets} setSelectedSets={setSelectedSets} index={i}/>)}
+            {dropDownCountArray.map((i) => <GenesetSelectDropDown key={i} sessionGenesets={sessionGeneSets} selectedSets={selectedSets} setSelectedSets={setSelectedSets} index={i} disable={disable}/>)}
         </Stack>
     )
 }
@@ -76,16 +80,18 @@ export const MenuProps = {
     },
 }
 
-function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets, index }: {
+function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets, index, disable }: {
     sessionGenesets: ({
         genes: Gene[];
     } & GeneSet)[], 
     selectedSets: ({
         genes: Gene[];
-    } & GeneSet)[], setSelectedSets: React.Dispatch<React.SetStateAction<({
+    } & GeneSet)[], 
+    setSelectedSets: React.Dispatch<React.SetStateAction<({
         genes: Gene[];
     } & GeneSet)[]>>, 
-    index: number
+    index: number, 
+    disable: string
 }) {
 
     const [selected, setSelected] = React.useState('')
@@ -117,17 +123,17 @@ function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets,
         <Grid container direction={'row'}>
             <Grid item xs={10}>
                 <FormControl fullWidth>
-                    <InputLabel id="combine-select-label" sx={{ fontSize: 16 }} color='secondary'>Gene Set</InputLabel>
+                    <InputLabel id="combine-select-label" sx={{ fontSize: 16 }} color='secondary'>{disable === 'other' ? "Select Gene Set" : "Select Set"}</InputLabel>
                     <Select
                         labelId="combine-select-label"
                         value={selected}
-                        label="Gene Set"
+                        label={disable === 'other' ? "Select Gene Set" : "Select Set"}
                         onChange={handleChange}
                         color='secondary'
                         MenuProps={MenuProps}
                     >
                         {sessionGenesets.map((geneset, i) => {
-                            return <MenuItem key={i} value={geneset.name} disabled={selectedSets.map((selectedSet) => selectedSet.name).includes(geneset.name)}>{geneset.name}</MenuItem>
+                            return <MenuItem key={i} value={geneset.name} disabled={selectedSets.map((selectedSet) => selectedSet.name).includes(geneset.name) || (disable==='gene' && geneset.isHumanGenes) || (disable==='other' && !geneset.isHumanGenes)}>{geneset.name}</MenuItem>
                         })}
                     </Select>
                 </FormControl>

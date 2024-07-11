@@ -35,7 +35,7 @@ export default function GenesetSelect({ sessionGenesets, selected, setSelected }
                     MenuProps={MenuProps}
                 >
                     {sessionGenesets?.gene_sets.map((geneset, i) => {
-                        return <MenuItem key={i} value={geneset.name}>{geneset.name}</MenuItem>
+                        return <MenuItem key={i} value={geneset.name} disabled={!geneset.isHumanGenes}>{geneset.name}</MenuItem>
                     })}
                 </Select>
             </FormControl>

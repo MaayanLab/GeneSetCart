@@ -22,11 +22,12 @@ export function copyToClipboard(genesString: string) {
 }
 
 
-function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, isHumanGenes: boolean }) {
+const RenderDetailsButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
   const [open, setOpen] = React.useState(false);
   const [validGenes, setValidGenes] = React.useState<string[]>([])
   React.useEffect(() => {
-
+    checkValidGenes(params.row.genes.toString().replaceAll(',', '\n'))
+      .then((result) => setValidGenes(result))
   }, [params.row.genes])
 
 
@@ -44,22 +45,10 @@ function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellP
         variant="contained"
         color="tertiary"
         size="small"
-        sx={{ margin: 1 }}
-        onClick={(event) => {
-          event.stopPropagation();
-          if (isHumanGenes) {
-            checkValidGenes(params.row.genes.toString().replaceAll(',', '\n'))
-              .then((result) => {
-                setValidGenes(result);
-                handleOpen();
-              })
-          } else {
-            setValidGenes(params.row.genes.filter((item: string) => item != ''))
-            handleOpen();
-          }
-        }}>
+        sx={{margin:1}}
+        onClick={(event) => { event.stopPropagation(); handleOpen() }}>
         <VisibilityIcon /> &nbsp;
-        {isHumanGenes ? 'Genes' : 'Items'}
+        Genes
       </Button>
       <Dialog
         onClose={handleClose}
@@ -67,8 +56,8 @@ function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellP
         <DialogTitle>{params.row.genesetName}</DialogTitle>
         <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
           <Grid item>
-            <Typography variant='body1' color='secondary'> {params.row.genes.length} {isHumanGenes ? 'genes' : 'items'}</Typography>
-            <Typography variant='body1' color='secondary'> {validGenes.length} valid {isHumanGenes ? 'genes' : 'items'} found</Typography>
+            <Typography variant='body1' color='secondary'> {params.row.genes.length} genes</Typography>
+            <Typography variant='body1' color='secondary'> {validGenes.length} valid genes found</Typography>
           </Grid>
           <Grid item>
             <TextField
@@ -91,31 +80,24 @@ function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellP
 }
 
 
+const columns: GridColDef[] = [
+  { field: 'id', headerName: 'ID', width: 50 },
+  { field: 'genesetName', headerName: 'Gene set name', width: 500 },
+  { field: 'genesButton', headerName: 'View Genes', width: 150, renderCell: RenderDetailsButton, }
+];
 
 
-
-export default function DataTable({ rows, isHumanGenes }: { rows: GMTGenesetInfo[], isHumanGenes: boolean }) {
+export default function DataTable({ rows }: { rows: GMTGenesetInfo[] }) {
   const params = useParams<{ id: string }>()
   const [status, setStatus] = React.useState<addStatus>({})
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
-  const [selectedRows, setSelectedRows] = React.useState<(GMTGenesetInfo | undefined)[]>([])
 
-  const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 50 },
-    { field: 'genesetName', headerName: isHumanGenes ? 'Gene Set Name' : 'Set Name', width: 500 },
-    {
-      field: 'genesButton', headerName: isHumanGenes ? 'View Genes' : 'View Set Items', width: 150, renderCell: (params) => {
-        return (
-          <RenderDetailsButton params={params} isHumanGenes={isHumanGenes} />
-        );
-      }
-    }
-  ];
+  const [selectedRows, setSelectedRows] = React.useState<(GMTGenesetInfo | undefined)[]>([])
 
   const addSets = React.useCallback(() => {
     setStatus({ loading: true })
-    addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id, isHumanGenes)
+    addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id)
       .then((results: any) => {
         if (results.code === 'success') {
           setStatus({ success: true })
@@ -129,13 +111,13 @@ export default function DataTable({ rows, isHumanGenes }: { rows: GMTGenesetInfo
           setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
         }
       })
-  }, [selectedRows, params.id, isHumanGenes])
+  }, [selectedRows, params.id])
 
 
 
   return (
     <div style={{ height: 400, width: '100%' }}>
-      {selectedRows.length > 0 && <Button color='tertiary' variant='contained' onClick={addSets} sx={{ marginBottom: 1 }}> <AddShoppingCartIcon /> &nbsp; ADD TO CART</Button>}
+      {selectedRows.length > 0 && <Button color='tertiary' variant='contained' onClick={addSets} sx={{marginBottom: 1}}> <AddShoppingCartIcon /> &nbsp; ADD TO CART</Button>}
       <DataGrid
         getRowHeight={() => 'auto'}
         rows={rows}

@@ -21,6 +21,8 @@ export type HeatmapProps = {
         description: string | null;
         session_id: string;
         createdAt: Date;
+        isHumanGenes: boolean; 
+        otherSymbols: string[]
     }[];
     setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
     heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean }
@@ -101,9 +103,9 @@ export const Heatmap = ({ width, height, legendSelectedSets, setOverlap, heatmap
                 for (let [n, innerLoop] of sortedLegendSets.entries()) {
                     const x = geneset.name
                     const y = innerLoop.name
-                    const xyJaccard = (x !== y) ? jaccard_similarity(geneset.genes.map((gene) => gene.gene_symbol), innerLoop.genes.map((gene) => gene.gene_symbol)) : (heatmapOptions.diagonal) ? 1 : 0
-                    const geneset1 = geneset.genes.map((gene) => gene.gene_symbol)
-                    const geneset2 = innerLoop.genes.map((gene) => gene.gene_symbol)
+                    const geneset1 = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
+                    const geneset2 = innerLoop.isHumanGenes ? innerLoop.genes.map((gene) => gene.gene_symbol) : innerLoop.otherSymbols
+                    const xyJaccard = (x !== y) ? jaccard_similarity(geneset1, geneset2) : (heatmapOptions.diagonal) ? 1 : 0
                     const overlap = (x !== y) ? geneset1.filter((x) => geneset2.includes(x)) : (heatmapOptions.diagonal) ? geneset1 : []
                     genesetRow.push({ x: geneset.alphabet, y: innerLoop.alphabet, value: xyJaccard, overlap: overlap, xName: geneset.name, yName: innerLoop.name })
                 }

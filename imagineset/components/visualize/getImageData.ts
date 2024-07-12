@@ -26,10 +26,12 @@ export async function getClustermapClasses(legendSelectedSets: {
     description: string | null;
     session_id: string;
     createdAt: Date;
+    isHumanGenes: boolean; 
+    otherSymbols: string[]
 }[] ){
     let genesetDict: { [key: string]: string[] } = {}
     legendSelectedSets?.forEach((geneset) => {
-        const genes = geneset.genes.map((gene) => gene.gene_symbol)
+        const genes = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
         const genesetName = geneset.alphabet
         genesetDict[genesetName] = genes
     })

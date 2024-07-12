@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import { ListSubheader, Grid, Stack, Button, Typography, Box, Tooltip, TextField, useMediaQuery, useTheme, ClickAwayListener } from '@mui/material';
+import { ListSubheader, Grid, Stack, Button, Typography, Box, Tooltip, TextField, useMediaQuery, useTheme, ClickAwayListener, Switch } from '@mui/material';
 import { PipelineSession, type Gene, type GeneSet } from '@prisma/client';
 import vennIcon from '@/public/img/otherLogos/VennDagramIcon.png'
 import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
@@ -33,6 +33,8 @@ import { copyToClipboard } from '@/components/assemble/DCCFetch/CFDEDataTable';
 import { Heatmap } from '@/components/visualize/PlotComponents/Heatmap/InteractiveHeatmap';
 import { getClustermap, getSuperVenn } from '@/components/visualize/getImageData';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+
 
 const scrollbarStyles = {
     'webkitAppearance': 'none',
@@ -91,7 +93,7 @@ const downloadSVG = (filename: string) => {
         }
         //add xml declaration
         source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), filename+'.svg')
+        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), filename + '.svg')
     };
 }
 
@@ -112,7 +114,7 @@ function downloadSVGByDiv(divId: string, filename: string) {
         }
         //add xml declaration
         source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), filename+'.svg')
+        downloadURI("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), filename + '.svg')
     };
 }
 
@@ -174,20 +176,25 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const visType = searchParams.get('type')
     const pathname = usePathname()
 
+    const [isHumanGenes, setIsHumanGenes] = React.useState(true)
     const [checked, setChecked] = React.useState<number[]>(checkedSets !== null ? checkedSets.split(',').map((item) => parseInt(item)) : []);
-    const selectedSets = React.useMemo(() => { return sessionInfo?.gene_sets.filter((set, index) => checked.includes(index)) }, [checked, sessionInfo?.gene_sets])
+    const selectedSets = React.useMemo(() => {
+        const typedSets = sessionInfo ? sessionInfo.gene_sets.filter((setItem) => (isHumanGenes && setItem.isHumanGenes) || (!isHumanGenes && !setItem.isHumanGenes)) : []
+        return typedSets.filter((set, index) => checked.includes(index))
+    }, [checked, sessionInfo?.gene_sets])
     const [visualization, setVisualization] = React.useState(visType !== null ? visType : '')
     const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
     const [assignGroups, setAssignGroups] = React.useState(false)
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
     const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: true, palette: 'viridis', fontSize: 12, disableLabels: false })
-    const [vennOptions, setVennOptions] = React.useState({ palette: 'Viridis'})
-    const [upSetOptions, setUpSetOptions] = React.useState({ color: '#000000'})
+    const [vennOptions, setVennOptions] = React.useState({ palette: 'Viridis' })
+    const [upSetOptions, setUpSetOptions] = React.useState({ color: '#000000' })
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [status, setStatus] = React.useState<addStatus>({})
     const [open, setOpen] = React.useState(false);
+
 
     const handleTooltipClose = () => {
         setOpen(false);
@@ -210,8 +217,8 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                     newSet['alphabet'] = i.toString()
                     return newSet
                 })
-                if (selectedSets.length  > 40) {
-                    setHeatmapOptions({...heatmapOptions, disableLabels: true})
+                if (selectedSets.length > 40) {
+                    setHeatmapOptions({ ...heatmapOptions, disableLabels: true })
                 }
                 return dataArrays
             } else {
@@ -230,7 +237,12 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [legendSelectedSets] = useDebounce(currentlegendSelectedSets, 800); // Debounce after 500ms
 
     const addSelectedToCart = React.useCallback(() => {
-        addToSessionSets(overlap.overlapGenes, sessionId, formatSelectionName(overlap.name), '').then((result) => setStatus({ success: true }))
+        if (isHumanGenes) {
+            addToSessionSets(overlap.overlapGenes, sessionId, formatSelectionName(overlap.name), '', [], true).then((result) => setStatus({ success: true }))
+        } else {
+            addToSessionSets([], sessionId, formatSelectionName(overlap.name), '', overlap.overlapGenes, false).then((result) => setStatus({ success: true }))
+        }
+
     }, [overlap])
 
     const formatSelectionName = React.useCallback((overlapSelection: string) => {
@@ -281,151 +293,178 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
 
 
     return (
-        <Grid container direction='row' spacing={1}>
-            <Grid item xs={isMobile ? 12 : 3}>
-                <Stack direction='column' spacing={2}>
-                    <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
-                    <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, minHeight: 350, boxShadow: 2, overflowY: 'scroll', wordWrap: 'break-word' }}>
-                        <ListSubheader disableSticky={true}>
-                            Genes ({overlap.overlapGenes === undefined ? 0 : overlap.overlapGenes.length})
-                            <Button color='secondary' onClick={addSelectedToCart}>  <AddShoppingCartIcon /> &nbsp;  ADD TO CART</Button>
-                        </ListSubheader>
-                        <Status status={status} />
-                        <TextField color='secondary'
-                            variant='outlined'
-                            size='small'
-                            value={formatSelectionName(overlap.name)}
-                            sx={{ marginLeft: 2, marginRight: 2 }}
-                            placeholder='Enter name of selected set'
-                            onChange={(evt) => setOverlap({ name: evt.target.value, overlapGenes: overlap.overlapGenes })}
-                            multiline
-                            inputProps={{ style: { resize: "both" } }}
-                        />
-                        <TextField
-                            multiline
-                            rows={9}
-                            sx={{
-                                "& fieldset": { border: 'none' },
-                            }}
-                            value={overlap === undefined ? '' : overlap.overlapGenes.join('\n')}
-                            disabled
-                        >
-                        </TextField>
-                    </Box>
-                </Stack>
-            </Grid>
-            <Grid item xs={isMobile ? 12 : 9}>
-                <Stack direction='column' spacing={2} maxWidth={'100%'}>
-                    <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
-                        <Tooltip title={"Can visualize 1 - 5 selected sets"}>
-                            <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Venn') }} disabled={!(checked.length < 6 && checked.length > 0)}>
-                                    <Image
-                                        src={vennIcon}
-                                        fill
-                                        alt=""
-                                        style={{ padding: "10%", objectFit: "contain" }}
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-                                </Button>
-                            </div>
-                        </Tooltip>
-                        <Tooltip title={"Can visualize 1 - 10 selected sets "}>
-                            <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('SuperVenn') }} disabled={!(checked.length < 11 && checked.length > 0)}>
-                                    <Image
-                                        src={superVennIcon}
-                                        fill
-                                        alt=""
-                                        style={{ padding: "10%", objectFit: "contain" }}
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-                                </Button>
-                            </div>
-                        </Tooltip>
-                        <Tooltip title={"Can visualize 1 - 10 selected sets"}>
-                            <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('UpSet') }} disabled={!(checked.length < 11 && checked.length > 0)}>
-                                    <Image
-                                        src={upsetIconAlt}
-                                        fill
-                                        alt=""
-                                        style={{ padding: "10%", objectFit: "contain" }}
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-                                </Button>
-                            </div>
-                        </Tooltip>
-                        <Tooltip title={"Can visualize > 1 selected sets "}>
-                            <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Heatmap') }} disabled={!(checked.length > 1)}>
-                                    <Image
-                                        src={heatmapIcon}
-                                        fill
-                                        alt=""
-                                        style={{ padding: "10%", objectFit: "contain" }}
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-                                </Button>
-                            </div>
-                        </Tooltip>
-                        <Tooltip title={"Can visualize > 5 selected sets "}>
-                            <div>
-                                <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('UMAP') }} disabled={!(checked.length > 5)}>
-                                    <Image
-                                        src={umapIcon}
-                                        fill
-                                        alt=""
-                                        style={{ padding: "10%", objectFit: "contain" }}
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-                                </Button>
-                            </div>
-                        </Tooltip>
+        <>
+            <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
+                <Tooltip title='Enter a set consisting of other identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
+                    <HelpOutlineIcon color="secondary" />
+                </Tooltip>
+                <Typography color={'purple'}>Other</Typography>
+                <Switch
+                    color="secondary"
+                    checked={isHumanGenes}
+                    onChange={() => { setIsHumanGenes(!isHumanGenes); setChecked([]); setVisualization('') }}
+                    sx={{
+                        "&.MuiSwitch-root .MuiSwitch-switchBase": {
+                            color: "purple"
+                        },
+
+                        "&.MuiSwitch-root .Mui-checked": {
+                            color: "#336699"
+                        }
+                    }}
+                />
+                <Typography color={'secondary'} >Human Gene Symbols</Typography>
+                <Tooltip title='Enter a set consisting of human entrez gene symbols'>
+                    <HelpOutlineIcon color='secondary' />
+                </Tooltip>
+            </Stack>
+            <Grid container direction='row' spacing={1}>
+                <Grid item xs={isMobile ? 12 : 3}>
+                    <Stack direction='column' spacing={2}>
+                        <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} isHumanGenes={isHumanGenes} />
+                        <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, minHeight: 350, boxShadow: 2, overflowY: 'scroll', wordWrap: 'break-word' }}>
+                            <ListSubheader disableSticky={true}>
+                                Genes ({overlap.overlapGenes === undefined ? 0 : overlap.overlapGenes.length})
+                                <Button color='secondary' onClick={addSelectedToCart}>  <AddShoppingCartIcon /> &nbsp;  ADD TO CART</Button>
+                            </ListSubheader>
+                            <Status status={status} />
+                            <TextField color='secondary'
+                                variant='outlined'
+                                size='small'
+                                value={formatSelectionName(overlap.name)}
+                                sx={{ marginLeft: 2, marginRight: 2 }}
+                                placeholder='Enter name of selected set'
+                                onChange={(evt) => setOverlap({ name: evt.target.value, overlapGenes: overlap.overlapGenes })}
+                                multiline
+                                inputProps={{ style: { resize: "both" } }}
+                            />
+                            <TextField
+                                multiline
+                                rows={9}
+                                sx={{
+                                    "& fieldset": { border: 'none' },
+                                }}
+                                value={overlap === undefined ? '' : overlap.overlapGenes.join('\n')}
+                                disabled
+                            >
+                            </TextField>
+                        </Box>
                     </Stack>
-                    <Box sx={{ boxShadow: 2, borderRadius: 10, minHeight: 400, minWidth: '400px', maxWidth: '100%', backgroundColor: '#FFFFFF'}}>
-                        <Stack direction='column'>
-                            <Box sx={{ minHeight: 50, minWidth: '100%', backgroundColor: '#FFFFFF', borderRadius: 10 }}>
-                                <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 1, marginTop: 1 }}>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height:25 }} onClick={() => { downloadPNG('visualization', visualization) }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height:25 }} onClick={() => { if (visualization === 'Venn') { downloadSVGByDiv('venn', visualization) } else if (visualization === 'Heatmap') { downloadHeatmapSVG() } else if (visualization === 'SuperVenn') { downloadSuperVennSVG() } else { downloadSVG(visualization) } }} ><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
-                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height:25 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
-                                    <ClickAwayListener onClickAway={handleTooltipClose}>
-                                        <div>
-                                            <Tooltip
-                                                PopperProps={{
-                                                    disablePortal: true,
-                                                }}
-                                                onClose={handleTooltipClose}
-                                                open={open}
-                                                disableFocusListener
-                                                disableHoverListener
-                                                disableTouchListener
-                                                title="Copied"
-                                            >
-                                                <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height:25 }} disabled={sessionInfo?.private} onClick={() => { handleTooltipOpen(); copyToClipboard(`https://g2sg.cfde.cloud${pathname}?checked=${checked.toString()}&type=${visualization}`) }}><ShareIcon /> &nbsp;<Typography >Share</Typography></Button>
-                                            </Tooltip>
-                                        </div>
-                                    </ClickAwayListener>
-                                </Stack>
-                                {<AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} heatmapOptions={heatmapOptions} setHeatmapOptions={setHeatmapOptions} vennOptions={vennOptions} setVennOptions={setVennOptions} upSetOptions={upSetOptions} setUpSetOptions={setUpSetOptions}/>}
-                            </Box>
-                            <Box sx={{ justifyContent: 'center'}}>
-                                <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px'}}>
-                                    {(visualization === 'Heatmap' && checked.length > 1 && heatmapOptions.interactive) && <Heatmap legendSelectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} width={700} height={700} setOverlap={setOverlap} />}
-                                    {(visualization === 'Heatmap' && checked.length > 1 && !heatmapOptions.interactive) && <ClusteredHeatmap selectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} />}
-                                    {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} vennOptions={vennOptions}/>}
-                                    {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
-                                    {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} upSetOptions={upSetOptions}/>}
-                                    {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={debouncedUmapOptions} />}
+                </Grid>
+                <Grid item xs={isMobile ? 12 : 9}>
+                    <Stack direction='column' spacing={2} maxWidth={'100%'}>
+                        <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
+                            <Tooltip title={"Can visualize 1 - 5 selected sets"}>
+                                <div>
+                                    <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Venn') }} disabled={!(checked.length < 6 && checked.length > 0)}>
+                                        <Image
+                                            src={vennIcon}
+                                            fill
+                                            alt=""
+                                            style={{ padding: "10%", objectFit: "contain" }}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                                    </Button>
                                 </div>
-                            </Box>
+                            </Tooltip>
+                            <Tooltip title={"Can visualize 1 - 10 selected sets "}>
+                                <div>
+                                    <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('SuperVenn') }} disabled={!(checked.length < 11 && checked.length > 0)}>
+                                        <Image
+                                            src={superVennIcon}
+                                            fill
+                                            alt=""
+                                            style={{ padding: "10%", objectFit: "contain" }}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                                    </Button>
+                                </div>
+                            </Tooltip>
+                            <Tooltip title={"Can visualize 1 - 10 selected sets"}>
+                                <div>
+                                    <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('UpSet') }} disabled={!(checked.length < 11 && checked.length > 0)}>
+                                        <Image
+                                            src={upsetIconAlt}
+                                            fill
+                                            alt=""
+                                            style={{ padding: "10%", objectFit: "contain" }}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                                    </Button>
+                                </div>
+                            </Tooltip>
+                            <Tooltip title={"Can visualize > 1 selected sets "}>
+                                <div>
+                                    <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('Heatmap') }} disabled={!(checked.length > 1)}>
+                                        <Image
+                                            src={heatmapIcon}
+                                            fill
+                                            alt=""
+                                            style={{ padding: "10%", objectFit: "contain" }}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                                    </Button>
+                                </div>
+                            </Tooltip>
+                            <Tooltip title={"Can visualize > 5 selected sets "}>
+                                <div>
+                                    <Button variant='outlined' color='tertiary' sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }} onClick={(event) => { setOverlap({ name: '', overlapGenes: [] }); setVisualization('UMAP') }} disabled={!(checked.length > 5)}>
+                                        <Image
+                                            src={umapIcon}
+                                            fill
+                                            alt=""
+                                            style={{ padding: "10%", objectFit: "contain" }}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                                    </Button>
+                                </div>
+                            </Tooltip>
                         </Stack>
-                    </Box>
-                </Stack>
-            </Grid>
-        </Grid >
+                        <Box sx={{ boxShadow: 2, borderRadius: 10, minHeight: 400, minWidth: '400px', maxWidth: '100%', backgroundColor: '#FFFFFF' }}>
+                            <Stack direction='column'>
+                                <Box sx={{ minHeight: 50, minWidth: '100%', backgroundColor: '#FFFFFF', borderRadius: 10 }}>
+                                    <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 1, marginTop: 1 }}>
+                                        <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height: 25 }} onClick={() => { downloadPNG('visualization', visualization) }}><CloudDownloadIcon />&nbsp;<Typography >PNG</Typography></Button>
+                                        <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height: 25 }} onClick={() => { if (visualization === 'Venn') { downloadSVGByDiv('venn', visualization) } else if (visualization === 'Heatmap') { downloadHeatmapSVG() } else if (visualization === 'SuperVenn') { downloadSuperVennSVG() } else { downloadSVG(visualization) } }} ><CloudDownloadIcon />&nbsp;<Typography >SVG</Typography></Button>
+                                        <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height: 25 }} onClick={() => { downloadLegend('legend.txt', (legendSelectedSets.map((item) => item.alphabet + ': ' + item.name)).join('\n')) }}><CloudDownloadIcon />&nbsp;<Typography >Legend</Typography></Button>
+                                        <ClickAwayListener onClickAway={handleTooltipClose}>
+                                            <div>
+                                                <Tooltip
+                                                    PopperProps={{
+                                                        disablePortal: true,
+                                                    }}
+                                                    onClose={handleTooltipClose}
+                                                    open={open}
+                                                    disableFocusListener
+                                                    disableHoverListener
+                                                    disableTouchListener
+                                                    title="Copied"
+                                                >
+                                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height: 25 }} disabled={sessionInfo?.private} onClick={() => { handleTooltipOpen(); copyToClipboard(`https://g2sg.cfde.cloud${pathname}?checked=${checked.toString()}&type=${visualization}`) }}><ShareIcon /> &nbsp;<Typography >Share</Typography></Button>
+                                                </Tooltip>
+                                            </div>
+                                        </ClickAwayListener>
+                                    </Stack>
+                                    {<AdditionalOptions visualization={visualization} umapOptions={umapOptions} setUmapOptions={setUmapOptions} heatmapOptions={heatmapOptions} setHeatmapOptions={setHeatmapOptions} vennOptions={vennOptions} setVennOptions={setVennOptions} upSetOptions={upSetOptions} setUpSetOptions={setUpSetOptions} />}
+                                </Box>
+                                <Box sx={{ justifyContent: 'center' }}>
+                                    <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
+                                        {(visualization === 'Heatmap' && checked.length > 1 && heatmapOptions.interactive) && <Heatmap legendSelectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} width={700} height={700} setOverlap={setOverlap} />}
+                                        {(visualization === 'Heatmap' && checked.length > 1 && !heatmapOptions.interactive) && <ClusteredHeatmap selectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} />}
+                                        {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} vennOptions={vennOptions} />}
+                                        {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
+                                        {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} upSetOptions={upSetOptions} />}
+                                        {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={debouncedUmapOptions} />}
+                                    </div>
+                                </Box>
+                            </Stack>
+                        </Box>
+                    </Stack>
+                </Grid>
+            </Grid >
+        </>
+
 
 
     )
 }
 
-export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }: {
+export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend, isHumanGenes }: {
     sessionInfo: {
         gene_sets: ({
             genes: Gene[];
@@ -441,7 +480,8 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
         description: string | null;
         session_id: string;
         createdAt: Date;
-    }[]
+    }[],
+    isHumanGenes: boolean
 }) {
 
     const handleToggle = (value: number) => () => {
@@ -455,6 +495,8 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
         }
         setChecked(newChecked);
     };
+
+    const typedSets = sessionInfo ? sessionInfo.gene_sets.filter((setItem) => (isHumanGenes && setItem.isHumanGenes) || (!isHumanGenes && !setItem.isHumanGenes)) : []
 
     const legendIds = legend.map((item) => item.id)
     return (
@@ -470,7 +512,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
                 </Stack>
             </ListSubheader>
 
-            {sessionInfo?.gene_sets.map((geneset, i) => {
+            {typedSets.map((geneset, i) => {
                 const labelId = `checkbox-list-label-${i}`;
                 if (legendIds.includes(geneset.id)) {
                     return (
@@ -510,7 +552,9 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
                     >
                         <ListItemButton
                             onClick={handleToggle(i)}
-                            dense>
+                            dense
+                        // disabled={(isHumanGenes && !geneset.isHumanGenes) || (!isHumanGenes && geneset.isHumanGenes)}
+                        >
                             <ListItemIcon>
                                 <Checkbox
                                     edge="start"

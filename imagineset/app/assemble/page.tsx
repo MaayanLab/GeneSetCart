@@ -32,7 +32,7 @@ export default async function Page(props: { params: { id: string }, searchParams
         })
 
         const newSessionId = newSession.id
-        redirect(`/assemble/${newSessionId}?type=single&geneset_id=${props.searchParams.geneset_id}`)
+        redirect(`/assemble/${newSessionId}?type=single&geneset_id=${props.searchParams.geneset_id}&add=${props.searchParams.add}`)
     } else { // if user is logged in but there is no session id, then reinstate most recently updated session
         const sessionsRanked = await prisma.pipelineSession.findMany({
             where: {
@@ -44,6 +44,6 @@ export default async function Page(props: { params: { id: string }, searchParams
             }
         })
         const mostRecentSessionId = sessionsRanked[0].id
-        redirect(`/assemble/${mostRecentSessionId}?type=single&geneset_id=${props.searchParams.geneset_id}`)
+        redirect(`/assemble/${mostRecentSessionId}?type=single&geneset_id=${props.searchParams.geneset_id}&add=${props.searchParams.add}`)
     }
 }

@@ -30,7 +30,7 @@ export async function checkValidGenes(genes: string) {
     return genesFound
 }
 
-export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string, user: User, otherSymbols: string[]) {
+export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string, user: User, otherSymbols: string[], isHumanGenes: boolean) {
     // get gene objects
     if (genesetName === '') throw new Error('Empty gene set name')
     const filteredList = gene_list.filter((item) => item !== null)

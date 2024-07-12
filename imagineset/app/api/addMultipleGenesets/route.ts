@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
             },
         })
-        await Promise.all(genesets.map(async (genesetInfo: { genes: string[], term: string, description: string }) => await addToSessionSets(genesetInfo.genes, newSession.id, genesetInfo.term, genesetInfo.description)))
+        await Promise.all(genesets.map(async (genesetInfo: { genes: string[], term: string, description: string }) => await addToSessionSets(genesetInfo.genes, newSession.id, genesetInfo.term, genesetInfo.description, [], true)))
         return NextResponse.json({ session_id: newSession.id }, {
             status: 200,
             headers: {

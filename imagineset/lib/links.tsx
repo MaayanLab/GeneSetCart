@@ -10,7 +10,7 @@ export function SignInLink({ children }: React.PropsWithChildren<{}>) {
     href="/api/auth/signin"
     onClick={evt => {
       evt.preventDefault()
-      signIn()
+      signIn('keycloak')
     }}>{children}</Link>
 }
 

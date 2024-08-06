@@ -23,7 +23,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
     return (
         <Stack direction='column' spacing={1} justifyContent="center" alignItems="center">
             <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
-                <Tooltip title='Enter a set consisting of other identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
+                <Tooltip title='Combine sets consisting of other identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
                     <HelpOutlineIcon color="secondary" />
                 </Tooltip>
                 <Typography color={'purple'}>Other</Typography>
@@ -42,7 +42,7 @@ export function CombineLayout({ sessionInfo, sessionId }: {
                     }}
                 />
                 <Typography color={'secondary'} >Human Gene Symbols</Typography>
-                <Tooltip title='Enter a set consisting of human entrez gene symbols'>
+                <Tooltip title='Combine sets only consisting of human entrez gene symbols'>
                     <HelpOutlineIcon color='secondary' />
                 </Tooltip>
             </Stack>

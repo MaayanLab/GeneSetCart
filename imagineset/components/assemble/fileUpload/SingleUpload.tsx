@@ -117,25 +117,32 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
 
     const submitGeneset = React.useCallback((evt: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         evt.preventDefault();
-        const genesetName = genesetInfo?.name
-        const otherSymbolsArray = genesetInfo ? genesetInfo?.otherSymbols.split('\n').filter((gene) => gene != '') : []
-        let description = genesetInfo?.description
-        if (!genesetName) throw new Error('no gene set name')
-        if (!description) description = ''
-        const sessionId = params.id
-        checkInSession(sessionId, genesetName).then((response) => {
-            if (response) {
-                setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
-            } else {
-                addToSessionSets(validGenes, sessionId, genesetName, description ? description : '', otherSymbolsArray, isHumanGenes).then((result) => { setStatus({ success: true }) }).catch((err) => {
-                    if (err.message === 'No valid genes in gene set') {
-                        setStatus({ error: { selected: true, message: err.message } })
-                    } else {
-                        setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
-                    }
-                })
+        try {
+            const genesetName = genesetInfo?.name
+            const otherSymbolsArray = genesetInfo ? genesetInfo?.otherSymbols.split('\n').filter((gene) => gene != '') : []
+            let description = genesetInfo?.description
+            if (!genesetName) throw new Error('No gene set name')
+            if (!description) description = ''
+            const sessionId = params.id
+            checkInSession(sessionId, genesetName).then((response) => {
+                if (response) {
+                    setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
+                } else {
+                    addToSessionSets(validGenes, sessionId, genesetName, description ? description : '', otherSymbolsArray, isHumanGenes).then((result) => { setStatus({ success: true }) }).catch((err) => {
+                        if (err.message === 'No valid genes in gene set') {
+                            setStatus({ error: { selected: true, message: err.message } })
+                        } else {
+                            setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+                        }
+                    })
+                }
+            })
+        } catch (err) {
+            if (err instanceof Error) {
+            setStatus({ error: { selected: true, message: err.message } })
             }
-        })
+        }
+
     }, [genesetInfo, validGenes])
 
     return (
@@ -229,7 +236,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                 </Grid>
                 <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 5}>
                     <Grid item container justifyContent={'center'} alignItems={'center'} direction='column'>
-                        {isHumanGenes ? <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography> : <></>}
+                        {isHumanGenes ? <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography> : <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.otherSymbols.split('\n').filter((item) => item != '').length : 0 } items found </Typography>}
                         <TextField
                             id="standard-multiline-static"
                             multiline

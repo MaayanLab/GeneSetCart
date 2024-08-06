@@ -133,7 +133,7 @@ function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets,
                         MenuProps={MenuProps}
                     >
                         {sessionGenesets.map((geneset, i) => {
-                            return <MenuItem key={i} value={geneset.name} disabled={selectedSets.map((selectedSet) => selectedSet.name).includes(geneset.name) || (disable==='gene' && geneset.isHumanGenes) || (disable==='other' && !geneset.isHumanGenes)}>{geneset.name}</MenuItem>
+                            return <MenuItem key={i} value={geneset.name} disabled={selectedSets.map((selectedSet) => selectedSet.name).includes(geneset.name) || (disable==='gene' && geneset.isHumanGenes) || (disable==='other' && !geneset.isHumanGenes)} sx={{width: 300, wordBreak: 'break-word', whiteSpace: 'normal'}}>{geneset.name}</MenuItem>
                         })}
                     </Select>
                 </FormControl>

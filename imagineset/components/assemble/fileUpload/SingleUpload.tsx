@@ -180,7 +180,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             value={genesetInfo ? genesetInfo?.name : ''}
                             focused={genesetInfo ? true : false}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setGenesetInfo(genesetInfo ? { ...genesetInfo, name: event.target.value } : { name: '', genes: '', description: '', otherSymbols: '' })
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, name: event.target.value } : { name: event.target.value, genes: '', description: '', otherSymbols: '' })
                             }}
                         />
                     </Grid>
@@ -195,7 +195,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             value={genesetInfo ? genesetInfo?.description : ''}
                             focused={genesetInfo ? true : false}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setGenesetInfo(genesetInfo ? { ...genesetInfo, description: event.target.value } : { name: '', genes: '', description: '', otherSymbols: '' })
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, description: event.target.value } : { name: '', genes: '', description: event.target.value, otherSymbols: '' })
                             }}
                         />
                     </Grid>
@@ -238,9 +238,9 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             value={genesetInfo ? isHumanGenes ? genesetInfo.genes  : genesetInfo.otherSymbols : ''}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 if (isHumanGenes) {
-                                    setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: '', description: '', otherSymbols: '' })
+                                    setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: event.target.value, description: '', otherSymbols: '' })
                                 } else {
-                                    setGenesetInfo(genesetInfo ? { ...genesetInfo, otherSymbols: event.target.value } : { name: '', genes: '', description: '', otherSymbols: '' })
+                                    setGenesetInfo(genesetInfo ? { ...genesetInfo, otherSymbols: event.target.value } : { name: '', genes: '', description: '', otherSymbols: event.target.value })
                                 }
                             }}
                         />

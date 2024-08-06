@@ -131,7 +131,7 @@ export function UpsetPlotV2({ selectedSets, setOverlap, upSetOptions }: {
             return { data, soloSets };
         }
 
-        const setData = selectedSets.map((geneset, i) => { return { name: geneset.alphabet, values: geneset.genes.map((gene) => gene.gene_symbol) } })
+        const setData = selectedSets.map((geneset, i) => { return { name: geneset.alphabet, values: geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols } })
 
         // calculating intersections WITHOUT solo sets
         const { intersections, soloSets } = formatIntersectionData(setData);

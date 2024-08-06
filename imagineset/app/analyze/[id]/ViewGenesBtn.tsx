@@ -51,19 +51,19 @@ export const ViewGenesBtn = ({ row }: {
                 <DialogTitle sx={{wordBreak: 'break-word'}}>{row.name}</DialogTitle>
                 <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
                     <Grid item>
-                        <Typography variant='body1' color='secondary'> {row.genes.length} genes</Typography>
+                        <Typography variant='body1' color='secondary'> {row.isHumanGenes ? row.genes.length : row.otherSymbols.length} genes</Typography>
                     </Grid>
                     <Grid item>
                         <TextField
                             id="standard-multiline-static"
                             multiline
                             rows={10}
-                            value={row.genes.map((gene) => gene.gene_symbol).toString().replaceAll(',', '\n')}
+                            value={row.isHumanGenes ? row.genes.map((gene) => gene.gene_symbol).join('\n') : row.otherSymbols.join('\n')}
                             disabled
                         />
                     </Grid>
                     <Grid item sx={{ mt: 2 }}>
-                        <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(row.genes.map((gene) => gene.gene_symbol).toString().replaceAll(',', '\n'))}>
+                        <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(row.isHumanGenes ? row.genes.map((gene) => gene.gene_symbol).join('\n') : row.otherSymbols.join('\n'))}>
                             COPY TO CLIPBOARD
                         </Button>
                     </Grid>

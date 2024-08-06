@@ -54,7 +54,7 @@ function calculateIntersections(possibleSubsets: ({
         const subsetLength = possibleSubset.length
         let subsetGenes: string[][] = []
         possibleSubset.forEach((subset) => {
-            const setGenes = subset.genes.map((gene) => gene.gene_symbol)
+            const setGenes = subset.isHumanGenes ? subset.genes.map((gene) => gene.gene_symbol) : subset.otherSymbols
             subsetGenes.push(setGenes)
         })
         const subsetGenesFlat = subsetGenes.flat()

@@ -17,7 +17,7 @@ export function SuperVenn({ selectedSets }: {
     const [loading, setLoading] = React.useState(false)
 
     const inputProps = {
-        sets: selectedSets?.map((geneset) => geneset.genes.map((gene) => gene.gene_symbol)),
+        sets: selectedSets?.map((geneset) => geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols),
         set_annotations: selectedSets?.map((geneset, i) => geneset.alphabet),
         widths_minmax_ratio: 0.1,
         rotate_col_annotations: true,

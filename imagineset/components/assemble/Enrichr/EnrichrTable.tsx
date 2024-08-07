@@ -115,7 +115,7 @@ export default function EnrichrTable({ rows }: { rows: searchResultsType[] }) {
         return undefined
         
     }))
-    addMultipleSetsToSession(mappedRows ? mappedRows : [], params.id)
+    addMultipleSetsToSession(mappedRows ? mappedRows : [], params.id, true)
       .then((results: any) => {
         if (results.code === 'success') {
           setStatus({ success: true })

@@ -51,19 +51,19 @@ export const ViewGenesBtn = ({ row }: {
                 <DialogTitle sx={{wordBreak: 'break-word'}}>{row.name}</DialogTitle>
                 <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
                     <Grid item>
-                        <Typography variant='body1' color='secondary'> {row.genes.length} genes</Typography>
+                        <Typography variant='body1' color='secondary'> {row.isHumanGenes ? row.genes.length : row.otherSymbols.length} genes</Typography>
                     </Grid>
                     <Grid item>
                         <TextField
                             id="standard-multiline-static"
                             multiline
                             rows={10}
-                            value={row.genes.map((gene) => gene.gene_symbol).toString().replaceAll(',', '\n')}
+                            value={row.isHumanGenes ? row.genes.map((gene) => gene.gene_symbol).join('\n') : row.otherSymbols.join('\n')}
                             disabled
                         />
                     </Grid>
                     <Grid item sx={{ mt: 2 }}>
-                        <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(row.genes.map((gene) => gene.gene_symbol).toString().replaceAll(',', '\n'))}>
+                        <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(row.isHumanGenes ? row.genes.map((gene) => gene.gene_symbol).join('\n') : row.otherSymbols.join('\n'))}>
                             COPY TO CLIPBOARD
                         </Button>
                     </Grid>
@@ -184,39 +184,34 @@ export function SplitButton({ row }: {
 
     const handleClick = (selectedIndex: number) => {
         const selectedButton = buttonOptions[selectedIndex]
+        const genes = row.isHumanGenes ? row.genes.map((gene) => gene.gene_symbol) : row.otherSymbols
         if (selectedButton === 'Enrichr') {
-            const genes = row.genes.map((gene) => gene.gene_symbol)
             const newSetName = row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION')
             enrich({ list: genes?.join('\n') || '', description: newSetName })
         } else if (selectedButton === 'Rummagene') {
-            getRummageneLink(row.name, row.genes.map((gene) => gene.gene_symbol)).then((link) => window.open(link, "_blank"))
+            getRummageneLink(row.name, genes).then((link) => window.open(link, "_blank"))
         } else if (selectedButton === 'Rummageo') {
-            getRummageoLink(row.name, row.genes.map((gene) => gene.gene_symbol)).then((link) => window.open(link, "_blank"))
+            getRummageoLink(row.name, genes).then((link) => window.open(link, "_blank"))
         }
         else if (selectedButton === 'KEA3') {
-            const genes = row.genes.map((gene) => gene.gene_symbol)
             const inputvalue = genes.join("%0A")
             const keaLink = "https://appyters.maayanlab.cloud/KEA3_Appyter/#/?args.Input%20gene/protein%20list=" + inputvalue + "&submit"
             window.open(keaLink, "_blank")
         } else if (selectedButton === 'ChEA3') {
-            const genes = row.genes.map((gene) => gene.gene_symbol)
             const inputvalue = genes.join("%0A")
             const cheaLink = "https://appyters.maayanlab.cloud/ChEA3_Appyter/#/?args.paste_gene_input=" + inputvalue + "&submit"
             window.open(cheaLink, "_blank")
         } else if (selectedButton === 'Enrichr-KG') {
-            const genes = row.genes.map((gene) => gene.gene_symbol)
             const newSetName = row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION')
             getEnrichrShortId(newSetName, genes).then((userListId) => window.open('https://maayanlab.cloud/enrichr-kg?userListId=' + userListId, "_blank"))
         }
         else if (selectedButton === 'SigCom LINCS') {
-            const genes = row.genes.map((gene) => gene.gene_symbol)
             getSigComLINCSId(row.name, genes).then((datasetId) => window.open('https://maayanlab.cloud/sigcom-lincs/#/SignatureSearch/Set/' + datasetId, "_blank"))
         } else if (selectedButton === 'CFDE GSE') {
-            const genes = row.genes.map((gene) => gene.gene_symbol)
             const newSetName = row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION')
             getEnrichrShortId(newSetName, genes).then((userListId) => window.open(`https://gse.cfde.cloud/?q={%22min_lib%22:1,%22libraries%22:[{%22name%22:%22LINCS_L1000_Chem_Pert_Consensus_Sigs%22,%22limit%22:5},{%22name%22:%22HuBMAP_ASCTplusB_augmented_2022%22,%22limit%22:5}],%22userListId%22:%22${userListId}%22,%22search%22:true}`, "_blank"))
         } else if (selectedButton === 'Playbook') {
-            getPlaybookLink(row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION'), row.genes.map((gene) => gene.gene_symbol)).then((link) => window.open(link, '_blank'))
+            getPlaybookLink(row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION'), genes).then((link) => window.open(link, '_blank'))
         }
     };
 

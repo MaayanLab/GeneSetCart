@@ -108,8 +108,10 @@ export default async function Header({ sessionId }: { sessionId: string | undefi
 
             }
         })
-        const mostRecentSessionId = sessionsRanked[0].id
-        sessionId = mostRecentSessionId
+        if (sessionsRanked.length > 0) {
+            const mostRecentSessionId = sessionsRanked[0].id
+            sessionId = mostRecentSessionId
+        }
     }
     if (sessionId) {
         let user: User & { pipelineSessions: PipelineSession[] } | null;

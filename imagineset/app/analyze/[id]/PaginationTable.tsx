@@ -20,6 +20,8 @@ export default function PaginatedTable({ rows }: {
         description: string | null;
         session_id: string;
         createdAt: Date;
+        isHumanGenes: boolean;
+        otherSymbols: string[]
     })[]
 }) {
 

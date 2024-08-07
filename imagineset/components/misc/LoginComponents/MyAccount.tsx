@@ -1,9 +1,8 @@
 'use client'
 
 import React from 'react'
-import Link from "next/link"
 
 export function AccountLink({ children }: React.PropsWithChildren<{}>) {
-    return <Link href="">{children}</Link>
+  return <a href={`https://auth.cfde.cloud/realms/cfde/account/?referrer=cfde-workbench&referrer_uri=${window.location.href}`} target="_blank">My account</a>
 }
 

@@ -8,6 +8,7 @@ import * as React from 'react';
 import dynamic from 'next/dynamic'
 import Header from '@/components/header/Header';
 import { shallowCopy } from '@/app/shallowcopy';
+// import { ReportButton } from '@/components/misc/Report/ReportButton';
 
 
 export default async function AnalyzePage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
@@ -136,6 +137,7 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
                         Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Playbook Workflow Builder, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS.
                     </Typography>
+                        {/* <ReportButton /> */}
                     <PaginatedTable rows={rows} />
                 </Container>
             </Container>

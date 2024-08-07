@@ -15,7 +15,7 @@ export function ClusteredHeatmap({ selectedSets, heatmapOptions }: {
     React.useEffect(() => {
         let genesetDict: { [key: string]: string[] } = {}
         selectedSets?.forEach((geneset) => {
-            const genes = geneset.genes.map((gene) => gene.gene_symbol)
+            const genes = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
             const genesetName = geneset.alphabet
             genesetDict[genesetName] = genes
         })

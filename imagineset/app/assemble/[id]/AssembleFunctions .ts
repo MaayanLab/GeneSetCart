@@ -30,7 +30,7 @@ export async function checkValidGenes(genes: string) {
     return genesFound
 }
 
-export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string, user: User) {
+export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string, user: User, otherSymbols: string[], isHumanGenes: boolean) {
     // get gene objects
     if (genesetName === '') throw new Error('Empty gene set name')
     const filteredList = gene_list.filter((item) => item !== null)
@@ -58,6 +58,7 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
             genes: {
                 connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
             },
+            otherSymbols: otherSymbols,
         }
     })
 
@@ -68,7 +69,9 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
         },
         data: {
             gene_sets: {
-                connect: [...oldSetsArray, newGeneset].filter((geneset) => geneset.id !== undefined),
+                connect: [...oldSetsArray.filter((geneset) => geneset.id !== undefined).map((geneset) => ({ id: geneset.id })), // Extract id for filtering
+                { id: newGeneset.id }], // Connect newGeneset by id (assuming it's an object with id)),
+                //     connect: [...oldSetsArray, newGeneset].filter((geneset) => geneset.id !== undefined),
             },
             lastModified: new Date()
         },
@@ -82,20 +85,24 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
 
 
 
-export async function addToSessionSets(gene_list: string[], sessionId: string, genesetName: string, description: string) {
-    // get gene objects
-    if (genesetName === '') throw new Error('Empty gene set name')
-    const geneObjects = await Promise.all(gene_list.map(async (gene) => await prisma.gene.findFirst({
-        where: {
-            gene_symbol: {
-                equals: gene,
-                mode: 'insensitive'
+export async function addToSessionSets(gene_list: string[], sessionId: string, genesetName: string, description: string, otherSymbols: string[], isHumanGenes: boolean) {
+    let geneObjectIds;
+    if (isHumanGenes) {
+        // get gene objects
+        if (genesetName === '') throw new Error('Empty gene set name')
+        const geneObjects = await Promise.all(gene_list.map(async (gene) => await prisma.gene.findFirst({
+            where: {
+                gene_symbol: {
+                    equals: gene,
+                    mode: 'insensitive'
+                }
             }
-        }
-    })));
+        })));
 
-    if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
-    const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
+        if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
+        geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
+    }
+
 
     // get sets that are already in session 
     const sessionOldSets = await prisma.pipelineSession.findUnique({
@@ -114,8 +121,10 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
             description: description,
             session_id: sessionId,
             genes: {
-                connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
+                connect: geneObjectIds ? geneObjectIds.filter((geneObject) => geneObject.id !== undefined) : [],
             },
+            otherSymbols: otherSymbols,
+            isHumanGenes: isHumanGenes,
         }
     })
 
@@ -125,7 +134,8 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
         },
         data: {
             gene_sets: {
-                connect: [...oldSetsArray, newGeneset].filter((geneset) => geneset.id !== undefined),
+                connect: [...oldSetsArray.filter((geneset) => geneset.id !== undefined).map((geneset) => ({ id: geneset.id })),
+                { id: newGeneset.id }],
             },
             lastModified: new Date()
         },
@@ -153,17 +163,22 @@ type selectedCrossRowType = {
 }
 
 
-export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string) {
+export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string, isHumanGenes: boolean) {
+    console.log(isHumanGenes)
     for (const row of rows) {
         if (row) {
             const alreadyExists = await checkInSession(sessionId, row.genesetName)
             if (alreadyExists) {
                 return { code: 'error', message: `Gene set : ${row.genesetName} already in cart` }
             } else {
-                const validGenes = await checkValidGenes(row.genes.toString().replaceAll(',', '\n'))
-                const added = await addToSessionSets(validGenes, sessionId, row.genesetName, '')
+                if (isHumanGenes) {
+                    const validGenes = await checkValidGenes(row.genes.toString().replaceAll(',', '\n'))
+                    const added = await addToSessionSets(validGenes, sessionId, row.genesetName, '', [], true)
+                } else {
+                    const validSymbols = row.genes.filter((item) => item != '')
+                    const added = await addToSessionSets([], sessionId, row.genesetName, '', validSymbols, false)
+                }
             }
-
         }
     }
     revalidatePath('/')
@@ -178,7 +193,7 @@ export async function addMultipleSetsToSessionCross(rows: (selectedCrossRowType 
                 return { code: 'error', message: `Gene set : ${row.geneset_1 + ' ∩ ' + row.geneset_2} already in cart` }
             } else {
                 const validGenes = await checkValidGenes(row.overlap.toString().replaceAll(',', '\n').replaceAll("'", ''))
-                const added = await addToSessionSets(validGenes, sessionId, row.geneset_1 + ' ∩ ' + row.geneset_2, '')
+                const added = await addToSessionSets(validGenes, sessionId, row.geneset_1 + ' ∩ ' + row.geneset_2, '', [], true)
             }
 
         }
@@ -196,7 +211,7 @@ export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[
                 return { code: 'error', message: `Gene set : ${row.genesetName} + (${row.dcc}) already in cart` }
             } else {
                 const validGenes = row.genes.map((gene) => gene.gene_symbol)
-                const added = await addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '')
+                const added = await addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '', [], true)
             }
         }
     }
@@ -222,7 +237,7 @@ export async function checkInSession(currentSessionId: string, newGeneSetName: s
     return false
 }
 
-export async function addToSessionByGenesetId (sessionId : string, geneset: {
+export async function addToSessionByGenesetId(sessionId: string, isHumanGenes: boolean, otherSymbols: string[], geneset: {
     genes: {
         id: string;
         gene_symbol: string;
@@ -234,19 +249,19 @@ export async function addToSessionByGenesetId (sessionId : string, geneset: {
     name: string;
     description: string | null;
     createdAt: Date;
-} ) {
+}) {
     const response = await checkInSession(sessionId, geneset.name);
     if (response) {
-        return {error: "Gene set already exists in this session!" }
+        return { error: "Gene set already exists in this session!" }
     } else {
         try {
-            const result = await addToSessionSets(geneset.genes.map((gene) => gene.gene_symbol), sessionId, geneset.name, geneset.description ? geneset.description : '')
-            return {success : "Added"}
-        } catch (err : any) {
+            const result = await addToSessionSets(geneset.genes.map((gene) => gene.gene_symbol), sessionId, geneset.name, geneset.description ? geneset.description : '', otherSymbols, isHumanGenes)
+            return { success: "Added" }
+        } catch (err: any) {
             if (err.message === 'No valid genes in gene set') {
-                return {error: err.message}
+                return { error: err.message }
             } else {
-                return {error: "Error in adding gene set!"}
+                return { error: "Error in adding gene set!" }
             }
         }
     }

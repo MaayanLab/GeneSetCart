@@ -22,8 +22,7 @@ const Item = styled(Card)(() => ({
 
 
 const providerImages: { [key: string]: string } = {
-  'Google': 'https://authjs.dev/img/providers/google.svg',
-  'GitHub': 'https://authjs.dev/img/providers/github.svg'
+  'CFDE': 'https://data.cfde.cloud/img/favicon.png'
 }
 
 const errors: Record<string, string> = {

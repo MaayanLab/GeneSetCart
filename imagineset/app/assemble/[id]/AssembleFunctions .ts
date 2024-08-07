@@ -35,52 +35,56 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
     if (genesetName === '') throw new Error('Empty gene set name')
     const filteredList = gene_list.filter((item) => item !== null)
     const geneObjects = filteredList
-
-    if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
-    const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
-
-    // get sets that are already in session 
-    const sessionOldSets = await prisma.pipelineSession.findUnique({
-        where: {
-            id: sessionId,
-        },
-        select: {
-            gene_sets: true
-        }
-    })
-
-    const oldSetsArray = sessionOldSets?.gene_sets ? sessionOldSets?.gene_sets : []
-    const newGeneset = await prisma.geneSet.create({
-        data: {
-            name: genesetName,
-            description: description,
-            session_id: sessionId,
-            genes: {
-                connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
+    if (isHumanGenes) {
+        if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
+        const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
+    
+        // get sets that are already in session 
+        const sessionOldSets = await prisma.pipelineSession.findUnique({
+            where: {
+                id: sessionId,
             },
-            otherSymbols: otherSymbols,
-        }
-    })
-
-    const updatedSession = await prisma.pipelineSession.update({
-        where: {
-            id: sessionId,
-            user_id: user.id
-        },
-        data: {
-            gene_sets: {
-                connect: [...oldSetsArray.filter((geneset) => geneset.id !== undefined).map((geneset) => ({ id: geneset.id })), // Extract id for filtering
-                { id: newGeneset.id }], // Connect newGeneset by id (assuming it's an object with id)),
-                //     connect: [...oldSetsArray, newGeneset].filter((geneset) => geneset.id !== undefined),
+            select: {
+                gene_sets: true
+            }
+        })
+    
+        const oldSetsArray = sessionOldSets?.gene_sets ? sessionOldSets?.gene_sets : []
+        const newGeneset = await prisma.geneSet.create({
+            data: {
+                name: genesetName,
+                description: description,
+                session_id: sessionId,
+                genes: {
+                    connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
+                },
+                otherSymbols: otherSymbols,
+            }
+        })
+    
+        const updatedSession = await prisma.pipelineSession.update({
+            where: {
+                id: sessionId,
+                user_id: user.id
             },
-            lastModified: new Date()
-        },
-        include: {
-            gene_sets: true
-        }
-    })
-    // revalidatePath('/')
-    return 'success'
+            data: {
+                gene_sets: {
+                    connect: [...oldSetsArray.filter((geneset) => geneset.id !== undefined).map((geneset) => ({ id: geneset.id })), // Extract id for filtering
+                    { id: newGeneset.id }], // Connect newGeneset by id (assuming it's an object with id)),
+                    //     connect: [...oldSetsArray, newGeneset].filter((geneset) => geneset.id !== undefined),
+                },
+                lastModified: new Date()
+            },
+            include: {
+                gene_sets: true
+            }
+        })
+        // revalidatePath('/')
+        return 'success'
+    
+    } else {
+     addToSessionSets([], sessionId, genesetName, description, otherSymbols, isHumanGenes)
+    }
 }
 
 

@@ -25,6 +25,7 @@ services:
       - PYTHON_API_BASE=http://g2sg-flask:8000
       - PUBLIC_USER_ID=${PUBLIC_USER_ID}
       - PUBLIC_URL=https://g2sg.cfde.cloud
+      - NEXTAUTH_KEYCLOAK=${NEXTAUTH_KEYCLOAK}
 
   g2sg-postgres:
     image: postgres:16

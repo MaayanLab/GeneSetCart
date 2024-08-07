@@ -42,7 +42,6 @@ export default function ColorToggleButton({ sessionId }: { sessionId: string }) 
             fullWidth
         >
             <ToggleButton value="/assemble" onClick={handleClick}>
-                {/* <Typography variant="nav" align='center'>ASSEMBLE</Typography> */}
                 ASSEMBLE &nbsp; <ArrowDropDownIcon />
             </ToggleButton>
             <Menu
@@ -51,7 +50,7 @@ export default function ColorToggleButton({ sessionId }: { sessionId: string }) 
                 onClose={handleClose}
             >
                 <MenuItem component={Link} href={`/assemble/${sessionId}?type=single`}>Upload .txt</MenuItem>
-                <MenuItem component={Link} href={`/assemble/${sessionId}?type=multiple`}>Upload .gmt</MenuItem>
+                <MenuItem component={Link} href={`/assemble/${sessionId}?type=multiple`}>Upload .xmt</MenuItem>
                 <MenuItem component={Link} href={`/assemble/${sessionId}?type=cfde`}>Search CFDE DCC gene sets</MenuItem>
                 <MenuItem component={Link} href={`/assemble/${sessionId}?type=pubmed`}>Search gene sets from PubMed </MenuItem>
                 <MenuItem component={Link} href={`/assemble/${sessionId}?type=enrichr`}>Search Enrichr gene sets </MenuItem>

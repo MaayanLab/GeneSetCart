@@ -295,7 +295,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     return (
         <>
             <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
-                <Tooltip title='Visualize sets consisting of other identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
+                <Tooltip title='Visualize sets consisting of identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
                     <HelpOutlineIcon color="secondary" />
                 </Tooltip>
                 <Typography color={'purple'}>Other</Typography>

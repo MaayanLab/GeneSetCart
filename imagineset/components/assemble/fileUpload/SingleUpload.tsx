@@ -156,7 +156,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             >
                 <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 5} justifyItems='center' alignItems={'center'} justifyContent={'center'}>
                     <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
-                        <Tooltip title='Enter a set consisting of other identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
+                        <Tooltip title='Enter a set consisting of identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
                             <HelpOutlineIcon color="secondary" />
                         </Tooltip>
                         <Typography color={'purple'}>Other</Typography>

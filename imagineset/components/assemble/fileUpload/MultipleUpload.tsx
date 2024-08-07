@@ -50,7 +50,7 @@ export default function MultipleUpload() {
             <div className="flex justify-center">
                 <Stack direction="column" spacing={1} justifyContent="center" alignItems="center">
                     <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
-                        <Tooltip title='Upload .xmt file with sets consisting of other identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
+                        <Tooltip title='Upload .xmt file with sets consisting of identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
                             <HelpOutlineIcon color="secondary" />
                         </Tooltip>
                         <Typography color={'purple'}>Other</Typography>

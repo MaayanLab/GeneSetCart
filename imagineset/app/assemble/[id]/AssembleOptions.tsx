@@ -74,7 +74,7 @@ export default function VerticalTabs({queryParams}: {queryParams: Record<string,
           textColor='secondary'
         >
           <Tab label="Upload .txt" {...a11yProps(0)} sx={{borderBottom: 1, borderColor: 'divider'}} />
-          <Tab label=" Upload .gmt" {...a11yProps(1)} sx={{borderBottom: 1, borderColor: 'divider'}}/>
+          <Tab label=" Upload .xmt" {...a11yProps(1)} sx={{borderBottom: 1, borderColor: 'divider'}}/>
           <Tab label="Search CFDE DCC Gene Sets" {...a11yProps(2)} sx={{borderBottom: 1, borderColor: 'divider'}}/>
           <Tab label="Search Gene Sets from Pubmed" {...a11yProps(3)} sx={{borderBottom: 1, borderColor: 'divider'}}/>
           <Tab label="Search Enrichr Gene Sets" {...a11yProps(4)} />

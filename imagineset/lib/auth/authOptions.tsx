@@ -8,7 +8,7 @@ const KEYCLOAK_PROVIDER_INFO = process.env.NEXTAUTH_KEYCLOAK!
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     providers: [ 
-    KeycloakProvider({...JSON.parse(KEYCLOAK_PROVIDER_INFO), allowDangerousEmailAccountLinking: true})
+    KeycloakProvider({...JSON.parse(KEYCLOAK_PROVIDER_INFO)})
 
     ],
     callbacks: {

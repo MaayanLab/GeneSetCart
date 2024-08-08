@@ -3,7 +3,10 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from '../prisma';
 import KeycloakProvider from 'next-auth/providers/keycloak'
 
-const KEYCLOAK_PROVIDER_INFO = process.env.NEXTAUTH_KEYCLOAK!
+let KEYCLOAK_PROVIDER_INFO = process.env.NEXTAUTH_KEYCLOAK
+if (!KEYCLOAK_PROVIDER_INFO) {
+  KEYCLOAK_PROVIDER_INFO = '{}'
+}
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),

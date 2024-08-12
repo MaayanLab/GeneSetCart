@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import { ListSubheader, Grid, Stack, Button, Typography, Box, Tooltip, TextField, useMediaQuery, useTheme, ClickAwayListener, Switch } from '@mui/material';
+import { ListSubheader, Grid, Stack, Button, Typography, Box, Tooltip, TextField, useMediaQuery, useTheme, ClickAwayListener, Switch, FormControlLabel } from '@mui/material';
 import { PipelineSession, type Gene, type GeneSet } from '@prisma/client';
 import vennIcon from '@/public/img/otherLogos/VennDagramIcon.png'
 import superVennIcon from '@/public/img/otherLogos/supervennIcon.png'
@@ -24,7 +24,7 @@ import { ClusteredHeatmap } from '@/components/visualize/PlotComponents/Heatmap/
 import { AdditionalOptions } from './AdditionalOptionsDisplay';
 const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), { ssr: false })
 import { useDebounce } from 'use-debounce';
-import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
+import { addToSessionSets, checkValidGenes } from '@/app/assemble/[id]/AssembleFunctions ';
 import { addStatus } from '@/components/assemble/fileUpload/SingleUpload';
 import Status from '@/components/assemble/Status';
 import ShareIcon from '@mui/icons-material/Share';
@@ -176,11 +176,11 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const visType = searchParams.get('type')
     const pathname = usePathname()
 
-    const [isHumanGenes, setIsHumanGenes] = React.useState(true)
+    const [isHumanGenes, setIsHumanGenes] = React.useState(false)
     const [checked, setChecked] = React.useState<number[]>(checkedSets !== null ? checkedSets.split(',').map((item) => parseInt(item)) : []);
     const selectedSets = React.useMemo(() => {
-        const typedSets = sessionInfo ? sessionInfo.gene_sets.filter((setItem) => (isHumanGenes && setItem.isHumanGenes) || (!isHumanGenes && !setItem.isHumanGenes)) : []
-        return typedSets.filter((set, index) => checked.includes(index))
+        const sessionGenesets = sessionInfo ? sessionInfo.gene_sets : []
+        return sessionGenesets.filter((set, index) => checked.includes(index))
     }, [checked, sessionInfo?.gene_sets])
     const [visualization, setVisualization] = React.useState(visType !== null ? visType : '')
     const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
@@ -194,6 +194,10 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [status, setStatus] = React.useState<addStatus>({})
     const [open, setOpen] = React.useState(false);
+    const [validGenes, setValidGenes] = React.useState<string[]>([])
+    React.useEffect(() => {
+        checkValidGenes(overlap.overlapGenes.join('\n')).then((result) => setValidGenes(result))
+    }, [overlap])
 
 
     const handleTooltipClose = () => {
@@ -238,12 +242,36 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
 
     const addSelectedToCart = React.useCallback(() => {
         if (isHumanGenes) {
-            addToSessionSets(overlap.overlapGenes, sessionId, formatSelectionName(overlap.name), '', [], true).then((result) => setStatus({ success: true }))
+            addToSessionSets(validGenes, sessionId, formatSelectionName(overlap.name), '', [], true)
+            .then((result) => setStatus({ success: true }))
+            .catch((err) => {
+                if (err.message === 'No valid genes in gene set') {
+                    setStatus({ error: { selected: true, message: err.message } })
+                }
+                else if (err.message === 'Empty gene set name') {
+                    setStatus({ error: { selected: true, message: err.message } })
+                }
+                else {
+                    setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+                }
+            })
         } else {
-            addToSessionSets([], sessionId, formatSelectionName(overlap.name), '', overlap.overlapGenes, false).then((result) => setStatus({ success: true }))
+            addToSessionSets([], sessionId, formatSelectionName(overlap.name), '', overlap.overlapGenes, false)
+            .then((result) => setStatus({ success: true }))
+            .catch((err) => {
+                if (err.message === 'No valid genes in gene set') {
+                    setStatus({ error: { selected: true, message: err.message } })
+                }
+                else if (err.message === 'Empty gene set name') {
+                    setStatus({ error: { selected: true, message: err.message } })
+                }
+                else {
+                    setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+                }
+            })
         }
 
-    }, [overlap])
+    }, [overlap, isHumanGenes, validGenes])
 
     const formatSelectionName = React.useCallback((overlapSelection: string) => {
         if (visualization === 'Venn') {
@@ -266,7 +294,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const downloadHeatmapSVG = React.useCallback(() => {
         let genesetDict: { [key: string]: string[] } = {}
         legendSelectedSets?.forEach((geneset) => {
-            const genes = geneset.genes.map((gene) => gene.gene_symbol)
+            const genes = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
             const genesetName = geneset.alphabet
             genesetDict[genesetName] = genes
         })
@@ -280,7 +308,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const downloadSuperVennSVG = React.useCallback(() => {
         let genesetDict: { [key: string]: string[] } = {}
         legendSelectedSets?.forEach((geneset) => {
-            const genes = geneset.genes.map((gene) => gene.gene_symbol)
+            const genes = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
             const genesetName = geneset.alphabet
             genesetDict[genesetName] = genes
         })
@@ -294,39 +322,31 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
 
     return (
         <>
-            <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
-                <Tooltip title='Visualize sets consisting of identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
-                    <HelpOutlineIcon color="secondary" />
-                </Tooltip>
-                <Typography color={'purple'}>Other</Typography>
-                <Switch
-                    color="secondary"
-                    checked={isHumanGenes}
-                    onChange={() => { setIsHumanGenes(!isHumanGenes); setChecked([]); setVisualization('') }}
-                    sx={{
-                        "&.MuiSwitch-root .MuiSwitch-switchBase": {
-                            color: "purple"
-                        },
-
-                        "&.MuiSwitch-root .Mui-checked": {
-                            color: "#336699"
-                        }
-                    }}
-                />
-                <Typography color={'secondary'} >Human Gene Symbols</Typography>
-                <Tooltip title='Visualize sets consisting of human entrez gene symbols'>
-                    <HelpOutlineIcon color='secondary' />
-                </Tooltip>
-            </Stack>
             <Grid container direction='row' spacing={1}>
                 <Grid item xs={isMobile ? 12 : 3}>
                     <Stack direction='column' spacing={2}>
-                        <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} isHumanGenes={isHumanGenes} />
+                        <GeneSetOptionsList sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} legend={legendSelectedSets} />
                         <Box sx={{ maxWidth: '100%', bgcolor: 'background.paper', borderRadius: 2, minHeight: 350, boxShadow: 2, overflowY: 'scroll', wordWrap: 'break-word' }}>
                             <ListSubheader disableSticky={true}>
-                                Genes ({overlap.overlapGenes === undefined ? 0 : overlap.overlapGenes.length})
+                                Items ({overlap.overlapGenes === undefined ? 0 : overlap.overlapGenes.length})
                                 <Button color='secondary' onClick={addSelectedToCart}>  <AddShoppingCartIcon /> &nbsp;  ADD TO CART</Button>
                             </ListSubheader>
+                            <FormControlLabel control={<Checkbox checked={isHumanGenes} onChange={(event) => {
+                                setIsHumanGenes(event.target.checked);
+                            }} />}
+                                label={
+                                    <>
+                                        <Typography sx={{ fontSize: 14 }}>
+                                            Only accept valid human gene symbols
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 14 }} color='purple'>
+                                             ({validGenes.length} valid genes found)
+                                        </Typography>
+                                    </>
+
+                                }
+                                sx={{ padding: 1 }}
+                            />
                             <Status status={status} />
                             <TextField color='secondary'
                                 variant='outlined'
@@ -464,7 +484,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     )
 }
 
-export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend, isHumanGenes }: {
+export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }: {
     sessionInfo: {
         gene_sets: ({
             genes: Gene[];
@@ -481,7 +501,6 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend, i
         session_id: string;
         createdAt: Date;
     }[],
-    isHumanGenes: boolean
 }) {
 
     const handleToggle = (value: number) => () => {
@@ -496,7 +515,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend, i
         setChecked(newChecked);
     };
 
-    const typedSets = sessionInfo ? sessionInfo.gene_sets.filter((setItem) => (isHumanGenes && setItem.isHumanGenes) || (!isHumanGenes && !setItem.isHumanGenes)) : []
+    // const typedSets = sessionInfo ? sessionInfo.gene_sets.filter((setItem) => (isHumanGenes && setItem.isHumanGenes) || (!isHumanGenes && !setItem.isHumanGenes)) : []
 
     const legendIds = legend.map((item) => item.id)
     return (
@@ -512,7 +531,7 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend, i
                 </Stack>
             </ListSubheader>
 
-            {typedSets.map((geneset, i) => {
+            {sessionInfo?.gene_sets.map((geneset, i) => {
                 const labelId = `checkbox-list-label-${i}`;
                 if (legendIds.includes(geneset.id)) {
                     return (

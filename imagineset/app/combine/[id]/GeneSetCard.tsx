@@ -11,7 +11,7 @@ import { FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Tex
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
-export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedSets, disable }: {
+export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedSets }: {
     sessionGeneSets: ({
         genes: Gene[];
     } & GeneSet)[], selectedSets: ({
@@ -20,7 +20,6 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
     setSelectedSets: React.Dispatch<React.SetStateAction<({
         genes: Gene[];
     } & GeneSet)[]>>,
-    disable: string
 }) {
 
     const [numSelectOptions, setNumSelectOptions] = React.useState(1)
@@ -34,7 +33,7 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
                     style={{ textAlign: 'center' }}
                 />
                 <CardContent>
-                    <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} selectedSets={selectedSets} setSelectedSets={setSelectedSets} disable={disable} />
+                    <SelectedGenesetList sessionGeneSets={sessionGeneSets} numSelectOptions={numSelectOptions} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
                     <div className="flex justify-center">
                     <Button onClick={() =>{setNumSelectOptions(oldNum => oldNum + 1)}} color="tertiary"><AddCircleIcon /></Button>
                     </div>
@@ -47,7 +46,7 @@ export function SelectGenesetsCard({ sessionGeneSets, selectedSets, setSelectedS
 
 
 
-export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, selectedSets, setSelectedSets, disable  }: {
+export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, selectedSets, setSelectedSets  }: {
     sessionGeneSets: ({
         genes: Gene[];
     } & GeneSet)[],
@@ -58,7 +57,6 @@ export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, selecte
     setSelectedSets: React.Dispatch<React.SetStateAction<({
         genes: Gene[];
     } & GeneSet)[]>>,
-    disable: string
 }) {
 
     let dropDownCountArray = [];
@@ -67,7 +65,7 @@ export function SelectedGenesetList({ sessionGeneSets, numSelectOptions, selecte
     }
     return (
         <Stack spacing={2}>
-            {dropDownCountArray.map((i) => <GenesetSelectDropDown key={i} sessionGenesets={sessionGeneSets} selectedSets={selectedSets} setSelectedSets={setSelectedSets} index={i} disable={disable}/>)}
+            {dropDownCountArray.map((i) => <GenesetSelectDropDown key={i} sessionGenesets={sessionGeneSets} selectedSets={selectedSets} setSelectedSets={setSelectedSets} index={i} />)}
         </Stack>
     )
 }
@@ -80,7 +78,7 @@ export const MenuProps = {
     },
 }
 
-function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets, index, disable }: {
+function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets, index }: {
     sessionGenesets: ({
         genes: Gene[];
     } & GeneSet)[], 
@@ -91,7 +89,6 @@ function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets,
         genes: Gene[];
     } & GeneSet)[]>>, 
     index: number, 
-    disable: string
 }) {
 
     const [selected, setSelected] = React.useState('')
@@ -123,17 +120,17 @@ function GenesetSelectDropDown({ sessionGenesets, selectedSets, setSelectedSets,
         <Grid container direction={'row'}>
             <Grid item xs={10}>
                 <FormControl fullWidth>
-                    <InputLabel id="combine-select-label" sx={{ fontSize: 16 }} color='secondary'>{disable === 'other' ? "Select Gene Set" : "Select Set"}</InputLabel>
+                    <InputLabel id="combine-select-label" sx={{ fontSize: 16 }} color='secondary'>Select Set</InputLabel>
                     <Select
                         labelId="combine-select-label"
                         value={selected}
-                        label={disable === 'other' ? "Select Gene Set" : "Select Set"}
+                        label={"Select Set"}
                         onChange={handleChange}
                         color='secondary'
                         MenuProps={MenuProps}
                     >
                         {sessionGenesets.map((geneset, i) => {
-                            return <MenuItem key={i} value={geneset.name} disabled={selectedSets.map((selectedSet) => selectedSet.name).includes(geneset.name) || (disable==='gene' && geneset.isHumanGenes) || (disable==='other' && !geneset.isHumanGenes)} sx={{width: 300, wordBreak: 'break-word', whiteSpace: 'normal'}}>{geneset.name}</MenuItem>
+                            return <MenuItem key={i} value={geneset.name} disabled={selectedSets.map((selectedSet) => selectedSet.name).includes(geneset.name)} sx={{width: 300, wordBreak: 'break-word', whiteSpace: 'normal'}}>{geneset.name}</MenuItem>
                         })}
                     </Select>
                 </FormControl>

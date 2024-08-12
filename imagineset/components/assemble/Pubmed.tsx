@@ -1,6 +1,7 @@
 'use client'
 import {
-  Button, Container,
+  Button, Checkbox, Container,
+  FormControlLabel,
   Grid, Stack, Switch, TextField,
   Tooltip,
   Typography,
@@ -67,6 +68,7 @@ export default function GeneshotSearch() {
   const [loading, setLoading] = React.useState(false)
   const [status, setStatus] = React.useState<addStatus>({})
   const [geneRIF, setGeneRIF] = React.useState(true)
+  const [isHumanGenes, setIsHumanGenes] = React.useState(false)
   React.useEffect(() => {
     checkValidGenes(foundGenes.toString().replaceAll(',', '\n')).then((response) => setValidGenes(response))
   }, [foundGenes])
@@ -125,7 +127,7 @@ export default function GeneshotSearch() {
         </Search>
         <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
           <Tooltip title='AutoRIF automatically searches PubMed for the entered terms and returns lists of genes associated with the resulting publications. Genes are ranked by either the number of times that gene was associated with the terms (Count) or the Count divided by the number of times that gene is referenced in publications in general (Normalized Count).'>
-            <HelpOutlineIcon color="secondary"/>
+            <HelpOutlineIcon color="secondary" />
           </Tooltip>
           <Typography color={'purple'}>AutoRIF</Typography>
           <Switch
@@ -136,11 +138,11 @@ export default function GeneshotSearch() {
               "&.MuiSwitch-root .MuiSwitch-switchBase": {
                 color: "purple"
               },
-            
+
               "&.MuiSwitch-root .Mui-checked": {
-               color: "#336699"
+                color: "#336699"
               }
-             }}
+            }}
           />
           <Typography color={'secondary'} >GeneRIF</Typography>
           <Tooltip title='Search PubMed using the manually-collected GeneRIF gene-term associations.'>
@@ -161,7 +163,7 @@ export default function GeneshotSearch() {
             if (response) {
               setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
             } else {
-              addToSessionSets(validGenes, sessionId, genesetName, description ? description : '', [], false)
+              addToSessionSets(isHumanGenes ? validGenes : [], sessionId, genesetName, description ? description : '', isHumanGenes ? [] : foundGenes, isHumanGenes)
                 .then((result) => { setStatus({ success: true }) })
                 .catch((err) => {
                   if (err.message === 'No valid genes in gene set') {
@@ -175,6 +177,12 @@ export default function GeneshotSearch() {
         }
         }>
         <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 5} justifyItems='center'>
+          <Grid item>
+            <FormControlLabel control={<Checkbox checked={isHumanGenes} onChange={(event) => {
+              setIsHumanGenes(event.target.checked);
+            }} />} label="Only accept valid human gene symbols"
+            />
+          </Grid>
           <Grid item>
             <TextField id="outlined-basic" required label="Gene Set Name" variant="outlined" name='name' />
           </Grid>

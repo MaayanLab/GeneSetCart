@@ -28,6 +28,7 @@ import playbookLogo from "@/public/img/otherLogos/playbook-workflow-builder.png"
 import cfdeLogo from "@/public/img/favicon.png"
 import { getEnrichrShortId, getPlaybookLink, getRummageneLink, getRummageoLink, getSigComLINCSId } from "@/app/analyze/[id]/AnalyzeFunctions";
 import { deleteGenesetByID } from "@/components/header/Header";
+import { checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
 
 
 
@@ -37,6 +38,10 @@ export const ViewGenesBtn = ({ row }: {
     } & GeneSet
 }) => {
     const [open, setOpen] = React.useState(false)
+    const [validGenes, setValidGenes] = React.useState<string[]>([])
+    React.useEffect(() => {
+        checkValidGenes(row.otherSymbols.join('\n')).then((result) => setValidGenes(result))
+    }, [row])    
     const handleClose = () => {
         setOpen(false);
     };
@@ -51,7 +56,10 @@ export const ViewGenesBtn = ({ row }: {
                 <DialogTitle sx={{wordBreak: 'break-word'}}>{row.name}</DialogTitle>
                 <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
                     <Grid item>
-                        <Typography variant='body1' color='secondary'> {row.isHumanGenes ? row.genes.length : row.otherSymbols.length} genes</Typography>
+                        <Typography variant='body1' color='secondary'> {row.isHumanGenes ? row.genes.length : row.otherSymbols.length} items</Typography>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant='body1' color='secondary'> {row.isHumanGenes ? row.genes.length : validGenes.length} valid genes</Typography>
                     </Grid>
                     <Grid item>
                         <TextField

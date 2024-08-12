@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect } from "react";
 import {
-    Button, Container, Grid, Stack, Switch, TextField,
+    Button, Checkbox, Container, FormControlLabel, Grid, Stack, Switch, TextField,
     Tooltip,
     Typography, useMediaQuery,
     useTheme
@@ -33,7 +33,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     const [validGenes, setValidGenes] = React.useState<string[]>([])
     const [status, setStatus] = React.useState<addStatus>({})
     const [genesetInfo, setGenesetInfo] = React.useState<genesetInfo>()
-    const [isHumanGenes, setIsHumanGenes] = React.useState(true)
+    const [isHumanGenes, setIsHumanGenes] = React.useState(false)
 
     const searchParams = useSearchParams();
     const urlParams = new URLSearchParams(searchParams);
@@ -95,9 +95,9 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             setGenesetInfo(isHumanGenes ? { ...genesetInfo, genes: reader.result.toString(), otherSymbols: '' } : { ...genesetInfo, otherSymbols: reader.result.toString(), genes: '' })
                         }
                         else {
-                            setGenesetInfo( isHumanGenes ? { name: '', genes: reader.result.toString(), description: '', otherSymbols: '' } : { name: '', genes: '', description: '', otherSymbols: reader.result.toString() })
+                            setGenesetInfo(isHumanGenes ? { name: '', genes: reader.result.toString(), description: '', otherSymbols: '' } : { name: '', genes: '', description: '', otherSymbols: reader.result.toString() })
                         }
-                        
+
                     }
                 },
                 false,
@@ -139,7 +139,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             })
         } catch (err) {
             if (err instanceof Error) {
-            setStatus({ error: { selected: true, message: err.message } })
+                setStatus({ error: { selected: true, message: err.message } })
             }
         }
 
@@ -155,30 +155,10 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             <Grid container display={isMobile ? 'block' : 'flex'} spacing={1} justifyContent="center"
             >
                 <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 5} justifyItems='center' alignItems={'center'} justifyContent={'center'}>
-                    <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
-                        <Tooltip title='Enter a set consisting of identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
-                            <HelpOutlineIcon color="secondary" />
-                        </Tooltip>
-                        <Typography color={'purple'}>Other</Typography>
-                        <Switch
-                            color="secondary"
-                            checked={isHumanGenes}
-                            onChange={() => setIsHumanGenes(!isHumanGenes)}
-                            sx={{
-                                "&.MuiSwitch-root .MuiSwitch-switchBase": {
-                                    color: "purple"
-                                },
-
-                                "&.MuiSwitch-root .Mui-checked": {
-                                    color: "#336699"
-                                }
-                            }}
-                        />
-                        <Typography color={'secondary'} >Human Gene Symbols</Typography>
-                        <Tooltip title='Enter a set consisting of human entrez gene symbols'>
-                            <HelpOutlineIcon color='secondary' />
-                        </Tooltip>
-                    </Stack>
+                    <FormControlLabel control={<Checkbox checked={isHumanGenes} onChange={(event) => {
+                        setIsHumanGenes(event.target.checked);
+                    }} />} label="Only accept valid human gene symbols"
+                    />
                     <Grid item>
                         <TextField
                             id="outlined-basic"
@@ -218,7 +198,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                                     }
                                 }}
                             >
-                                 <UploadIcon /> UPLOAD FILE
+                                <UploadIcon /> UPLOAD FILE
                                 <input
                                     id='single-file-input'
                                     hidden
@@ -236,13 +216,13 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                 </Grid>
                 <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 5}>
                     <Grid item container justifyContent={'center'} alignItems={'center'} direction='column'>
-                        {isHumanGenes ? <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography> : <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.otherSymbols.split('\n').filter((item) => item != '').length : 0 } items found </Typography>}
+                        {isHumanGenes ? <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography> : <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.otherSymbols.split('\n').filter((item) => item != '').length : 0} items found </Typography>}
                         <TextField
                             id="standard-multiline-static"
                             multiline
                             rows={10}
                             placeholder={isHumanGenes ? "Paste gene symbols here" : "Paste set identifiers here"}
-                            value={genesetInfo ? isHumanGenes ? genesetInfo.genes  : genesetInfo.otherSymbols : ''}
+                            value={genesetInfo ? isHumanGenes ? genesetInfo.genes : genesetInfo.otherSymbols : ''}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 if (isHumanGenes) {
                                     setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: event.target.value, description: '', otherSymbols: '' })

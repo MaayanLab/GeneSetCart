@@ -1,6 +1,6 @@
 'use client'
 import React from "react";
-import { Box, Button, Container, Switch, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Button, Container, Stack, Typography, useMediaQuery, useTheme, FormControlLabel, Checkbox } from "@mui/material";
 import DataTable from "./DataTable";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
@@ -14,7 +14,7 @@ export default function MultipleUpload() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
     const [gmtGenesets, setGmtGenesets] = React.useState<GMTGenesetInfo[]>([])
-    const [isHumanGenes, setIsHumanGenes] = React.useState(true)
+    const [isHumanGenes, setIsHumanGenes] = React.useState(false)
 
 
     const readGMTFile = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,30 +49,10 @@ export default function MultipleUpload() {
             </Typography>
             <div className="flex justify-center">
                 <Stack direction="column" spacing={1} justifyContent="center" alignItems="center">
-                    <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
-                        <Tooltip title='Upload .xmt file with sets consisting of identifiers other than human entrez gene symbols e.g drugs, other organism symbols.'>
-                            <HelpOutlineIcon color="secondary" />
-                        </Tooltip>
-                        <Typography color={'purple'}>Other</Typography>
-                        <Switch
-                            color="secondary"
-                            checked={isHumanGenes}
-                            onChange={() => setIsHumanGenes(!isHumanGenes)}
-                            sx={{
-                                "&.MuiSwitch-root .MuiSwitch-switchBase": {
-                                    color: "purple"
-                                },
-
-                                "&.MuiSwitch-root .Mui-checked": {
-                                    color: "#336699"
-                                }
-                            }}
-                        />
-                        <Typography color={'secondary'} >Human Gene Symbols</Typography>
-                        <Tooltip title='Upload .xmt file with sets consisting of human entrez gene symbols'>
-                            <HelpOutlineIcon color='secondary' />
-                        </Tooltip>
-                    </Stack>
+                    <FormControlLabel control={<Checkbox checked={isHumanGenes} onChange={(event) => {
+                        setIsHumanGenes(event.target.checked);
+                    }} />} label="Only accept valid human gene symbols"
+                    />
                     <Button
                         variant="outlined"
                         component="label"

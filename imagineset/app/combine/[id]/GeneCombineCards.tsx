@@ -3,10 +3,10 @@
 import { SelectGenesetsCard } from "./GeneSetCard"
 import { type Gene, type GeneSet } from "@prisma/client";
 import React from "react";
-import { Card, Box, CardContent, Divider, TextField, Stack, CardHeader, Button, Typography, Tooltip } from "@mui/material";
+import { Card, Box, CardContent, Divider, TextField, Stack, CardHeader, Button, Typography, Tooltip, FormControlLabel, Checkbox } from "@mui/material";
 import Status from "../../../components/assemble/Status";
 import { copyToClipboard } from "../../../components/assemble/DCCFetch/CFDEDataTable";
-import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkInSession, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
 import { addStatus } from "../../../components/assemble/fileUpload/SingleUpload";
 import InfoIcon from '@mui/icons-material/Info';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
@@ -28,7 +28,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
             genes: Gene[];
         } & GeneSet)[];
     } | null,
-    sessionId: string, 
+    sessionId: string,
 }) {
     const [selectedSets, setSelectedSets] = React.useState<({
         genes: Gene[];
@@ -37,12 +37,17 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
     const [displayedGenes, setDisplayedGenes] = React.useState<string[]>([])
     const [generatedSetName, setGeneratedSetName] = React.useState('')
     const [status, setStatus] = React.useState<addStatus>({})
+    const [isHumanGenes, setIsHumanGenes] = React.useState(true)
+    const [validGenes, setValidGenes] = React.useState<string[]>([])
+    React.useEffect(() => {
+        checkValidGenes(displayedGenes.join('\n')).then((result) => setValidGenes(result))
+    }, [displayedGenes])
 
     const unionAction = () => {
         let genes: string[] = []
         let genesetNames: string[] = []
         selectedSets.forEach((set) => {
-            const setGenes = set.genes.map((gene) => gene.gene_symbol)
+            const setGenes = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             for (let geneSymbol of setGenes) {
                 if (!genes.includes(geneSymbol)) {
                     genes.push(geneSymbol)
@@ -60,7 +65,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         let genesetNames: string[] = []
         const selectedSetsCount = selectedSets.length
         selectedSets.forEach((set) => {
-            const setGenes = set.genes.map((gene) => gene.gene_symbol)
+            const setGenes = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             allGenes.push(setGenes)
             genesetNames.push(set.name)
         })
@@ -81,7 +86,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         let toSubtractGenes: string[] = []
         let toSubtractGenesetNames: string[] = []
         selectedSets.slice(1).forEach((set) => {
-            const setGenes = set.genes.map((gene) => gene.gene_symbol)
+            const setGenes = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             for (let geneSymbol of setGenes) {
                 if (!toSubtractGenes.includes(geneSymbol)) {
                     toSubtractGenes.push(geneSymbol)
@@ -100,7 +105,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         let allGenes: string[][] = []
         let genesetNames: string[] = []
         selectedSets.forEach((set) => {
-            const setGenes = set.genes.map((gene) => gene.gene_symbol)
+            const setGenes = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             allGenes.push(setGenes)
             genesetNames.push(set.name)
         })
@@ -122,7 +127,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
             if (response) {
                 setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
             } else {
-                addToSessionSets(displayedGenes, sessionId, generatedSetName, '', [], true)
+                addToSessionSets(isHumanGenes ? validGenes : [], sessionId, generatedSetName, '', isHumanGenes ? [] : displayedGenes, isHumanGenes)
                     .then((response) => setStatus({ success: true }))
                     .catch((err) => {
                         if (err.message === 'No valid genes in gene set') {
@@ -140,7 +145,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
     }, [displayedGenes, generatedSetName, sessionId])
     return (
         <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'} useFlexGap flexWrap="wrap">
-            <SelectGenesetsCard sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} selectedSets={selectedSets} setSelectedSets={setSelectedSets} disable={'other'}/>
+            <SelectGenesetsCard sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
             <Box sx={{ minWidth: 100 }}>
                 <Card variant="outlined" sx={{ minHeight: 400, height: '100%', overflowY: 'scroll' }}>
                     <CardHeader
@@ -210,7 +215,12 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
                                 multiline
                                 inputProps={{ style: { resize: "both" } }}
                             />
-                            <Typography variant='body1' color='secondary' style={{ textAlign: 'center' }}> {displayedGenes.length} valid genes found</Typography>
+                            <FormControlLabel control={<Checkbox checked={isHumanGenes} onChange={(event) => {
+                                setIsHumanGenes(event.target.checked);
+                            }} />} label="Only accept valid human gene symbols"
+                            />
+                            <Typography variant='body1' color='secondary' style={{ textAlign: 'center' }}> {displayedGenes.length} items</Typography>
+                            <Typography variant='body1' color='secondary' style={{ textAlign: 'center' }}> {validGenes.length} valid genes found</Typography>
                             <TextField
                                 id="standard-multiline-static"
                                 multiline

@@ -25,10 +25,6 @@ export function copyToClipboard(genesString: string) {
 function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, isHumanGenes: boolean }) {
   const [open, setOpen] = React.useState(false);
   const [validGenes, setValidGenes] = React.useState<string[]>([])
-  React.useEffect(() => {
-
-  }, [params.row.genes])
-
 
   const handleClose = () => {
     setOpen(false);
@@ -47,19 +43,14 @@ function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellP
         sx={{ margin: 1 }}
         onClick={(event) => {
           event.stopPropagation();
-          if (isHumanGenes) {
             checkValidGenes(params.row.genes.toString().replaceAll(',', '\n'))
               .then((result) => {
                 setValidGenes(result);
                 handleOpen();
               })
-          } else {
-            setValidGenes(params.row.genes.filter((item: string) => item != ''))
-            handleOpen();
-          }
         }}>
         <VisibilityIcon /> &nbsp;
-        {isHumanGenes ? 'Genes' : 'Items'}
+        {'Genes'}
       </Button>
       <Dialog
         onClose={handleClose}
@@ -67,8 +58,8 @@ function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellP
         <DialogTitle>{params.row.genesetName}</DialogTitle>
         <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
           <Grid item>
-            <Typography variant='body1' color='secondary'> {params.row.genes.length} {isHumanGenes ? 'genes' : 'items'}</Typography>
-            <Typography variant='body1' color='secondary'> {validGenes.length} valid {isHumanGenes ? 'genes' : 'items'} found</Typography>
+            <Typography variant='body1' color='secondary'> {params.row.genes.filter((item: string) => item != '').length} items found</Typography>
+            <Typography variant='body1' color='secondary'> {validGenes.length} valid genes found</Typography>
           </Grid>
           <Grid item>
             <TextField

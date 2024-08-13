@@ -6,10 +6,14 @@ export async function POST(request: Request) {
     const genesetName = data['term']
     const genes = data['genes']
     const description = data['description']
+    let validate = true
+    if ('validate' in data) {
+        validate = data['validate']
+    }
     if (genes.length < 1) return NextResponse.json({ error: 'Empty gene set' }, { status: 400 })
     if (genesetName === '') return NextResponse.json({ error: 'No gene set name' }, { status: 400 })
     try {
-        const addedGenesetId = await addToAddedGenesets(genes, genesetName, description)
+        const addedGenesetId = await addToAddedGenesets(genes, genesetName, description, validate)
         return NextResponse.json({ geneset_url: process.env.PUBLIC_URL + `/assemble?type=single&geneset_id=${addedGenesetId}&add=true`}, {
             status: 200,
             headers: {
@@ -20,7 +24,7 @@ export async function POST(request: Request) {
                 "Access-Control-Max-Age": "86400",
             }
         })
-    } catch {
+    } catch (err) {
         return NextResponse.json({ error: 'Error processing request' }, {
             status: 500,
             headers: {

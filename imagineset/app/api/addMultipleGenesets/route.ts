@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
     const data = await request.json();
     const genesets = data
-    if (genesets.length < 1) return NextResponse.json({ error: 'More than one gene set must be sent in request to be added' }, { status: 400 })
+    if (genesets.length < 1) return NextResponse.json({ error: 'At least one gene set must be sent in request to be added' }, { status: 400 })
     try {
         const anonymousUserId = process.env.PUBLIC_USER_ID
         const anonymousUser = await prisma.user.upsert({

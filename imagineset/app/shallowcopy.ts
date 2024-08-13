@@ -39,30 +39,40 @@ export async function shallowCopy(user: User,
     }
 }
 
-export async function addToAddedGenesets(gene_list: string[], genesetName: string, description: string){
+export async function addToAddedGenesets(gene_list: string[], genesetName: string, description: string, validate: boolean){
         // get gene objects
+        // TODO: allow users to add gene sets using API when the gene sets are other 
         if (genesetName === '') throw new Error('Empty gene set name')
-        const geneObjects = await Promise.all(gene_list.map(async (gene) => await prisma.gene.findFirst({
-            where: {
-                gene_symbol: {
-                    equals: gene,
-                    mode: 'insensitive'
+        let otherSymbolsArray : string[] = []
+        let geneObjectIds : {
+            id: string | undefined;
+        }[] = []
+        if (validate) {
+            const geneObjects = await Promise.all(gene_list.map(async (gene) => await prisma.gene.findFirst({
+                where: {
+                    gene_symbol: {
+                        equals: gene,
+                        mode: 'insensitive'
+                    }
                 }
-            }
-        })));
-    
-        if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
-        const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
+            })));
+        
+            if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
+            geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) }).filter((geneObject) => geneObject.id !== undefined)
+        } else {
+            otherSymbolsArray = gene_list.filter((gene) => gene != '')
+            if (otherSymbolsArray.length === 0) throw new Error('No valid genes in gene set')
+        }
         const addedGeneset = await prisma.addedGeneset.create({
             data: {
                 name: genesetName,
                 description: description,
                 genes: {
-                    connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
+                    connect: geneObjectIds,
                 },
+                otherSymbols: otherSymbolsArray
             }
         })
-
         return addedGeneset.id
 }
 

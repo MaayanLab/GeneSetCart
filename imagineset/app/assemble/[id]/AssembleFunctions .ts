@@ -2,7 +2,7 @@
 import prisma from '@/lib/prisma'
 import { readFileSync } from 'fs'
 import path from 'path'
-import { type GeneSet, type Gene, User } from '@prisma/client'
+import { type GeneSet, type Gene, User, addedGeneset } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { searchResultsType } from '@/components/assemble/DCCFetch/DCCUpload'
 
@@ -240,25 +240,28 @@ export async function checkInSession(currentSessionId: string, newGeneSetName: s
     return false
 }
 
-export async function addToSessionByGenesetId(sessionId: string, isHumanGenes: boolean, otherSymbols: string[], geneset: {
+export async function addToSessionByGenesetId(sessionId: string, geneset: {
     genes: {
         id: string;
         gene_symbol: string;
         synonyms: string;
         description: string | null;
     }[];
-} & {
-    id: string;
-    name: string;
-    description: string | null;
-    createdAt: Date;
-}) {
+} & addedGeneset) {
     const response = await checkInSession(sessionId, geneset.name);
     if (response) {
         return { error: "Gene set already exists in this session!" }
     } else {
         try {
-            const result = await addToSessionSets(geneset.genes.map((gene) => gene.gene_symbol), sessionId, geneset.name, geneset.description ? geneset.description : '', otherSymbols, isHumanGenes)
+            let isHumanGenes = true;
+            let otherSymbols : string[] = []; 
+            let validGenes = geneset.genes.map((gene) => gene.gene_symbol);
+            if (geneset.otherSymbols.length > 0) {
+                isHumanGenes = false;
+                otherSymbols = geneset.otherSymbols
+                validGenes = []
+            }
+            const result = await addToSessionSets(validGenes, sessionId, geneset.name, geneset.description ? geneset.description : '', otherSymbols, isHumanGenes)
             return { success: "Added" }
         } catch (err: any) {
             if (err.message === 'No valid genes in gene set') {

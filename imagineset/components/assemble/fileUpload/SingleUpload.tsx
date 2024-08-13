@@ -11,7 +11,6 @@ import { useParams, usePathname, useRouter, useSearchParams } from "next/navigat
 import Status from "../Status";
 import { getGenesetInfo } from "@/app/shallowcopy";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 
@@ -24,7 +23,7 @@ export type addStatus = {
     },
 }
 
-type genesetInfo = { name: string, genes: string, description: string | null, otherSymbols: string }
+type genesetInfo = { name: string, genes: string, description: string | null }
 
 export default function SingleUpload({ queryParams }: { queryParams: Record<string, string | string[] | undefined> }) {
     const theme = useTheme();
@@ -47,9 +46,14 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             const sessionId = params.id
             getGenesetInfo(genesetId).then((geneset) => {
                 if (geneset) {
-                    setGenesetInfo({ name: geneset.name, genes: geneset.genes.map((gene) => gene.gene_symbol).join('\n'), description: geneset.description, otherSymbols: '' })
+                    if (geneset.genes.length > 0) {
+                        setIsHumanGenes(true)
+                        setGenesetInfo({ name: geneset.name, genes: geneset.genes.map((gene) => gene.gene_symbol).join('\n'), description: geneset.description })
+                    } else{
+                        setGenesetInfo({ name: geneset.name, genes: geneset.otherSymbols.join('\n'), description: geneset.description })
+                    }
                     if (add === 'true') {
-                        addToSessionByGenesetId(sessionId, true, [], geneset).then((response) => {
+                        addToSessionByGenesetId(sessionId, geneset).then((response) => {
                             if (response.success) {
                                 setStatus({ success: true })
                             } else {
@@ -67,7 +71,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     }, [])
 
     const getExample = React.useCallback(() => {
-        loadTxtExample().then((response) => setGenesetInfo({ name: 'example gene set', genes: response, description: '', otherSymbols: '' }));
+        loadTxtExample().then((response) => setGenesetInfo({ name: 'example gene set', genes: response, description: '' }));
     }, [genesetInfo])
 
 
@@ -92,10 +96,10 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                 () => {
                     if (reader.result) {
                         if (genesetInfo) {
-                            setGenesetInfo(isHumanGenes ? { ...genesetInfo, genes: reader.result.toString(), otherSymbols: '' } : { ...genesetInfo, otherSymbols: reader.result.toString(), genes: '' })
+                            setGenesetInfo({ ...genesetInfo, genes: reader.result.toString() })
                         }
                         else {
-                            setGenesetInfo(isHumanGenes ? { name: '', genes: reader.result.toString(), description: '', otherSymbols: '' } : { name: '', genes: '', description: '', otherSymbols: reader.result.toString() })
+                            setGenesetInfo({ name: '', genes: reader.result.toString(), description: '' })
                         }
 
                     }
@@ -119,7 +123,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
         evt.preventDefault();
         try {
             const genesetName = genesetInfo?.name
-            const otherSymbolsArray = genesetInfo ? genesetInfo?.otherSymbols.split('\n').filter((gene) => gene != '') : []
+            const otherSymbolsArray = genesetInfo ? genesetInfo?.genes.split('\n').filter((gene) => gene != '') : []
             let description = genesetInfo?.description
             if (!genesetName) throw new Error('No gene set name')
             if (!description) description = ''
@@ -128,13 +132,28 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                 if (response) {
                     setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
                 } else {
-                    addToSessionSets(validGenes, sessionId, genesetName, description ? description : '', otherSymbolsArray, isHumanGenes).then((result) => { setStatus({ success: true }) }).catch((err) => {
-                        if (err.message === 'No valid genes in gene set') {
-                            setStatus({ error: { selected: true, message: err.message } })
-                        } else {
-                            setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
-                        }
-                    })
+                    if (isHumanGenes) {
+                        addToSessionSets(validGenes, sessionId, genesetName, description ? description : '', [], isHumanGenes)
+                            .then((result) => { setStatus({ success: true }) })
+                            .catch((err) => {
+                                if (err.message === 'No valid genes in gene set') {
+                                    setStatus({ error: { selected: true, message: err.message } })
+                                } else {
+                                    setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+                                }
+                            })
+                    } else {
+                        addToSessionSets([], sessionId, genesetName, description ? description : '', otherSymbolsArray, isHumanGenes)
+                            .then((result) => { setStatus({ success: true }) })
+                            .catch((err) => {
+                                if (err.message === 'No valid genes in gene set') {
+                                    setStatus({ error: { selected: true, message: err.message } })
+                                } else {
+                                    setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+                                }
+                            })
+                    }
+
                 }
             })
         } catch (err) {
@@ -143,7 +162,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             }
         }
 
-    }, [genesetInfo, validGenes])
+    }, [genesetInfo, validGenes, isHumanGenes])
 
     return (
         <Container>
@@ -167,7 +186,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             value={genesetInfo ? genesetInfo?.name : ''}
                             focused={genesetInfo ? true : false}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setGenesetInfo(genesetInfo ? { ...genesetInfo, name: event.target.value } : { name: event.target.value, genes: '', description: '', otherSymbols: '' })
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, name: event.target.value } : { name: event.target.value, genes: '', description: '' })
                             }}
                         />
                     </Grid>
@@ -182,7 +201,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             value={genesetInfo ? genesetInfo?.description : ''}
                             focused={genesetInfo ? true : false}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setGenesetInfo(genesetInfo ? { ...genesetInfo, description: event.target.value } : { name: '', genes: '', description: event.target.value, otherSymbols: '' })
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, description: event.target.value } : { name: '', genes: '', description: event.target.value })
                             }}
                         />
                     </Grid>
@@ -216,19 +235,16 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                 </Grid>
                 <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 5}>
                     <Grid item container justifyContent={'center'} alignItems={'center'} direction='column'>
-                        {isHumanGenes ? <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography> : <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.otherSymbols.split('\n').filter((item) => item != '').length : 0} items found </Typography>}
+                        <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.genes.split('\n').filter((item) => item != '').length : 0} items found </Typography>
+                        <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography>
                         <TextField
                             id="standard-multiline-static"
                             multiline
                             rows={10}
                             placeholder={isHumanGenes ? "Paste gene symbols here" : "Paste set identifiers here"}
-                            value={genesetInfo ? isHumanGenes ? genesetInfo.genes : genesetInfo.otherSymbols : ''}
+                            value={genesetInfo ? genesetInfo.genes : ''}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                if (isHumanGenes) {
-                                    setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: event.target.value, description: '', otherSymbols: '' })
-                                } else {
-                                    setGenesetInfo(genesetInfo ? { ...genesetInfo, otherSymbols: event.target.value } : { name: '', genes: '', description: '', otherSymbols: event.target.value })
-                                }
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: event.target.value, description: '' })
                             }}
                         />
                     </Grid>

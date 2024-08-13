@@ -248,7 +248,11 @@
           "description": {
             "type": "string",
             "example": "A gene set from KOMP2 Mouse Phenotypes 2022 provided by KOMP2"
-          }
+          },
+            "validate": {
+              "type": "boolean",
+              "example": true
+            }
         },
         "xml": {
           "name": "geneset"

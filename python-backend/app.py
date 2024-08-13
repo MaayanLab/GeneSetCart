@@ -79,6 +79,7 @@ def createHeatmap():
     data = request.get_json()
     genesets_dict = data['genesets_dict']
     display_diagonal= data['display-diagonal']
+    annotation_text= data['annot']
     color_palette = data['color-palette']
     font_size = data['font-size']
     disable_labels  = data['disable-labels']
@@ -95,12 +96,12 @@ def createHeatmap():
     col_linkage = linkage(
         distance.pdist(correlations_array.T), method='average')
     if display_diagonal: 
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels))
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels), annot=annotation_text, fmt=".1f")
     else: 
         np.fill_diagonal(a, 5)
         mask = np.where(a == 5, True, False)
         plt.clf()
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, mask=mask, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels))
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, mask=mask, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels), annot=annotation_text, fmt=".1f")
     plt.rcParams["font.size"] = font_size
     # Save plot to a BytesIO object 
     img = io.BytesIO()

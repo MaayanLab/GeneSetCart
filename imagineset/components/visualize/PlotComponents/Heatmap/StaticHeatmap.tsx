@@ -8,7 +8,7 @@ export function ClusteredHeatmap({ selectedSets, heatmapOptions }: {
         alphabet: string;
         genes: Gene[];
     } & GeneSet)[] | undefined;
-    heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean }
+    heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean, annotationText: boolean }
 }) {
     const [heatmapImageString, setHeatmapImageString] = React.useState<string | null>(null)
 
@@ -16,7 +16,8 @@ export function ClusteredHeatmap({ selectedSets, heatmapOptions }: {
         let genesetDict: { [key: string]: string[] } = {}
         selectedSets?.forEach((geneset) => {
             const genes = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
-            const genesetName = geneset.alphabet
+            // const genesetName = geneset.alphabet
+            const genesetName = geneset.name
             genesetDict[genesetName] = genes
         })
         getClustermap(genesetDict, heatmapOptions)

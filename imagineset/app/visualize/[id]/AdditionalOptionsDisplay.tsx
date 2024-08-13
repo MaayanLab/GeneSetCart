@@ -14,13 +14,14 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
         visualization: string,
         umapOptions: UMAPOptionsType,
         setUmapOptions: React.Dispatch<React.SetStateAction<UMAPOptionsType>>,
-        heatmapOptions: { diagonal: boolean; interactive: boolean, palette: string, fontSize: number, disableLabels: boolean },
+        heatmapOptions: { diagonal: boolean; interactive: boolean, palette: string, fontSize: number, disableLabels: boolean, annotationText: boolean },
         setHeatmapOptions: React.Dispatch<React.SetStateAction<{
             diagonal: boolean;
             interactive: boolean;
             palette: string;
             fontSize: number;
             disableLabels: boolean
+            annotationText: boolean
         }>>,
         vennOptions: { palette: string },
         setVennOptions: React.Dispatch<React.SetStateAction<{
@@ -167,14 +168,14 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
                 <FormControlLabel
                     label="Color"
                     control={
-                        <input type='color' onChange={(evt) => {setUpSetOptions({color: evt.target.value})}} value={upSetOptions.color}></input>
+                        <input type='color' onChange={(evt) => { setUpSetOptions({ color: evt.target.value }) }} value={upSetOptions.color}></input>
                     }
                 />
             </Stack>
         )
     }
 
-        if (visualization === 'Heatmap') {
+    if (visualization === 'Heatmap') {
         return (
             <Stack direction='row' spacing={2} sx={{ justifyContent: 'center', padding: 1 }}>
                 <FormControlLabel
@@ -184,6 +185,18 @@ export function AdditionalOptions({ visualization, umapOptions, setUmapOptions, 
                             checked={!heatmapOptions.diagonal}
                             onChange={(evt) => {
                                 setHeatmapOptions({ ...heatmapOptions, diagonal: !heatmapOptions.diagonal })
+                            }
+                            }
+                        />
+                    }
+                />
+                <FormControlLabel
+                    label="Annotation Text"
+                    control={
+                        <Checkbox
+                            checked={heatmapOptions.annotationText}
+                            onChange={(evt) => {
+                                setHeatmapOptions({ ...heatmapOptions, annotationText: !heatmapOptions.annotationText })
                             }
                             }
                         />

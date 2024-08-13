@@ -25,7 +25,7 @@ export type HeatmapProps = {
         otherSymbols: string[]
     }[];
     setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
-    heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean }
+    heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean, annotationText: boolean }
 };
 
 export type InteractionData = {

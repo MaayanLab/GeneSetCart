@@ -186,7 +186,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
     const [assignGroups, setAssignGroups] = React.useState(false)
     const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: assignGroups, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
-    const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: true, palette: 'viridis', fontSize: 12, disableLabels: false })
+    const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: true, palette: 'viridis', fontSize: 12, disableLabels: false, annotationText: false})
     const [vennOptions, setVennOptions] = React.useState({ palette: 'Viridis' })
     const [upSetOptions, setUpSetOptions] = React.useState({ color: '#000000' })
     const [debouncedUmapOptions] = useDebounce(umapOptions, 500); // Debounce after 500ms

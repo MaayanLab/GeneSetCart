@@ -14,7 +14,7 @@ type RendererProps = {
   setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>;
   colorScale: d3.ScaleSequential<string, never>;
   clusterClasses: { [key: string]: number };
-  heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean }
+  heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean, annotationText: boolean }
 };
 
 
@@ -58,7 +58,7 @@ export const Renderer = ({
   const allShapes = data.map((d, i) => {
     const x = xScale(d.x);
     const y = yScale(d.y);
-
+    console.log(<text x={x? + (0.5 * xScale.bandwidth()) : 0} y={y? (0.5 * yScale.bandwidth()) : 0}>{d.value.toFixed(2)}</text>  )
     if (d.value === null || !x || !y) {
       return;
     }
@@ -91,7 +91,8 @@ export const Renderer = ({
     }
 
     return (
-      <rect
+      <>
+        <rect
         key={i}
         x={xScale(d.x)}
         y={yScale(d.y)}
@@ -113,6 +114,8 @@ export const Renderer = ({
         onMouseDown={() => setOverlap({ name: d.x + ',' + d.y, overlapGenes: d.overlap })}
         cursor="pointer"
       />
+      {heatmapOptions.annotationText && <text x={x + 0.5 * xScale.bandwidth()} y={y + 0.5 * yScale.bandwidth()} dominant-baseline="middle" text-anchor="middle" fontSize={heatmapOptions.fontSize}>{d.value.toFixed(2)} </text> }  
+      </>
     );
   });
 

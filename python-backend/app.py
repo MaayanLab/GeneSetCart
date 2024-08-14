@@ -66,6 +66,18 @@ def jaccard_similarity_multiple(genesets_dict):
         all_sets_jaccard.append(jaccard_row)
     return all_sets_jaccard
 
+def overlap_multiple(genesets_dict):
+    all_sets_overlap = []
+    for outer_geneset in list(genesets_dict.keys()): 
+        overlap_row = []
+        for inner_geneset in list(genesets_dict.keys()):
+            outer_genesets_genes = set(genesets_dict[outer_geneset])
+            inner_genesets_genes = set(genesets_dict[inner_geneset]) 
+            overlap_genes = outer_genesets_genes.intersection(inner_genesets_genes)
+            overlap_row.append(len(overlap_genes))
+        all_sets_overlap.append(overlap_row)
+    return all_sets_overlap
+
 @app.route('/api/getUMAP', methods=['POST'])
 def calculateUMAP():
     data = request.get_json()
@@ -95,13 +107,15 @@ def createHeatmap():
         distance.pdist(correlations_array), method='average')
     col_linkage = linkage(
         distance.pdist(correlations_array.T), method='average')
+    if annotation_text == True: 
+        annotation_text = overlap_multiple(genesets_dict)
     if display_diagonal: 
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels), annot=annotation_text, fmt=".1f")
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels), annot=annotation_text, fmt='g')
     else: 
         np.fill_diagonal(a, 5)
         mask = np.where(a == 5, True, False)
         plt.clf()
-        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, mask=mask, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels), annot=annotation_text, fmt=".1f")
+        sns.clustermap(jindex_df, row_linkage=row_linkage, col_linkage=col_linkage, method="average", cmap=color_palette, mask=mask, vmin=0, yticklabels=not(disable_labels), xticklabels=not(disable_labels), annot=annotation_text, fmt='g')
     plt.rcParams["font.size"] = font_size
     # Save plot to a BytesIO object 
     img = io.BytesIO()

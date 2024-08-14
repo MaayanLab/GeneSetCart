@@ -114,7 +114,7 @@ export const Renderer = ({
         onMouseDown={() => setOverlap({ name: d.x + ',' + d.y, overlapGenes: d.overlap })}
         cursor="pointer"
       />
-      {heatmapOptions.annotationText && <text x={x + 0.5 * xScale.bandwidth()} y={y + 0.5 * yScale.bandwidth()} dominant-baseline="middle" text-anchor="middle" fontSize={heatmapOptions.fontSize}>{d.value.toFixed(2)} </text> }  
+      {heatmapOptions.annotationText && <text x={x + 0.5 * xScale.bandwidth()} y={y + 0.5 * yScale.bandwidth()} dominant-baseline="middle" text-anchor="middle" fontSize={heatmapOptions.fontSize}>{d.overlap.length} </text> }  
       </>
     );
   });

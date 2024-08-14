@@ -464,12 +464,12 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                 </Box>
                                 <Box sx={{ justifyContent: 'center' }}>
                                     <div className='flex justify-center' id="visualization" style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                                        {(visualization === 'Heatmap' && checked.length > 1 && heatmapOptions.interactive) && <Heatmap legendSelectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} width={700} height={700} setOverlap={setOverlap} />}
-                                        {(visualization === 'Heatmap' && checked.length > 1 && !heatmapOptions.interactive) && <ClusteredHeatmap selectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} />}
-                                        {visualization === 'Venn' && checked.length < 6 && checked.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} vennOptions={vennOptions} />}
-                                        {(visualization === 'SuperVenn' && checked.length < 11 && checked.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
-                                        {(visualization === 'UpSet' && checked.length < 11 && checked.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} upSetOptions={upSetOptions} />}
-                                        {(visualization === 'UMAP' && checked.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={debouncedUmapOptions} />}
+                                        {(visualization === 'Heatmap' && legendSelectedSets.length > 1 && heatmapOptions.interactive) && <Heatmap legendSelectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} width={700} height={700} setOverlap={setOverlap} />}
+                                        {(visualization === 'Heatmap' && legendSelectedSets.length > 1 && !heatmapOptions.interactive) && <ClusteredHeatmap selectedSets={legendSelectedSets} heatmapOptions={heatmapOptions} />}
+                                        {visualization === 'Venn' && legendSelectedSets.length < 6 && legendSelectedSets.length > 0 && <VennPlot selectedSets={legendSelectedSets} setOverlap={setOverlap} vennOptions={vennOptions} />}
+                                        {(visualization === 'SuperVenn' && legendSelectedSets.length < 11 && legendSelectedSets.length > 0) && <SuperVenn selectedSets={legendSelectedSets} />}
+                                        {(visualization === 'UpSet' && legendSelectedSets.length < 11 && legendSelectedSets.length > 0) && <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} upSetOptions={upSetOptions} />}
+                                        {(visualization === 'UMAP' && legendSelectedSets.length > 5) && <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={debouncedUmapOptions} />}
                                     </div>
                                 </Box>
                             </Stack>

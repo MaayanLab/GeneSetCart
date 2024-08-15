@@ -36,8 +36,7 @@ export const AxisBottom = ({
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fill='black'
-                fontSize={12}
-                // transform="rotate(-90)"
+                fontSize={16}
             >
                 UMAP-1
             </text>

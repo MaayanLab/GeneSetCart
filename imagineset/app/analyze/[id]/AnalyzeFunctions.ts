@@ -103,7 +103,6 @@ export async function getRummageoLink(genesetName: string, genes: string[]) {
 
 export async function getSigComLINCSId(genesetName: string, genes: string[]) {
     const LINCS_FIND_URL = 'https://maayanlab.cloud/sigcom-lincs/metadata-api/entities/find'
-    const genesString = genes.join('\n')
     const { data } = await axios.post(LINCS_FIND_URL, {
         'filter': {
             'where': {

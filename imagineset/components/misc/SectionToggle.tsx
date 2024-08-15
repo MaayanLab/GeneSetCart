@@ -67,6 +67,9 @@ export default function ColorToggleButton({ sessionId }: { sessionId: string }) 
             <ToggleButton value="/analyze" href={`/analyze/${sessionId}`}>
                 <Typography variant="nav" align='center'>ANALYZE</Typography>
             </ToggleButton>
+            <ToggleButton value="/report" href={`/report/${sessionId}`}>
+                <Typography variant="nav" align='center'>GENERATE REPORT</Typography>
+            </ToggleButton>
         </ToggleButtonGroup>
 
     );

@@ -32,7 +32,7 @@ export const AxisLeft = ({ yScale, pixelsPerTick, width }: AxisLeftProps) => {
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fill='black'
-                fontSize={12}
+                fontSize={16}
                 transform="rotate(-90)"
             >
                 UMAP-2

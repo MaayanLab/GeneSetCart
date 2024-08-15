@@ -7,22 +7,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Gene } from '@prisma/client';
+import { Gene, GeneSet } from '@prisma/client';
 import { Typography, Container, Grid, TableFooter, TablePagination } from "@mui/material";
 import { DeleteBtn, SplitButton, ViewGenesBtn } from "@/app/analyze/[id]/ViewGenesBtn";
 
 export default function PaginatedTable({ rows }: {
     rows: ({
         genes: Gene[];
-    } & {
-        id: string;
-        name: string;
-        description: string | null;
-        session_id: string;
-        createdAt: Date;
-        isHumanGenes: boolean;
-        otherSymbols: string[]
-    })[]
+    } & GeneSet)[]
 }) {
 
     const [page, setPage] = React.useState(0)

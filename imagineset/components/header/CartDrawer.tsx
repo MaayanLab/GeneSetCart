@@ -111,7 +111,7 @@ const DrawerInfo = ({ genesets, sessionId, sessionName }: {
     const downloadSessionSets = () => {
         let gmtContent = "data:text/gmt;charset=utf-8," 
         + genesets?.map((gene_set, index) => {
-            const genes = gene_set?.genes.map((gene) => gene.gene_symbol)
+            const genes = gene_set.isHumanGenes ? gene_set?.genes.map((gene) => gene.gene_symbol) : gene_set.otherSymbols
             const GMTInfo = (index === 0) ? gene_set?.name + '\t' + genes?.join('\t') : '\n' + gene_set?.name + '\t' + genes?.join('\t')
             return GMTInfo
         })
@@ -156,15 +156,7 @@ export default function CartDrawer({ sessionInfo }: {
         session_name: string | null;
         gene_sets: ({
             genes: Gene[];
-        } & {
-            id: string;
-            name: string;
-            description: string | null;
-            session_id: string;
-            createdAt: Date;
-            isHumanGenes: boolean; 
-            otherSymbols: string[];
-        })[];
+        } & GeneSet)[];
     } | null
 }) {
 

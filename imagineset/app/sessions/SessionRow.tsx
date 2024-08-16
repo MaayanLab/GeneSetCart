@@ -34,7 +34,7 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
     const downloadSessionSets = () => {
         let gmtContent = "data:text/gmt;charset=utf-8," 
         + session.genesets_full.map((gene_set, index) => {
-            const genes = gene_set?.genes.map((gene) => gene.gene_symbol)
+            const genes = gene_set?.isHumanGenes ? gene_set?.genes.map((gene) => gene.gene_symbol) : gene_set?.otherSymbols
             const GMTInfo = (index === 0) ? gene_set?.name + '\t' + genes?.join('\t') : '\n' + gene_set?.name + '\t' + genes?.join('\t')
             return GMTInfo
         })

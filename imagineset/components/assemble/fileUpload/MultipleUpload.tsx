@@ -28,7 +28,8 @@ export default function MultipleUpload() {
                         const genesets = reader.result.toString()
                             .split('\n')
                             .map((row, i) => { return { id: i, genesetName: row.split('\t', 1)[0], genes: row.split('\t').slice(1) } })
-                        setGmtGenesets(genesets)
+                        const filteredGenesets = genesets.filter((set)=> set.genesetName !== '' || set.genes.length !== 0)
+                        setGmtGenesets(filteredGenesets)
                     }
                 },
                 false,

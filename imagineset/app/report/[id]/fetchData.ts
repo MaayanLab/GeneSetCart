@@ -3,6 +3,7 @@ import { Gene, GeneSet } from "@prisma/client";
 import axios from "axios";
 import { analysisOptions } from "./ReportLayout";
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function getAnalysisData(selectedSets: ({
     genes: Gene[];
@@ -20,13 +21,13 @@ export async function getAnalysisData(selectedSets: ({
             const keaResults = await getKEA3Results(genes, geneset.name)
             const meanRank10 = keaResults['Integrated--meanRank'].slice(0, 10)
             const topRank10 = keaResults['Integrated--topRank'].slice(0, 10)
-            genesetResults['keaResults'] = {meanRank: meanRank10, topRank: topRank10}
+            genesetResults['keaResults'] = { meanRank: meanRank10, topRank: topRank10 }
         }
         if (analysisOptions.chea) {
             const cheaResults = await getChEAResults(genes, geneset.name)
             const meanRank10 = cheaResults['Integrated--meanRank'].slice(0, 10)
             const topRank10 = cheaResults['Integrated--topRank'].slice(0, 10)
-            genesetResults['cheaResults'] = {meanRank: meanRank10, topRank: topRank10}
+            genesetResults['cheaResults'] = { meanRank: meanRank10, topRank: topRank10 }
         }
         if (analysisOptions.sigcom) {
             const sigcomResults = await getSigComLINCSResults(genes, geneset.name)
@@ -43,6 +44,11 @@ export async function getAnalysisData(selectedSets: ({
         analysisResults[geneset.id] = genesetResults
     }))
 
+    let genesetDict: { [key: string]: string[] } = {}
+    selectedSets.forEach((set) => {
+        genesetDict[set.name] = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
+    })
+    analysisResults['overlappingGenes'] = getGMTOverlap(genesetDict)
     return analysisResults
 }
 
@@ -63,7 +69,6 @@ async function getEnrichrResults(genes: string[], term: string) {
     // const libraries = ['WikiPathway_2023_Human', 'GWAS_Catalog_2023', 'GO_Biological_Process_2023', 'MGI_Mammalian_Phenotype_Level_4_2021',]
     const libraries = ['WikiPathway_2023_Human', 'GO_Biological_Process_2023']
 
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
     let libResults: { [key: string]: any[] } = {}
     for (let lib of libraries) {
         const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}`)
@@ -79,7 +84,7 @@ async function getEnrichrResults(genes: string[], term: string) {
             libResults[lib] = topResults
         }
     }
-    return {libResults: libResults, shortId: shortId}
+    return { libResults: libResults, shortId: shortId }
 }
 
 async function getKEA3Results(genes: string[], term: string) {
@@ -92,8 +97,18 @@ async function getKEA3Results(genes: string[], term: string) {
         method: 'POST',
         body: JSON.stringify(payload)
     });
-    const data = await response.text()
-    return JSON.parse(data)
+    if (response.status === 200) {
+        const data = await response.text()
+        return JSON.parse(data)
+    } else {
+        await sleep(5)
+        const response = await fetch(KEA_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const data = await response.text()
+        return JSON.parse(data)
+    }
 }
 
 async function getChEAResults(genes: string[], term: string) {
@@ -106,9 +121,18 @@ async function getChEAResults(genes: string[], term: string) {
         method: 'POST',
         body: JSON.stringify(payload)
     });
-    const data = await response.json()
-    return data
-
+    if (response.status === 200) {
+        const data = await response.json()
+        return data
+    } else {
+        await sleep(5)
+        const response = await fetch(CHEA_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json()
+        return data
+    }
 }
 
 async function getSigComLINCSResults(genes: string[], term: string) {
@@ -158,4 +182,27 @@ async function getSigComLINCSResults(genes: string[], term: string) {
     return sigcomLink
 }
 
+export type overlapArray = {
+    geneset1: string,
+    geneset2: string,
+    overlapGenes: string[]
+}
 
+function getGMTOverlap(genesetsObject: { [key: string]: string[] }) {
+    let overlapAll: overlapArray[] = []
+    const genesetNames = Object.keys(genesetsObject)
+    for (let geneset1 of genesetNames) {
+        for (let geneset2 of genesetNames) {
+            if (geneset1 !== geneset2) {
+                const genes1 = genesetsObject[geneset1]
+                const genes2 = genesetsObject[geneset2]
+                const overlap = genes1.filter(x => genes2.includes(x))
+                if (overlap.length <= 10) {
+                    overlapAll.push({ geneset1: geneset1, geneset2: geneset2, overlapGenes: overlap })
+                }
+            }
+
+        }
+    }
+    return overlapAll
+}

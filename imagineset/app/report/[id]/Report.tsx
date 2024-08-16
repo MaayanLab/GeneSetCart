@@ -15,6 +15,8 @@ import { getAnalysisData } from './fetchData';
 import dynamic from 'next/dynamic';
 import { BarChart, CHEABarChart, EnrichrResults, KEABarChart } from './AnalysisFigures';
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
+import BasicTable from './OverlapTable';
+import { StaticVenn } from '@/components/visualize/PlotComponents/Venn/StaticVenn';
 
 
 // Visualization of overlap between selected gene sets
@@ -24,26 +26,24 @@ import { analysisOptions, visualizationOptions } from "./ReportLayout";
 // Rummagene and RummaGEO links
 // GPT generated text
 // Download report from G2SG as .pdf file
-export default function Report({ selectedSets, checked, sessionId, visualizationOptions, analysisOptions, disabledOptions, setLoading }: {
+export default function Report({ selectedSets, checked, sessionId, visualizationOptions, disabledOptions, analysisData, analysisOptions}: {
     selectedSets: ({
         genes: Gene[];
     } & GeneSet)[],
     checked: number[],
     sessionId: string,
     visualizationOptions: visualizationOptions,
-    analysisOptions: analysisOptions,
     disabledOptions: visualizationOptions,
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>
+    analysisData: any, 
+    analysisOptions: analysisOptions
 
 }) {
 
 
-    const [heatmapOptions, setHeatmapOptions] = React.useState({ diagonal: false, interactive: true, palette: 'viridis', fontSize: 9, disableLabels: false, annotationText: false })
-    const [umapOptions, setUmapOptions] = React.useState<UMAPOptionsType>({ assignGroups: false, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 })
-    const [vennOptions, setVennOptions] = React.useState({ palette: 'Viridis' })
-    const [upSetOptions, setUpSetOptions] = React.useState({ color: '#000000' })
+    const heatmapOptions = { diagonal: false, interactive: true, palette: 'viridis', fontSize: 11, disableLabels: false, annotationText: false }
+    const umapOptions = { assignGroups: false, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 }
+    const upSetOptions = { color: '#000000' }
     const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
-    const [analysisData, setAnalysisData] = React.useState<any>({})
     const legendSelectedSets = React.useMemo(() => {
         return selectedSets.map((set, i) => {
             if (selectedSets.length > 26) {
@@ -52,37 +52,9 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                 return { ...set, alphabet: alphabet[i] }
             }
         })
-
-        // if (selectedSets) {
-        //     if (selectedSets.length > 26) {
-        //         const dataArrays = selectedSets.map((geneset, i) => {
-        //             const newSet = { ...geneset, 'alphabet': '' }
-        //             newSet['alphabet'] = geneset.name
-        //             return newSet
-        //         })
-        //         if (selectedSets.length > 40) {
-        //             setHeatmapOptions({ ...heatmapOptions, disableLabels: true })
-        //         }
-        //         return dataArrays
-        //     } else {
-        //         const dataArrays = selectedSets.map((geneset, i) => {
-        //             const newSet = { ...geneset, 'alphabet': '' }
-        //             newSet['alphabet'] = geneset.name
-        //             return newSet
-        //         })
-        //         return dataArrays
-        //     }
-        // } else {
-        //     return []
-        // }
     }, [selectedSets])
 
-    React.useEffect(() => {
-        getAnalysisData(selectedSets, analysisOptions).then((result) => {
-            setAnalysisData(result)
-            setLoading(false)
-        })
-    }, [selectedSets])
+
 
     const componentRef = React.useRef<HTMLDivElement>(null);
 
@@ -99,7 +71,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                     <Typography variant="h4" color="secondary.dark" sx={{ padding: 3 }}>G2SG Report</Typography>
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VISUALIZATION OF OVERLAP</Typography>
                     {(visualizationOptions.heatmap && !disabledOptions.heatmap) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack direction='column'>
+                        <Stack direction='column' style={{ breakInside: 'avoid' }}>
                             <ClusteredHeatmap selectedSets={legendSelectedSets.map((set, i) => {
                                 return { ...set, alphabet: set.name }
                             })}
@@ -113,22 +85,23 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                     </div>
                     }
                     {(visualizationOptions.venn && !disabledOptions.venn) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack direction='column' justifyContent={'center'}>
-                            <div style={{ minHeight: '80%'}} className='flex justify-center'>
-                                <VennPlot
+                        <Stack direction='column' justifyContent={'center'} style={{ breakInside: 'avoid' }}>
+                            {/* <div style={{ minHeight: '80%' }} > */}
+                                {/* <VennPlot
                                     selectedSets={legendSelectedSets}
                                     setOverlap={setOverlap}
-                                    vennOptions={vennOptions} />
-                            </div>
+                                    vennOptions={vennOptions} /> */}
+                                <StaticVenn selectedSets={legendSelectedSets} />
+                            {/* </div> */}
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                                <strong>Figure 1.</strong> Overlap between the selected gene sets. {legendSelectedSets.map((set) => (set.alphabet) + ': ' + set.name + '; ')}.
+                                <strong>Figure 1.</strong> Overlap between the selected gene sets.
                                 This figure contains a venn diagram showing the overlap between the gene sets with the number of overlapping genes in each intersection.
                                 Visualization from: <Link color='secondary'>https://g2sg.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Venn</Link>
                             </Typography>
                         </Stack>
                     </div>}
                     {(visualizationOptions.supervenn && !disabledOptions.supervenn) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack direction='column'>
+                        <Stack direction='column' style={{ breakInside: 'avoid' }}>
                             <div style={{ minHeight: '80%' }} className='flex justify-center'>
                                 <StaticSuperVenn selectedSets={legendSelectedSets.map((set, i) => {
                                     return { ...set, alphabet: set.name }
@@ -142,19 +115,19 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                         </Stack>
                     </div>}
                     {(visualizationOptions.upset && !disabledOptions.upset) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack direction='column'>
+                        <Stack direction='column' style={{ breakInside: 'avoid' }}>
                             <div style={{ minHeight: '80%' }} className='flex justify-center'>
                                 <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} upSetOptions={upSetOptions} />
                             </div>
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                                <strong>Figure 1.</strong> Overlap between the selected gene sets. {legendSelectedSets.map((set) => (set.alphabet) + ': ' + set.name)}.
+                                <strong>Figure 1.</strong> Overlap between the selected gene sets. {legendSelectedSets.map((set) => (set.alphabet) + ': ' + set.name + '; ')}.
                                 This figure contains a venn diagram showing the overlap between the gene sets with the number of overlapping genes in each intersection.
                                 Visualization from: <Link color='secondary'>https://g2sg.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UpSet</Link>
                             </Typography>
                         </Stack>
                     </div>}
                     {(visualizationOptions.umap && !disabledOptions.umap) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack>
+                        <Stack style={{ breakInside: 'avoid' }}>
                             <div style={{ minHeight: '80%' }} className='flex justify-center'>
                                 <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={umapOptions} />
                             </div>
@@ -165,11 +138,14 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             </Typography>
                         </Stack>
                     </div>}
+                    <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>OVERLAPPING GENES</Typography>
+                    <Box sx={{ padding: 3 }}>
+                        <BasicTable rows={analysisData['overlappingGenes'] ? analysisData['overlappingGenes'] : []} />
+                    </Box>
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>ANALYSIS LINKS</Typography>
-
                     <List sx={{ listStyle: "decimal", marginLeft: 3 }}>
-                        {selectedSets.map((geneset) =>
-                            <ListItem sx={{ display: "list-item" }}>
+                        {selectedSets.map((geneset, i) =>
+                            <ListItem sx={{ display: "list-item" }} key={i}>
                                 {geneset.name} ({geneset.genes.length})
                                 <Stack direction='column'>
                                     {(analysisData[geneset.id] && analysisOptions.enrichr) &&
@@ -206,8 +182,8 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                         </Stack>
                                     }
                                 </Stack>
-                                <List sx={{ listStyleType: 'disc' }}>
-                                {(analysisData[geneset.id] && analysisOptions.sigcom) &&
+                                <List sx={{ listStyleType: 'disc', marginLeft: 5 }}>
+                                    {(analysisData[geneset.id] && analysisOptions.sigcom) &&
                                         <ListItem sx={{ display: 'list-item' }}>
                                             SigCom LINCS Link: <Link color='secondary'>{analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''}</Link>
                                         </ListItem>

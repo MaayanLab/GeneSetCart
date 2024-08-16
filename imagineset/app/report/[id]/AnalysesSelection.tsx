@@ -22,7 +22,7 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
     }) {
     return (
         <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
-            <Tooltip title={"Can visualize 1 - 5 selected sets"} placement="top">
+            <Tooltip title={"Can visualize 2 - 5 selected sets"} placement="top">
                 <div>
                     <Button variant='outlined' color={visualizationOptions.venn ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
                         onClick={(event) => setVisualizationOptions({ ...visualizationOptions, venn: !visualizationOptions.venn })} disabled={disabledVisualizations.venn}
@@ -51,7 +51,7 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
                     </Button>
                 </div>
             </Tooltip>
-            <Tooltip title={"Can visualize 1 - 10 selected sets"} placement="top">
+            <Tooltip title={"Can visualize 1 - 6 selected sets"} placement="top">
                 <div>
                     <Button variant='outlined' color={visualizationOptions.upset ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
                         onClick={(event) => setVisualizationOptions({ ...visualizationOptions, upset: !visualizationOptions.upset })} disabled={disabledVisualizations.upset}

@@ -1,19 +1,18 @@
 import React from "react";
-import Plotly from "plotly.js";
-import createPlotlyComponent from "react-plotly.js/factory";
 import { Stack } from "@mui/material";
-const Plot = createPlotlyComponent(Plotly);
+import Plot from 'react-plotly.js';
 
 
 export function BarChart({ terms, pvalues, library, order, markerOptions }: { terms: string[], pvalues: number[], library: string, order: string, markerOptions: any }) {
     const data: any =
         [
-            { type: 'bar', 
-            x: pvalues, 
-            y: terms, orientation: 'h', 
-            text: terms.map(String),
-            marker: markerOptions
-        },
+            {
+                type: 'bar',
+                x: pvalues,
+                y: terms, orientation: 'h',
+                text: terms.map(String),
+                marker: markerOptions
+            },
         ]
     const layout = {
         title: library,
@@ -42,20 +41,22 @@ export function StackedBarChart({ plotData, title }: { plotData: any, title: str
 export function EnrichrResults({ data }: { data: any }) {
     const libraries = ['WikiPathway_2023_Human', 'GO_Biological_Process_2023']
     // const libraries = ['WikiPathway_2023_Human', 'GWAS_Catalog_2023', 'GO_Biological_Process_2023', 'MGI_Mammalian_Phenotype_Level_4_2021',]
-    const barPlots = libraries.map((library) => {
+    const barPlots = libraries.map((library, i) => {
         const libraryData = data[library]
         const terms = libraryData.map((enrichedTermResult: any[]) => enrichedTermResult[1])
         const pvalues = libraryData.map((enrichedTermResult: any[]) => enrichedTermResult[2])
-        const markerOptions =  {
+        const markerOptions = {
             color: 'rgb(245, 87, 66)',
             opacity: 0.6,
             line: {
-              color: 'rgb(176, 73, 60)',
-              width: 1.5
+                color: 'rgb(176, 73, 60)',
+                width: 1.5
             }
         }
         return (
-            <BarChart terms={terms.map((terms: string, i: number) => {return terms + ' (p=' + pvalues[i].toExponential(2).toString() + ')' })} pvalues={pvalues.map((pvalue: number) => -Math.log10(pvalue))} library={library} order={"total ascending"} markerOptions={markerOptions} />
+            <div style={{ breakInside: 'avoid' }} key={i}>
+                <BarChart terms={terms.map((terms: string, i: number) => { return terms + ' (p=' + pvalues[i].toExponential(2).toString() + ')' })} pvalues={pvalues.map((pvalue: number) => -Math.log10(pvalue))} library={library} order={"total ascending"} markerOptions={markerOptions} />
+            </div>
         )
     }
     )
@@ -85,18 +86,22 @@ export function KEABarChart({ data }: { data: any }) {
         }
 
     })
-    const markerOptions =  {
+    const markerOptions = {
         color: 'rgb(158,202,225)',
         opacity: 0.6,
         line: {
-          color: 'rgb(8,48,107)',
-          width: 1.5
+            color: 'rgb(8,48,107)',
+            width: 1.5
         }
     }
     return (
         <Stack direction='column'>
-            <BarChart terms={topRankTerms} pvalues={topRankScores} library={'TopRank Score'} order={"total descending"} markerOptions={markerOptions}/>
-            <StackedBarChart plotData={stackedChartData} title={'MeanRank Score'} />
+            <div style={{ breakInside: 'avoid' }}>
+                <BarChart terms={topRankTerms} pvalues={topRankScores} library={'TopRank Score'} order={"total descending"} markerOptions={markerOptions} />
+            </div>
+            <div style={{ breakInside: 'avoid' }}>
+                <StackedBarChart plotData={stackedChartData} title={'MeanRank Score'} />
+            </div>
         </Stack>
     )
 }
@@ -112,7 +117,7 @@ export function CHEABarChart({ data }: { data: any }) {
             rankData[libInfo.split(',')[0] as string].push(parseInt(libInfo.split(',')[1]))
         })
         sources.forEach((source) => {
-            if (!presentLibs.includes(source)){
+            if (!presentLibs.includes(source)) {
                 rankData[source].push(0)
             }
         })
@@ -129,7 +134,9 @@ export function CHEABarChart({ data }: { data: any }) {
         }
     })
     return (
-        <StackedBarChart plotData={stackedChartData} title={'MeanRank Score'} />
+        <div style={{ breakInside: 'avoid' }}>
+            <StackedBarChart plotData={stackedChartData} title={'MeanRank Score'} />
+        </div>
     )
 }
 

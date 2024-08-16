@@ -64,3 +64,19 @@ export async function getSuperVenn(genesetDict: {[key: string]: string[]}){
     const response = await req.text()
     return response
 }
+
+export async function getVenn(genesetDict: {
+    [key: string]: string[];
+}){
+    const API_BASE_URL = process.env.PYTHON_API_BASE
+    if (!API_BASE_URL) throw new Error('API_BASE_URL not found') 
+    const req = await fetch(API_BASE_URL + '/api/get_venn', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 'genesets_dict': genesetDict }),
+    })
+    const response = await req.text()
+    return response
+}

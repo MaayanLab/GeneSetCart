@@ -22,8 +22,6 @@ export async function generateGPTSummary(overlapInfo: overlapArray[]) {
     Do not include 'Hypothesis: ' at the beginning of your response and 
     limit your response to about 12 sentences.
     `
-
-    console.log(input)
     try {
         const openaiKey = process.env.OPENAI_API_KEY
         if (!openaiKey) throw new Error('no OPENAI_API_KEY')

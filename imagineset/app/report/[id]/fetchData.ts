@@ -50,8 +50,10 @@ export async function getAnalysisData(selectedSets: ({
         genesetDict[set.name] = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
     })
     analysisResults['overlappingGenes'] = getGMTOverlap(genesetDict)
-    const gptSummary = await generateGPTSummary(analysisResults['overlappingGenes'])
-    analysisResults['gptSummary'] = gptSummary.response
+    if (analysisResults['overlappingGenes'].length > 0) {
+        const gptSummary = await generateGPTSummary(analysisResults['overlappingGenes'])
+        analysisResults['gptSummary'] = gptSummary.response
+    }
     return analysisResults
 }
 

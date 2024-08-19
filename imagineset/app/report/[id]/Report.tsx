@@ -1,14 +1,12 @@
 import React from 'react';
-import { Heatmap } from '@/components/visualize/PlotComponents/Heatmap/InteractiveHeatmap';
 import { Box, Button, Link, List, ListItem, Stack, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { Gene, GeneSet } from '@prisma/client';
-import { OverlapSelection, UMAPOptionsType, alphabet } from '@/app/visualize/[id]/VisualizeLayout';
+import { OverlapSelection, alphabet } from '@/app/visualize/[id]/VisualizeLayout';
 import { ClusteredHeatmap } from '@/components/visualize/PlotComponents/Heatmap/StaticHeatmap';
-import VennPlot from '@/components/visualize/PlotComponents/Venn/Venn';
 import { UpsetPlotV2 } from '@/components/visualize/PlotComponents/UpSet/Upset';
 import { UMAP } from '@/components/visualize/PlotComponents/Umap/Umap';
-import ReactToPrint, { useReactToPrint } from "react-to-print";
+import ReactToPrint from "react-to-print";
 import { StaticSuperVenn } from '@/components/visualize/PlotComponents/SuperVenn/StaticSuperVenn';
 import DownloadIcon from '@mui/icons-material/Download';
 import { getNumbering } from './fetchData';
@@ -107,7 +105,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             </div>
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.upset}.</strong> Overlap between the selected gene sets. {legendSelectedSets.map((set) => (set.alphabet) + ': ' + set.name + '; ')}.
-                                This figure contains a venn diagram showing the overlap between the gene sets with the number of overlapping genes in each intersection.
+                                This figure contains an UpSet plot showing the overlap between the gene sets with the number of overlapping genes in each intersection.
                                 Visualization from: <Link color='secondary'>https://g2sg.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UpSet</Link>
                             </Typography>
                         </Stack>
@@ -150,7 +148,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                             <Typography variant="h5" color="secondary.dark">{alphabet[analysisLegends.kea]}. Kinase Enrichment Analysis</Typography>
                                             <KEABarChart data={analysisData[geneset.id]['keaResults']} />
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                                                <strong>Figure {figureLegends.kea[i]}.</strong> Kinase enrichement analysis results of the {geneset.name} gene set showing top 10 ranked kinases
+                                                <strong>Figure {figureLegends.kea[i]}.</strong> Kinase enrichment analysis results of the {geneset.name} gene set showing top 10 ranked kinases
                                                 across libraries based on two different metrics. The MeanRank bar chart is color-coded by
                                                 library; hover over a colored bar segment to view individual library rankings for a given kinase.
                                                 The TopRank bar chart displays the TopRank score for each of the top-ranking kinases.
@@ -162,7 +160,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                             <Typography variant="h5" color="secondary.dark">{alphabet[analysisLegends.chea]}. Transciption Factor Enrichment Analysis</Typography>
                                             <CHEABarChart data={analysisData[geneset.id]['cheaResults']} />
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                                                <strong>Figure {figureLegends.chea[i]}.</strong> Transcription factor enrichement analysis results of the {geneset.name} gene set showing top 10 ranked TFs
+                                                <strong>Figure {figureLegends.chea[i]}.</strong> Transcription factor enrichment analysis results of the {geneset.name} gene set showing top 10 ranked TFs
                                                 across libraries.
                                             </Typography>
                                         </Stack>
@@ -188,10 +186,14 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             </ListItem>
                         )}
                     </List>
-                    <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>GPT GENERATED SUMMARY</Typography>
-                    <Typography variant='body2' color='black' sx={{ marginLeft: 5, marginTop: 1 }}>
-                        {analysisData['gptSummary']}
-                    </Typography>
+                    {analysisData.gptSummary &&
+                        <Box sx={{ marginLeft: 3, marginTop: 2 }}>
+                            <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1 }}>GPT GENERATED SUMMARY</Typography>
+                            <Typography variant='body2' color='black' sx={{ marginLeft: 3, marginTop: 1 }}>
+                                {analysisData['gptSummary']}
+                            </Typography>
+                        </Box>
+                    }
                 </Paper>
             </div>
         </>

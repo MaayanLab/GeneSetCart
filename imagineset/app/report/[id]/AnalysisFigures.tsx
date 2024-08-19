@@ -3,14 +3,14 @@ import { Stack } from "@mui/material";
 import Plot from 'react-plotly.js';
 
 
-export function BarChart({ terms, pvalues, library, order, markerOptions }: { terms: string[], pvalues: number[], library: string, order: string, markerOptions: any }) {
+export function BarChart({ terms, pvalues, library, order, markerOptions, xTitle, yTitle }: { terms: string[], pvalues: number[], library: string, order: string, markerOptions: any, xTitle: string, yTitle: string }) {
     const data: any =
         [
             {
                 type: 'bar',
                 x: pvalues,
                 y: terms, orientation: 'h',
-                text: terms,
+                text: terms.map((term)=> formatPlotText(term)),
                 marker: markerOptions,
             },
         ]
@@ -18,19 +18,42 @@ export function BarChart({ terms, pvalues, library, order, markerOptions }: { te
         title: library,
         yaxis: {
             showticklabels: false,
-            categoryorder: order as any
+            categoryorder: order as any,
+            title: {
+                text: yTitle,
+                font: {
+                    size: 18,
+                }
+            }
+        },
+        xaxis: {
+            title: {
+                text: xTitle,
+                font: {
+                    size: 14,
+                }
+            },
         }
     };
 
     return <Plot data={data} layout={layout} />;
 }
 
-export function StackedBarChart({ plotData, title }: { plotData: any, title: string }) {
+export function StackedBarChart({ plotData, title, xTitle, yTitle }: { plotData: any, title: string, xTitle: string, yTitle: string }) {
     const data = plotData
     const layout = {
         title: title,
         yaxis: {
-            categoryorder: "total descending" as any
+            categoryorder: "total descending" as any,
+            yTitle: yTitle
+        },
+        xaxis: {
+            title: {
+                text: xTitle,
+                font: {
+                    size: 14,
+                }
+            },
         },
         barmode: 'stack' as any
     };
@@ -55,7 +78,15 @@ export function EnrichrResults({ data }: { data: any }) {
         }
         return (
             <div style={{ breakInside: 'avoid' }} key={i}>
-                <BarChart terms={terms.map((terms: string, i: number) => { return terms + ' (p=' + pvalues[i].toExponential(2).toString() + ')' })} pvalues={pvalues.map((pvalue: number) => -Math.log10(pvalue))} library={library} order={"total ascending"} markerOptions={markerOptions} />
+                <BarChart terms={terms.map((terms: string, i: number) => {
+                    return terms + ' (p=' + pvalues[i].toExponential(2).toString() + ')'
+                })}
+                    pvalues={pvalues.map((pvalue: number) => -Math.log10(pvalue))}
+                    library={library} order={"total ascending"}
+                    markerOptions={markerOptions}
+                    xTitle="-Log(P-value)"
+                    yTitle=""
+                />
             </div>
         )
     }
@@ -97,10 +128,10 @@ export function KEABarChart({ data }: { data: any }) {
     return (
         <Stack direction='column'>
             <div style={{ breakInside: 'avoid' }}>
-                <BarChart terms={topRankTerms} pvalues={topRankScores} library={'TopRank Score'} order={"total descending"} markerOptions={markerOptions} />
+                <BarChart terms={topRankTerms} pvalues={topRankScores} library={'TopRank Score'} order={"total descending"} markerOptions={markerOptions} xTitle="TopRank Score" yTitle="" />
             </div>
             <div style={{ breakInside: 'avoid' }}>
-                <StackedBarChart plotData={stackedChartData} title={'MeanRank Score'} />
+                <StackedBarChart plotData={stackedChartData} title={'MeanRank Score'} xTitle={'Sum of Ranks'} yTitle="" />
             </div>
         </Stack>
     )
@@ -135,11 +166,11 @@ export function CHEABarChart({ data }: { data: any }) {
     })
     return (
         <div style={{ breakInside: 'avoid' }}>
-            <StackedBarChart plotData={stackedChartData} title={'MeanRank Score'} />
+            <StackedBarChart plotData={stackedChartData} title={'MeanRank Score'}  xTitle="Sum of Ranks" yTitle=''/>
         </div>
     )
 }
 
-function formatPlotText(text: string){
-    return text.substring(0, 50) + '</br>' + text.substring(50)
+function formatPlotText(text: string) {
+    return text.substring(0, 60) + '<br>' + text.substring(60)
 }

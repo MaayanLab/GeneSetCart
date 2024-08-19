@@ -14,7 +14,7 @@ export default function BasicTable({ rows }: { rows: overlapArray[] }) {
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Set 1</TableCell>
+                        <TableCell align="center">Set 1</TableCell>
                         <TableCell align="center">Set 2</TableCell>
                         <TableCell align="center">nOverlap</TableCell>
                         <TableCell align="center">Genes</TableCell>
@@ -26,12 +26,10 @@ export default function BasicTable({ rows }: { rows: overlapArray[] }) {
                             key={i}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
-                            <TableCell component="th" scope="row">
-                                {row.geneset1}
-                            </TableCell>
-                            <TableCell align="right">{row.geneset2}</TableCell>
-                            <TableCell align="right">{row.overlapGenes.length}</TableCell>
-                            <TableCell align="right">{row.overlapGenes.join(', ')}</TableCell>
+                            <TableCell align="center">{row.geneset1}</TableCell>
+                            <TableCell align="center">{row.geneset2}</TableCell>
+                            <TableCell align="center">{row.overlapGenes.length}</TableCell>
+                            <TableCell align="center">{row.overlapGenes.join(', ')}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

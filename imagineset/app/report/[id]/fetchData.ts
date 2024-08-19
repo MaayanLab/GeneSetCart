@@ -1,7 +1,8 @@
 import { getRummageneLink, getRummageoLink } from "@/app/analyze/[id]/AnalyzeFunctions";
 import { Gene, GeneSet } from "@prisma/client";
 import axios from "axios";
-import { analysisOptions } from "./ReportLayout";
+import { analysisOptions, visualizationOptions } from "./ReportLayout";
+import { generateGPTSummary } from "./gptSummary";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -49,6 +50,8 @@ export async function getAnalysisData(selectedSets: ({
         genesetDict[set.name] = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
     })
     analysisResults['overlappingGenes'] = getGMTOverlap(genesetDict)
+    const gptSummary = await generateGPTSummary(analysisResults['overlappingGenes'])
+    analysisResults['gptSummary'] = gptSummary.response
     return analysisResults
 }
 
@@ -190,19 +193,77 @@ export type overlapArray = {
 
 function getGMTOverlap(genesetsObject: { [key: string]: string[] }) {
     let overlapAll: overlapArray[] = []
+    let completedPairs : string[] = []
     const genesetNames = Object.keys(genesetsObject)
     for (let geneset1 of genesetNames) {
         for (let geneset2 of genesetNames) {
             if (geneset1 !== geneset2) {
-                const genes1 = genesetsObject[geneset1]
-                const genes2 = genesetsObject[geneset2]
-                const overlap = genes1.filter(x => genes2.includes(x))
-                if (overlap.length <= 10) {
-                    overlapAll.push({ geneset1: geneset1, geneset2: geneset2, overlapGenes: overlap })
+                if (!(completedPairs.includes([geneset1, geneset2].toString()) || completedPairs.includes([geneset2, geneset1].toString()))){
+                    const genes1 = genesetsObject[geneset1]
+                    const genes2 = genesetsObject[geneset2]
+                    const overlap = genes1.filter(x => genes2.includes(x))
+                    if (overlap.length <= 10) {
+                        overlapAll.push({ geneset1: geneset1, geneset2: geneset2, overlapGenes: overlap })
+                        completedPairs.push([geneset1, geneset2].toString())
+                    }
                 }
             }
-
         }
     }
     return overlapAll
+}
+
+export function getNumbering(visualizationOptions: visualizationOptions, analysisOptions: analysisOptions, disabledOptions: visualizationOptions, selectedSetsCount: number) {
+    const figureLegends : {[key: string]:  any }= { 'venn': 0, 'supervenn': 0, 'upset': 0, 'heatmap': 0, 'umap': 0, 'enrichr': [], 'kea': [], 'chea': [] }
+    const analysisLegends = {'enrichr': 0, 'kea': 0, 'chea': 0 }
+    let current = 1
+    let analysisCurrent = 0
+    if (visualizationOptions.heatmap && !disabledOptions.heatmap) {
+        figureLegends.heatmap = current
+        current += 1
+    }
+    if (visualizationOptions.venn && !disabledOptions.venn) {
+        figureLegends.venn = current
+        current += 1
+    }
+    if (visualizationOptions.supervenn && !disabledOptions.supervenn) {
+        figureLegends.supervenn = current
+        current += 1
+    }
+    if (visualizationOptions.upset && !disabledOptions.upset) {
+        figureLegends.upset = current
+        current += 1
+    }
+
+    if (visualizationOptions.umap && !disabledOptions.umap) {
+        figureLegends.umap = current
+        current += 1
+    }
+    for (let i = 0; i < selectedSetsCount; i++) {
+        if (analysisOptions.enrichr) {
+            figureLegends.enrichr.push(current)
+            current += 1
+            if (i === 0 ){
+                analysisLegends.enrichr = analysisCurrent
+                analysisCurrent += 1
+            }
+        }
+        if (analysisOptions.kea) {
+            figureLegends.kea.push(current)
+            current += 1
+            if (i === 0 ){
+            analysisLegends.kea = analysisCurrent
+            analysisCurrent += 1
+            }
+        }
+        if (analysisOptions.chea) {
+            figureLegends.chea.push(current)
+            current += 1
+            if (i === 0 ){
+            analysisLegends.chea = analysisCurrent
+            analysisCurrent += 1
+            }
+        }
+    }
+    return {figureLegends: figureLegends, analysisLegends: analysisLegends}
 }

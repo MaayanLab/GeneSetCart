@@ -13,7 +13,7 @@ export function LinearIndeterminate() {
 
 export default function CircularIndeterminate() {
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
       <CircularProgress color='secondary'/>
     </Box>
   );

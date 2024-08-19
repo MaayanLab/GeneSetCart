@@ -10,8 +10,8 @@ export function BarChart({ terms, pvalues, library, order, markerOptions }: { te
                 type: 'bar',
                 x: pvalues,
                 y: terms, orientation: 'h',
-                text: terms.map(String),
-                marker: markerOptions
+                text: terms,
+                marker: markerOptions,
             },
         ]
     const layout = {
@@ -140,3 +140,6 @@ export function CHEABarChart({ data }: { data: any }) {
     )
 }
 
+function formatPlotText(text: string){
+    return text.substring(0, 50) + '</br>' + text.substring(50)
+}

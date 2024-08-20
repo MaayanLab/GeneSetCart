@@ -2,13 +2,14 @@ import { authOptions } from '@/lib/auth/authOptions'
 import GenesetSelect from "@/app/augment/[id]/SelectGeneset";
 import ColorToggleButton from "@/components/misc/SectionToggle";
 import prisma from "@/lib/prisma";
-import { TextField, Typography, Grid } from "@mui/material";
+import { TextField, Typography, Grid, Chip } from "@mui/material";
 import Container from "@mui/material/Container";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
 import { shallowCopy } from '@/app/shallowcopy';
 import { AugmentLayout } from './AugmentLayout';
+import { SessionChip } from '@/components/misc/SesssionChip';
 
 export default async function AugmentPage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams
@@ -24,7 +25,7 @@ export default async function AugmentPage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }, 
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -41,7 +42,10 @@ export default async function AugmentPage(props: { params: { id: string }, searc
                     <Container>
                         <ColorToggleButton sessionId={props.params.id} />
                         <Container>
-                            <Typography variant="h3" color="secondary.dark" className='p-5'>AUGMENT YOUR GENE SETS</Typography>
+                            <div className='flex items-center'>
+                                <Typography variant="h3" color="secondary.dark" className='p-5'>AUGMENT YOUR GENE SETS</Typography>
+                                <SessionChip sessionId={props.params.id} />
+                            </div>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                                 Augment your gene sets with co-expressed and co-mentioned genes
                             </Typography>
@@ -76,7 +80,7 @@ export default async function AugmentPage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }, 
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -128,7 +132,10 @@ export default async function AugmentPage(props: { params: { id: string }, searc
             <Container>
                 <ColorToggleButton sessionId={props.params.id} />
                 <Container>
-                    <Typography variant="h3" color="secondary.dark" className='p-5'>AUGMENT YOUR GENE SETS</Typography>
+                    <div className='flex items-center'>
+                        <Typography variant="h3" color="secondary.dark" className='p-5'>AUGMENT YOUR GENE SETS</Typography>
+                        <SessionChip sessionId={props.params.id} />
+                    </div>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                         Augment your gene sets with co-expressed and co-mentioned genes
                     </Typography>

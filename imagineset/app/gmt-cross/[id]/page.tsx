@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
 import { shallowCopy } from '@/app/shallowcopy';
 import Cookies from 'js-cookie'
+import { SessionChip } from '@/components/misc/SesssionChip';
 
 export default async function GMTCross(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams
@@ -24,7 +25,7 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
             gene_sets: {
                 include: {
                     genes: true
-                }, 
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -42,7 +43,10 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
                     </Grid>
                     <Container>
                         <Container>
-                            <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>COMMON FUND GENE SET CROSSING</Typography>
+                            <div className='flex items-center'>
+                                <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>COMMON FUND GENE SET CROSSING</Typography>
+                                <SessionChip sessionId={props.params.id} />
+                            </div>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
                                 Cross Common Fund GMTs to explore their similarity for novel hypothesis generation. Each gene set pair is displayed with their Fisher exact test p-value, odds ratio and overlapping genes.
                             </Typography>
@@ -58,7 +62,7 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
                 },
                 include: {
                     pipelineSessions: true
-                } 
+                }
             })
             if (user === null) return redirect((qs.lib1 && qs.lib2) ? `/api/auth/signin?callbackUrl=/gmt-cross/${props.params.id}` : `/api/auth/signin?callbackUrl=/gmt-cross/`)
             await shallowCopy(user, anonymousUserSession, 'gmt-cross', false, qs)
@@ -76,7 +80,7 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
             gene_sets: {
                 include: {
                     genes: true
-                }, 
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -129,7 +133,10 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
             </Grid>
             <Container>
                 <Container>
-                    <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>COMMON FUND GENE SET CROSSING</Typography>
+                    <div className='flex items-center'>
+                        <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>COMMON FUND GENE SET CROSSING</Typography>
+                        <SessionChip sessionId={props.params.id} />
+                    </div>                    
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
                         Cross Common Fund GMTs to explore their similarity for novel hypothesis generation. Each gene set pair is displayed with their Fisher exact test p-value, odds ratio and overlapping genes.
                     </Typography>

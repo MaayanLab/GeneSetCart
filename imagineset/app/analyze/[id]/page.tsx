@@ -8,6 +8,7 @@ import * as React from 'react';
 import dynamic from 'next/dynamic'
 import Header from '@/components/header/Header';
 import { shallowCopy } from '@/app/shallowcopy';
+import { SessionChip } from '@/components/misc/SesssionChip';
 // import { ReportButton } from '@/components/misc/Report/ReportButton';
 
 
@@ -27,7 +28,7 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }, 
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -45,7 +46,10 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
                     <Container>
                         <ColorToggleButton sessionId={props.params.id} />
                         <Container sx={{ mb: 5 }}>
-                            <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>ANALYZE YOUR GENE SETS</Typography>
+                            <div className='flex items-center'>
+                                <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>ANALYZE YOUR GENE SETS</Typography>
+                                <SessionChip sessionId={props.params.id} />
+                            </div>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
                                 Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
                             </Typography>
@@ -133,11 +137,14 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
             <Container>
                 <ColorToggleButton sessionId={props.params.id} />
                 <Container sx={{ mb: 5 }}>
-                    <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>ANALYZE YOUR GENE SETS</Typography>
+                    <div className='flex items-center'>
+                        <Typography variant="h3" color="secondary.dark" sx={{ mb: 2, mt: 2 }}>ANALYZE YOUR GENE SETS</Typography>
+                        <SessionChip sessionId={props.params.id} />
+                    </div>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
                         Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Playbook Workflow Builder, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS.
                     </Typography>
-                        {/* <ReportButton /> */}
+                    {/* <ReportButton /> */}
                     <PaginatedTable rows={rows} />
                 </Container>
             </Container>

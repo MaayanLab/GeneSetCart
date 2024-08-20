@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
 import { shallowCopy } from '@/app/shallowcopy';
 import { ReportLayout } from './ReportLayout';
+import { SessionChip } from '@/components/misc/SesssionChip';
 
 export default async function CombinePage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams
@@ -25,7 +26,7 @@ export default async function CombinePage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }, 
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -42,9 +43,13 @@ export default async function CombinePage(props: { params: { id: string }, searc
                     <Container>
                         <ColorToggleButton sessionId={props.params.id} />
                         <Container sx={{ mb: 5 }}>
-                            <Typography variant="h3" color="secondary.dark" className='p-5'>COMBINE YOUR GENE SETS</Typography>
+                            <div className='flex items-center'>
+                                <Typography variant="h3" color="secondary.dark" className='p-5'>GENERATE REPORT</Typography>
+                                <SessionChip sessionId={props.params.id} />
+                            </div>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                                Combine your gene sets using set operations (intersect, union or consensus)
+                                Generate a report of your selected gene sets which displays a downloadable .pdf containing a visualization of overlap between selected gene sets, overlapping genes,
+                                Enrichr, KEA, ChEA, SigCom LINCS links and plots for selected libraries and sets, Rummagene and RummaGEO links and a GPT generated text.
                             </Typography>
                             <CombineLayout sessionInfo={anonymousUserSession} sessionId={props.params.id} />
                         </Container>
@@ -76,7 +81,7 @@ export default async function CombinePage(props: { params: { id: string }, searc
             gene_sets: {
                 include: {
                     genes: true
-                }, 
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -128,10 +133,13 @@ export default async function CombinePage(props: { params: { id: string }, searc
             <Container>
                 <ColorToggleButton sessionId={props.params.id} />
                 <Container sx={{ mb: 5 }}>
-                    <Typography variant="h3" color="secondary.dark" className='p-5'>GENERATE REPORT</Typography>
+                    <div className='flex items-center'>
+                        <Typography variant="h3" color="secondary.dark" className='p-5'>GENERATE REPORT</Typography>
+                        <SessionChip sessionId={props.params.id} />
+                    </div>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                        Generate a report of your selected gene sets which displays a downloadable .pdf containing a visualization of overlap between selected gene sets, overlapping genes, 
-                        Enrichr, KEA, ChEA, SigCom LINCS links and plots for selected libraries and sets, Rummagene and RummaGEO links and a GPT generated text. 
+                        Generate a report of your selected gene sets which displays a downloadable .pdf containing a visualization of overlap between selected gene sets, overlapping genes,
+                        Enrichr, KEA, ChEA, SigCom LINCS links and plots for selected libraries and sets, Rummagene and RummaGEO links and a GPT generated text.
                     </Typography>
                     <ReportLayout sessionInfo={sessionInfo} sessionId={props.params.id} />
                 </Container>

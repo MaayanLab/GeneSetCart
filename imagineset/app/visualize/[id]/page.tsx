@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header from '@/components/header/Header';
 import { shallowCopy } from '@/app/shallowcopy';
+import { SessionChip } from '@/components/misc/SesssionChip';
 
 export default async function VisualizePage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams
@@ -22,7 +23,7 @@ export default async function VisualizePage(props: { params: { id: string }, sea
             gene_sets: {
                 include: {
                     genes: true
-                }, 
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -39,7 +40,10 @@ export default async function VisualizePage(props: { params: { id: string }, sea
                     <Container>
                         <ColorToggleButton sessionId={props.params.id} />
                         <Container sx={{ mb: 5 }}>
-                            <Typography variant="h3" color="secondary.dark" className='p-5'>VISUALIZE YOUR GENE SETS</Typography>
+                            <div className='flex items-center'>
+                                <Typography variant="h3" color="secondary.dark" className='p-5'>VISUALIZE YOUR GENE SETS</Typography>
+                                <SessionChip sessionId={props.params.id} />
+                            </div>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                                 Visualize the overlap between your gene sets with Venn, Supervenn, UpSet, Hierarchically-Clustered Heatmaps and UMAP plots.
                             </Typography>
@@ -125,7 +129,10 @@ export default async function VisualizePage(props: { params: { id: string }, sea
             <Container>
                 <ColorToggleButton sessionId={props.params.id} />
                 <Container sx={{ mb: 5 }}>
-                    <Typography variant="h3" color="secondary.dark" className='p-5'>VISUALIZE YOUR GENE SETS</Typography>
+                    <div className='flex items-center'>
+                        <Typography variant="h3" color="secondary.dark" className='p-5'>VISUALIZE YOUR GENE SETS</Typography>
+                        <SessionChip sessionId={props.params.id} />
+                    </div>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                         Visualize the overlap between your gene sets with Venn, Supervenn, UpSet, Hierarchically-Clustered Heatmaps and UMAP plots.
                     </Typography>

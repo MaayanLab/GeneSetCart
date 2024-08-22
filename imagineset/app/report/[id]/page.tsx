@@ -51,7 +51,7 @@ export default async function CombinePage(props: { params: { id: string }, searc
                                 Generate a report of your selected gene sets which displays a downloadable .pdf containing a visualization of overlap between selected gene sets, overlapping genes,
                                 Enrichr, KEA, ChEA, SigCom LINCS links and plots for selected libraries and sets, Rummagene and RummaGEO links and a GPT generated text.
                             </Typography>
-                            <CombineLayout sessionInfo={anonymousUserSession} sessionId={props.params.id} />
+                            <ReportLayout sessionInfo={anonymousUserSession} sessionId={props.params.id} />
                         </Container>
                     </Container>
                 </>

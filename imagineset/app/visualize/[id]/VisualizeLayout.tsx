@@ -33,7 +33,6 @@ import { copyToClipboard } from '@/components/assemble/DCCFetch/CFDEDataTable';
 import { Heatmap } from '@/components/visualize/PlotComponents/Heatmap/InteractiveHeatmap';
 import { getClustermap, getSuperVenn } from '@/components/visualize/getImageData';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 
 const scrollbarStyles = {
@@ -241,8 +240,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [legendSelectedSets] = useDebounce(currentlegendSelectedSets, 800); // Debounce after 500ms
 
     const addSelectedToCart = React.useCallback(() => {
-        if (isHumanGenes) {
-            addToSessionSets(validGenes, sessionId, formatSelectionName(overlap.name), '', [], true)
+            addToSessionSets(isHumanGenes ? validGenes : [], sessionId, formatSelectionName(overlap.name), '', isHumanGenes ? [] : overlap.overlapGenes, isHumanGenes)
             .then((result) => setStatus({ success: true }))
             .catch((err) => {
                 if (err.message === 'No valid genes in gene set') {
@@ -255,22 +253,6 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                     setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
                 }
             })
-        } else {
-            addToSessionSets([], sessionId, formatSelectionName(overlap.name), '', overlap.overlapGenes, false)
-            .then((result) => setStatus({ success: true }))
-            .catch((err) => {
-                if (err.message === 'No valid genes in gene set') {
-                    setStatus({ error: { selected: true, message: err.message } })
-                }
-                else if (err.message === 'Empty gene set name') {
-                    setStatus({ error: { selected: true, message: err.message } })
-                }
-                else {
-                    setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
-                }
-            })
-        }
-
     }, [overlap, isHumanGenes, validGenes])
 
     const formatSelectionName = React.useCallback((overlapSelection: string) => {

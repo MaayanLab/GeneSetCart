@@ -8,8 +8,9 @@ import ArticleIcon from '@mui/icons-material/Article';
 
 import dynamic from "next/dynamic";
 import { EnrichmentAnalysisSelection, VisualizationSelection } from "./AnalysesSelection";
-import CircularIndeterminate, { LinearIndeterminate } from "@/components/misc/Loading";
+import CircularIndeterminate from "@/components/misc/Loading";
 import { getAnalysisData } from "./fetchData";
+import { JsonObject } from "@prisma/client/runtime/library";
 
 const Report = dynamic(() => import("./Report"), {
     ssr: false,
@@ -30,6 +31,7 @@ export type analysisOptions = {
     sigcom: boolean;
     rummagene: boolean;
     rummageo: boolean;
+    playbook: boolean;
 }
 
 export function ReportLayout({ sessionInfo, sessionId }: {
@@ -44,16 +46,25 @@ export function ReportLayout({ sessionInfo, sessionId }: {
     const [checked, setChecked] = React.useState<number[]>([]);
     const [displayReport, setDisplayReport] = React.useState(false)
     const [visualizationOptions, setVisualizationOptions] = React.useState({ venn: true, upset: true, supervenn: true, heatmap: true, umap: true })
-    const [analysisOptions, setAnalysisOptions] = React.useState({ enrichr: true, kea: true, chea: true, sigcom: true, rummagene: true, rummageo: true })
+    const [analysisOptions, setAnalysisOptions] = React.useState({ enrichr: true, kea: true, chea: true, sigcom: true, rummagene: true, rummageo: true, playbook: true })
     const [loading, setLoading] = React.useState(false)
-    const [analysisData, setAnalysisData] = React.useState<any>({})
+    const [analysisData, setAnalysisData] = React.useState<JsonObject>({})
 
     const selectedSets = React.useMemo(() => {
-        setDisplayReport(false);
+        if (checked.length > 3) {
+            setAnalysisOptions({ enrichr: false, kea: false, chea: false, sigcom: false, rummagene: false, rummageo: false, playbook: true })
+        }
+        setAnalysisData({})
+        setDisplayReport(false)
         const typedSets = sessionInfo ? sessionInfo.gene_sets : []
         const checkedSets = typedSets.filter((set, index) => checked.includes(index))
         return checkedSets
     }, [checked, sessionInfo?.gene_sets])
+
+    React.useEffect(() => {
+        setAnalysisData({})
+        setDisplayReport(false)
+    }, [analysisOptions, visualizationOptions])
 
     const disabledVisualizations = React.useMemo(() => {
         let disabledOptions = { venn: false, upset: false, supervenn: false, heatmap: false, umap: false }
@@ -76,36 +87,41 @@ export function ReportLayout({ sessionInfo, sessionId }: {
         return disabledOptions
     }, [selectedSets])
 
-    React.useEffect(() => {
-        if (displayReport === true) {
-            getAnalysisData(selectedSets, analysisOptions).then((result) => {
-                setAnalysisData(result)
-                setLoading(false)
-            })
-        }
-    }, [selectedSets, analysisOptions, displayReport])
-
     return (
         <Stack direction='column' spacing={1} justifyContent="center" alignItems="center">
             <GeneSetSelect sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} selectedSets={selectedSets} />
             <Typography variant="h4" color='secondary'> CHOOSE VISUALIZATION OPTIONS</Typography>
             <VisualizationSelection visualizationOptions={visualizationOptions} setVisualizationOptions={setVisualizationOptions} disabledVisualizations={disabledVisualizations} />
             <Typography variant="h4" color='secondary'> CHOOSE ENRICHMENT ANALYSIS TOOLS OPTIONS</Typography>
-            <EnrichmentAnalysisSelection analysisOptions={analysisOptions} setAnalysisOptions={setAnalysisOptions} disabled={selectedSets.length === 0} />
-            <Button
-                variant='contained'
-                fullWidth
-                color='secondary'
-                disabled={selectedSets.length < 1}
-                onClick={() => { setDisplayReport(true); setLoading(true) }}>
-                <ArticleIcon /> &nbsp; Generate Report
-            </Button>
+            <EnrichmentAnalysisSelection analysisOptions={analysisOptions} setAnalysisOptions={setAnalysisOptions} selectedSetsCount = {selectedSets.length} />
+                <Button
+                    variant='contained'
+                    color='secondary'
+                    disabled={selectedSets.length < 1}
+                    onClick={() => { 
+                        setAnalysisData({}); 
+                        setDisplayReport(false)
+                        setLoading(true); 
+                        getAnalysisData(selectedSets, analysisOptions, visualizationOptions).then((result) => {
+                            setAnalysisData(result)
+                            setLoading(false)
+                            setDisplayReport(true)
+                        }) 
+                        }}>
+                    <ArticleIcon /> &nbsp; Generate Report
+                </Button>
             {loading && <Stack direction='column' sx={{ justifyContent: 'center' }}>
                 <Typography variant="body2" color='secondary'>Generating Report...</Typography>
                 <CircularIndeterminate />
             </Stack>}
-            {displayReport && !loading && <Report selectedSets={selectedSets} checked={checked} sessionId={sessionId} visualizationOptions={visualizationOptions} disabledOptions={disabledVisualizations} analysisData={analysisData} analysisOptions={analysisOptions} />}
+            {(!loading && displayReport) &&
+                <Report selectedSets={selectedSets}
+                    checked={checked}
+                    sessionId={sessionId}
+                    visualizationOptions={visualizationOptions}
+                    disabledOptions={disabledVisualizations}
+                    analysisData={analysisData}
+                    analysisOptions={analysisOptions} />}
         </Stack>
-
     )
 }

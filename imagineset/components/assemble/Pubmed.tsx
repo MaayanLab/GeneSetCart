@@ -6,7 +6,7 @@ import {
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme
+  useTheme, Chip
 } from "@mui/material";;
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
@@ -20,7 +20,7 @@ import { addStatus } from "./fileUpload/SingleUpload";
 import cache from "@/lib/cache";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-
+import { getPrivateSession } from "./fileUpload/getSessionPrivate";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -69,6 +69,16 @@ export default function GeneshotSearch() {
   const [status, setStatus] = React.useState<addStatus>({})
   const [geneRIF, setGeneRIF] = React.useState(true)
   const [isHumanGenes, setIsHumanGenes] = React.useState(false)
+  const [privateSession, setPrivateSession] = React.useState(false)
+
+  React.useEffect(() => {
+    getPrivateSession(params.id).then((response: boolean | null) => {
+      if (response) {
+        setPrivateSession(response)
+      }
+    })
+  }, [])
+
   React.useEffect(() => {
     checkValidGenes(foundGenes.toString().replaceAll(',', '\n')).then((response) => setValidGenes(response))
   }, [foundGenes])
@@ -104,7 +114,12 @@ export default function GeneshotSearch() {
   }, [geneRIF])
   return (
     <Container maxWidth={false} sx={{ width: '100%' }}>
-      <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH GENE SETS FROM PUBMED</Typography>
+      <div className='flex items-center'>
+        <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH GENE SETS FROM PUBMED</Typography>
+        <Tooltip title={`Current session is ${privateSession ? 'private' : 'public'}`}>
+          <Chip label={privateSession ? 'Private' : 'Public'} variant="outlined" />
+        </Tooltip>
+      </div>
       <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 3 }}>
         Enter a search term to obtain all genes mentioned with that term in publications according to GeneRIF or AutoRIF.
       </Typography>

@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect } from "react";
 import {
-    Button, Checkbox, Container, FormControlLabel, Grid, Stack, Switch, TextField,
+    Button, Checkbox, Chip, Container, FormControlLabel, Grid, Stack, Switch, TextField,
     Tooltip,
     Typography, useMediaQuery,
     useTheme
@@ -13,6 +13,7 @@ import { getGenesetInfo } from "@/app/shallowcopy";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
+import { getPrivateSession } from "./getSessionPrivate";
 
 export type addStatus = {
     success?: boolean,
@@ -33,6 +34,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     const [status, setStatus] = React.useState<addStatus>({})
     const [genesetInfo, setGenesetInfo] = React.useState<genesetInfo>()
     const [isHumanGenes, setIsHumanGenes] = React.useState(false)
+    const [privateSession, setPrivateSession] = React.useState(false)
 
     const searchParams = useSearchParams();
     const urlParams = new URLSearchParams(searchParams);
@@ -49,7 +51,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                     if (geneset.genes.length > 0) {
                         setIsHumanGenes(true)
                         setGenesetInfo({ name: geneset.name, genes: geneset.genes.map((gene) => gene.gene_symbol).join('\n'), description: geneset.description })
-                    } else{
+                    } else {
                         setGenesetInfo({ name: geneset.name, genes: geneset.otherSymbols.join('\n'), description: geneset.description })
                     }
                     if (add === 'true') {
@@ -68,6 +70,11 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                 }
             })
         }
+        getPrivateSession(params.id).then((response: boolean | null) => {
+            if (response) {
+                setPrivateSession(response)
+            }
+        })
     }, [])
 
     const getExample = React.useCallback(() => {
@@ -166,7 +173,12 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
 
     return (
         <Container>
-            <Typography variant="h3" color="secondary.dark" className='p-5'>UPLOAD SINGLE GENE SET</Typography>
+            <div className='flex items-center'>
+                <Typography variant="h3" color="secondary.dark" className='p-5'>UPLOAD SINGLE GENE SET</Typography>
+                <Tooltip title={`Current session is ${privateSession ? 'private' : 'public'}`}>
+                    <Chip label={privateSession ? 'Private' : 'Public'} variant="outlined" />
+                </Tooltip>
+            </div>
             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                 Upload a single .txt file containing gene symbols, each on new line OR paste your gene set in
                 the text box below

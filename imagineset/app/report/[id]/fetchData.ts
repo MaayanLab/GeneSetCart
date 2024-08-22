@@ -3,12 +3,13 @@ import { Gene, GeneSet } from "@prisma/client";
 import axios from "axios";
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
 import { generateGPTSummary } from "./gptSummary";
+import { getPlaybookReportLink } from "./playbook";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function getAnalysisData(selectedSets: ({
     genes: Gene[];
-} & GeneSet)[], analysisOptions: analysisOptions) {
+} & GeneSet)[], analysisOptions: analysisOptions, visualizationOptions: visualizationOptions) {
     const analysisResults: { [key: string]: any } = {}
     await Promise.all(selectedSets.map(async (geneset) => {
         let genesetResults: { [key: string]: any } = {};
@@ -54,6 +55,7 @@ export async function getAnalysisData(selectedSets: ({
         const gptSummary = await generateGPTSummary(analysisResults['overlappingGenes'])
         analysisResults['gptSummary'] = gptSummary.response
     }
+    analysisResults['playbookLink'] = await getPlaybookReportLink(selectedSets, visualizationOptions)
     return analysisResults
 }
 

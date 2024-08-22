@@ -172,5 +172,5 @@ export function CHEABarChart({ data }: { data: any }) {
 }
 
 function formatPlotText(text: string) {
-    return text.substring(0, 60) + '<br>' + text.substring(60)
+    return text.substring(0, 40) + '<br>' + text.substring(40)
 }

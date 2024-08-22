@@ -1,8 +1,5 @@
 'use client'
-import {
-  Box,
-  Container, Grid,
-  Typography,
+import {Container, Grid,Typography, Tooltip, Chip
 } from "@mui/material";;
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
@@ -13,7 +10,9 @@ import { DCCIcons } from "./DCCIconBtn";
 import CFDEDataTable from "./CFDEDataTable";
 import { termSearch } from "./DCCFetchFunc";
 import { Gene } from "@prisma/client";
-import CircularIndeterminate, { LinearIndeterminate } from "@/components/misc/Loading";
+import { LinearIndeterminate } from "@/components/misc/Loading";
+import { getPrivateSession } from "../fileUpload/getSessionPrivate";
+import { useParams } from "next/navigation";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -87,6 +86,16 @@ export function DCCPage() {
   const [searchResults, setSearchResults] = React.useState<searchResultsType[]>([])
   const [checked, setChecked] = React.useState<number[]>(dccCheckedDisplay.map((dcc, i) => i));
   const [loading, setLoading] = React.useState(false);
+  const params = useParams<{ id: string }>()
+  const [privateSession, setPrivateSession] = React.useState(false)
+
+  React.useEffect(() => {
+      getPrivateSession(params.id).then((response: boolean | null) => {
+          if (response) {
+              setPrivateSession(response)
+          }
+      })
+  }, [])
 
   const searchDCCs = React.useMemo(() => {
     return searchResults.map((result) => result.dcc).filter((v, i, self) => i == self.indexOf(v))
@@ -120,7 +129,12 @@ export function DCCPage() {
 
   return (
     <Container>
-      <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH CFDE DCC GENE SETS</Typography>
+            <div className='flex items-center'>
+            <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH CFDE DCC GENE SETS</Typography>
+        <Tooltip title={`Current session is ${privateSession ? 'private' : 'public'}`}>
+          <Chip label={privateSession ? 'Private' : 'Public'} variant="outlined" />
+        </Tooltip>
+      </div>
       <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
         Search for Common Fund generated gene sets related to a term
       </Typography>

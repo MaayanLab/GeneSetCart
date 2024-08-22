@@ -1,15 +1,13 @@
 'use client'
-import {
-  Container, Grid,
-  Typography,
-} from "@mui/material";;
+import { Container, Grid, Typography, Tooltip, Chip } from "@mui/material";;
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import * as React from 'react';
 import EnrichrTable from "./EnrichrTable";
-import { Gene } from "@prisma/client";
 import { LibraryList } from "./LibraryList";
+import { getPrivateSession } from "../fileUpload/getSessionPrivate";
+import { useParams } from "next/navigation";
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -66,6 +64,16 @@ export function EnrichrPage() {
   const [searchResults, setSearchResults] = React.useState<searchResultsType[]>([])
   const [libraries, setLibraries] = React.useState<string[]>([])
   const [checked, setChecked] = React.useState<number[]>([]);
+  const params = useParams<{ id: string }>()
+  const [privateSession, setPrivateSession] = React.useState(false)
+
+  React.useEffect(() => {
+    getPrivateSession(params.id).then((response: boolean | null) => {
+      if (response) {
+        setPrivateSession(response)
+      }
+    })
+  }, [])
 
   const rows = React.useMemo(() => {
     return searchResults.filter((result) => (libraries.filter((library, i) => checked
@@ -80,11 +88,11 @@ export function EnrichrPage() {
     fetch('https://maayanlab.cloud/Enrichr/termmap?' + new URLSearchParams(`meta=${query}`))
       .then((response) => response.json()
         .then((data) => {
-          let foundSets : searchResultsType[] = []
+          let foundSets: searchResultsType[] = []
           let idCount = 0
           const termResults = data['terms']
           setLibraries(Object.keys(termResults));
-          setChecked(Object.keys(termResults).slice(0,2).map((library, i) => i))
+          setChecked(Object.keys(termResults).slice(0, 2).map((library, i) => i))
           Object.keys(termResults).forEach((library) => {
             const libraryResults = termResults[library];
             libraryResults.map((geneset: string) => {
@@ -103,7 +111,12 @@ export function EnrichrPage() {
 
   return (
     <Container>
-      <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH ENRICHR GENE SETS</Typography>
+      <div className='flex items-center'>
+        <Typography variant="h3" color="secondary.dark" className='p-5'>SEARCH ENRICHR GENE SETS</Typography>
+        <Tooltip title={`Current session is ${privateSession ? 'private' : 'public'}`}>
+          <Chip label={privateSession ? 'Private' : 'Public'} variant="outlined" />
+        </Tooltip>
+      </div>
       <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
         Search for Enrichr gene sets related to a term.
       </Typography>
@@ -124,10 +137,10 @@ export function EnrichrPage() {
         </Grid>
         <Grid container item spacing={2} xs={12}>
           <Grid container item xs={3}>
-            <LibraryList libraries={libraries} checked={checked} setChecked={setChecked} genesetCount={searchResults.length}/>
+            <LibraryList libraries={libraries} checked={checked} setChecked={setChecked} genesetCount={searchResults.length} />
           </Grid>
           <Grid container item xs={9}>
-          <EnrichrTable rows={rows} />
+            <EnrichrTable rows={rows} />
           </Grid>
         </Grid>
       </Grid>

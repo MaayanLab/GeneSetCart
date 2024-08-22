@@ -15,6 +15,14 @@ import { analysisOptions, visualizationOptions } from "./ReportLayout";
 import BasicTable from './OverlapTable';
 import { StaticVenn } from '@/components/visualize/PlotComponents/Venn/StaticVenn';
 
+const marginTop = "10px"
+const marginRight = "5px"
+const marginBottom = "10px"
+const marginLeft = "5px"
+const getPageMargins = () => {
+    return `@page { margin: ${marginTop} ${marginRight} ${marginBottom} ${marginLeft} !important; }`;
+};
+
 
 export default function Report({ selectedSets, checked, sessionId, visualizationOptions, disabledOptions, analysisData, analysisOptions }: {
     selectedSets: ({
@@ -45,7 +53,6 @@ export default function Report({ selectedSets, checked, sessionId, visualization
     }, [selectedSets])
 
 
-
     const componentRef = React.useRef<HTMLDivElement>(null);
 
     return (
@@ -54,14 +61,22 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                 trigger={() => <Button variant="contained" color="primary"><DownloadIcon /> Download Report</Button>}
                 content={() => componentRef.current}
             />
-            <div ref={componentRef}>
+
+            <div ref={componentRef} >
+                <style>{getPageMargins()}</style>
                 <Paper sx={{
                     minWidth: '100%'
                 }}>
                     <Typography variant="h4" color="secondary.dark" sx={{ padding: 3 }}>G2SG Report</Typography>
+                    {('playbookLink' in analysisData && analysisOptions.playbook) &&
+                        <>
+                            <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VIEW IN PLAYBOOK WORKFLOW BUILDER</Typography>
+                            <Typography sx={{ marginLeft: 5}}> Playbook Link: <Link color='secondary'>{analysisData['playbookLink']}</Link></Typography>
+                        </>
+                    }
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VISUALIZATION OF OVERLAP</Typography>
                     {(visualizationOptions.heatmap && !disabledOptions.heatmap) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack direction='column' style={{ breakInside: 'avoid' }}>
+                        <Stack direction='column' style={{ breakInside: 'avoid' }} sx={{ padding: 5 }}>
                             <ClusteredHeatmap selectedSets={legendSelectedSets.map((set, i) => {
                                 return { ...set, alphabet: set.name }
                             })}
@@ -75,7 +90,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                     </div>
                     }
                     {(visualizationOptions.venn && !disabledOptions.venn) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack direction='column' justifyContent={'center'} style={{ breakInside: 'avoid' }}>
+                        <Stack direction='column' justifyContent={'center'} style={{ breakInside: 'avoid' }} sx={{ padding: 5 }}>
                             <StaticVenn selectedSets={legendSelectedSets} />
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.venn}.</strong> Overlap between the selected gene sets.
@@ -85,21 +100,21 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                         </Stack>
                     </div>}
                     {(visualizationOptions.supervenn && !disabledOptions.supervenn) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack direction='column' style={{ breakInside: 'avoid' }}>
+                        <Stack direction='column' style={{ breakInside: 'avoid' }} sx={{ padding: 5 }}>
                             <div style={{ minHeight: '80%' }} className='flex justify-center'>
                                 <StaticSuperVenn selectedSets={legendSelectedSets.map((set, i) => {
                                     return { ...set, alphabet: set.name }
                                 })} />
                             </div>
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                                <strong>Figure {figureLegends.supervenn}.</strong> Overlap between the selected gene sets. This figure contains a SuperVenn plot showing the overlap between the selected gene sets.
+                                <strong>Figure {figureLegends.supervenn}.</strong> A Supervenn figure showing regions of overlapping genes between gene sets.
                                 The number of overlapping genes is shown at the bottom of each section
                                 Visualization from: <Link color='secondary'>https://g2sg.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=SuperVenn</Link>
                             </Typography>
                         </Stack>
                     </div>}
                     {(visualizationOptions.upset && !disabledOptions.upset) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack direction='column' style={{ breakInside: 'avoid' }}>
+                        <Stack direction='column' style={{ breakInside: 'avoid' }} sx={{ padding: 5 }}>
                             <div style={{ minHeight: '80%' }} className='flex justify-center'>
                                 <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} upSetOptions={upSetOptions} />
                             </div>
@@ -111,7 +126,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                         </Stack>
                     </div>}
                     {(visualizationOptions.umap && !disabledOptions.umap) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
-                        <Stack style={{ breakInside: 'avoid' }}>
+                        <Stack style={{ breakInside: 'avoid' }} sx={{ padding: 5 }}>
                             <div style={{ minHeight: '80%' }} className='flex justify-center'>
                                 <UMAP selectedSets={legendSelectedSets} setOverlap={setOverlap} umapOptions={umapOptions} />
                             </div>
@@ -124,7 +139,10 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                     </div>}
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>OVERLAPPING GENES</Typography>
                     <Box sx={{ padding: 3 }}>
-                        <BasicTable rows={analysisData['overlappingGenes'] ? analysisData['overlappingGenes'] : []} />
+                        <BasicTable rows={'overlappingGenes' in analysisData ? analysisData['overlappingGenes'] : []} />
+                        <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
+                            <strong>Table 1.</strong> Table showing the gene set pairs that have less that 10 overlapping genes between them.
+                        </Typography>
                     </Box>
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>ANALYSIS LINKS</Typography>
                     <List sx={{ listStyle: "decimal", marginLeft: 5 }}>
@@ -132,19 +150,19 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <ListItem sx={{ display: "list-item" }} key={i}>
                                 {geneset.name} ({geneset.genes.length})
                                 <Stack direction='column'>
-                                    {(analysisData[geneset.id] && analysisOptions.enrichr) &&
-                                        <Stack direction='column' sx={{ marginLeft: 5, marginTop: 1 }}>
+                                    {(geneset.id in analysisData && 'enrichrResults' in analysisData[geneset.id] && analysisOptions.enrichr) &&
+                                        <Stack direction='column' sx={{ marginLeft: 5, marginTop: 1 }} >
                                             <Typography variant="h5" color="secondary.dark">{alphabet[analysisLegends.enrichr]}. Enrichr</Typography>
                                             <EnrichrResults data={analysisData[geneset.id]['enrichrResults']} />
-                                            <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
+                                            <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }} style={{ breakInside: 'avoid' }}>
                                                 <strong>Figure {figureLegends.enrichr[i]}.</strong> Enrichment analysis results of the {geneset.name} gene set showing top 5 enriched terms from the
                                                 WikiPathway_2023_Human and GO Biological Processes libraries.
                                                 Enrichr: <Link color='secondary'>https://maayanlab.cloud/Enrichr/enrich?dataset={analysisData[geneset.id]['enrichrLink']}</Link>
                                             </Typography>
                                         </Stack>
                                     }
-                                    {(analysisData[geneset.id] && analysisOptions.kea) &&
-                                        <Stack direction='column' sx={{ marginLeft: 5, marginTop: 1 }}>
+                                    {(geneset.id in analysisData && 'keaResults' in analysisData[geneset.id] && analysisOptions.kea) &&
+                                        <Stack direction='column' sx={{ marginLeft: 5, marginTop: 1 }} style={{ breakInside: 'avoid' }}>
                                             <Typography variant="h5" color="secondary.dark">{alphabet[analysisLegends.kea]}. Kinase Enrichment Analysis</Typography>
                                             <KEABarChart data={analysisData[geneset.id]['keaResults']} />
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
@@ -155,8 +173,8 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                             </Typography>
                                         </Stack>
                                     }
-                                    {(analysisData[geneset.id] && analysisOptions.chea) &&
-                                        <Stack direction='column'>
+                                    {(geneset.id in analysisData && 'cheaResults' in analysisData[geneset.id] && analysisOptions.chea) &&
+                                        <Stack direction='column' sx={{ marginLeft: 5, marginTop: 1 }} style={{ breakInside: 'avoid' }}>
                                             <Typography variant="h5" color="secondary.dark">{alphabet[analysisLegends.chea]}. Transciption Factor Enrichment Analysis</Typography>
                                             <CHEABarChart data={analysisData[geneset.id]['cheaResults']} />
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
@@ -167,17 +185,17 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                     }
                                 </Stack>
                                 <List sx={{ listStyleType: 'disc', marginLeft: 5 }}>
-                                    {(analysisData[geneset.id] && analysisOptions.sigcom) &&
+                                    {(geneset.id in analysisData && 'sigcomLink' in analysisData[geneset.id] && analysisOptions.sigcom) &&
                                         <ListItem sx={{ display: 'list-item' }}>
                                             SigCom LINCS Link: <Link color='secondary'>{analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''}</Link>
                                         </ListItem>
                                     }
-                                    {(analysisData[geneset.id] && analysisOptions.rummagene) &&
+                                    {(geneset.id in analysisData && 'rummageneLink' in analysisData[geneset.id] && analysisOptions.rummagene) &&
                                         <ListItem sx={{ display: 'list-item' }}>
                                             Rummagene Link: <Link color='secondary'>{analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''}</Link>
                                         </ListItem>
                                     }
-                                    {(analysisData[geneset.id] && analysisOptions.rummageo) &&
+                                    {(geneset.id in analysisData && 'rummageoLink' in analysisData[geneset.id] && analysisOptions.rummageo) &&
                                         <ListItem sx={{ display: 'list-item' }}>
                                             RummaGEO Link: <Link color='secondary'>{analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''}</Link>
                                         </ListItem>
@@ -189,7 +207,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                     {analysisData.gptSummary &&
                         <Box sx={{ marginLeft: 3, marginTop: 2 }}>
                             <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1 }}>GPT GENERATED SUMMARY</Typography>
-                            <Typography variant='body2' color='black' sx={{ marginLeft: 3, marginTop: 1 }}>
+                            <Typography variant='body2' color='black' sx={{ padding: 3 }}>
                                 {analysisData['gptSummary']}
                             </Typography>
                         </Box>

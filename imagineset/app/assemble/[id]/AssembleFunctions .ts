@@ -37,7 +37,7 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
     if (isHumanGenes) {
         if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
         const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
-    
+
         // get sets that are already in session 
         const sessionOldSets = await prisma.pipelineSession.findUnique({
             where: {
@@ -47,7 +47,7 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
                 gene_sets: true
             }
         })
-    
+
         const oldSetsArray = sessionOldSets?.gene_sets ? sessionOldSets?.gene_sets : []
         const newGeneset = await prisma.geneSet.create({
             data: {
@@ -60,7 +60,7 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
                 otherSymbols: otherSymbols,
             }
         })
-    
+
         const updatedSession = await prisma.pipelineSession.update({
             where: {
                 id: sessionId,
@@ -80,12 +80,11 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
         })
         // revalidatePath('/')
         return 'success'
-    
+
     } else {
-     addToSessionSets([], sessionId, genesetName, description, otherSymbols, isHumanGenes)
+        addToSessionSets([], sessionId, genesetName, description, otherSymbols, isHumanGenes)
     }
 }
-
 
 
 export async function addToSessionSets(gene_list: string[], sessionId: string, genesetName: string, description: string, otherSymbols: string[], isHumanGenes: boolean) {
@@ -167,7 +166,6 @@ type selectedCrossRowType = {
 
 
 export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string, isHumanGenes: boolean) {
-    console.log(isHumanGenes)
     for (const row of rows) {
         if (row) {
             const alreadyExists = await checkInSession(sessionId, row.genesetName)
@@ -254,7 +252,7 @@ export async function addToSessionByGenesetId(sessionId: string, geneset: {
     } else {
         try {
             let isHumanGenes = true;
-            let otherSymbols : string[] = []; 
+            let otherSymbols: string[] = [];
             let validGenes = geneset.genes.map((gene) => gene.gene_symbol);
             if (geneset.otherSymbols.length > 0) {
                 isHumanGenes = false;

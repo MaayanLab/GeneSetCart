@@ -55,7 +55,6 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
             }
             genesetNames.push(set.name)
         })
-
         setDisplayedGenes(genes)
         setGeneratedSetName(genesetNames.join(' ∪ '))
     }
@@ -77,7 +76,6 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         }, countArray);
 
         const genes = Object.keys(occurrences).filter((gene) => occurrences[gene] === selectedSetsCount)
-
         setDisplayedGenes(genes)
         setGeneratedSetName(genesetNames.join(' ∩ '))
     }

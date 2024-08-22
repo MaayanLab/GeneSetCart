@@ -141,6 +141,7 @@ model addedGeneset {
   description String?
   genes       Gene[]
   createdAt   DateTime @default(now())
+  otherSymbols String[] @default([])
 
   @@map("added_genesets")
 }

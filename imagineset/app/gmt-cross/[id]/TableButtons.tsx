@@ -87,7 +87,8 @@ export const RenderGeneSet1 = ({ params, sessionId }: { params: GridRenderCellPa
                                     if (response) {
                                         setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
                                     } else {
-                                        addToSessionSets(genesetGenes.toString().replaceAll("'", '').split(','), sessionId, genesetName, '', [], true).then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
+                                        addToSessionSets(genesetGenes.toString().replaceAll("'", '').split(','), sessionId, genesetName, '', [], true)
+                                        .then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
                                     }
                                 })
                             }}
@@ -181,7 +182,8 @@ export const RenderGeneSet2 = ({ params, sessionId }: { params: GridRenderCellPa
                                     if (response) {
                                         setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
                                     } else {
-                                        addToSessionSets(genesetGenes.toString().replaceAll("'", '').split(','), sessionId, genesetName, '', [], true).then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
+                                        addToSessionSets(genesetGenes.toString().replaceAll("'", '').split(','), sessionId, genesetName, '', [], true)
+                                        .then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
                                     }
                                 })
                             }}
@@ -266,7 +268,8 @@ export const RenderOverlapButton = ({ params, sessionId }: { params: GridRenderC
                                         if (response) {
                                             setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
                                         } else {
-                                            addToSessionSets(params.row.overlap.toString().replaceAll("'", '').split(','), sessionId, genesetName, '', [], true).then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
+                                            addToSessionSets(params.row.overlap.toString().replaceAll("'", '').split(','), sessionId, genesetName, '', [], true)
+                                            .then((result) => { setStatus({ success: true }) }).catch((err) => setStatus({ error: { selected: true, message: "Error in adding gene set!" } }))
                                         }
                                     })
                                 }}

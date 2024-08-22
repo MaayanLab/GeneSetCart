@@ -140,7 +140,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
                     })
             }
         })
-    }, [displayedGenes, generatedSetName, sessionId])
+    }, [displayedGenes, generatedSetName, sessionId, isHumanGenes])
     return (
         <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'} useFlexGap flexWrap="wrap">
             <SelectGenesetsCard sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />

@@ -257,20 +257,30 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
 
     const formatSelectionName = React.useCallback((overlapSelection: string) => {
         if (visualization === 'Venn') {
-            const newOverlapName = overlapSelection.split(',').map((selection) => legendSelectedSets.find((item) => item.alphabet === selection)?.name).join(' ∩ ')
-            return newOverlapName
-        } else if (visualization === 'UpSet') {
-            const newOverlapName = overlapSelection.split('').map((selection) => legendSelectedSets.find((item) => item.alphabet === selection)?.name).join(' ∩ ')
+            let newOverlapName = overlapSelection.split(',').map((selection) => legendSelectedSets.find((item) => item.alphabet === selection)?.name).join(' ∩ ')
+            if (newOverlapName === '') {
+                newOverlapName = overlapSelection
+            }
             return newOverlapName
         }
+        //  else if (visualization === 'UpSet') {
+        //     let newOverlapName = overlapSelection.split('').map((selection) => legendSelectedSets.find((item) => item.alphabet === selection)?.name).join(' ∩ ')
+        //     if (newOverlapName === '') {
+        //         newOverlapName = overlapSelection
+        //     }
+        //     return newOverlapName
+        // }
         else if (visualization === 'Heatmap') {
-            const newOverlapName = overlapSelection.split(',').map((selection) => legendSelectedSets.find((item) => item.alphabet === selection)?.name).join(' ∩ ')
+            let newOverlapName = overlapSelection.split(',').map((selection) => legendSelectedSets.find((item) => item.alphabet === selection)?.name).join(' ∩ ')
+            if (newOverlapName === '') {
+                newOverlapName = overlapSelection
+            }
             return newOverlapName
         }
         else if (visualization === 'UMAP') {
             return overlapSelection
         }
-        return ''
+        return overlapSelection
     }, [legendSelectedSets, visualization])
 
     const downloadHeatmapSVG = React.useCallback(() => {

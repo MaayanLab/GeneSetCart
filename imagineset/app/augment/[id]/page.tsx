@@ -47,7 +47,8 @@ export default async function AugmentPage(props: { params: { id: string }, searc
                                 <SessionChip sessionId={props.params.id} />
                             </div>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                                Augment your gene sets with co-expressed and co-mentioned genes
+                                Augment your gene sets with co-expressed and co-mentioned genes. With the current options, only sets consisting of 
+                                valid human gene symbols can be augmented.
                             </Typography>
                             <AugmentLayout sessionGenesets={anonymousUserSession} sessionId={props.params.id} />
                         </Container>
@@ -137,7 +138,8 @@ export default async function AugmentPage(props: { params: { id: string }, searc
                         <SessionChip sessionId={props.params.id} />
                     </div>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                        Augment your gene sets with co-expressed and co-mentioned genes
+                        Augment your gene sets with co-expressed and co-mentioned genes. With the current options, only sets consisting of 
+                        valid human gene symbols can be augmented.
                     </Typography>
                     <AugmentLayout sessionGenesets={sessionInfo} sessionId={props.params.id} />
                 </Container>

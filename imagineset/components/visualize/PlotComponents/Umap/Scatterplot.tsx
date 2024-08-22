@@ -23,7 +23,7 @@ type ScatterplotProps = {
     setOverlap: React.Dispatch<React.SetStateAction<OverlapSelection>>
 };
 
-// Simplified version of a scatterplot
+// Code adapted from https://www.react-graph-gallery.com/scatter-plot
 export const Scatterplot = ({ width, height, data, setOverlap }: ScatterplotProps) => {
     const boundsWidth = width - MARGIN.right - MARGIN.left;
     const boundsHeight = height - MARGIN.top - MARGIN.bottom;
@@ -140,7 +140,6 @@ export const Scatterplot = ({ width, height, data, setOverlap }: ScatterplotProp
                         />
                     </g>
 
-                    {/* Circles */}
                     {allShapes}
                 </g>
                 <g
@@ -151,7 +150,6 @@ export const Scatterplot = ({ width, height, data, setOverlap }: ScatterplotProp
                     {legends}
                 </g>
             </svg>
-            {/* Tooltip */}
             <div
                 style={{
                     width: boundsWidth,

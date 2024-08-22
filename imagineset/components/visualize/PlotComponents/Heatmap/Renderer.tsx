@@ -17,7 +17,7 @@ type RendererProps = {
   heatmapOptions: { diagonal: boolean, palette: string, fontSize: number, disableLabels: boolean, annotationText: boolean }
 };
 
-
+// Code adapted from https://www.react-graph-gallery.com/heatmap
 export const Renderer = ({
   width,
   height,
@@ -163,9 +163,7 @@ export const Renderer = ({
 
 
   const allSubgroups = Object.keys(clusterClasses);
-  // Data Wrangling: stack the data
   const stackSeries = d3.stack().keys(allSubgroups).order(d3.stackOrderNone);
-  //.offset(d3.stackOffsetNone);
   const series = stackSeries([clusterClasses]);
   // Y axis
   let barMax = 0

@@ -20,6 +20,21 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the platform.
 
+## .env File Set Up
+For the `NEXTAUTH_SECRET` value
+Run
+```
+openssl rand -base64 32
+```
+Set NEXTAUTH_URL=http://localhost:3000
+
+## Running the python backend
+To run the python backend. Run the command: 
+``` 
+gunicorn --workers 2 --timeout 600 --bind 0.0.0.0:8000 app:app
+```
+And set PYTHON_API_BASE='http://0.0.0.0:8000' in the .env file
+
 
 ## Provisioning the Database
 To use the site, you have to populate your local database with gene and crossing pairs data. Firstly, make sure apply migrations to create the tables

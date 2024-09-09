@@ -21,6 +21,8 @@ function CustomToolbar() {
   }
   
 export function CrossingTable({ rows, columns }: { rows: CFDECrossPair[], columns: GridColDef[] }) {
+    // remove gene sets that are too large (> 3000 genes)
+    rows = rows.filter((row) => row.n_genes1 < 1500 && row.n_genes2 < 1500)
     return (
             <DataGrid
                 getRowHeight={() => 'auto'}

@@ -306,7 +306,7 @@ export function GMTCrossLayout() {
 
     return (
         <Stack direction="column" spacing={3} sx={{ marginBottom: 3, justifyContent: 'center' }}>
-            <DCCIcons selected={selectedDCCs} />
+            <DCCIcons selected={selectedDCCs} setSelected={setSelectedDCCs} selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} />
             <Stack direction='row' spacing={2}>
                 <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs} />
                 <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs} />

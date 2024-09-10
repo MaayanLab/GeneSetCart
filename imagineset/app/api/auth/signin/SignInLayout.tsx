@@ -52,7 +52,7 @@ export function SignInLayout({ providers }: { providers: never[] | Record<Litera
   return (
     <div className={styles.page}>
       <Stack direction='column' sx={{justifyContent: 'center', alignItems: 'center'}}>
-      <Typography variant="h1" color="secondary.dark" className='p-5'>GET-GENE-SET-GO</Typography>
+      <Typography variant="h1" color="secondary.dark" className='p-5'>GeneSetCart</Typography>
       <StyledCard />
       <Item elevation={3}>
         <center><img src="/img/G2SG-logo.png" alt="Logo" loading="lazy" height="200" width="200" ></img></center>

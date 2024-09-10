@@ -67,7 +67,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                 <Paper sx={{
                     minWidth: '100%'
                 }}>
-                    <Typography variant="h4" color="secondary.dark" sx={{ padding: 3 }}>G2SG Report</Typography>
+                    <Typography variant="h4" color="secondary.dark" sx={{ padding: 3 }}>GeneSetCart Report</Typography>
                     {('playbookLink' in analysisData && analysisOptions.playbook) &&
                         <>
                             <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VIEW IN PLAYBOOK WORKFLOW BUILDER</Typography>

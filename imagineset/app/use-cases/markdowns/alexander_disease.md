@@ -4,7 +4,7 @@ Alexander disease (AxD) is a rare neurodegenerative disease caused by a mutation
 
 <br />
 
-The Gene Expression Omnibus (GEO) is a major open biomedical research repository for transcriptomics and other omics datasets that currently contains millions of gene expression samples from tens of thousands of studies collected by research laboratories [3]. Here, we use the G2SG pipeline to analyze gene sets created by comparing gene expression samples obtained from GEO of wild type (WT) or controls to alexander disease samples.
+The Gene Expression Omnibus (GEO) is a major open biomedical research repository for transcriptomics and other omics datasets that currently contains millions of gene expression samples from tens of thousands of studies collected by research laboratories [3]. Here, we use the GeneSetCart pipeline to analyze gene sets created by comparing gene expression samples obtained from GEO of wild type (WT) or controls to alexander disease samples.
 
 <br />
 
@@ -19,7 +19,7 @@ To obtain disease signatures, we perform differential gene expression analysis o
 
 <br />
 
-We group these differentially expressed genes into up and down genes with up genes having a logFC > 0 and down genes having logFC < 0. The top 100 differentially expressed up and down genes based on t-statistic scores were then used to create the up and down gene sets for each study. These up and down genes from each sample were then used to create a single .gmt file called the alexander_disease.gmt. The .gmt file was uploaded into the G2SG application for further integrative analysis using the “Upload GMT” option in the Assemble step of the platform. Using the G2SG pipeline, we found consensus up and down signatures which are genes that appear in the majority of all up or down gene sets. We analyze potential drugs that could reverse the gene expression changes by sending the consensus gene sets to SigCom LINCS [6]. We also perform gene set enrichment analysis on the consensus signatures by sending them to Enrichr [1].
+We group these differentially expressed genes into up and down genes with up genes having a logFC > 0 and down genes having logFC < 0. The top 100 differentially expressed up and down genes based on t-statistic scores were then used to create the up and down gene sets for each study. These up and down genes from each sample were then used to create a single .gmt file called the alexander_disease.gmt. The .gmt file was uploaded into the GeneSetCart application for further integrative analysis using the “Upload GMT” option in the Assemble step of the platform. Using the GeneSetCart pipeline, we found consensus up and down signatures which are genes that appear in the majority of all up or down gene sets. We analyze potential drugs that could reverse the gene expression changes by sending the consensus gene sets to SigCom LINCS [6]. We also perform gene set enrichment analysis on the consensus signatures by sending them to Enrichr [1].
 
 <br />
 
@@ -48,7 +48,7 @@ Vorinostat, a member of a class of drugs known as histone deacetylase (HDAC) inh
 
 <u> **CONCLUSION** </u>
 
-Here, we use the G2SG Assemble-Augment-Combine-Visualize-Analyze pipeline to explore possible targets and drugs that can reverse the gene expression changes related to Alexander Disease. We show that G2SG is a powerful tool that helps analyze gene sets created from related experiments and studies such as those created from the differential gene expression analyses of gene expression samples from Alexander disease studies. This enables users to find potential biomarkers and therapeutic treatments for the disease which are not limited to only one study.
+Here, we use the GeneSetCart Assemble-Augment-Combine-Visualize-Analyze pipeline to explore possible targets and drugs that can reverse the gene expression changes related to Alexander Disease. We show that GeneSetCart is a powerful tool that helps analyze gene sets created from related experiments and studies such as those created from the differential gene expression analyses of gene expression samples from Alexander disease studies. This enables users to find potential biomarkers and therapeutic treatments for the disease which are not limited to only one study.
 
 <br />
 

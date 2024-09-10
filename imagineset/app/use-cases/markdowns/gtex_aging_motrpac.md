@@ -63,7 +63,7 @@ A novelty assessment of the top crossing pair sets was done by comparing the num
 
 <u> **CONCLUSION** </u>
 
-Here, we found some biological pathways and their related genes that are associated with both aging and exercise through crossing aging signatures created from GTEx and exercise related gene sets from MoTrPAC. Many of these genes are mentioned in less than 100 publications which suggests that they might be understudied. This provides evidence for further exploration of the link between these genes and both aging and exercise (Fig.3). This displays the utility of the G2SG application in integrating data sets produced from various Common Fund programs to stimulate scientific discovery.
+Here, we found some biological pathways and their related genes that are associated with both aging and exercise through crossing aging signatures created from GTEx and exercise related gene sets from MoTrPAC. Many of these genes are mentioned in less than 100 publications which suggests that they might be understudied. This provides evidence for further exploration of the link between these genes and both aging and exercise (Fig.3). This displays the utility of the GeneSetCart application in integrating data sets produced from various Common Fund programs to stimulate scientific discovery.
 
 <br />
 

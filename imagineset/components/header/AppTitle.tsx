@@ -22,7 +22,7 @@ export default function AppTitle() {
                     </ElevatedIconButton>
                 </div>
                 <div>
-                    <Typography variant='cfde' color={'secondary'}>{'Get-Gene-Set-Go'}</Typography>
+                    <Typography variant='cfde' color={'secondary'}>{'GeneSetCart'}</Typography>
                 </div>
             </Button>
         )

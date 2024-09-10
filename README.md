@@ -1,4 +1,4 @@
-# G2SG
+# GeneSetCart
 This is an application for assembling, augmenting, combining, visualizing and analyzing gene sets: [g2sg.cfde.cloud](g2sg.cfde.cloud)
 
 ## Getting Started

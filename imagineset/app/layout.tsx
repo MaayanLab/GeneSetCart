@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 // const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Get-Gene-Set-Go',
+  title: 'GeneSetCart',
   description: '',
   icons: {
     icon: '/img/G2SG-logo.png', // /public path

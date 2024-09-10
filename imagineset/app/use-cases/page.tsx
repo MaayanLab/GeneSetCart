@@ -28,7 +28,7 @@ export default async function UseCases({ params }: { params: { id: string } }) {
             <Container>
                 <Typography variant="h3" color="secondary.dark" className='p-5'>USE CASES</Typography>
                 <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, marginLeft: 3 }}>
-                    This page describes some use cases of the G2SG web application.
+                    This page describes some use cases of the GeneSetCart web application.
                 </Typography>
                 <Container>
                     <StyledAccordionComponent

@@ -43,7 +43,8 @@ export function GeneSetSelect({ sessionInfo, checked, setChecked, selectedSets}:
         <List sx={{
             maxWidth: '100%', bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 350, boxShadow: 2, '&::-webkit-scrollbar': { ...scrollbarStyles },
             '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }
-        }}>
+        }}
+        disablePadding>
             <ListSubheader>
                 Selected Gene Sets ({checked.length})
                 <Stack direction='row' sx={{justifyContent:'center'}}>

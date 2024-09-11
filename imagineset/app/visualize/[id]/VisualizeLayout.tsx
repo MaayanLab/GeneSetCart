@@ -514,7 +514,9 @@ export function GeneSetOptionsList({ sessionInfo, checked, setChecked, legend }:
         <List sx={{
             maxWidth: '100%', bgcolor: 'background.paper', overflow: 'scroll', borderRadius: 2, minHeight: 400, maxHeight: 350, boxShadow: 2, '&::-webkit-scrollbar': { ...scrollbarStyles },
             '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }
-        }}>
+        }}
+        disablePadding
+        >
             <ListSubheader>
                 My Gene Sets ({checked.length})
                 <Stack direction='row'>

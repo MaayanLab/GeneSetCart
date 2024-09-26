@@ -10,7 +10,7 @@ import rummageneLogo from "@/public/img/otherLogos/rummageneLogo.png"
 import rummageoLogo from "@/public/img/otherLogos/rummageoLogo.webp"
 import kea3Logo from "@/public/img/otherLogos/KEA3Logo.png"
 import chea3logo from "@/public/img/otherLogos/chea3Logo.png"
-import SigcomLincsLogo from "@/public/img/otherLogos/sigcomLincsLogo.svg"
+import SigcomLincsLogo from "@/public/img/otherLogos/sigcomlincs.png"
 import playbookLogo from "@/public/img/otherLogos/playbook-workflow-builder.png"
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
 
@@ -25,7 +25,7 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
         <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
             <Tooltip title={"Can visualize 2 - 5 selected sets"} placement="top">
                 <div>
-                    <Button variant='outlined' color={visualizationOptions.venn ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={visualizationOptions.venn ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setVisualizationOptions({ ...visualizationOptions, venn: !visualizationOptions.venn })} disabled={disabledVisualizations.venn}
                     >
                         <Image
@@ -39,7 +39,7 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
             </Tooltip>
             <Tooltip title={"Can visualize 1 - 10 selected sets "} placement="top">
                 <div>
-                    <Button variant='outlined' color={visualizationOptions.supervenn ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={visualizationOptions.supervenn ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setVisualizationOptions({ ...visualizationOptions, supervenn: !visualizationOptions.supervenn })} disabled={disabledVisualizations.supervenn}
 
                     >
@@ -54,7 +54,7 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
             </Tooltip>
             <Tooltip title={"Can visualize 1 - 6 selected sets"} placement="top">
                 <div>
-                    <Button variant='outlined' color={visualizationOptions.upset ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={visualizationOptions.upset ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setVisualizationOptions({ ...visualizationOptions, upset: !visualizationOptions.upset })} disabled={disabledVisualizations.upset}
                     >
                         <Image
@@ -68,7 +68,7 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
             </Tooltip>
             <Tooltip title={"Can visualize > 1 selected sets "} placement="top">
                 <div>
-                    <Button variant='outlined' color={visualizationOptions.heatmap ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={visualizationOptions.heatmap ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setVisualizationOptions({ ...visualizationOptions, heatmap: !visualizationOptions.heatmap })} disabled={disabledVisualizations.heatmap}
                     >
                         <Image
@@ -82,7 +82,7 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
             </Tooltip>
             <Tooltip title={"Can visualize > 5 selected sets "} placement="top">
                 <div>
-                    <Button variant='outlined' color={visualizationOptions.umap ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={visualizationOptions.umap ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setVisualizationOptions({ ...visualizationOptions, umap: !visualizationOptions.umap })} disabled={disabledVisualizations.umap}
                     >
                         <Image
@@ -101,9 +101,9 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
 export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOptions, selectedSetsCount }: { analysisOptions: analysisOptions, setAnalysisOptions: React.Dispatch<React.SetStateAction<analysisOptions>>, selectedSetsCount: number }) {
     return (
         <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
-            <Tooltip title={"Enrichment analysis results of the genes via Enrichr"} placement="top">
+            <Tooltip title={"Enrichment analysis results of the genes via Enrichr"} placement="bottom">
                 <div>
-                    <Button variant='outlined' color={analysisOptions.enrichr ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={analysisOptions.enrichr ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setAnalysisOptions({ ...analysisOptions, enrichr: !analysisOptions.enrichr })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
                     >
                         <Image
@@ -115,9 +115,9 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                     </Button>
                 </div>
             </Tooltip>
-            <Tooltip title={"Identifies protein kinases whose substrates are enriched in the genes"} placement="top">
+            <Tooltip title={"Identifies protein kinases whose substrates are enriched in the genes"} placement="bottom">
                 <div>
-                    <Button variant='outlined' color={analysisOptions.kea ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={analysisOptions.kea ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setAnalysisOptions({ ...analysisOptions, kea: !analysisOptions.kea })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
                     >
                         <Image
@@ -129,9 +129,9 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                     </Button>
                 </div>
             </Tooltip>
-            <Tooltip title={"Identifies transcription factors whose targets are enriched in the genes"} placement="top">
+            <Tooltip title={"Identifies transcription factors whose targets are enriched in the genes"} placement="bottom">
                 <div>
-                    <Button variant='outlined' color={analysisOptions.chea ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={analysisOptions.chea ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setAnalysisOptions({ ...analysisOptions, chea: !analysisOptions.chea })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
                     >
                         <Image
@@ -143,19 +143,24 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                     </Button>
                 </div>
             </Tooltip>
-            <Tooltip title={"Identify perturbations from over 1 million signatures that maximally up- or down-regulate the expression of the gene sets"} placement="top">
+            <Tooltip title={"Identify perturbations from over 1 million signatures that maximally up- or down-regulate the expression of the gene sets"} placement="bottom">
                 <div>
-                    <Button variant='outlined' color={analysisOptions.sigcom ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={analysisOptions.sigcom ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setAnalysisOptions({ ...analysisOptions, sigcom: !analysisOptions.sigcom })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
                     >
-                        <SigcomLincsLogo />
+                        <Image
+                            src={SigcomLincsLogo}
+                            fill
+                            alt=""
+                            style={{ padding: "10%", objectFit: "contain" }}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                     </Button>
 
                 </div>
             </Tooltip>
-            <Tooltip title={"Identify most similar gene sets extracted from supporting tables of PubMed articles"} placement="top">
+            <Tooltip title={"Identify most similar gene sets extracted from supporting tables of PubMed articles"} placement="bottom">
                 <div>
-                    <Button variant='outlined' color={analysisOptions.rummagene ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={analysisOptions.rummagene ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setAnalysisOptions({ ...analysisOptions, rummagene: !analysisOptions.rummagene })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
                     >
                         <Image
@@ -167,9 +172,9 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                     </Button>
                 </div>
             </Tooltip>
-            <Tooltip title={"Identify most similar signatures from GEO studies to your gene sets"} placement="top">
+            <Tooltip title={"Identify most similar signatures from GEO studies to your gene sets"} placement="bottom">
                 <div>
-                    <Button variant='outlined' color={analysisOptions.rummageo ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={analysisOptions.rummageo ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setAnalysisOptions({ ...analysisOptions, rummageo: !analysisOptions.rummageo })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
                     >
                         <Image
@@ -181,9 +186,9 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                     </Button>
                 </div>
             </Tooltip>
-            <Tooltip title={"Create analysis workflow from gene sets in the Playbook Workflow Builder"} placement="top">
+            <Tooltip title={"Create analysis workflow from gene sets in the Playbook Workflow Builder"} placement="bottom">
                 <div>
-                    <Button variant='outlined' color={analysisOptions.playbook ? 'success' : 'error'} sx={{ height: 100, width: 100, border: 1.5, borderRadius: 2 }}
+                    <Button variant='outlined' color={analysisOptions.playbook ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setAnalysisOptions({ ...analysisOptions, playbook: !analysisOptions.playbook })} disabled={(selectedSetsCount === 0)}
                     >
                         <Image

@@ -30,8 +30,6 @@ export default async function SessionsPage({ params }: { params: { id: string } 
         }
     })
 
-    console.log(sessions[1].gene_sets[0])
-
     const SessionTable = dynamic(() => import("./SessionTable"), { ssr: false })
 
     return (

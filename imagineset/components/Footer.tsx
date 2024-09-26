@@ -23,7 +23,7 @@ export default async function Footer() {
                         <Stack direction={"column"} spacing={2}>
                             <CFDELogo title="CFDE Workbench" href="/" color="inherit" />
                             <Divider sx={{ borderColor: "#FFF" }} />
-                            <Link href="https://github.com/MaayanLab/G2SG/">
+                            <Link href="https://github.com/MaayanLab/GeneSetCart/">
                                 <div className='flex items-center space-x-1'>
                                     <Icon path={mdiGithub} size={1} />
                                     <Typography variant='subtitle2' className='flex'>
@@ -31,7 +31,7 @@ export default async function Footer() {
                                     </Typography>
                                 </div>
                             </Link>
-                            <Link href="https://github.com/MaayanLab/G2SG/issues/new" target='_blank'>
+                            <Link href="https://github.com/MaayanLab/GeneSetCart/issues/new" target='_blank'>
                                 <div className='flex items-center space-x-1'>
                                     <Icon path={mdiBugOutline} size={1} />
                                     <Typography variant='subtitle2' className='flex'>

@@ -1,5 +1,5 @@
 # GeneSetCart
-This is an application for assembling, augmenting, combining, visualizing and analyzing gene sets: [g2sg.cfde.cloud](g2sg.cfde.cloud)
+This is an application for assembling, augmenting, combining, visualizing and analyzing gene sets: [genesetcart.cfde.cloud](genesetcart.cfde.cloud)
 
 ## Getting Started
 ```bash

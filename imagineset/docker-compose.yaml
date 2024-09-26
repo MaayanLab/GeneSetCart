@@ -47,6 +47,18 @@ services:
     environment:
       PORT: 8000
 
+  g2sg-legacy-redirect:
+    image: maayanlab/proxy:1.2.9
+    x-kubernetes:
+      imagePullPolicy: IfNotPresent
+      annotations:
+        maayanlab.cloud/ingress: https://g2sg.cfde.cloud
+    ports:
+      - 80
+    environment:
+      nginx_server_name: https://g2sg.cfde.cloud
+      nginx_redirect_00: /(.*) https://genesetcart.cfde.cloud/$$1
+
 volumes:
   g2sg-data:
     x-kubernetes:

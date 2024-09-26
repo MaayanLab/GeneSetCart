@@ -206,7 +206,7 @@ function getGMTOverlap(genesetsObject: { [key: string]: string[] }) {
                     const genes1 = genesetsObject[geneset1]
                     const genes2 = genesetsObject[geneset2]
                     const overlap = genes1.filter(x => genes2.includes(x))
-                    if (overlap.length <= 10) {
+                    if (overlap.length <= 30) {
                         overlapAll.push({ geneset1: geneset1, geneset2: geneset2, overlapGenes: overlap })
                         completedPairs.push([geneset1, geneset2].toString())
                     }

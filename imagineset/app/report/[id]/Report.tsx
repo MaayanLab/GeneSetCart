@@ -137,13 +137,16 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             </Typography>
                         </Stack>
                     </div>}
+                    {'overlappingGenes' in analysisData && analysisData['overlappingGenes'].length > 0 ? <>
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>OVERLAPPING GENES</Typography>
                     <Box sx={{ padding: 3 }}>
                         <BasicTable rows={'overlappingGenes' in analysisData ? analysisData['overlappingGenes'] : []} />
                         <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                            <strong>Table 1.</strong> Table showing the gene set pairs that have less that 10 overlapping genes between them.
+                            <strong>Table 1.</strong> Gene set pairs with 25 or less overlapping genes between them.
                         </Typography>
                     </Box>
+                    </> : <></>}
+                    {selectedSets[0].id in analysisData && Object.keys(analysisData[selectedSets[0].id]).length > 0 ? <>
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>ANALYSIS LINKS</Typography>
                     <List sx={{ listStyle: "decimal", marginLeft: 5 }}>
                         {selectedSets.map((geneset, i) =>
@@ -204,6 +207,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             </ListItem>
                         )}
                     </List>
+                    </> : <></>}
                     {analysisData.gptSummary &&
                         <Box sx={{ marginLeft: 3, marginTop: 2 }}>
                             <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1 }}>GPT GENERATED SUMMARY</Typography>

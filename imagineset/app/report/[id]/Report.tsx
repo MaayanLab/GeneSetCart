@@ -84,7 +84,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.heatmap}.</strong> Jaccard similarity scores between gene sets. This figure contains a clustered heatmap with
                                 each cell representing the Jaccard index of each overlap between the gene sets.
-                                Visualization from: <Link color='secondary'>https://g2sg.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Heatmap</Link>
+                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Heatmap</Link>
                             </Typography>
                         </Stack>
                     </div>
@@ -95,7 +95,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.venn}.</strong> Overlap between the selected gene sets.
                                 This figure contains a venn diagram showing the overlap between the gene sets with the number of overlapping genes in each intersection.
-                                Visualization from: <Link color='secondary'>https://g2sg.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Venn</Link>
+                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Venn</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -109,7 +109,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.supervenn}.</strong> A Supervenn figure showing regions of overlapping genes between gene sets.
                                 The number of overlapping genes is shown at the bottom of each section
-                                Visualization from: <Link color='secondary'>https://g2sg.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=SuperVenn</Link>
+                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=SuperVenn</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -121,7 +121,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.upset}.</strong> Overlap between the selected gene sets. {legendSelectedSets.map((set) => (set.alphabet) + ': ' + set.name + '; ')}.
                                 This figure contains an UpSet plot showing the overlap between the gene sets with the number of overlapping genes in each intersection.
-                                Visualization from: <Link color='secondary'>https://g2sg.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UpSet</Link>
+                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UpSet</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -133,7 +133,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.umap}.</strong>  Uniform Manifold Approximation and Projection of the selected gene sets clustered with Leiden clustering algorithm.
                                 The parameters used for the visualization were set to: min_dist = 0.1, spread = 1, and nNeighbors = 15.
-                                Visualization from: <Link color='secondary'>https://g2sg.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UMAP</Link>
+                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UMAP</Link>
                             </Typography>
                         </Stack>
                     </div>}

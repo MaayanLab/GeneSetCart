@@ -447,7 +447,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
                                                     disableTouchListener
                                                     title="Copied"
                                                 >
-                                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height: 25 }} disabled={sessionInfo?.private} onClick={() => { handleTooltipOpen(); copyToClipboard(`https://g2sg.cfde.cloud${pathname}?checked=${checked.toString()}&type=${visualization}`) }}><ShareIcon /> &nbsp;<Typography >Share</Typography></Button>
+                                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: 2, height: 25 }} disabled={sessionInfo?.private} onClick={() => { handleTooltipOpen(); copyToClipboard(`https://genesetcart.cfde.cloud${pathname}?checked=${checked.toString()}&type=${visualization}`) }}><ShareIcon /> &nbsp;<Typography >Share</Typography></Button>
                                                 </Tooltip>
                                             </div>
                                         </ClickAwayListener>

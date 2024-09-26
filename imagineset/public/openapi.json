@@ -10,11 +10,11 @@
   },
   "externalDocs": {
     "description": "Find out more about GeneSetCart",
-    "url": "http://g2sg.cfde.cloud"
+    "url": "http://genesetcart.cfde.cloud"
   },
   "servers": [
     {
-      "url": "https://g2sg.cfde.cloud/api"
+      "url": "https://genesetcart.cfde.cloud/api"
     }
   ],
   "tags": [

@@ -44,8 +44,7 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                                     }}>
                                     {alexanderUseCase}
                                 </ReactMarkdown>}
-                                launchLink="https://g2sg.cfde.cloud/analyze/clve10831005o1p8osxg25ta5" /> //  public session in my account (so that users cant change it)
-                                // launchLink="https://g2sg.cfde.cloud/analyze/clv2phuo8002nvfpmq44m8iyf" />
+                                launchLink="https://genesetcart.cfde.cloud/analyze/clve10831005o1p8osxg25ta5" /> //  public session in my account (so that users cant change it)
                                 
                         }
                         label={'alexander'}
@@ -63,7 +62,7 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                                     }}>
                                     {gtexAgingMotrpac}
                                 </ReactMarkdown>}
-                                launchLink="https://g2sg.cfde.cloud/gmt-cross/clv2p3a4o002hvfpmgbsuf8p3?lib1=GTEx+Tissue-Specific+Aging+Signatures&lib2=MoTrPAC+Rat+Endurance+Exercise+Training" />
+                                launchLink="https://genesetcart.cfde.cloud/gmt-cross/clv2p3a4o002hvfpmgbsuf8p3?lib1=GTEx+Tissue-Specific+Aging+Signatures&lib2=MoTrPAC+Rat+Endurance+Exercise+Training" />
                         }
                         label={'gtex-motrpac-crossing'}
                     />

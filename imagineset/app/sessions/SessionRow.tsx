@@ -92,7 +92,7 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
                             disableTouchListener
                             title="Copied"
                         >
-                            <Button color='secondary' onClick={() => { handleTooltipOpen(); copyToClipboard(`https://g2sg.cfde.cloud/analyze/${session.id}`) }} disabled={session.private}><ShareIcon /></Button>
+                            <Button color='secondary' onClick={() => { handleTooltipOpen(); copyToClipboard(`https://genesetcart.cfde.cloud/analyze/${session.id}`) }} disabled={session.private}><ShareIcon /></Button>
                         </Tooltip>
                     </div>
                 </ClickAwayListener>

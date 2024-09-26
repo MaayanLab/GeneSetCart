@@ -4,7 +4,18 @@ import React from "react";
 import { SessionRow } from "./SessionRow";
 import { Gene, GeneSet, PipelineSession} from "@prisma/client";
 
-export default function SessionTable({sessions}: { sessions: (PipelineSession & { gene_sets: GeneSet[] }  & { genesets_full: (({genes: Gene[]} & GeneSet) | null)[];})[]}){
+type GeneSetGenes = {
+    id: string;
+    name: string;
+    description: string | null;
+    session_id: string;
+    createdAt: Date;
+    isHumanGenes: boolean;
+    otherSymbols: string[];
+    genes: Gene[];
+}
+
+export default function SessionTable({sessions}: { sessions: (PipelineSession & { gene_sets: GeneSetGenes[] })[]}){
     const [page, setPage] = React.useState(0)
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const handleChangePage = (

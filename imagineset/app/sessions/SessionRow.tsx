@@ -13,7 +13,18 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import DownloadIcon from '@mui/icons-material/Download';
 import { downloadURI } from "../visualize/[id]/VisualizeLayout";
 
-export function SessionRow({ session }: { session: PipelineSession & { gene_sets: GeneSet[] } & { genesets_full: (({genes: Gene[]} & GeneSet) | null)[];} }) {
+type GeneSetGenes = {
+    id: string;
+    name: string;
+    description: string | null;
+    session_id: string;
+    createdAt: Date;
+    isHumanGenes: boolean;
+    otherSymbols: string[];
+    genes: Gene[];
+}
+
+export function SessionRow({ session }: { session: PipelineSession & { gene_sets: GeneSetGenes[] }}) {
 
 
     const deleteSession = React.useCallback((session: PipelineSession & { gene_sets: GeneSet[] }) => {
@@ -33,7 +44,7 @@ export function SessionRow({ session }: { session: PipelineSession & { gene_sets
 
     const downloadSessionSets = () => {
         let gmtContent = "data:text/gmt;charset=utf-8," 
-        + session.genesets_full.map((gene_set, index) => {
+        + session.gene_sets.map((gene_set, index) => {
             const genes = gene_set?.isHumanGenes ? gene_set?.genes.map((gene) => gene.gene_symbol) : gene_set?.otherSymbols
             const GMTInfo = (index === 0) ? gene_set?.name + '\t' + genes?.join('\t') : '\n' + gene_set?.name + '\t' + genes?.join('\t')
             return GMTInfo

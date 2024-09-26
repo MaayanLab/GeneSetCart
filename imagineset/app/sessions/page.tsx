@@ -22,21 +22,15 @@ export default async function SessionsPage({ params }: { params: { id: string } 
             user_id: user.id
         },
         include: {
-            gene_sets: true
+            gene_sets: {
+                include: {
+                    genes: true
+                }
+            }
         }
     })
 
-    const fullSessions = await Promise.all(sessions.map(async (session) => {
-        const sessionGenesets = await Promise.all(session.gene_sets.map(async (gene_set) => {return await prisma.geneSet.findUnique({
-            where: {
-                id: gene_set.id
-            }, 
-            include: {
-                genes: true
-            }
-        })}))
-        return {...session, genesets_full: sessionGenesets}
-    }))
+    console.log(sessions[1].gene_sets[0])
 
     const SessionTable = dynamic(() => import("./SessionTable"), { ssr: false })
 
@@ -49,7 +43,7 @@ export default async function SessionsPage({ params }: { params: { id: string } 
             <Typography variant="h3" color="secondary.dark" className='p-5'>MY PREVIOUS SESSIONS</Typography>
             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
             </Typography>
-            <SessionTable sessions={fullSessions} />
+            <SessionTable sessions={sessions} />
         </Container>
         </>
     )

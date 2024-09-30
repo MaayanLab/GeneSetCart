@@ -71,7 +71,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                     {('playbookLink' in analysisData && analysisOptions.playbook) &&
                         <>
                             <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VIEW IN PLAYBOOK WORKFLOW BUILDER</Typography>
-                            <Typography sx={{ marginLeft: 5}}> Playbook Link: <Link color='secondary'>{analysisData['playbookLink']}</Link></Typography>
+                            <Typography sx={{ marginLeft: 5}}> Playbook Link: <Link color='secondary' href={analysisData['playbookLink']} target="_blank">{analysisData['playbookLink']}</Link></Typography>
                         </>
                     }
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VISUALIZATION OF OVERLAP</Typography>
@@ -84,7 +84,8 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.heatmap}.</strong> Jaccard similarity scores between gene sets. This figure contains a clustered heatmap with
                                 each cell representing the Jaccard index of each overlap between the gene sets.
-                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Heatmap</Link>
+                                Visualization from: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=Heatmap`} 
+                                target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Heatmap</Link>
                             </Typography>
                         </Stack>
                     </div>
@@ -95,7 +96,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.venn}.</strong> Overlap between the selected gene sets.
                                 This figure contains a venn diagram showing the overlap between the gene sets with the number of overlapping genes in each intersection.
-                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Venn</Link>
+                                Visualization from: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=Venn`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Venn</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -109,7 +110,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.supervenn}.</strong> A Supervenn figure showing regions of overlapping genes between gene sets.
                                 The number of overlapping genes is shown at the bottom of each section
-                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=SuperVenn</Link>
+                                Visualization from: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=SuperVenn`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=SuperVenn</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -121,7 +122,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.upset}.</strong> Overlap between the selected gene sets. {legendSelectedSets.map((set) => (set.alphabet) + ': ' + set.name + '; ')}.
                                 This figure contains an UpSet plot showing the overlap between the gene sets with the number of overlapping genes in each intersection.
-                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UpSet</Link>
+                                Visualization from: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=UpSet`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UpSet</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -133,7 +134,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                 <strong>Figure {figureLegends.umap}.</strong>  Uniform Manifold Approximation and Projection of the selected gene sets clustered with Leiden clustering algorithm.
                                 The parameters used for the visualization were set to: min_dist = 0.1, spread = 1, and nNeighbors = 15.
-                                Visualization from: <Link color='secondary'>https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UMAP</Link>
+                                Visualization from: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=UMAP`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UMAP</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -160,7 +161,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }} style={{ breakInside: 'avoid' }}>
                                                 <strong>Figure {figureLegends.enrichr[i]}.</strong> Enrichment analysis results of the {geneset.name} gene set showing top 5 enriched terms from the
                                                 WikiPathway_2023_Human and GO Biological Processes libraries.
-                                                Enrichr: <Link color='secondary'>https://maayanlab.cloud/Enrichr/enrich?dataset={analysisData[geneset.id]['enrichrLink']}</Link>
+                                                Enrichr: <Link color='secondary' href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.id]['enrichrLink']}`} target="_blank">https://maayanlab.cloud/Enrichr/enrich?dataset={analysisData[geneset.id]['enrichrLink']}</Link>
                                             </Typography>
                                         </Stack>
                                     }
@@ -190,17 +191,17 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                 <List sx={{ listStyleType: 'disc', marginLeft: 5 }}>
                                     {(geneset.id in analysisData && 'sigcomLink' in analysisData[geneset.id] && analysisOptions.sigcom) &&
                                         <ListItem sx={{ display: 'list-item' }}>
-                                            SigCom LINCS Link: <Link color='secondary'>{analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''}</Link>
+                                            SigCom LINCS Link: <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''}</Link>
                                         </ListItem>
                                     }
                                     {(geneset.id in analysisData && 'rummageneLink' in analysisData[geneset.id] && analysisOptions.rummagene) &&
                                         <ListItem sx={{ display: 'list-item' }}>
-                                            Rummagene Link: <Link color='secondary'>{analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''}</Link>
+                                            Rummagene Link: <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''}</Link>
                                         </ListItem>
                                     }
                                     {(geneset.id in analysisData && 'rummageoLink' in analysisData[geneset.id] && analysisOptions.rummageo) &&
                                         <ListItem sx={{ display: 'list-item' }}>
-                                            RummaGEO Link: <Link color='secondary'>{analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''}</Link>
+                                            RummaGEO Link: <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''}</Link>
                                         </ListItem>
                                     }
                                 </List>

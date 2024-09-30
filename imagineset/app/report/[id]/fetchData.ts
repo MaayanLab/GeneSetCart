@@ -185,7 +185,7 @@ async function getSigComLINCSResults(genes: string[], term: string) {
 
     const persistentId = response.data.id
 
-    const sigcomLink = "https://maayanlab.cloud/sigcom-lincs#/SignatureSearch/Rank/%s" + persistentId
+    const sigcomLink = "https://maayanlab.cloud/sigcom-lincs#/SignatureSearch/Set/" + persistentId
     return sigcomLink
 }
 

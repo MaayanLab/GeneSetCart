@@ -38,7 +38,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
 }) {
 
     const { figureLegends, analysisLegends } = getNumbering(visualizationOptions, analysisOptions, disabledOptions, selectedSets.length)
-    const heatmapOptions = { diagonal: false, interactive: true, palette: 'viridis', fontSize: 11, disableLabels: false, annotationText: false }
+    const heatmapOptions = { diagonal: false, interactive: true, palette: 'Reds', fontSize: 11, disableLabels: false, annotationText: true }
     const umapOptions = { assignGroups: false, minDist: 0.1, spread: 1, nNeighbors: 15, randomState: 42 }
     const upSetOptions = { color: '#000000' }
     const [overlap, setOverlap] = React.useState<OverlapSelection>({ name: '', overlapGenes: [] })
@@ -52,7 +52,12 @@ export default function Report({ selectedSets, checked, sessionId, visualization
         })
     }, [selectedSets])
 
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
 
+    const todayString = mm + '/' + dd + '/' + yyyy;
     const componentRef = React.useRef<HTMLDivElement>(null);
 
     return (
@@ -67,9 +72,8 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                 <Paper sx={{
                     minWidth: '100%'
                 }}>
-                    <Typography variant="h4" color="secondary.dark" sx={{ padding: 3 }}>GeneSetCart Report</Typography>
-                    
-                   
+                    <Typography variant="h4" color="secondary.dark" sx={{ padding: 3, paddingBottom: 0, textAlign: 'center' }}>GeneSetCart Report</Typography>
+                    <Typography variant="subtitle1" color="secondary.dark" sx={{ padding: 1, textAlign: 'center' }}>{todayString} | Session: <Link color='secondary' href={`https://genesetcart.cfde.cloud/analyze/${sessionId}`} target="_blank">https://genesetcart.cfde.cloud/analyze/{sessionId}</Link></Typography>
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VISUALIZATION OF OVERLAP</Typography>
                     {(visualizationOptions.heatmap && !disabledOptions.heatmap) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
                         <Stack direction='column' style={{ breakInside: 'avoid' }} sx={{ padding: 5 }}>
@@ -78,9 +82,8 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             })}
                                 heatmapOptions={heatmapOptions} />
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                                <strong>Figure {figureLegends.heatmap}.</strong> Jaccard similarity scores between gene sets. This figure contains a clustered heatmap with
-                                each cell representing the Jaccard index of each overlap between the gene sets.
-                                Visualization from: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=Heatmap`} 
+                                <strong>Figure {figureLegends.heatmap}.</strong> Jaccard similarity scores between gene sets hierarchically clustered. Annotations indicate the number of genes in each overlap.
+                                An interactive clustermap visualization is available from GeneSetCart: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=Heatmap`} 
                                 target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Heatmap</Link>
                             </Typography>
                         </Stack>
@@ -90,9 +93,8 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                         <Stack direction='column' justifyContent={'center'} style={{ breakInside: 'avoid' }} sx={{ padding: 5 }}>
                             <StaticVenn selectedSets={legendSelectedSets} />
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                                <strong>Figure {figureLegends.venn}.</strong> Overlap between the selected gene sets.
-                                This figure contains a venn diagram showing the overlap between the gene sets with the number of overlapping genes in each intersection.
-                                Visualization from: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=Venn`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Venn</Link>
+                                <strong>Figure {figureLegends.venn}.</strong> Venn diagram showing the overlap between the selected gene sets.
+                                An interactive Venn diagram visualization is available from GeneSetCart: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=Venn`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=Venn</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -104,9 +106,9 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                 })} />
                             </div>
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                                <strong>Figure {figureLegends.supervenn}.</strong> A Supervenn figure showing regions of overlapping genes between gene sets.
-                                The number of overlapping genes is shown at the bottom of each section
-                                Visualization from: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=SuperVenn`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=SuperVenn</Link>
+                                <strong>Figure {figureLegends.supervenn}.</strong> A Supervenn diagram showing regions of overlapping genes between gene sets.
+                                Overlapping genes counts are shown at the bottom of each section
+                                An interactive Supervenn diagram visualization is available from GeneSetCart: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=SuperVenn`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=SuperVenn</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -116,9 +118,8 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                 <UpsetPlotV2 selectedSets={legendSelectedSets} setOverlap={setOverlap} upSetOptions={upSetOptions} />
                             </div>
                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
-                                <strong>Figure {figureLegends.upset}.</strong> Overlap between the selected gene sets. {legendSelectedSets.map((set) => (set.alphabet) + ': ' + set.name + '; ')}.
-                                This figure contains an UpSet plot showing the overlap between the gene sets with the number of overlapping genes in each intersection.
-                                Visualization from: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=UpSet`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UpSet</Link>
+                                <strong>Figure {figureLegends.upset}.</strong> UpSet plot of the overlap across the gene sets. {legendSelectedSets.map((set) => (set.alphabet) + ': ' + set.name + '; ')}.
+                                An interactive UpSet plot visualization is available from GeneSetCart: <Link color='secondary' href={`https://genesetcart.cfde.cloud/visualize/${sessionId}?checked=${checked.join(',')}&type=UpSet`} target="_blank">https://genesetcart.cfde.cloud/visualize/{sessionId}?checked={checked.join(',')}&type=UpSet</Link>
                             </Typography>
                         </Stack>
                     </div>}
@@ -152,30 +153,27 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                 <Stack direction='column'>
                                     {(geneset.id in analysisData && 'enrichrResults' in analysisData[geneset.id] && analysisOptions.enrichr) &&
                                         <Stack direction='column' sx={{ marginLeft: 5, marginTop: 1 }} >
-                                            <Typography variant="h5" color="secondary.dark">{alphabet[analysisLegends.enrichr]}. Enrichr</Typography>
                                             <EnrichrResults data={analysisData[geneset.id]['enrichrResults']} />
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }} style={{ breakInside: 'avoid' }}>
                                                 <strong>Figure {figureLegends.enrichr[i]}.</strong> Enrichment analysis results of the {geneset.name} gene set showing top 5 enriched terms from the
-                                                WikiPathway_2023_Human and GO Biological Processes libraries.
+                                                (A) WikiPathway_2023_Human and (B) GO Biological Processes libraries.
                                                 Enrichr: <Link color='secondary' href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.id]['enrichrLink']}`} target="_blank">https://maayanlab.cloud/Enrichr/enrich?dataset={analysisData[geneset.id]['enrichrLink']}</Link>
                                             </Typography>
                                         </Stack>
                                     }
                                     {(geneset.id in analysisData && 'keaResults' in analysisData[geneset.id] && analysisOptions.kea) &&
                                         <Stack direction='column' sx={{ marginLeft: 5, marginTop: 1 }} style={{ breakInside: 'avoid' }}>
-                                            <Typography variant="h5" color="secondary.dark">{alphabet[analysisLegends.kea]}. Kinase Enrichment Analysis</Typography>
+                                            <Typography variant="h5" color="secondary.dark">Kinase Enrichment Analysis</Typography>
                                             <KEABarChart data={analysisData[geneset.id]['keaResults']} />
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                                 <strong>Figure {figureLegends.kea[i]}.</strong> Kinase enrichment analysis results of the {geneset.name} gene set showing top 10 ranked kinases
-                                                across libraries based on two different metrics. The MeanRank bar chart is color-coded by
-                                                library; hover over a colored bar segment to view individual library rankings for a given kinase.
-                                                The TopRank bar chart displays the TopRank score for each of the top-ranking kinases.
+                                                across libraries based on two different metrics.
                                             </Typography>
                                         </Stack>
                                     }
                                     {(geneset.id in analysisData && 'cheaResults' in analysisData[geneset.id] && analysisOptions.chea) &&
                                         <Stack direction='column' sx={{ marginLeft: 5, marginTop: 1 }} style={{ breakInside: 'avoid' }}>
-                                            <Typography variant="h5" color="secondary.dark">{alphabet[analysisLegends.chea]}. Transciption Factor Enrichment Analysis</Typography>
+                                            <Typography variant="h5" color="secondary.dark">Transciption Factor Enrichment Analysis</Typography>
                                             <CHEABarChart data={analysisData[geneset.id]['cheaResults']} />
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                                 <strong>Figure {figureLegends.chea[i]}.</strong> Transcription factor enrichment analysis results of the {geneset.name} gene set showing top 10 ranked TFs

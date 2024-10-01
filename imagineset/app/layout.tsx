@@ -5,6 +5,8 @@ import ThemeRegistry from './ThemeRegistry';
 import Background from '@/components/styled/background'
 import { Grid } from '@mui/material/'
 import Footer from '@/components/Footer';
+import { GoogleAnalytics } from '@next/third-parties/google'
+
 
 // const inter = Inter({ subsets: ['latin'] })
 
@@ -35,6 +37,7 @@ export default async function RootLayout({
             <Grid item><Footer /></Grid>
           </Grid>
         </ThemeRegistry>
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} /> : null}
       </body>
     </html>
   )

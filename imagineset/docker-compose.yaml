@@ -22,6 +22,7 @@ services:
       - PUBLIC_USER_ID=${PUBLIC_USER_ID}
       - PUBLIC_URL=https://genesetcart.cfde.cloud
       - NEXTAUTH_KEYCLOAK=${NEXTAUTH_KEYCLOAK}
+      - NEXT_PUBLIC_GA_MEASUREMENT_ID=${NEXT_PUBLIC_GA_MEASUREMENT_ID}
 
   g2sg-postgres:
     image: postgres:16

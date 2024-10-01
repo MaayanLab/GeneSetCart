@@ -186,18 +186,18 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                     {(geneset.id in analysisData && 'sigcomLink' in analysisData[geneset.id] && analysisOptions.sigcom) &&
                                         <ListItem sx={{ display: 'list-item' }}>
                                             Query SigCom LINCS, a web-based search engine that serves over 1.5 million gene expression signatures processed, analyzed, and visualized from LINCS, GTEx, and GEO. SigCom LINCS provides rapid signature similarity search for mimickers and reversers given sets of up and down genes [{analysisLegends.sigcom}].
-                                            <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''}</Link>
+                                            <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''} target="_blank"> {analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''}</Link>
                                         </ListItem>
                                     }
                                     {(geneset.id in analysisData && 'rummageneLink' in analysisData[geneset.id] && analysisOptions.rummagene) &&
                                         <ListItem sx={{ display: 'list-item' }}>
                                             Rummagene provides enrichment analysis on hundreds of thousands gene sets extracted from supporting tables of over one hundred thousand articles from PubMed Central to find the most similar gene sets that match your query [{analysisLegends.rummagene}].
-                                            <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''}</Link>
+                                            <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''} target="_blank"> {analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''}</Link>
                                         </ListItem>
                                     }
                                     {(geneset.id in analysisData && 'rummageoLink' in analysisData[geneset.id] && analysisOptions.rummageo) &&
                                         <ListItem sx={{ display: 'list-item' }}>
-                                            RummaGEO provides enrichment analysis on hundreds of thousands gene sets extracted automatically from GEO studies to find the most similar gene sets that match your query [{analysisLegends.rummageo}]. <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''}</Link>
+                                            RummaGEO provides enrichment analysis on hundreds of thousands gene sets extracted automatically from GEO studies to find the most similar gene sets that match your query [{analysisLegends.rummageo}]. <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''} target="_blank"> {analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''}</Link>
                                         </ListItem>
                                     }
                                 </List>
@@ -217,7 +217,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='body2' color='black' sx={{ padding: 3 }}>
                                 {analysisData['gptSummary']}
                             </Typography>
-                            <Typography variant='subtitle2'>* Interpret this summary with caution*</Typography>
+                            <Typography variant='subtitle2'>* Interpret this summary with caution *</Typography>
                         </Box>
                     }
                     <Typography variant="h6" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2, marginBottom: 2 }}>REFERENCES</Typography>

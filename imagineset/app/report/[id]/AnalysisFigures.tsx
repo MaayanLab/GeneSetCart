@@ -1,6 +1,7 @@
 import React from "react";
 import { Stack } from "@mui/material";
 import Plot from 'react-plotly.js';
+import { text } from "d3";
 
 
 export function BarChart({ terms, pvalues, library, order, markerOptions, xTitle, yTitle }: { terms: string[], pvalues: number[], library: string, order: string, markerOptions: any, xTitle: string, yTitle: string }) {
@@ -12,6 +13,13 @@ export function BarChart({ terms, pvalues, library, order, markerOptions, xTitle
                 y: terms, orientation: 'h',
                 text: terms.map((term)=> formatPlotText(term)),
                 marker: markerOptions,
+                textposition: 'inside',
+                insidetextfont: {
+                    size: 14,
+                    textposition: 'inside',
+                    textanchor: 'start',
+                },
+                insidetextanchor: 'start',
             },
         ]
     const layout = {
@@ -22,7 +30,7 @@ export function BarChart({ terms, pvalues, library, order, markerOptions, xTitle
             title: {
                 text: yTitle,
                 font: {
-                    size: 18,
+                    size: 30,
                 }
             }
         },
@@ -33,7 +41,10 @@ export function BarChart({ terms, pvalues, library, order, markerOptions, xTitle
                     size: 14,
                 }
             },
-        }
+        },
+        height: 600,
+        width: 800,
+        
     };
 
     return <Plot data={data} layout={layout} />;
@@ -62,8 +73,13 @@ export function StackedBarChart({ plotData, title, xTitle, yTitle }: { plotData:
 }
 
 export function EnrichrResults({ data }: { data: any }) {
+    console.log(data)
     const libraries = ['WikiPathway_2023_Human', 'GO_Biological_Process_2023']
     // const libraries = ['WikiPathway_2023_Human', 'GWAS_Catalog_2023', 'GO_Biological_Process_2023', 'MGI_Mammalian_Phenotype_Level_4_2021',]
+    const alphabet = [
+        "A",
+        "B",
+    ];
     const barPlots = libraries.map((library, i) => {
         const libraryData = data[library]
         const terms = libraryData.map((enrichedTermResult: any[]) => enrichedTermResult[1])
@@ -74,10 +90,11 @@ export function EnrichrResults({ data }: { data: any }) {
             line: {
                 color: 'rgb(176, 73, 60)',
                 width: 1.5
-            }
+            },
         }
         return (
             <div style={{ breakInside: 'avoid' }} key={i}>
+                <p>{alphabet[i]}.</p>
                 <BarChart terms={terms.map((terms: string, i: number) => {
                     return terms + ' (p=' + pvalues[i].toExponential(2).toString() + ')'
                 })}
@@ -127,9 +144,9 @@ export function KEABarChart({ data }: { data: any }) {
     }
     return (
         <Stack direction='column'>
-            <div style={{ breakInside: 'avoid' }}>
+            {/* <div style={{ breakInside: 'avoid' }}>
                 <BarChart terms={topRankTerms} pvalues={topRankScores} library={'TopRank Score'} order={"total descending"} markerOptions={markerOptions} xTitle="TopRank Score" yTitle="" />
-            </div>
+            </div> */}
             <div style={{ breakInside: 'avoid' }}>
                 <StackedBarChart plotData={stackedChartData} title={'MeanRank Score'} xTitle={'Sum of Ranks'} yTitle="" />
             </div>
@@ -172,5 +189,5 @@ export function CHEABarChart({ data }: { data: any }) {
 }
 
 function formatPlotText(text: string) {
-    return text.substring(0, 40) + '<br>' + text.substring(40)
+    return text.substring(0, 80) + '<br>' + text.substring(80)
 }

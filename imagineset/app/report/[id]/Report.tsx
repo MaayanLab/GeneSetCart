@@ -68,12 +68,8 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                     minWidth: '100%'
                 }}>
                     <Typography variant="h4" color="secondary.dark" sx={{ padding: 3 }}>GeneSetCart Report</Typography>
-                    {('playbookLink' in analysisData && analysisOptions.playbook) &&
-                        <>
-                            <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VIEW IN PLAYBOOK WORKFLOW BUILDER</Typography>
-                            <Typography sx={{ marginLeft: 5}}> Playbook Link: <Link color='secondary' href={analysisData['playbookLink']} target="_blank">{analysisData['playbookLink']}</Link></Typography>
-                        </>
-                    }
+                    
+                   
                     <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VISUALIZATION OF OVERLAP</Typography>
                     {(visualizationOptions.heatmap && !disabledOptions.heatmap) && <div className='flex justify-center' style={{ backgroundColor: '#FFFFFF', position: 'relative', minHeight: '500px', minWidth: '500px', maxWidth: '100%', borderRadius: '30px' }}>
                         <Stack direction='column' style={{ breakInside: 'avoid' }} sx={{ padding: 5 }}>
@@ -209,6 +205,12 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                         )}
                     </List>
                     </> : <></>}
+                    {('playbookLink' in analysisData && analysisOptions.playbook) &&
+                        <>
+                            <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>VIEW IN PLAYBOOK WORKFLOW BUILDER</Typography>
+                            <Typography sx={{ marginLeft: 5}}> Playbook Link: <Link color='secondary' href={analysisData['playbookLink']} target="_blank">{analysisData['playbookLink']}</Link></Typography>
+                        </>
+                    }
                     {analysisData.gptSummary &&
                         <Box sx={{ marginLeft: 3, marginTop: 2 }}>
                             <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1 }}>GPT GENERATED SUMMARY</Typography>

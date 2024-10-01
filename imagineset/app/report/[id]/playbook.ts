@@ -200,18 +200,6 @@ function getVisualizationsJSON(visualizationOptions: visualizationOptions,) {
 
         })
     }
-    if (visualizationOptions.umap) {
-        visualizationWorkflows.push({
-            id: 'umap-plot-id',
-            type: 'UMAPFrom[GMT]',
-            inputs: {
-                matrix: {
-                    id: 'gmt-1'
-                }
-            }
-
-        })
-    }
     return visualizationWorkflows
 }
 

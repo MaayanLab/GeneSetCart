@@ -5,7 +5,7 @@ x-kubernetes:
 services:
   g2sg-app:
     build: .
-    image: maayanlab/g2sg-app:0.6.8
+    image: maayanlab/g2sg-app:0.6.9
     platform: linux/amd64
     x-kubernetes:
       imagePullPolicy: IfNotPresent
@@ -38,7 +38,7 @@ services:
 
   g2sg-flask:
     build: ../python-backend
-    image: maayanlab/g2sg-flask:0.6.8
+    image: maayanlab/g2sg-flask:0.6.9
     platform: linux/amd64
     x-kubernetes:
       imagePullPolicy: IfNotPresent

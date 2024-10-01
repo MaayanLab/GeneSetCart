@@ -13,13 +13,12 @@ export function BarChart({ terms, pvalues, library, order, markerOptions, xTitle
                 y: terms, orientation: 'h',
                 text: terms.map((term)=> formatPlotText(term)),
                 marker: markerOptions,
-                textposition: 'inside',
+                textposition: 'both',
                 insidetextfont: {
                     size: 14,
-                    textposition: 'inside',
-                    textanchor: 'start',
                 },
                 insidetextanchor: 'start',
+                cliponaixs: false,
             },
         ]
     const layout = {
@@ -32,7 +31,8 @@ export function BarChart({ terms, pvalues, library, order, markerOptions, xTitle
                 font: {
                     size: 30,
                 }
-            }
+            },
+            automargin: true
         },
         xaxis: {
             title: {
@@ -41,9 +41,10 @@ export function BarChart({ terms, pvalues, library, order, markerOptions, xTitle
                     size: 14,
                 }
             },
+            automargin: true
         },
         height: 600,
-        width: 800,
+        width: 1000,
         
     };
 

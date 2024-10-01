@@ -223,27 +223,27 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                     <Typography variant="h6" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2, marginBottom: 2 }}>REFERENCES</Typography>
                     {analysisLegends.enrichr != 0 && 
                     <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
-                        [{analysisLegends.enrichr}]. Chen EY, Tan CM, Kou Y, Duan Q, Wang Z, Meirelles GV, Clark NR, Ma'ayan A. Enrichr: interactive and collaborative HTML5 gene list enrichment analysis tool. BMC Bioinformatics. 2013 Apr 15;14:128. doi: 10.1186/1471-2105-14-128. 
+                        [{analysisLegends.enrichr}]. Chen EY, Tan CM, Kou Y, Duan Q, Wang Z, Meirelles GV, Clark NR, Ma&apos;ayan A. Enrichr: interactive and collaborative HTML5 gene list enrichment analysis tool. BMC Bioinformatics. 2013 Apr 15;14:128. doi: 10.1186/1471-2105-14-128. 
                     </Typography>}
                     {analysisLegends.kea != 0 && 
                     <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
-                        [{analysisLegends.kea}]. Kuleshov MV, Xie Z, London ABK, Yang J, Evangelista JE, Lachmann A, Shu I, Torre D, Ma'ayan A. KEA3: improved kinase enrichment analysis via data integration. Nucleic Acids Res. 2021 Jul 2;49(W1):W304-W316. doi: 10.1093/nar/gkab359.
+                        [{analysisLegends.kea}]. Kuleshov MV, Xie Z, London ABK, Yang J, Evangelista JE, Lachmann A, Shu I, Torre D, Ma&apos;ayan A. KEA3: improved kinase enrichment analysis via data integration. Nucleic Acids Res. 2021 Jul 2;49(W1):W304-W316. doi: 10.1093/nar/gkab359.
                     </Typography>}
                     {analysisLegends.chea != 0 && 
                     <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
-                        [{analysisLegends.chea}]. Keenan AB, Torre D, Lachmann A, Leong AK, Wojciechowicz ML, Utti V, Jagodnik KM, Kropiwnicki E, Wang Z, Ma'ayan A. ChEA3: transcription factor enrichment analysis by orthogonal omics integration. Nucleic Acids Res. 2019 Jul 2;47(W1):W212-W224. doi: 10.1093/nar/gkz446.
+                        [{analysisLegends.chea}]. Keenan AB, Torre D, Lachmann A, Leong AK, Wojciechowicz ML, Utti V, Jagodnik KM, Kropiwnicki E, Wang Z, Ma&apos;ayan A. ChEA3: transcription factor enrichment analysis by orthogonal omics integration. Nucleic Acids Res. 2019 Jul 2;47(W1):W212-W224. doi: 10.1093/nar/gkz446.
                     </Typography>}
                     {analysisLegends.sigcom != 0 && 
                     <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
-                        [{analysisLegends.sigcom}].Evangelista JE, Clarke DJB, Xie Z, Lachmann A, Jeon M, Chen K, Jagodnik KM, Jenkins SL, Kuleshov MV, Wojciechowicz ML, Schürer SC, Medvedovic M, Ma'ayan A. SigCom LINCS: data and metadata search engine for a million gene expression signatures. Nucleic Acids Res. 2022 Jul 5;50(W1):W697-W709. doi: 10.1093/nar/gkac328.
+                        [{analysisLegends.sigcom}].Evangelista JE, Clarke DJB, Xie Z, Lachmann A, Jeon M, Chen K, Jagodnik KM, Jenkins SL, Kuleshov MV, Wojciechowicz ML, Schürer SC, Medvedovic M, Ma&apos;ayan A. SigCom LINCS: data and metadata search engine for a million gene expression signatures. Nucleic Acids Res. 2022 Jul 5;50(W1):W697-W709. doi: 10.1093/nar/gkac328.
                     </Typography>}
                     {analysisLegends.rummagene != 0 && 
                     <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
-                        [{analysisLegends.rummagene}]. Clarke DJB, Marino GB, Deng EZ, Xie Z, Evangelista JE, Ma'ayan A. Rummagene: massive mining of gene sets from supporting materials of biomedical research publications. Commun Biol. 2024 Apr 20;7(1):482. doi: 10.1038/s42003-024-06177-7.
+                        [{analysisLegends.rummagene}]. Clarke DJB, Marino GB, Deng EZ, Xie Z, Evangelista JE, Ma&apos;ayan A. Rummagene: massive mining of gene sets from supporting materials of biomedical research publications. Commun Biol. 2024 Apr 20;7(1):482. doi: 10.1038/s42003-024-06177-7.
                     </Typography>}
                     {analysisLegends.rummageo != 0 && 
                     <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
-                        [{analysisLegends.rummageo}]. Marino GB, Clarke DJB, Deng EZ, Ma'ayan A. RummaGEO: Automatic Mining of Human and Mouse Gene Sets from GEO. bioRxiv [Preprint]. 2024 Apr 13:2024.04.09.588712. doi: 10.1101/2024.04.09.588712.
+                        [{analysisLegends.rummageo}]. Marino GB, Clarke DJB, Deng EZ, Ma&apos;ayan A. RummaGEO: Automatic Mining of Human and Mouse Gene Sets from GEO. bioRxiv [Preprint]. 2024 Apr 13:2024.04.09.588712. doi: 10.1101/2024.04.09.588712.
                     </Typography>}
                     <br></br>
                 </Paper>

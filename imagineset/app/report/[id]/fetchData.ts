@@ -219,9 +219,9 @@ function getGMTOverlap(genesetsObject: { [key: string]: string[] }) {
 
 export function getNumbering(visualizationOptions: visualizationOptions, analysisOptions: analysisOptions, disabledOptions: visualizationOptions, selectedSetsCount: number) {
     const figureLegends : {[key: string]:  any }= { 'venn': 0, 'supervenn': 0, 'upset': 0, 'heatmap': 0, 'umap': 0, 'enrichr': [], 'kea': [], 'chea': [] }
-    const analysisLegends = {'enrichr': 0, 'kea': 0, 'chea': 0 }
+    const analysisLegends = {'enrichr': 0, 'kea': 0, 'chea': 0, 'sigcom': 0, 'rummagene': 0, 'rummageo': 0, 'playbook': 0 }
     let current = 1
-    let analysisCurrent = 0
+    let analysisCurrent = 1
     if (visualizationOptions.heatmap && !disabledOptions.heatmap) {
         figureLegends.heatmap = current
         current += 1
@@ -267,6 +267,22 @@ export function getNumbering(visualizationOptions: visualizationOptions, analysi
             analysisLegends.chea = analysisCurrent
             analysisCurrent += 1
             }
+        }
+        if (analysisOptions.sigcom && i === 0) {
+            analysisLegends.sigcom = analysisCurrent
+            analysisCurrent += 1
+        }
+        if (analysisOptions.rummagene && i === 0) {
+            analysisLegends.rummagene = analysisCurrent
+            analysisCurrent += 1
+        }
+        if (analysisOptions.rummageo && i === 0) {
+            analysisLegends.rummageo = analysisCurrent
+            analysisCurrent += 1
+        }
+        if (analysisOptions.playbook && i === 0) {
+            analysisLegends.playbook = analysisCurrent
+            analysisCurrent += 1
         }
     }
     return {figureLegends: figureLegends, analysisLegends: analysisLegends}

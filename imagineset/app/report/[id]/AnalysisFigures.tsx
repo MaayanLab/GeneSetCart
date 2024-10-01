@@ -73,7 +73,6 @@ export function StackedBarChart({ plotData, title, xTitle, yTitle }: { plotData:
 }
 
 export function EnrichrResults({ data }: { data: any }) {
-    console.log(data)
     const libraries = ['WikiPathway_2023_Human', 'GO_Biological_Process_2023']
     // const libraries = ['WikiPathway_2023_Human', 'GWAS_Catalog_2023', 'GO_Biological_Process_2023', 'MGI_Mammalian_Phenotype_Level_4_2021',]
     const alphabet = [

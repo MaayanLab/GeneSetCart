@@ -157,7 +157,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }} style={{ breakInside: 'avoid' }}>
                                                 <strong>Figure {figureLegends.enrichr[i]}.</strong> Enrichment analysis results of the {geneset.name} gene set showing top 5 enriched terms from the
                                                 (A) WikiPathway_2023_Human and (B) GO Biological Processes libraries.
-                                                Enrichr: <Link color='secondary' href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.id]['enrichrLink']}`} target="_blank">https://maayanlab.cloud/Enrichr/enrich?dataset={analysisData[geneset.id]['enrichrLink']}</Link>
+                                                Enrichr [{analysisLegends.enrichr}]: <Link color='secondary' href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.id]['enrichrLink']}`} target="_blank">https://maayanlab.cloud/Enrichr/enrich?dataset={analysisData[geneset.id]['enrichrLink']}</Link>
                                             </Typography>
                                         </Stack>
                                     }
@@ -167,7 +167,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                             <KEABarChart data={analysisData[geneset.id]['keaResults']} />
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                                 <strong>Figure {figureLegends.kea[i]}.</strong> Kinase enrichment analysis results of the {geneset.name} gene set showing top 10 ranked kinases
-                                                across libraries based on two different metrics.
+                                                across libraries based on a mean ranking from KEA3 [{analysisLegends.kea}].
                                             </Typography>
                                         </Stack>
                                     }
@@ -177,7 +177,7 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                             <CHEABarChart data={analysisData[geneset.id]['cheaResults']} />
                                             <Typography variant='caption' color='black' sx={{ wordWrap: 'break-word', padding: 2 }}>
                                                 <strong>Figure {figureLegends.chea[i]}.</strong> Transcription factor enrichment analysis results of the {geneset.name} gene set showing top 10 ranked TFs
-                                                across libraries.
+                                                across libraries based on a mean ranking from ChEA3 [{analysisLegends.chea}].
                                             </Typography>
                                         </Stack>
                                     }
@@ -185,17 +185,19 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                                 <List sx={{ listStyleType: 'disc', marginLeft: 5 }}>
                                     {(geneset.id in analysisData && 'sigcomLink' in analysisData[geneset.id] && analysisOptions.sigcom) &&
                                         <ListItem sx={{ display: 'list-item' }}>
-                                            SigCom LINCS Link: <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''}</Link>
+                                            Query SigCom LINCS, a web-based search engine that serves over 1.5 million gene expression signatures processed, analyzed, and visualized from LINCS, GTEx, and GEO. SigCom LINCS provides rapid signature similarity search for mimickers and reversers given sets of up and down genes [{analysisLegends.sigcom}].
+                                            <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['sigcomLink'] : ''}</Link>
                                         </ListItem>
                                     }
                                     {(geneset.id in analysisData && 'rummageneLink' in analysisData[geneset.id] && analysisOptions.rummagene) &&
                                         <ListItem sx={{ display: 'list-item' }}>
-                                            Rummagene Link: <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''}</Link>
+                                            Rummagene provides enrichment analysis on hundreds of thousands gene sets extracted from supporting tables of over one hundred thousand articles from PubMed Central to find the most similar gene sets that match your query [{analysisLegends.rummagene}].
+                                            <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['rummageneLink'] : ''}</Link>
                                         </ListItem>
                                     }
                                     {(geneset.id in analysisData && 'rummageoLink' in analysisData[geneset.id] && analysisOptions.rummageo) &&
                                         <ListItem sx={{ display: 'list-item' }}>
-                                            RummaGEO Link: <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''}</Link>
+                                            RummaGEO provides enrichment analysis on hundreds of thousands gene sets extracted automatically from GEO studies to find the most similar gene sets that match your query [{analysisLegends.rummageo}]. <Link color='secondary' href={analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''} target="_blank">{analysisData[geneset.id] ? analysisData[geneset.id]['rummageoLink'] : ''}</Link>
                                         </ListItem>
                                     }
                                 </List>
@@ -215,8 +217,35 @@ export default function Report({ selectedSets, checked, sessionId, visualization
                             <Typography variant='body2' color='black' sx={{ padding: 3 }}>
                                 {analysisData['gptSummary']}
                             </Typography>
+                            <Typography variant='subtitle2'>* Interpret this summary with caution*</Typography>
                         </Box>
                     }
+                    <Typography variant="h6" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2, marginBottom: 2 }}>REFERENCES</Typography>
+                    {analysisLegends.enrichr != 0 && 
+                    <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
+                        [{analysisLegends.enrichr}]. Chen EY, Tan CM, Kou Y, Duan Q, Wang Z, Meirelles GV, Clark NR, Ma'ayan A. Enrichr: interactive and collaborative HTML5 gene list enrichment analysis tool. BMC Bioinformatics. 2013 Apr 15;14:128. doi: 10.1186/1471-2105-14-128. 
+                    </Typography>}
+                    {analysisLegends.kea != 0 && 
+                    <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
+                        [{analysisLegends.kea}]. Kuleshov MV, Xie Z, London ABK, Yang J, Evangelista JE, Lachmann A, Shu I, Torre D, Ma'ayan A. KEA3: improved kinase enrichment analysis via data integration. Nucleic Acids Res. 2021 Jul 2;49(W1):W304-W316. doi: 10.1093/nar/gkab359.
+                    </Typography>}
+                    {analysisLegends.chea != 0 && 
+                    <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
+                        [{analysisLegends.chea}]. Keenan AB, Torre D, Lachmann A, Leong AK, Wojciechowicz ML, Utti V, Jagodnik KM, Kropiwnicki E, Wang Z, Ma'ayan A. ChEA3: transcription factor enrichment analysis by orthogonal omics integration. Nucleic Acids Res. 2019 Jul 2;47(W1):W212-W224. doi: 10.1093/nar/gkz446.
+                    </Typography>}
+                    {analysisLegends.sigcom != 0 && 
+                    <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
+                        [{analysisLegends.sigcom}].Evangelista JE, Clarke DJB, Xie Z, Lachmann A, Jeon M, Chen K, Jagodnik KM, Jenkins SL, Kuleshov MV, Wojciechowicz ML, Schürer SC, Medvedovic M, Ma'ayan A. SigCom LINCS: data and metadata search engine for a million gene expression signatures. Nucleic Acids Res. 2022 Jul 5;50(W1):W697-W709. doi: 10.1093/nar/gkac328.
+                    </Typography>}
+                    {analysisLegends.rummagene != 0 && 
+                    <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
+                        [{analysisLegends.rummagene}]. Clarke DJB, Marino GB, Deng EZ, Xie Z, Evangelista JE, Ma'ayan A. Rummagene: massive mining of gene sets from supporting materials of biomedical research publications. Commun Biol. 2024 Apr 20;7(1):482. doi: 10.1038/s42003-024-06177-7.
+                    </Typography>}
+                    {analysisLegends.rummageo != 0 && 
+                    <Typography variant='body2' color='black' sx={{ marginLeft: 5 }}>
+                        [{analysisLegends.rummageo}]. Marino GB, Clarke DJB, Deng EZ, Ma'ayan A. RummaGEO: Automatic Mining of Human and Mouse Gene Sets from GEO. bioRxiv [Preprint]. 2024 Apr 13:2024.04.09.588712. doi: 10.1101/2024.04.09.588712.
+                    </Typography>}
+                    <br></br>
                 </Paper>
             </div>
         </>

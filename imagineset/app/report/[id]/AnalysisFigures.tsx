@@ -13,7 +13,7 @@ export function BarChart({ terms, pvalues, library, order, markerOptions, xTitle
                 y: terms, orientation: 'h',
                 text: terms.map((term)=> formatPlotText(term)),
                 marker: markerOptions,
-                textposition: 'both',
+                textposition: 'inside',
                 insidetextfont: {
                     size: 14,
                 },
@@ -189,5 +189,5 @@ export function CHEABarChart({ data }: { data: any }) {
 }
 
 function formatPlotText(text: string) {
-    return text.substring(0, 80) + '<br>' + text.substring(80)
+    return text.substring(0, 120) + '<br>' + text.substring(120)
 }

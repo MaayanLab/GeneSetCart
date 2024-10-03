@@ -191,6 +191,7 @@ export default function Report({
                 variant="subtitle1"
                 color="secondary.dark"
                 sx={{ padding: 1, paddingLeft: 5, textAlign: "left" }}
+                key={i}
               >
                 {set.name} ({set.genes.length} genes)
               </Typography>

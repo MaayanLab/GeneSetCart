@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import prisma from '@/lib/prisma'
 
 
-export const beginNewSession = async () => {
+export const beginNewSession = async ( page?: string) => {
     const session = await getServerSession(authOptions)
     if (!session) {
         const anonymousUserId = process.env.PUBLIC_USER_ID
@@ -28,7 +28,9 @@ export const beginNewSession = async () => {
         })
 
         const newSessionId = newSession.id
-        redirect(`/assemble/${newSessionId}`)
+        if (page) {
+            redirect(`/${page}/${newSessionId}`)
+        } else redirect(`/assemble/${newSessionId}`)
     }
     // if (!session) return redirect("/api/auth/signin?callbackUrl=/")
     const user = await prisma.user.findUnique({
@@ -46,5 +48,9 @@ export const beginNewSession = async () => {
     })
 
     const newSessionId = newSession.id
-    redirect(`/assemble/${newSessionId}`)
+    if (page) {
+        redirect(`/${page}/${newSessionId}`)
+    } else redirect(`/assemble/${newSessionId}`)
 }
+
+

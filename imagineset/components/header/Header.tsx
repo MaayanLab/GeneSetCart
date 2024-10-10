@@ -231,6 +231,9 @@ export default async function Header({
                     <Link href={"/use-cases"}>
                       <TextNav title={"USE CASES"} path={"/use-cases"} />
                     </Link>
+                    <Link href={"https://chromewebstore.google.com/detail/genesetcart/dahaedghigbofibfadgedahlekhphmbd"} target="_blank">
+                      <TextNav title={"EXTENSION"} path={"--"} />
+                    </Link>
                     <Link href={"/api-documentation"}>
                       <TextNav title={"API"} path={"/api-documentation"} />
                     </Link>
@@ -306,6 +309,9 @@ export default async function Header({
                     )}
                     <Link href={"/use-cases"}>
                       <TextNav title={"USE CASES"} path={"/use-cases"} />
+                    </Link>
+                    <Link href={"https://chromewebstore.google.com/detail/genesetcart/dahaedghigbofibfadgedahlekhphmbd"} target="_blank">
+                      <TextNav title={"EXTENSION"} path={"--"} />
                     </Link>
                     <Link href={"/api-documentation"}>
                       <TextNav title={"API"} path={"/api-documentation"} />

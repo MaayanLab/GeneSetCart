@@ -11,7 +11,7 @@ export async function getAnalysisData(selectedSets: ({
     genes: Gene[];
 } & GeneSet)[], analysisOptions: analysisOptions, visualizationOptions: visualizationOptions) {
     const analysisResults: { [key: string]: any } = {}
-    await Promise.all(selectedSets.map(async (geneset) => {
+    for (const geneset of selectedSets) {
         let genesetResults: { [key: string]: any } = {};
         const genes = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
         if (analysisOptions.enrichr) {
@@ -44,7 +44,7 @@ export async function getAnalysisData(selectedSets: ({
             genesetResults['rummageoLink'] = rummageoLink
         }
         analysisResults[geneset.id] = genesetResults
-    }))
+    }
 
     let genesetDict: { [key: string]: string[] } = {}
     selectedSets.forEach((set) => {
@@ -62,6 +62,7 @@ export async function getAnalysisData(selectedSets: ({
 async function getEnrichrResults(genes: string[], term: string) {
     const ENRICHR_URL = 'https://maayanlab.cloud/Enrichr/addList'
     const genesString = genes.toString().split(',').join('\n').replaceAll("'", '')
+    await sleep(1000)
     const { data } = await axios.post(ENRICHR_URL, {
         'list': genesString,
         'description': term
@@ -75,21 +76,22 @@ async function getEnrichrResults(genes: string[], term: string) {
     const shortId = data.shortId
     // const libraries = ['WikiPathway_2023_Human', 'GWAS_Catalog_2023', 'GO_Biological_Process_2023', 'MGI_Mammalian_Phenotype_Level_4_2021',]
     const libraries = ['WikiPathway_2023_Human', 'GO_Biological_Process_2023']
-
     let libResults: { [key: string]: any[] } = {}
     for (let lib of libraries) {
+        await sleep(1000)
         const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}`)
         if (response.status === 200) {
             const enrichmentResults = await response.json()
             const topResults = enrichmentResults[lib].slice(0, 10)
             libResults[lib] = topResults
         } else {
-            await sleep(5)
+            await sleep(5000)
             const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}`)
             const enrichmentResults = await response.json()
             const topResults = enrichmentResults[lib].slice(0, 10)
             libResults[lib] = topResults
         }
+        await sleep(1000)
     }
     return { libResults: libResults, shortId: shortId }
 }

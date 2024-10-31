@@ -1,77 +1,76 @@
 <u> **BACKGROUND** </u>
 
-Alexander disease (AxD) is a rare neurodegenerative disease caused by a mutation in the GFAP gene that codes for the glial fibrillary acidic protein (GFAP)[1]. GFAP protein supports the brain's white matter (the myelin sheath) at normal levels but in Alexander disease, the gain-of-function mutation of the GFAP gene causes this protein to accumulate. Instead of helping maintain myelin, the extra GFAP kills other cells and damages the myelin. The overexpression of GFAP also results in the appearance and accumulation of Rosenthal fibers (RFs), protein aggregates in the cytoplasm of astrocytes [2], in subpial and white matter central nervous system areas which have typically high GFAP expression. Other than RF fiber build-up, astrocytes in Alexander disease also have abnormal cell shape and functionality. Therefore, Alexander disease is marked by this astrocyte phenotype which has physiological manifestations such as seizures. .
-
-<br />
-
-The Gene Expression Omnibus (GEO) is a major open biomedical research repository for transcriptomics and other omics datasets that currently contains millions of gene expression samples from tens of thousands of studies collected by research laboratories [3]. Here, we use the GeneSetCart pipeline to analyze gene sets created by comparing gene expression samples obtained from GEO of wild type (WT) or controls to alexander disease samples.
+Alexander disease (AxD) is a rare neurodegenerative disease caused by a mutation in the GFAP gene which codes for the glial fibrillary acidic protein (GFAP) [1]. The GFAP protein supports the formation of myelin sheaths in normal physiology, but in Alexander disease, the gain-of-function mutation in the GFAP gene causes the protein product to accumulate. Instead of helping maintain myelin sheaths, the extra GFAP causes damage to the myelin. The overexpression of GFAP in animal models also results in the appearance and accumulation of Rosenthal fibers (RF), protein aggregates in the cytoplasm of astrocytes [2], in subpial and white matter central nervous system areas, which have typically high GFAP expression. Other than RF build-up, astrocytes in AxD also have abnormal cell shape and function. The Gene Expression Omnibus (GEO) is a major open biomedical research repository for transcriptomics and other omics datasets that currently contains millions of gene expression samples from tens of thousands of studies collected by research laboratories from around the world [3]. Here, we use the GeneSetCart pipeline to analyze gene sets created by comparing gene expression samples obtained from GEO of wild type (WT) or controls to AxD samples (Fig. 1).
 
 <br />
 
 ![Alexander Disease Use Case Workflow](/img/markdownImg/alexander_disease_workflow.png)
+
 <h5> Fig 1: Alexander Disease Use Case Workflow </h5>
 <br />
 
+<u> **METHOD** </u>
 
- <u> **METHODS** </u>
-
-To obtain disease signatures, we perform differential gene expression analysis on RNA-seq gene expression samples from three GEO studies that compare control or wild type to Alexander disease samples (GSE198817 , GSE197044, GSE116327) [4]. The GSE198817 study contains gene expression samples from hippocampus and corpus callosum tissue of Gfap+/+, Gfap+/R236H, and mGFAPTg170-2 transgenic mice. The GSE197044 study contains RNA-seq profiles from hippocampus and corpus callosum tissue of male Gfap+/R236H and Gfap+/+ mice in FVB/N-Tac at 8 weeks of age. The GSE116327 study contains gene expression profiles of healthy control and AxD patient iPSC-derived astrocytes and post-mortem brain tissues. Differentially expressed genes between WT vs. disease samples for each study are computed using the limma method. This analysis was done using the Bulk RNA-seq analysis pipeline appyter [5]. 
-
-<br />
-
-We group these differentially expressed genes into up and down genes with up genes having a logFC > 0 and down genes having logFC < 0. The top 100 differentially expressed up and down genes based on t-statistic scores were then used to create the up and down gene sets for each study. These up and down genes from each sample were then used to create a single .gmt file called the alexander_disease.gmt. The .gmt file was uploaded into the GeneSetCart application for further integrative analysis using the “Upload GMT” option in the Assemble step of the platform. Using the GeneSetCart pipeline, we found consensus up and down signatures which are genes that appear in the majority of all up or down gene sets. We analyze potential drugs that could reverse the gene expression changes by sending the consensus gene sets to SigCom LINCS [6]. We also perform gene set enrichment analysis on the consensus signatures by sending them to Enrichr [1].
+To obtain the AxD disease signatures, we perform differential gene expression analysis on RNA-seq gene expression samples from three GEO studies that compare control or wild type to AxD samples (GSE198817, GSE197044, GSE116327) [4]. GSE198817 contains gene expression samples from the hippocampus and corpus callosum tissue of Gfap+/+, Gfap+/R236H, and mGFAPTg170-2 transgenic mice. The GSE197044 study has RNA-seq profiles from hippocampus and corpus callosum tissue of male Gfap+/R236H and Gfap+/+ mice in FVB/N-Tac at 8 weeks of age; and the GSE116327 study has profiles from healthy controls and AxD patients iPSC-derived astrocytes and post-mortem brain tissues. Differentially expressed genes between healthy controls and disease samples for each study are computed using the limma method [5]. This analysis was performed with the bulk RNA-seq analysis pipeline appyter [6]. The up and down genes were converted into gene sets. These gene sets were uploaded to GeneSetCart for further integrative analysis. Using the GeneSetCart Combine feature, consensus up and down sets were created. Choosing the consensus criteria of 3, the consensus up signature has 65 genes and the consensus down signature has 20 genes.  These up and down consensus sets were submitted to SigCom LINCS [7] to identify potential drugs and preclinical small molecules that may reverse the disease gene expression changes in different cell lines. We also perform gene set enrichment analysis on the consensus up and down sets with Enrichr [8] (Fig 2A-C). 
 
 <br />
 
-Taking the consensus of all up gene sets (with a consensus cut-off of 6) yields seven genes that appear in at least 6 of the 10 up gene sets. We can analyze potential drugs that could reverse the gene expression changes by sending the consensus gene set to SigCom LINCS [6]. 
+![Alexander Disease Use Case Workflow](/img/markdownImg/alexander_disease_fig2.png)
 
-<br />
+<h5> Fig 2: Enriched pathways and phenotypes in Alexander’s Disease >A. Top 10 enriched terms from ChEA 2022 library of consensus up signature (n= 3) gene set in Enrichr. B. Top 10 enriched terms from WikiPathway 2023 Mouse library of consensus up signature (n= 3) gene set in Enrichr. C. Top 10 enriched terms from MGI Mammalian Phenotype Level 4 2024 library of consensus up signature gene set in Enrichr. Consensus signature is consensus n=3 of down signature gene sets. 
 
-<u> **RESULTS AND DISCUSSION** </u>
+<u>
+<a href='https://maayanlab.cloud/Enrichr/enrich?dataset=353b542bd70809d81a9dd815efacd13c' target='_blank'>View results in Enrichr</a>
+</u>
 
-Choosing the consensus criteria of 3, our consensus up signature contains 65 genes while our consensus down signature contains 20 genes.  The enrichment results are presented as bar charts along with links to the reports in Enrichr. The upregulated genes (consensus up signature) are enriched for brain related terms such as complement system in neuronal development and plasticity, spinal cord injury and TYROBP causal network in microglia. The downregulated genes are also enriched for neurobiological terms such as phosphodiesterases in neuronal function and neuroinflammation and glutamatergic signaling. 
-
-<br />
-
-![Enrichment analysis of consensus up and down signature gene sets in Enrichr](/img/markdownImg/alexander_disease_enrichment.png)
-<h5> Fig 2: Enrichment analysis of consensus up and down signature gene sets in Enrichr. (A) Top enriched terms from WikiPathway 2023 Human library of  consensus up signature gene set in Enrichr.  Consensus signature is consensus n=3 of up signatures. Plot from: https://maayanlab.cloud/Enrichr/enrich?dataset=c24d601f51ffb6f071642514d1b3a02f (B) Top enriched terms from WikiPathway 2023 Human library of consensus down signature gene set in Enrichr. Consensus signature is consensus n=3 of down signature gene sets. Plot from: https://maayanlab.cloud/Enrichr/enrich?dataset=425ca9fd10bf9f97577a8b8620681d79 
 </h5>
 <br />
 
-Using the SigCOM LINCS API, we queried the consensus (n=3) up and down gene sets against all the LINCS L1000 chemical perturbation signatures to find drugs that reverse the consensus disease signature. This returns drug signatures with the z-sum and rank of each signature. Reversers (signatures that have up-regulated genes more similar to the input down genes, and the down-regulated genes more similar to the input up genes) have negative z-sums and mimickers (signatures that have similar up-regulated genes to the input up gene list, and down-regulated genes to the down gene list) have positive z-sums. Therefore, with the ranking of signatures done with the most positive z-sums being higher and most negative z-sums being lower, reversers are ranked towards the end. For each drug, we compute the Kolmogorov–Smirnov statistic using Scipy python library by (i) comparing the observed z-sum scores of its signatures to a normal distribution and (ii) comparing the observed ranks to the uniform distribution. These are used to rank the drugs based on a KS-score to find the drugs with the highest concentration of signatures at the bottom of the ranked list. There are 7 drugs that appear in both the top 10 ranked drugs from both methods: bortezomib, MG-132, vorinostat, panobinostat, GSK-1059615, BI-2536 and brefeldin-a. 
+<u> **RESULT AND DISCUSSION** </u>
 
-<br />
+The consensus upregulated genes are enriched for transcription factors known to regulate immune response and inflammation. The top three transcription factors from the ChEA [9] analysis are RELA, IRF8 and STAT3 (p<0.0001, Fisher’s exact test). Consistent with inflammation and AxD, the top enriched WikiPathways [10] pathway is Spinal Cord Injury WP2432 (p=8.234e-7) with the 6 overlapping genes: CXCL10, CCND1, CCL2, CXCL1, VIM, and GFAP. The most profound results from the enrichment analysis come from the MGI Mouse Phenotypes library with the top 4 most enriched terms: Increased Susceptibility To Induced Morbidity/Mortality MP:0009763    (p=1.576e-8), CNS Inflammation MP:0006082 (p=3.795e-7), Demyelination MP:0000921 (p=0.000004793), and Abnormal Myelination MP:0000920 (p=0.00001292). The knockout mice of the overlapping genes with these terms could serve as AxD disease models due to the shared phenotype. GFAP only overlaps with genes from the Abnormal Myelination MP:0000920 phenotype together with TYROBP, PTPRC, ADGRG6, and TLR2 (Fig. 4B). When querying Rummagene [11] with the consensus up genes, the brain inflammation signature is further confirmed. Several of the top matching sets in Rummagene are from brain inflammation studies with two studies about prion disease [12,13] suggesting potentially similar mechanisms between prion disease and AxD.
 
-Vorinostat, a member of a class of drugs known as histone deacetylase (HDAC) inhibitors, is an FDA-approved drug for cutaneous T-cell lymphoma (CTCL). The drug has been found to decrease GFAP expression in glioblastoma cells [7]. Other studies have shown that the inhibition of histone deacetylases (HDACs) with trichostatin A or sodium butyrate reduced GFAP expression in primary human astrocytes and astrocytoma cells [8]. Another highly ranked reverser found was panobinostat, also an FDA-approved histone deacetylase (HDAC) inhibitor which is used to treat multiple myeloma in combination with bortezomib and dexamethasone [9]. With a main mechanism of action similar to vorinostat of inhibiting HDAC, panobinostat may also be a potential drug to treat Alexander disease. Another potential therapeutic agent is BI-2536. BI-2536  is a polo-like kinase 1 (PLK1) inhibitor and studies show that PLK1 inhibition induces cell autophagy and that it results in mTOR dephosphorylation [10]. Therefore, BI-2536 may potentially serve as a therapeutic agent for treating Alexander's disease because autophagic clearance of accumulated GFAP protein is regulated by the p38/MAPK and mTOR signaling pathways [11], which the drug has been found to inhibit.
+The consensus down-regulated genes are enriched for terms related to brain tissues and cell types. Specifically, markers for astrocytes are the top enriched terms from the gene set libraries created from CellMarker [14], Tabula Muris [15], PanglaoDB [16], and Allen Brain Atlas 10x scRNA [17] (Fig. 4C). This observation is also supported by a RummaGEO [18]  query that returned matching gene sets from studies titled: RNA-Seq of human astrocytes GSE73721; Regionally specified human pluripotent stem cell-derived astrocytes GSE133489; and CROP-seq of hiPSC-derived astrocytes GSE182307 and GSE182309.
 
-<br />
-
-<u> **CONCLUSION** </u>
-
-Here, we use the GeneSetCart Assemble-Augment-Combine-Visualize-Analyze pipeline to explore possible targets and drugs that can reverse the gene expression changes related to Alexander Disease. We show that GeneSetCart is a powerful tool that helps analyze gene sets created from related experiments and studies such as those created from the differential gene expression analyses of gene expression samples from Alexander disease studies. This enables users to find potential biomarkers and therapeutic treatments for the disease which are not limited to only one study.
-
-<br />
+<br/>
 
 <u> **REFERENCES** </u>
 
-- [1]	J. Kuhn and M. Cascella, Alexander Disease. StatPearls Publishing, 2023.
+- [1]   Kuhn J, Cascella M. Alexander Disease. StatPearls Publishing; 2023.
 
-- [2]	A. Messing, M. W. Head, K. Galles, E. J. Galbreath, J. E. Goldman, and M. Brenner, “Fatal encephalopathy with astrocyte inclusions in GFAP transgenic mice,” Am. J. Pathol., vol. 152, no. 2, pp. 391–398, Feb. 1998.
+- [2]   Messing A, Head MW, Galles K, Galbreath EJ, Goldman JE, Brenner M. Fatal encephalopathy with astrocyte inclusions in GFAP transgenic mice. Am J Pathol. 1998;152: 391–398.
 
-- [3]	T. Barrett et al., “NCBI GEO: archive for functional genomics data sets--update,” Nucleic Acids Res., vol. 41, no. Database issue, pp. D991–5, Jan. 2013.
+- [3]   Barrett T, Wilhite SE, Ledoux P, Evangelista C, Kim IF, Tomashevsky M, et al. NCBI GEO: archive for functional genomics data sets--update. Nucleic Acids Res. 2013;41: D991–5.
 
-- [4]	S. C. Gammie, A. Messing, M. A. Hill, C. A. Kelm-Nelson, and T. L. Hagemann, “Large-scale gene expression changes in APP/PSEN1 and GFAP mutation models exhibit high congruence with Alzheimer’s disease,” PLoS One, vol. 19, no. 1, p. e0291995, Jan. 2024.
+- [4]   Gammie SC, Messing A, Hill MA, Kelm-Nelson CA, Hagemann TL. Large-scale gene expression changes in APP/PSEN1 and GFAP mutation models exhibit high congruence with Alzheimer’s disease. PLoS One. 2024;19: e0291995.
 
-- [5]	D. J. B. Clarke et al., “Appyters: Turning Jupyter Notebooks into data-driven web apps,” Patterns (N Y), vol. 2, no. 3, p. 100213, Mar. 2021.
+- [5]   Ritchie ME, Phipson B, Wu D, Hu Y, Law CW, Shi W, et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. Nucleic Acids Res. 2015;43: e47.
 
-- [6]	J. E. Evangelista et al., “SigCom LINCS: data and metadata search engine for a million gene expression signatures,” Nucleic Acids Res., vol. 50, no. W1, pp. W697–W709, Jul. 2022.
+- [6]   Clarke DJB, Jeon M, Stein DJ, Moiseyev N, Kropiwnicki E, Dai C, et al. Appyters: Turning Jupyter Notebooks into data-driven web apps. Patterns (N Y). 2021;2: 100213.
 
-- [7]	T. Perez, R. Berges, H. Maccario, D. Braguer, and S. Honoré, “P11.06 Non epigenetic effect of vorinostat in glioblastoma cells,” Neuro. Oncol., vol. 21, no. Suppl 3, p. iii43, Sep. 2019.
+- [7]   Evangelista JE, Clarke DJB, Xie Z, Lachmann A, Jeon M, Chen K, et al. SigCom LINCS: data and metadata search engine for a million gene expression signatures. Nucleic Acids Res. 2022;50: W697–W709.
 
-- [9]	R. Kanski et al., “Histone acetylation in astrocytes suppresses GFAP and stimulates a reorganization of the intermediate filament network,” J. Cell Sci., vol. 127, no. Pt 20, pp. 4368–4380, Oct. 2014.
+- [8]   Chen EY, Tan CM, Kou Y, Duan Q, Wang Z, Meirelles GV, et al. Enrichr: interactive and collaborative HTML5 gene list enrichment analysis tool. BMC Bioinformatics. 2013;14: 128.
 
-- [9]	K. Wahaib, A. E. Beggs, H. Campbell, L. Kodali, and P. D. Ford, “Panobinostat: A histone deacetylase inhibitor for the treatment of relapsed or refractory multiple myeloma,” Am. J. Health. Syst. Pharm., vol. 73, no. 7, pp. 441–450, Apr. 2016.
+- [9]   Keenan AB, Torre D, Lachmann A, Leong AK, Wojciechowicz ML, Utti V, et al. ChEA3: transcription factor enrichment analysis by orthogonal omics integration. Nucleic Acids Res. 2019;47: W212–W224.
 
-- [10]	Y.-F. Tao et al., “Inhibiting PLK1 induces autophagy of acute myeloid leukemia cells via mammalian target of rapamycin pathway dephosphorylation,” Oncol. Rep., vol. 37, no. 3, pp. 1419–1429, Mar. 2017.
+- [10]  Kutmon M, Riutta A, Nunes N, Hanspers K, Willighagen EL, Bohler A, et al. WikiPathways: capturing the full diversity of pathway knowledge. Nucleic Acids Res. 2016;44: D488–94.
 
-- [11]	G. Tang et al., “Autophagy induced by Alexander disease-mutant GFAP accumulation is regulated by p38/MAPK and mTOR signaling pathways,” Hum. Mol. Genet., vol. 17, no. 11, pp. 1540–1555, Jun. 2008.
+- [11]  Clarke DJB, Marino GB, Deng EZ, Xie Z, Evangelista JE, Ma’ayan A. Rummagene: massive mining of gene sets from supporting materials of biomedical research publications. Commun Biol. 2024;7: 482.
+
+- [12]  Slota JA, Medina SJ, Frost KL, Booth SA. Neurons and astrocytes elicit brain region specific transcriptional responses to prion disease in the Murine CA1 and thalamus. Front Neurosci. 2022;16: 918811.
+
+- [13]  Crespo I, Roomp K, Jurkowski W, Kitano H, del Sol A. Gene regulatory network analysis supports inflammation as a key neurodegeneration process in prion disease. BMC Syst Biol. 2012;6: 132.
+
+- [14]  Zhang X, Lan Y, Xu J, Quan F, Zhao E, Deng C, et al. CellMarker: a manually curated resource of cell markers in human and mouse. Nucleic Acids Res. 2019;47: D721–D728.
+
+- [15]  Tabula Muris Consortium. A single-cell transcriptomic atlas characterizes ageing tissues in the mouse. Nature. 2020;583: 590–595.
+
+- [16]  Franzén O, Gan L-M, Björkegren JLM. PanglaoDB: a web server for exploration of mouse and human single-cell RNA sequencing data. Database (Oxford). 2019;2019. doi:10.1093/database/baz046
+
+- [17]  Shen EH, Overly CC, Jones AR. The Allen Human Brain Atlas: comprehensive gene expression mapping of the human brain. Trends Neurosci. 2012;35: 711–714.
+
+- [18]  Marino GB, Clarke DJB, Lachmann A, Deng EZ, Ma’ayan A. RummaGEO: Automatic mining of human and mouse gene sets from GEO. Patterns (N Y). 2024;5: 101072.
+
+
+

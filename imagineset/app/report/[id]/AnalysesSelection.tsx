@@ -15,11 +15,13 @@ import playbookLogo from "@/public/img/otherLogos/playbook-workflow-builder.png"
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
 
 
-export function VisualizationSelection({ visualizationOptions, setVisualizationOptions, disabledVisualizations }:
+export function VisualizationSelection({ visualizationOptions, setVisualizationOptions, disabledVisualizations, errorMessage, setErrorMessage }:
     {
         visualizationOptions: visualizationOptions,
         setVisualizationOptions: React.Dispatch<React.SetStateAction<visualizationOptions>>,
-        disabledVisualizations: visualizationOptions
+        disabledVisualizations: visualizationOptions,
+        errorMessage: string,
+        setErrorMessage: React.Dispatch<React.SetStateAction<string>>
     }) {
     return (
         <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
@@ -98,13 +100,19 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
     )
 }
 
-export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOptions, selectedSetsCount }: { analysisOptions: analysisOptions, setAnalysisOptions: React.Dispatch<React.SetStateAction<analysisOptions>>, selectedSetsCount: number }) {
+export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOptions, selectedSetsCount, errorMessage, setErrorMessage }: { analysisOptions: analysisOptions, setAnalysisOptions: React.Dispatch<React.SetStateAction<analysisOptions>>, selectedSetsCount: number, errorMessage: string, setErrorMessage: React.Dispatch<React.SetStateAction<string>> }) {
     return (
         <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
             <Tooltip title={"Enrichment analysis results of the genes via Enrichr"} placement="top">
-                <div>
+                <div onClick={() => {
+                            if (selectedSetsCount === 0) {
+                                setErrorMessage('Select at least 1 set');
+                            } else if (selectedSetsCount > 5) {
+                                setErrorMessage('Select at most 5 sets');
+                            }
+                        }}>
                     <Button variant='outlined' color={analysisOptions.enrichr ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
-                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, enrichr: !analysisOptions.enrichr })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
+                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, enrichr: !analysisOptions.enrichr })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 5)}
                     >
                         <Image
                             src={enrichrLogo}
@@ -116,9 +124,15 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                 </div>
             </Tooltip>
             <Tooltip title={"Identifies protein kinases whose substrates are enriched in the genes"} placement="top">
-                <div>
+                <div onClick={() => {
+                            if (selectedSetsCount === 0) {
+                                setErrorMessage('Select at least 1 set');
+                            } else if (selectedSetsCount > 5) {
+                                setErrorMessage('Select at most 5 sets');
+                            }
+                        }}>
                     <Button variant='outlined' color={analysisOptions.kea ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
-                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, kea: !analysisOptions.kea })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
+                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, kea: !analysisOptions.kea })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 5)}
                     >
                         <Image
                             src={kea3Logo}
@@ -130,9 +144,15 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                 </div>
             </Tooltip>
             <Tooltip title={"Identifies transcription factors whose targets are enriched in the genes"} placement="top">
-                <div>
+                <div onClick={() => {
+                            if (selectedSetsCount === 0) {
+                                setErrorMessage('Select at least 1 set');
+                            } else if (selectedSetsCount > 5) {
+                                setErrorMessage('Select at most 5 sets');
+                            }
+                        }}>
                     <Button variant='outlined' color={analysisOptions.chea ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
-                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, chea: !analysisOptions.chea })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
+                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, chea: !analysisOptions.chea })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 5)}
                     >
                         <Image
                             src={chea3logo}
@@ -144,9 +164,15 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                 </div>
             </Tooltip>
             <Tooltip title={"Identify perturbations from over 1 million signatures that maximally up- or down-regulate the expression of the gene sets"} placement="top">
-                <div>
+                <div onClick={() => {
+                            if (selectedSetsCount === 0) {
+                                setErrorMessage('Select at least 1 set');
+                            } else if (selectedSetsCount > 5) {
+                                setErrorMessage('Select at most 5 sets');
+                            }
+                        }}>
                     <Button variant='outlined' color={analysisOptions.sigcom ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
-                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, sigcom: !analysisOptions.sigcom })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
+                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, sigcom: !analysisOptions.sigcom })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 5)}
                     >
                         <Image
                             src={SigcomLincsLogo}
@@ -159,9 +185,15 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                 </div>
             </Tooltip>
             <Tooltip title={"Identify most similar gene sets extracted from supporting tables of PubMed articles"} placement="top">
-                <div>
+                <div onClick={() => {
+                            if (selectedSetsCount === 0) {
+                                setErrorMessage('Select at least 1 set');
+                            } else if (selectedSetsCount > 5) {
+                                setErrorMessage('Select at most 5 sets');
+                            }
+                        }}>
                     <Button variant='outlined' color={analysisOptions.rummagene ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
-                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, rummagene: !analysisOptions.rummagene })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
+                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, rummagene: !analysisOptions.rummagene })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 5)}
                     >
                         <Image
                             src={rummageneLogo}
@@ -173,9 +205,16 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                 </div>
             </Tooltip>
             <Tooltip title={"Identify most similar signatures from GEO studies to your gene sets"} placement="top">
-                <div>
+                <div onClick={() => {
+                            if (selectedSetsCount === 0) {
+                                setErrorMessage('Select at least 1 set');
+                            } else if (selectedSetsCount > 5) {
+                                setErrorMessage('Select at most 5 sets');
+                            }
+                        }}>
                     <Button variant='outlined' color={analysisOptions.rummageo ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
-                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, rummageo: !analysisOptions.rummageo })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 3)}
+                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, rummageo: !analysisOptions.rummageo })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 5)}
+                        
                     >
                         <Image
                             src={rummageoLogo}
@@ -187,7 +226,11 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                 </div>
             </Tooltip>
             <Tooltip title={"Create analysis workflow from gene sets in the Playbook Workflow Builder"} placement="top">
-                <div>
+                <div onClick={() => {
+                            if (selectedSetsCount === 0) {
+                                setErrorMessage('Select at least 1 set');
+                            }
+                        }}>
                     <Button variant='outlined' color={analysisOptions.playbook ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
                         onClick={(event) => setAnalysisOptions({ ...analysisOptions, playbook: !analysisOptions.playbook })} disabled={(selectedSetsCount === 0)}
                     >

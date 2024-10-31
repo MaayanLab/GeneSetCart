@@ -2,7 +2,7 @@
 
 import { type Gene, type GeneSet } from "@prisma/client";
 import React from "react";
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Fade, Stack, Typography } from "@mui/material";
 import { GeneSetSelect } from "./GenesetSelect";
 import ArticleIcon from '@mui/icons-material/Article';
 
@@ -49,9 +49,17 @@ export function ReportLayout({ sessionInfo, sessionId }: {
     const [analysisOptions, setAnalysisOptions] = React.useState({ enrichr: true, kea: true, chea: true, sigcom: true, rummagene: true, rummageo: true, playbook: true })
     const [loading, setLoading] = React.useState(false)
     const [analysisData, setAnalysisData] = React.useState<JsonObject>({})
+    const [errorMessage , setErrorMessage] = React.useState('')
+
+
+    React.useEffect(() => { 
+        if (errorMessage.length > 0) {
+            setTimeout(() => { setErrorMessage('') }, 3000)
+        }
+    }, [errorMessage, setErrorMessage])
 
     const selectedSets = React.useMemo(() => {
-        if (checked.length > 3) {
+        if (checked.length > 5) {
             setAnalysisOptions({ enrichr: false, kea: false, chea: false, sigcom: false, rummagene: false, rummageo: false, playbook: true })
         }
         setAnalysisData({})
@@ -91,12 +99,13 @@ export function ReportLayout({ sessionInfo, sessionId }: {
         <Stack direction='column' spacing={1} justifyContent="center" alignItems="center">
             <GeneSetSelect sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} selectedSets={selectedSets} />
             <Typography variant="h4" color='secondary'> CHOOSE VISUALIZATION OPTIONS</Typography>
-            <VisualizationSelection visualizationOptions={visualizationOptions} setVisualizationOptions={setVisualizationOptions} disabledVisualizations={disabledVisualizations} />
+            <VisualizationSelection visualizationOptions={visualizationOptions} setVisualizationOptions={setVisualizationOptions} disabledVisualizations={disabledVisualizations} errorMessage = {errorMessage} setErrorMessage = {setErrorMessage}  />
             <Typography variant="h4" color='secondary'> CHOOSE ENRICHMENT ANALYSIS TOOLS OPTIONS</Typography>
-            <EnrichmentAnalysisSelection analysisOptions={analysisOptions} setAnalysisOptions={setAnalysisOptions} selectedSetsCount = {selectedSets.length} />
+            <EnrichmentAnalysisSelection analysisOptions={analysisOptions} setAnalysisOptions={setAnalysisOptions} selectedSetsCount = {selectedSets.length} errorMessage = {errorMessage} setErrorMessage = {setErrorMessage} />
                 <Button
                     variant='contained'
                     color='secondary'
+                    className="mb-10"
                     disabled={selectedSets.length < 1}
                     onClick={() => { 
                         setAnalysisData({}); 
@@ -110,7 +119,13 @@ export function ReportLayout({ sessionInfo, sessionId }: {
                         }}>
                     <ArticleIcon /> &nbsp; Generate Report
                 </Button>
+           <Fade in={errorMessage.length > 0} timeout={500}>
+                <Typography variant="body2" color='error' sx={{ position: 'absolute', bottom: -200, backgroundColor: '#fc6156'
+                    , borderRadius: 2, padding: 1, width: '30%', textAlign: 'center', color: 'white', fontWeight: 'bold'
+                }}>{errorMessage}</Typography>
+            </Fade>
             {loading && <Stack direction='column' sx={{ justifyContent: 'center' }}>
+            
                 <Typography variant="body2" color='secondary'>Generating Report...</Typography>
                 <CircularIndeterminate />
             </Stack>}

@@ -19,6 +19,11 @@ const gtexAgingMotrpac = readFileSync(
     { encoding: 'utf8', flag: 'r' }
 )
 
+const gtexAgingMotrpacAdrenalApipose = readFileSync(
+    path.resolve('app/use-cases/markdowns', './gtex_adrenal_adipose.md'),
+    { encoding: 'utf8', flag: 'r' }
+)
+
 export default async function UseCases({ params }: { params: { id: string } }) {
     return (
         <>
@@ -50,7 +55,7 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                         label={'alexander'}
                     />
                     <StyledAccordionComponent
-                        heading="CFDE GMT Crossing: GTEx Aging Signatures vs MoTrPAC Exercise Gene Sets"
+                        heading="CFDE GMT Crossing: GTEx Aging Signatures vs MoTrPAC Exercise Gene Sets (Blood)"
                         content={
                             <UseCaseContent2 description={
                                 <ReactMarkdown
@@ -65,6 +70,23 @@ export default async function UseCases({ params }: { params: { id: string } }) {
                                 launchLink="https://genesetcart.cfde.cloud/gmt-cross/clv2p3a4o002hvfpmgbsuf8p3?lib1=GTEx+Tissue-Specific+Aging+Signatures&lib2=MoTrPAC+Rat+Endurance+Exercise+Training" />
                         }
                         label={'gtex-motrpac-crossing'}
+                    />
+                    <StyledAccordionComponent
+                        heading="CFDE GMT Crossing: GTEx Aging Signatures vs MoTrPAC Exercise Gene Sets (Adrenal and Adipose Tissue)"
+                        content={
+                            <UseCaseContent2 description={
+                                <ReactMarkdown
+                                    rehypePlugins={[rehypeRaw]}
+                                    remarkPlugins={[remarkGfm]}
+                                    components={{
+                                        img: ({ node, ...props }) => <img style={{ maxWidth: '90%', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}{...props} />,
+                                        h5: ({ node, ...props }) => <h5 style={{ fontSize: 12 }}{...props} />
+                                    }}>
+                                    {gtexAgingMotrpacAdrenalApipose}
+                                </ReactMarkdown>}
+                                launchLink="https://genesetcart.cfde.cloud/gmt-cross/clv2p3a4o002hvfpmgbsuf8p3?lib1=GTEx+Tissue-Specific+Aging+Signatures&lib2=MoTrPAC+Rat+Endurance+Exercise+Training" />
+                        }
+                        label={'gtex-motrpac-crossing-adrenal-adipose'}
                     />
                 </Container>
             </Container>

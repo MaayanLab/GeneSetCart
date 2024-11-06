@@ -8,6 +8,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import maayanLabLogo from '@/public/img/otherLogos/maayanlabLogo.png'
+import ccLogo from '@/public/img/otherLogos/cc-by-nc-sa.png'
 import IconButton from "@mui/material/IconButton"
 import Email from "@/public/img/email.svg"
 import { CFDELogo, Logo } from './styled/Logo';
@@ -72,7 +73,9 @@ export default async function Footer() {
                     <Grid item>
                         <Stack spacing={2}>
                             <Link href="https://labs.icahn.mssm.edu/maayanlab/" target='_blank'><Image src={maayanLabLogo} alt="" width='100' height={'100'}></Image></Link>
+                            <Link href={"https://creativecommons.org/licenses/by-sa/4.0/"} target='_blank'><Image src={ccLogo} alt="" width='100' height={'100'}/></Link>
                         </Stack>
+
                     </Grid>
                 </Grid>
             </Container>

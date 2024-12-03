@@ -51,7 +51,7 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
                                 <SessionChip sessionId={props.params.id} />
                             </div>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                                Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS
+                                Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Rummagene, RummaGEO, ChEA3, KEA3, SigCOM LINCS, L2S2, and PFOCRummage
                             </Typography>
                             <PaginatedTable rows={rows} />
                         </Container>
@@ -142,7 +142,7 @@ export default async function AnalyzePage(props: { params: { id: string }, searc
                         <SessionChip sessionId={props.params.id} />
                     </div>
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-                        Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Playbook Workflow Builder, Rummagene, RummaGEO, ChEA3, KEA3 and SigCOM LINCS.
+                        Analyze your gene sets by sending them to CFDE-GSE, Enrichr, Enrichr-KG, Playbook Workflow Builder, Rummagene, RummaGEO, ChEA3, KEA3, SigCOM LINCS, L2S2, and PFOCRummage.
                     </Typography>
                     <PaginatedTable rows={rows} />
                 </Container>

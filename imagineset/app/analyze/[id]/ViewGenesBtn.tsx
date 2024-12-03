@@ -26,7 +26,9 @@ import chea3logo from "@/public/img/otherLogos/chea3Logo.png"
 import SigcomLincsLogo from "@/public/img/otherLogos/sigcomLincsLogo.svg"
 import playbookLogo from "@/public/img/otherLogos/playbook-workflow-builder.png"
 import cfdeLogo from "@/public/img/favicon.png"
-import { getEnrichrShortId, getPlaybookLink, getRummageneLink, getRummageoLink, getSigComLINCSId } from "@/app/analyze/[id]/AnalyzeFunctions";
+import l2s2Logo from "@/public/img/otherLogos/LINCSearch_logo.png"
+import pfocrummageLogo from "@/public/img/otherLogos/PFOCRummageBlack.png"
+import { getEnrichrShortId, getPlaybookLink, getRummageneLink, getRummageoLink, getSigComLINCSId, getL2S2Link, getPFOCRummageLink } from "@/app/analyze/[id]/AnalyzeFunctions";
 import { deleteGenesetByID } from "@/components/header/Header";
 import { checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
 
@@ -176,10 +178,24 @@ const options = [<>
     </div>&nbsp;<Typography sx={{ fontSize: 13 }}>
         Enrichr
     </Typography>
+</>,
+<>
+    <div>
+        <Image src={l2s2Logo} width={30} alt="L2S2 logo"></Image>
+    </div>&nbsp;<Typography sx={{ fontSize: 13 }}>
+        L2S2
+    </Typography>
+</>,
+<>
+    <div>
+        <Image src={pfocrummageLogo} width={30} alt="PFOCRummage logo"></Image>
+    </div>&nbsp;<Typography sx={{ fontSize: 13 }}>
+        PFOCRummage
+    </Typography>
 </>
 ];
 
-const buttonOptions = ['SigCom LINCS', 'CFDE GSE', 'Playbook', 'Rummagene', 'Rummageo', 'KEA3', 'ChEA3', 'Enrichr-KG', 'Enrichr']
+const buttonOptions = ['SigCom LINCS', 'CFDE GSE', 'Playbook', 'Rummagene', 'Rummageo', 'KEA3', 'ChEA3', 'Enrichr-KG', 'Enrichr', 'L2S2', 'PFOCRummage'];
 
 export function SplitButton({ row }: {
     row: {
@@ -220,6 +236,12 @@ export function SplitButton({ row }: {
             getEnrichrShortId(newSetName, genes).then((userListId) => window.open(`https://gse.cfde.cloud/?q={%22min_lib%22:1,%22libraries%22:[{%22name%22:%22LINCS_L1000_Chem_Pert_Consensus_Sigs%22,%22limit%22:5},{%22name%22:%22HuBMAP_ASCTplusB_augmented_2022%22,%22limit%22:5}],%22userListId%22:%22${userListId}%22,%22search%22:true}`, "_blank"))
         } else if (selectedButton === 'Playbook') {
             getPlaybookLink(row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION'), genes).then((link) => window.open(link, '_blank'))
+        } else if (selectedButton === 'L2S2') {
+            const newSetName = row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION')
+            getL2S2Link(newSetName, genes).then((link) => window.open(link, '_blank'))
+        } else if (selectedButton === 'PFOCRummage') {
+            const newSetName = row.name.replaceAll('∩', 'INTERSECT').replaceAll('∪', 'UNION')
+            getPFOCRummageLink(newSetName, genes).then((link) => window.open(link, '_blank'))
         }
     };
 
@@ -275,6 +297,7 @@ export function SplitButton({ row }: {
                 anchorEl={anchorRef.current}
                 role={undefined}
                 transition
+
                 disablePortal
             >
                 {({ TransitionProps, placement }) => (
@@ -283,6 +306,8 @@ export function SplitButton({ row }: {
                         style={{
                             transformOrigin:
                                 placement === 'bottom' ? 'center top' : 'center bottom',
+                            maxHeight: 80 * 4.5,
+                            overflow: 'auto',
                         }}
                     >
                         <Paper>

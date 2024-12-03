@@ -162,3 +162,86 @@ export async function getPlaybookLink(genesetName: string, genes: string[]) {
     const res = await req.json()
     return `https://playbook-workflow-builder.cloud/graph/${res}`
 }
+
+export async function getPFOCRummageLink(genesetName: string, genes: string[]) {
+    const PFOCRUMMAGE_URL = 'https://pfocrummage.maayanlab.cloud/graphql'
+    const json = {
+        "operationName": "AddUserGeneSet",
+        "variables": { "description": genesetName, "genes": genes },
+        "query": "mutation AddUserGeneSet($genes: [String], $description: String = \"\") {\n  addUserGeneSet(input: {genes: $genes, description: $description}) {\n    userGeneSet {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n"
+    }
+    try {
+        const response = await fetch(PFOCRUMMAGE_URL,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(json),
+            })
+
+        const responseJSON = await response.json()
+        const datasetId = responseJSON["data"]['addUserGeneSet']["userGeneSet"]["id"]
+        const link = 'https://pfocrummage.maayanlab.cloud/enrich?dataset=' + datasetId
+        return link
+    } catch {
+        await new Promise(r => setTimeout(r, 2000));
+        const response = await fetch(PFOCRUMMAGE_URL,
+            {
+                method: "POST",
+                headers: {
+                    // "Content-Type": "application/json;charset=UTF-8",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)"
+                },
+                body: JSON.stringify(json),
+            })
+
+        const responseJSON = await response.json()
+        const datasetId = responseJSON["data"]['addUserGeneSet']["userGeneSet"]["id"]
+        const link = 'https://pfocrummage.maayanlab.cloud/enrich?dataset=' + datasetId
+        return link
+    }
+}
+
+
+export async function getL2S2Link(genesetName: string, genes: string[]) {
+    const L2S2_URL = 'https://l2s2.maayanlab.cloud/graphql'
+    const json = {
+        "operationName": "AddUserGeneSet",
+        "variables": { "description": genesetName, "genes": genes },
+        "query": "mutation AddUserGeneSet($genes: [String], $description: String = \"\") {\n  addUserGeneSet(input: {genes: $genes, description: $description}) {\n    userGeneSet {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n"
+    }
+    try {
+        const response = await fetch(L2S2_URL,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(json),
+            })
+
+        const responseJSON = await response.json()
+        const datasetId = responseJSON["data"]['addUserGeneSet']["userGeneSet"]["id"]
+        const link = 'https://l2s2.maayanlab.cloud/enrich?dataset=' + datasetId
+        return link
+    } catch {
+        await new Promise(r => setTimeout(r, 2000));
+        const response = await fetch(L2S2_URL,
+            {
+                method: "POST",
+                headers: {
+                    // "Content-Type": "application/json;charset=UTF-8",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)"
+                },
+                body: JSON.stringify(json),
+            })
+
+        const responseJSON = await response.json()
+        const datasetId = responseJSON["data"]['addUserGeneSet']["userGeneSet"]["id"]
+        const link = 'https://l2s2.maayanlab.cloud/enrich?dataset=' + datasetId
+        return link
+    }
+}

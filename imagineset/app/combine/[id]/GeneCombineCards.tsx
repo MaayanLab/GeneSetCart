@@ -6,7 +6,7 @@ import React from "react";
 import { Card, Box, CardContent, Divider, TextField, Stack, CardHeader, Button, Typography, Tooltip, FormControlLabel, Checkbox } from "@mui/material";
 import Status from "../../../components/assemble/Status";
 import { copyToClipboard } from "../../../components/assemble/DCCFetch/CFDEDataTable";
-import { addToSessionSets, checkInSession, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkInSession, checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions";
 import { addStatus } from "../../../components/assemble/fileUpload/SingleUpload";
 import InfoIcon from '@mui/icons-material/Info';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';

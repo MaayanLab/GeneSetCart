@@ -30,7 +30,7 @@ import l2s2Logo from "@/public/img/otherLogos/LINCSearch_logo.png"
 import pfocrummageLogo from "@/public/img/otherLogos/PFOCRummageBlack.png"
 import { getEnrichrShortId, getPlaybookLink, getRummageneLink, getRummageoLink, getSigComLINCSId, getL2S2Link, getPFOCRummageLink } from "@/app/analyze/[id]/AnalyzeFunctions";
 import { deleteGenesetByID } from "@/components/header/Header";
-import { checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
+import { checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions";
 
 
 

@@ -6,7 +6,7 @@ import {
     Typography, useMediaQuery,
     useTheme
 } from "@mui/material";
-import { addToSessionByGenesetId, addToSessionSets, checkInSession, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions ";
+import { addToSessionByGenesetId, addToSessionSets, checkInSession, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import Status from "../Status";
 import { getGenesetInfo } from "@/app/shallowcopy";

@@ -5,7 +5,7 @@ import React from "react";
 import { fetchGenes } from "@/app/gmt-cross/[id]/GMTCrossFunctions";
 import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { enrich } from "@/app/analyze/[id]/ViewGenesBtn";
-import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions ";
+import { addToSessionSets, checkInSession } from "@/app/assemble/[id]/AssembleFunctions";
 import { addStatus } from "@/components/assemble/fileUpload/SingleUpload";
 import Status from "@/components/assemble/Status";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';

@@ -1,6 +1,6 @@
 'use server'
 
-import { checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions ";
+import { checkValidGenes } from "@/app/assemble/[id]/AssembleFunctions";
 
 export async function getGeneshotPredGenes(gene_list: string[], augmentWith: string) {
     const payload = {

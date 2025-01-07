@@ -24,7 +24,7 @@ import { ClusteredHeatmap } from '@/components/visualize/PlotComponents/Heatmap/
 import { AdditionalOptions } from './AdditionalOptionsDisplay';
 const VennPlot = dynamic(() => import('../../../components/visualize/PlotComponents/Venn/Venn'), { ssr: false })
 import { useDebounce } from 'use-debounce';
-import { addToSessionSets, checkValidGenes } from '@/app/assemble/[id]/AssembleFunctions ';
+import { addToSessionSets, checkValidGenes } from '@/app/assemble/[id]/AssembleFunctions';
 import { addStatus } from '@/components/assemble/fileUpload/SingleUpload';
 import Status from '@/components/assemble/Status';
 import ShareIcon from '@mui/icons-material/Share';

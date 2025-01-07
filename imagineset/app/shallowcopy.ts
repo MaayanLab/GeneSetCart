@@ -1,6 +1,6 @@
 'use server'
 import prisma from "@/lib/prisma";
-import { addToSessionSetsGeneObj } from "./assemble/[id]/AssembleFunctions ";
+import { addToSessionSetsGeneObj } from "./assemble/[id]/AssembleFunctions";
 import { Gene, GeneSet, PipelineSession, User } from "@prisma/client";
 import { redirect } from "next/navigation";
 import Cookies from 'js-cookie'

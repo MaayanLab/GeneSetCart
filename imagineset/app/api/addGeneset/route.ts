@@ -1,4 +1,4 @@
-import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions ';
+import { addToSessionSets } from '@/app/assemble/[id]/AssembleFunctions';
 import prisma from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 

@@ -7,7 +7,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { getGeneshotPredGenes, getPPIGenes } from '@/app/augment/[id]/AugmentFunctions';
-import { addToSessionSets, checkInSession } from '@/app/assemble/[id]/AssembleFunctions ';
+import { addToSessionSets, checkInSession } from '@/app/assemble/[id]/AssembleFunctions';
 import CircularIndeterminate from '../../../components/misc/Loading';
 import Status from '../../../components/assemble/Status';
 import { addStatus } from '../../../components/assemble/fileUpload/SingleUpload';

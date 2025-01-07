@@ -109,7 +109,7 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
 
 export async function addToSessionSets(gene_list: string[], sessionId: string, genesetName: string, description: string, otherSymbols: string[], isHumanGenes: boolean) {
     let geneObjectIds;
-    if (isHumanGenes) {
+    if (gene_list.length > 0) {
         // get gene objects
         if (genesetName === '') throw new Error('Empty gene set name')
         const geneObjects = await Promise.all(gene_list.map(async (gene) => await prisma.gene.findFirst({

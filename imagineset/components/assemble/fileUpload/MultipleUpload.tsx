@@ -1,8 +1,7 @@
 'use client'
 import React from "react";
-import { Button, Container, Stack, Typography, useMediaQuery, useTheme, FormControlLabel, Checkbox, Tooltip, Chip } from "@mui/material";
+import { Button, Container, Stack, Typography, useMediaQuery, useTheme, FormControlLabel, Checkbox, Tooltip, Chip, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Grid } from "@mui/material";
 import DataTable from "./DataTable";
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { getPrivateSession } from "./getSessionPrivate";
 import { useParams } from "next/navigation";
 
@@ -12,11 +11,42 @@ export type GMTGenesetInfo = {
     genes: string[]
 }
 
+export const MenuProps = {
+    sx: {
+      "&& .Mui-selected": {
+        backgroundColor: "#7187C3"
+      }
+    },
+}
+
+const speciesMap: Record<string, string> = {
+        'Homo sapiens': 'Mammalia/Homo_sapiens',
+        'Mus musculus': 'Mammalia/Mus_musculus',
+        'Rattus norvegicus': 'Mammalia/Rattus_norvegicus',
+        'Pan troglodytes': 'Mammalia/Pan_troglodytes',
+        'Sus scrofa': 'Mammalia/Sus_scrofa',
+        'Bos taurus': 'Mammalia/Bos_taurus',
+        'Canis familiaris': 'Mammalia/Canis_familiaris',
+        'Danio reri': 'Non-mammalian_vertebrates/Danio_reri',
+        'Gallus gallus': 'Non-mammalian_vertebrates/Gallus_gallus',
+        'Xenopus laevis': 'Non-mammalian_vertebrates/Xenopus_laevis',
+        'Xenopus tropicalis': 'Non-mammalian_vertebrates/Xenopus_tropicalis',
+        'Anopheles gambiae': 'Invertebrates/Anopheles_gambiae',
+        'Caenorhabditis elegans': 'Invertebrates/Caenorhabditis_elegans',
+        'Drosophila melanogaster': 'Invertebrates/Drosophila_melanogaster',
+        'Arabidopsis thaliana': 'Plants/Arabidopsis_thaliana',
+        'Chlamydomonas reinhardtii': 'Plants/Chlamydomonas_reinhardtii',
+        'Oryza sativa': 'Plants/Oryza_sativa',
+        'Zea mays': 'Plants/Zea_mays'
+}
+
 export default function MultipleUpload() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+    const [species, setSpecies] = React.useState('Mammalia/Homo_sapiens')
     const [gmtGenesets, setGmtGenesets] = React.useState<GMTGenesetInfo[]>([])
-    const [isHumanGenes, setIsHumanGenes] = React.useState(false)
+    const isHumanGenes = React.useMemo(() => species == 'Mammalia/Homo_sapiens', [species])
+    const [validGeneSymbols, setValidGeneSymbols] = React.useState(true)
     const params = useParams<{ id: string }>()
     const [privateSession, setPrivateSession] = React.useState(false)
 
@@ -38,7 +68,7 @@ export default function MultipleUpload() {
                     if (reader.result) {
                         const genesets = reader.result.toString()
                             .split('\n')
-                            .map((row, i) => { return { id: i, genesetName: row.split('\t', 1)[0], genes: row.split('\t').slice(1) } })
+                            .map((row, i) => { return { id: i, genesetName: row.split('\t', 1)[0], genes: row.split('\t').slice(2) } })
                         const filteredGenesets = genesets.filter((set) => set.genesetName !== '' || set.genes.length !== 0)
                         setGmtGenesets(filteredGenesets)
                     }
@@ -51,6 +81,10 @@ export default function MultipleUpload() {
             }
         }
     }
+
+    const handleChange = (event: SelectChangeEvent) => {
+        setSpecies(event.target.value as string);
+    };
 
 
     return (
@@ -66,10 +100,28 @@ export default function MultipleUpload() {
                 </Typography>
             <div className="flex justify-center">
                 <Stack direction="column" spacing={1} justifyContent="center" alignItems="center">
-                    <FormControlLabel control={<Checkbox checked={isHumanGenes} onChange={(event) => {
-                        setIsHumanGenes(event.target.checked);
-                    }} />} label="Only accept valid human gene symbols"
+                <Grid justifyItems='center' alignItems={'center'} justifyContent={'center'}>
+                <FormControlLabel control={<Checkbox checked={validGeneSymbols} onChange={(event) => {
+                        setValidGeneSymbols(event.target.checked);
+                    }} />} label="Only accept valid gene symbols"
                     />
+                {validGeneSymbols &&
+                
+                <FormControl>
+                    <InputLabel id="species-select-label" sx={{ fontSize: 16 }} color='secondary'>Species</InputLabel>
+                    <Select
+                        labelId="species-select-label"
+                        value={species}
+                        label={"Species"}
+                        onChange={handleChange}
+                        color='secondary'
+                        MenuProps={MenuProps}
+                    >
+                        {Object.entries(speciesMap).flatMap((item, i) => {
+                            return <MenuItem key={i} value={item[1]} sx={{width: 300, wordBreak: 'break-word', whiteSpace: 'normal'}}>{item[0]}</MenuItem>
+                        })}
+                    </Select>
+                </FormControl>}</Grid>
                     <Button
                         variant="outlined"
                         component="label"
@@ -87,7 +139,7 @@ export default function MultipleUpload() {
 
             </div>
             <div style={{ height: 600, width: '100%' }} className="mt-2">
-                <DataTable rows={gmtGenesets} isHumanGenes={isHumanGenes} />
+                <DataTable rows={gmtGenesets} species={species} validGeneSymbols={validGeneSymbols} isHumanGenes={isHumanGenes} />
             </div>
         </Container>
     )

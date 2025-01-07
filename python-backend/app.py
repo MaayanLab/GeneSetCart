@@ -1,3 +1,4 @@
+from functools import lru_cache
 import json
 from flask import Flask, request
 from flask_cors import CORS
@@ -251,6 +252,7 @@ SPECIES_SET = set([
 )
     
 @app.route('/api/gene_lookup', methods=['GET', 'POST'])
+@lru_cache
 def gene_lookup():
     if request.method == "POST":
         data = request.get_json()
@@ -258,18 +260,9 @@ def gene_lookup():
         species = data['species']
         if species not in SPECIES_SET:
             return {'error': f"Species {species} not supported"}
-        lookup = ncbi_genes_lookup(species=species).get
+        lookup = ncbi_genes_lookup(organism=species).get
         converted = [lookup(gene) for gene in input_genes]
-        return {'converted': converted}
-    
-@app.route('/api/gene_conversion', methods=['GET', 'POST'])
-def gene_conversion():
-    if request.method == "POST":
-        data = request.get_json()
-        input_genes = data['input_genes']
-        human_offical = set(ncbi_genes_lookup(species='Homo_sapiens').values())
-        human_converted = [input_g.upper() for input_g in input_genes if input_g.upper() in human_offical]
-        return {'human_converted': human_converted}
+        return {'converted': converted }
 
 CFDE_LIB_LINKS = {
     "Glygen Glycosylated Proteins": "https://cfde-drc.s3.amazonaws.com/GlyGen/XMT/2022-12-13/GlyGen_XMT_2022-12-13_GlyGen_Glycosylated_Proteins_2022.gmt",

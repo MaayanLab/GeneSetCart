@@ -27,7 +27,27 @@ export async function checkValidGenes(genes: string) {
     );
     const allGenes = possibleGenes.map((geneRecord) => geneRecord.gene_symbol.toLowerCase())
     const genesFound = genesArray.filter((gene) => allGenes.includes(gene.toLowerCase()))
-    return genesFound
+    return genesFound.map(g => g.toUpperCase())
+}
+
+export async function convertGeneSpecies(genes: string, species: string) {
+    const genesArray = genes.split('\n').filter((gene) => gene != '')
+    const API_BASE_URL = process.env.PYTHON_API_BASE
+    if (!API_BASE_URL) throw new Error('API_BASE_URL not found') 
+    const req = await fetch(API_BASE_URL + '/api/gene_lookup', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            'input_genes': genesArray,
+            'species': species
+         }),
+    })
+    if (req.ok) {
+        const reqJson = await req.json()
+        return reqJson['converted']
+    }
 }
 
 export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string, user: User, otherSymbols: string[], isHumanGenes: boolean) {
@@ -165,7 +185,7 @@ type selectedCrossRowType = {
 }
 
 
-export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string, isHumanGenes: boolean) {
+export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string,  validGeneSymbols: boolean, species: string, isHumanGenes: boolean) {
     for (const row of rows) {
         if (row) {
             const alreadyExists = await checkInSession(sessionId, row.genesetName)
@@ -175,6 +195,11 @@ export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined
                 if (isHumanGenes) {
                     const validGenes = await checkValidGenes(row.genes.toString().replaceAll(',', '\n'))
                     const added = await addToSessionSets(validGenes, sessionId, row.genesetName, '', [], true)
+                } else if (validGeneSymbols) {
+                    const validSymbols = row.genes.filter((item) => item != '')
+                    const convertedSymbols = await convertGeneSpecies(validSymbols.join('\n'), species).then((response) => response.filter((g: any) => g))
+                    const validHuman = await checkValidGenes(convertedSymbols.join('\n'))
+                    const added = await addToSessionSets(validHuman, sessionId, row.genesetName, '', convertedSymbols, false)
                 } else {
                     const validSymbols = row.genes.filter((item) => item != '')
                     const added = await addToSessionSets([], sessionId, row.genesetName, '', validSymbols, false)

@@ -1,12 +1,13 @@
 'use client'
 import React, { useEffect } from "react";
 import {
-    Button, Checkbox, Chip, Container, FormControlLabel, Grid, Stack, Switch, TextField,
-    Tooltip,
+    Button, Checkbox, Select, Chip, Container, FormControlLabel, Grid, Stack, Switch, TextField,
+    Tooltip, FormControl, MenuItem, InputLabel,
     Typography, useMediaQuery,
-    useTheme
+    useTheme,
+    SelectChangeEvent,
 } from "@mui/material";
-import { addToSessionByGenesetId, addToSessionSets, checkInSession, checkValidGenes, loadTxtExample } from "../../../app/assemble/[id]/AssembleFunctions";
+import { addToSessionByGenesetId, addToSessionSets, checkInSession, checkValidGenes, loadTxtExample, convertGeneSpecies } from "../../../app/assemble/[id]/AssembleFunctions";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import Status from "../Status";
 import { getGenesetInfo } from "@/app/shallowcopy";
@@ -24,16 +25,50 @@ export type addStatus = {
     },
 }
 
+export const MenuProps = {
+    sx: {
+      "&& .Mui-selected": {
+        backgroundColor: "#7187C3"
+      }
+    },
+}
+
+
+const speciesMap: Record<string, string> = {
+        'Homo sapiens': 'Mammalia/Homo_sapiens',
+        'Mus musculus': 'Mammalia/Mus_musculus',
+        'Rattus norvegicus': 'Mammalia/Rattus_norvegicus',
+        'Pan troglodytes': 'Mammalia/Pan_troglodytes',
+        'Sus scrofa': 'Mammalia/Sus_scrofa',
+        'Bos taurus': 'Mammalia/Bos_taurus',
+        'Canis familiaris': 'Mammalia/Canis_familiaris',
+        'Danio reri': 'Non-mammalian_vertebrates/Danio_reri',
+        'Gallus gallus': 'Non-mammalian_vertebrates/Gallus_gallus',
+        'Xenopus laevis': 'Non-mammalian_vertebrates/Xenopus_laevis',
+        'Xenopus tropicalis': 'Non-mammalian_vertebrates/Xenopus_tropicalis',
+        'Anopheles gambiae': 'Invertebrates/Anopheles_gambiae',
+        'Caenorhabditis elegans': 'Invertebrates/Caenorhabditis_elegans',
+        'Drosophila melanogaster': 'Invertebrates/Drosophila_melanogaster',
+        'Arabidopsis thaliana': 'Plants/Arabidopsis_thaliana',
+        'Chlamydomonas reinhardtii': 'Plants/Chlamydomonas_reinhardtii',
+        'Oryza sativa': 'Plants/Oryza_sativa',
+        'Zea mays': 'Plants/Zea_mays'
+}
+
 type genesetInfo = { name: string, genes: string, description: string | null }
 
 export default function SingleUpload({ queryParams }: { queryParams: Record<string, string | string[] | undefined> }) {
     const theme = useTheme();
     const params = useParams<{ id: string }>()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const [validGenes, setValidGenes] = React.useState<string[]>([])
+    const [geneValidation, setGeneValidation] = React.useState(false)
+    const [validHumanGenes, setValidHumanGenes] = React.useState<string[]>([])
+    const [convertedSymbols, setConvertedSymbols] = React.useState<string[]>([])
+    const [validGeneSymbols, setValidGeneSymbols] = React.useState(true)
     const [status, setStatus] = React.useState<addStatus>({})
     const [genesetInfo, setGenesetInfo] = React.useState<genesetInfo>()
-    const [isHumanGenes, setIsHumanGenes] = React.useState(false)
+    const [species, setSpecies] = React.useState('Mammalia/Homo_sapiens')
+    const isHumanGenes = React.useMemo(() => species == 'Mammalia/Homo_sapiens', [species])
     const [privateSession, setPrivateSession] = React.useState(false)
 
     const searchParams = useSearchParams();
@@ -49,7 +84,6 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             getGenesetInfo(genesetId).then((geneset) => {
                 if (geneset) {
                     if (geneset.genes.length > 0) {
-                        setIsHumanGenes(true)
                         setGenesetInfo({ name: geneset.name, genes: geneset.genes.map((gene) => gene.gene_symbol).join('\n'), description: geneset.description })
                     } else {
                         setGenesetInfo({ name: geneset.name, genes: geneset.otherSymbols.join('\n'), description: geneset.description })
@@ -121,10 +155,17 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     }, [genesetInfo, isHumanGenes])
 
     useEffect(() => {
-        if (genesetInfo) {
-            checkValidGenes(genesetInfo.genes).then((response) => setValidGenes(response))
+        if (genesetInfo && validGeneSymbols) {
+            setTimeout(() =>
+            convertGeneSpecies(genesetInfo.genes, species).then((response) => setConvertedSymbols(response)), 3000)
         }
-    }, [genesetInfo])
+        
+        if (convertedSymbols.length > 0) {
+            checkValidGenes(convertedSymbols.filter((g) => g).join('\n')).then((response) => setValidHumanGenes(response))
+        }
+        
+    }, [genesetInfo, validGeneSymbols, convertedSymbols, setConvertedSymbols, species ])
+
 
     const submitGeneset = React.useCallback((evt: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         evt.preventDefault();
@@ -140,7 +181,17 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                     setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
                 } else {
                     if (isHumanGenes) {
-                        addToSessionSets(validGenes, sessionId, genesetName, description ? description : '', [], isHumanGenes)
+                        addToSessionSets(validHumanGenes, sessionId, genesetName, description ? description : '', [], isHumanGenes)
+                            .then((result) => { setStatus({ success: true }) })
+                            .catch((err) => {
+                                if (err.message === 'No valid genes in gene set') {
+                                    setStatus({ error: { selected: true, message: err.message } })
+                                } else {
+                                    setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
+                                }
+                            })
+                    } else if (validGeneSymbols) {
+                        addToSessionSets(validHumanGenes, sessionId, genesetName, description ? description : '', convertedSymbols, isHumanGenes)
                             .then((result) => { setStatus({ success: true }) })
                             .catch((err) => {
                                 if (err.message === 'No valid genes in gene set') {
@@ -169,7 +220,11 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             }
         }
 
-    }, [genesetInfo, validGenes, isHumanGenes])
+    }, [genesetInfo, validHumanGenes, isHumanGenes, validGeneSymbols])
+
+    const handleChange = (event: SelectChangeEvent) => {
+        setSpecies(event.target.value as string);
+    };
 
     return (
         <Container>
@@ -186,14 +241,31 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             <Grid container display={isMobile ? 'block' : 'flex'} spacing={1} justifyContent="center"
             >
                 <Grid direction='column' container item spacing={2} xs={isMobile ? 12 : 5} justifyItems='center' alignItems={'center'} justifyContent={'center'}>
-                    <FormControlLabel control={<Checkbox checked={isHumanGenes} onChange={(event) => {
-                        setIsHumanGenes(event.target.checked);
-                    }} />} label="Only accept valid human gene symbols"
+                    <FormControlLabel control={<Checkbox checked={validGeneSymbols} onChange={(event) => {
+                        setValidGeneSymbols(event.target.checked);
+                    }} />} label="Only accept valid gene symbols"
                     />
+                    {validGeneSymbols &&
+                    
+                    <FormControl>
+                        <InputLabel id="species-select-label" sx={{ fontSize: 16 }} color='secondary'>Species</InputLabel>
+                        <Select
+                            labelId="species-select-label"
+                            value={species}
+                            label={"Species"}
+                            onChange={handleChange}
+                            color='secondary'
+                            MenuProps={MenuProps}
+                        >
+                            {Object.entries(speciesMap).flatMap((item, i) => {
+                                return <MenuItem key={i} value={item[1]} sx={{width: 300, wordBreak: 'break-word', whiteSpace: 'normal'}}>{item[0]}</MenuItem>
+                            })}
+                        </Select>
+                    </FormControl>}
                     <Grid item>
                         <TextField
                             id="outlined-basic"
-                            required label={isHumanGenes ? "Gene Set Name" : "Set Name"}
+                            required label={validGeneSymbols ? "Gene Set Name" : "Set Name"}
                             variant="outlined"
                             value={genesetInfo ? genesetInfo?.name : ''}
                             focused={genesetInfo ? true : false}
@@ -209,7 +281,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             variant="outlined"
                             rows={4}
                             multiline
-                            placeholder={isHumanGenes ? "Gene Set Description (optional)" : "Set Description (optional)"}
+                            placeholder={validGeneSymbols ? "Gene Set Description (optional)" : "Set Description (optional)"}
                             value={genesetInfo ? genesetInfo?.description : ''}
                             focused={genesetInfo ? true : false}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -245,20 +317,34 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                         </Stack>
                     </Grid>
                 </Grid>
-                <Grid direction='column' item container spacing={3} xs={isMobile ? 12 : 5}>
-                    <Grid item container justifyContent={'center'} alignItems={'center'} direction='column'>
+                <Grid direction='column' item container spacing={4} xs={isMobile ? 12 : 5}>
+                    <Grid item container gap={1} spacing={2} justifyContent={'center'} alignItems={'center'} direction='column'>
                         <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.genes.split('\n').filter((item) => item != '').length : 0} items found </Typography>
-                        <Typography variant='body1' color='secondary'> {validGenes?.length} valid genes found</Typography>
-                        <TextField
+                        {validGeneSymbols &&
+                        <Button variant="contained" onClick={() => setGeneValidation(true)}><Typography variant='body1' color='secondary'> {convertedSymbols.filter((g) => g).length} valid genes found</Typography></Button>}
+
+                        {geneValidation ? 
+                            <div onClick={() => setGeneValidation(false)}
+                             style={{ overflow: 'scroll', height: '263px', width: '211px', padding: 10, border: '1px solid darkblue', borderRadius: '5px' }}>
+                                {genesetInfo?.genes.split('\n').map((gene, index) => (
+                                    <span key={index} style={{ color: convertedSymbols[index] ? 'green' : 'red' }}>
+                                        {gene == convertedSymbols[index] ? <>{gene}&#x2713;</> : <>{convertedSymbols[index] ? <>{gene}&rarr;{convertedSymbols[index]}</> : <>{gene}&#x2715;</> }</>}
+                                        {index < genesetInfo.genes.split('\n').length - 1 && <br />}
+                                    </span>
+                                ))}
+                            </div>
+                            : 
+                            <TextField
                             id="standard-multiline-static"
                             multiline
                             rows={10}
-                            placeholder={isHumanGenes ? "Paste gene symbols here" : "Paste set identifiers here"}
+                            placeholder={validGeneSymbols ? "Paste gene symbols here" : "Paste set identifiers here"}
                             value={genesetInfo ? genesetInfo.genes : ''}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: event.target.value, description: '' })
                             }}
-                        />
+                        />}
+
                     </Grid>
                     <Grid container item spacing={2} sx={{ mt: 1 }} justifyContent={'center'}>
                         <Grid item>

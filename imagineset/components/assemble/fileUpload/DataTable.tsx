@@ -9,7 +9,7 @@ import {
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
-import { addMultipleSetsToSession, addToSessionSets, checkValidGenes } from '@/app/assemble/[id]/AssembleFunctions';
+import { addMultipleSetsToSession, addToSessionSets, checkValidGenes, convertGeneSpecies } from '@/app/assemble/[id]/AssembleFunctions';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { useParams } from 'next/navigation';
 import { addStatus } from './SingleUpload';
@@ -22,9 +22,10 @@ export function copyToClipboard(genesString: string) {
 }
 
 
-function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, isHumanGenes: boolean }) {
+function RenderDetailsButton({ params, species, validGeneSymbols }: { params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>, species: string, validGeneSymbols: boolean }) {
   const [open, setOpen] = React.useState(false);
   const [validGenes, setValidGenes] = React.useState<string[]>([])
+  const [geneValidation, setGeneValidation] = React.useState(false)
 
   const handleClose = () => {
     setOpen(false);
@@ -43,11 +44,11 @@ function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellP
         sx={{ margin: 1 }}
         onClick={(event) => {
           event.stopPropagation();
-            checkValidGenes(params.row.genes.toString().replaceAll(',', '\n'))
-              .then((result) => {
-                setValidGenes(result);
-                handleOpen();
-              })
+          if (validGeneSymbols) {
+            convertGeneSpecies(params.row.genes.toString().replaceAll(',', '\n'), species).then((result) => setValidGenes(result))
+            handleOpen();
+          }
+          else handleOpen();
         }}>
         <VisibilityIcon /> &nbsp;
         {'Genes'}
@@ -57,18 +58,30 @@ function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellP
         open={open}>
         <DialogTitle>{params.row.genesetName}</DialogTitle>
         <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
-          <Grid item>
+          <Grid item gap={3} marginBottom={2}>
             <Typography variant='body1' color='secondary'> {params.row.genes.filter((item: string) => item != '').length} items found</Typography>
-            <Typography variant='body1' color='secondary'> {validGenes.length} valid genes found</Typography>
+            {validGeneSymbols &&
+            <Button variant="contained" onClick={() => setGeneValidation(true)}><Typography variant='body1' color='secondary'> {validGenes.filter((g) => g).length} valid genes found</Typography></Button>}
           </Grid>
           <Grid item>
+          {geneValidation ? 
+            <div onClick={() => setGeneValidation(false)}
+              style={{ overflow: 'scroll', height: '263px', width: '211px', padding: 10, border: '1px solid darkblue', borderRadius: '5px' }}>
+                {params.row.genes.map((gene: string, index: number) => (
+                    <span key={index} style={{ color: validGenes[index] ? 'green' : 'red' }}>
+                        {gene == validGenes[index] ? <>{gene}&#x2713;</> : <>{validGenes[index] ? <>{gene}&rarr;{validGenes[index]}</> : <>{gene}&#x2715;</> }</>}
+                        {index < params.row.genes.length - 1 && <br />}
+                    </span>
+                ))}
+            </div>
+            : 
             <TextField
               id="standard-multiline-static"
               multiline
               rows={10}
               value={params.row.genes.toString().replaceAll(',', '\n')}
               disabled
-            />
+          />}
           </Grid>
           <Grid item sx={{ mt: 2 }}>
             <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(params.row.genes.toString().replaceAll(',', '\n'))}>
@@ -85,7 +98,7 @@ function RenderDetailsButton({ params, isHumanGenes }: { params: GridRenderCellP
 
 
 
-export default function DataTable({ rows, isHumanGenes }: { rows: GMTGenesetInfo[], isHumanGenes: boolean }) {
+export default function DataTable({ rows, species, validGeneSymbols, isHumanGenes }: { rows: GMTGenesetInfo[], species: string, validGeneSymbols: boolean, isHumanGenes: boolean }) {
   const params = useParams<{ id: string }>()
   const [status, setStatus] = React.useState<addStatus>({})
   const [rowSelectionModel, setRowSelectionModel] =
@@ -94,11 +107,11 @@ export default function DataTable({ rows, isHumanGenes }: { rows: GMTGenesetInfo
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 50 },
-    { field: 'genesetName', headerName: isHumanGenes ? 'Gene Set Name' : 'Set Name', width: 500 },
+    { field: 'genesetName', headerName: validGeneSymbols ? 'Gene Set Name' : 'Set Name', width: 500 },
     {
-      field: 'genesButton', headerName: isHumanGenes ? 'View Genes' : 'View Set Items', width: 150, renderCell: (params) => {
+      field: 'genesButton', headerName: validGeneSymbols ? 'View Genes' : 'View Set Items', width: 150, renderCell: (params) => {
         return (
-          <RenderDetailsButton params={params} isHumanGenes={isHumanGenes} />
+          <RenderDetailsButton params={params} species={species} validGeneSymbols={validGeneSymbols} />
         );
       }
     }
@@ -106,7 +119,8 @@ export default function DataTable({ rows, isHumanGenes }: { rows: GMTGenesetInfo
 
   const addSets = React.useCallback(() => {
     setStatus({ loading: true })
-    addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id, isHumanGenes)
+    //TODO: UPDATE FUNCTION FOR MULTIPLE SPECIES
+    addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id, validGeneSymbols, species, isHumanGenes)
       .then((results: any) => {
         if (results.code === 'success') {
           setStatus({ success: true })
@@ -120,7 +134,7 @@ export default function DataTable({ rows, isHumanGenes }: { rows: GMTGenesetInfo
           setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
         }
       })
-  }, [selectedRows, params.id, isHumanGenes])
+  }, [selectedRows, params.id, validGeneSymbols])
 
 
 

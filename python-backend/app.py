@@ -209,7 +209,7 @@ def getPPIGenes():
         'text-genes': (None, '\n'.join(input_genes)),
         'min_network_size': (None, 10),
         'path_length': (None, 2),
-        'min_number_of_articles_supporting_interaction': (None, 10),
+        'min_number_of_articles_supporting_interaction': (None, 0),
         'max_number_of_interactions_per_protein': (None, 200),
         'max_number_of_interactions_per_article': (None, 100),
         'enable_BioGRID': (None, True),

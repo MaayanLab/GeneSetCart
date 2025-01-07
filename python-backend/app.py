@@ -17,6 +17,7 @@ from supervenn import supervenn
 import requests
 import venn
 from gene_info_utils import ncbi_genes_lookup
+import pyenrichr as pye
 
 
 app = Flask(__name__)
@@ -269,6 +270,39 @@ def gene_conversion():
         human_offical = set(ncbi_genes_lookup(species='Homo_sapiens').values())
         human_converted = [input_g.upper() for input_g in input_genes if input_g.upper() in human_offical]
         return {'human_converted': human_converted}
+
+CFDE_LIB_LINKS = {
+    "Glygen Glycosylated Proteins": "https://cfde-drc.s3.amazonaws.com/GlyGen/XMT/2022-12-13/GlyGen_XMT_2022-12-13_GlyGen_Glycosylated_Proteins_2022.gmt",
+    "GTEx Tissue-Specific Aging Signatures": "https://cfde-drc.s3.amazonaws.com/GTEx/XMT/2022-06-06/GTEx_XMT_2022-06-06_GTEx_Aging_Signatures_2021.gmt",
+    "GTEx Tissue Gene Expression Profiles": "https://cfde-drc.s3.amazonaws.com/GTEx/XMT/2023-03-10/GTEx_XMT_2023-03-10_GTEx_Tissues_V8_2023.gmt",
+    "IDG Drug Targets": "https://cfde-drc.s3.amazonaws.com/IDG/XMT/2022-12-13/IDG_XMT_2022-12-13_IDG_Drug_Targets_2022.gmt",
+    "KOMP2 Mouse Phenotypes": "https://cfde-drc.s3.amazonaws.com/KOMP2/XMT/2022-12-13/KOMP2_XMT_2022-12-13_KOMP2_Mouse_Phenotypes_2022.gmt",
+    "LINCS L1000 CMAP Chemical Pertubation Consensus Signatures": "https://cfde-drc.s3.amazonaws.com/LINCS/XMT/2022-12-13/LINCS_XMT_2022-12-13_LINCS_L1000_Chem_Pert_Consensus_Sigs.gmt",
+    "LINCS L1000 CMAP CRISPR Knockout Consensus Signatures": "https://cfde-drc.s3.amazonaws.com/LINCS/XMT/2022-12-13/LINCS_XMT_2022-12-13_LINCS_L1000_CRISPR_KO_Consensus_Sigs.gmt",
+    "MoTrPAC Rat Endurance Exercise Training": "https://cfde-drc.s3.amazonaws.com/MoTrPAC/XMT/2023-09-29/MoTrPAC_XMT_2023-09-29_MoTrPAC_Rat_Exercise_Sigs_2023.gmt",
+    "Metabolomics Gene-Metabolite Associations": "https://cfde-drc.s3.amazonaws.com/MW/XMT/2022-12-13/MW_XMT_2022-12-13_Metabolomics_Workbench_Metabolites_2022.gmt",
+    "Human BioMolecular Atlas Program Azimuth": "https://minio.dev.maayanlab.cloud/g2sg/CFDE%20libraries/HubMAP_Azimuth_2023_Augmented.gmt",
+}
+
+@app.route('/api/cross_user_set')
+def cross_user_set():
+    if request.method == "POST":
+        data = request.get_json()
+        input_genes = data['input_genes']
+        cfde_lib = data['cfde_lib']
+        cfde_lib_txt = requests.get(CFDE_LIB_LINKS[cfde_lib]).text
+        cfde_lib_gmt = {}
+        for line in cfde_lib_txt.split('\n'):
+            split_line = line.strip().split('\t')
+            term = split_line[0]
+            genes = split_line[2:]
+            if len(genes) > 0:
+                cfde_lib_gmt[term] = set(genes)  
+        human_offical = set(ncbi_genes_lookup(species='Homo_sapiens').values())
+        human_converted = [input_g.upper() for input_g in input_genes if input_g.upper() in human_offical]
+        fisher = pye.enrichment.FastFisher(34000)
+        result = pye.enrichment.fisher(human_converted, cfde_lib_gmt, fisher=fisher)
+        return {'result': result.to_dict()}
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True, threading=True)

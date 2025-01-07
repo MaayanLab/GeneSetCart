@@ -16,6 +16,7 @@ from collections import defaultdict
 from supervenn import supervenn
 import requests
 import venn
+from gene_info_utils import ncbi_genes_lookup
 
 
 app = Flask(__name__)
@@ -225,6 +226,49 @@ def getPPIGenes():
         nodes = json.loads(json_response['G2N'])['network']['nodes']
         ppi_genes = [node['name'] for node in nodes]
         return {'ppi_genes': ppi_genes}
+    
+        
+SPECIES_SET = set([
+    'Invertebrates/Anopheles_gambiae',
+    'Invertebrates/Caenorhabditis_elegans',
+    'Invertebrates/Drosophila_melanogaster',
+    'Mammalia/Bos_taurus',
+    'Mammalia/Canis_familiaris',
+    'Mammalia/Homo_sapiens',
+    'Mammalia/Mus_musculus',
+    'Mammalia/Pan_troglodytes',
+    'Mammalia/Rattus_norvegicus',
+    'Mammalia/Sus_scrofa',
+    'Non-mammalian_vertebrates/Danio_reri',
+    'Non-mammalian_vertebrates/Gallus_gallus',
+    'Non-mammalian_vertebrates/Xenopus_laevis',
+    'Non-mammalian_vertebrates/Xenopus_tropicalis',
+    'Plants/Arabidopsis_thaliana',
+    'Plants/Chlamydomonas_reinhardtii',
+    'Plants/Oryza_sativa',
+    'Plants/Zea_mays']
+)
+    
+@app.route('/api/gene_lookup', methods=['GET', 'POST'])
+def gene_lookup():
+    if request.method == "POST":
+        data = request.get_json()
+        input_genes = data['input_genes']
+        species = data['species']
+        if species not in SPECIES_SET:
+            return {'error': f"Species {species} not supported"}
+        lookup = ncbi_genes_lookup(species=species).get
+        converted = [lookup(gene) for gene in input_genes]
+        return {'converted': converted}
+    
+@app.route('/api/gene_conversion', methods=['GET', 'POST'])
+def gene_conversion():
+    if request.method == "POST":
+        data = request.get_json()
+        input_genes = data['input_genes']
+        human_offical = set(ncbi_genes_lookup(species='Homo_sapiens').values())
+        human_converted = [input_g.upper() for input_g in input_genes if input_g.upper() in human_offical]
+        return {'human_converted': human_converted}
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True, threading=True)

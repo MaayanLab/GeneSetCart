@@ -159,12 +159,13 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             setTimeout(() =>
             convertGeneSpecies(genesetInfo.genes, species).then((response) => setConvertedSymbols(response)), 3000)
         }
-        
+    }, [genesetInfo, validGeneSymbols, setConvertedSymbols, species])
+
+    useEffect(() => {
         if (convertedSymbols.length > 0) {
             checkValidGenes(convertedSymbols.filter((g) => g).join('\n')).then((response) => setValidHumanGenes(response))
         }
-        
-    }, [genesetInfo, validGeneSymbols, convertedSymbols, setConvertedSymbols, species ])
+    }, [convertedSymbols, setValidHumanGenes])
 
 
     const submitGeneset = React.useCallback((evt: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

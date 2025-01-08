@@ -277,11 +277,11 @@ CFDE_LIB_LINKS = {
     "Human BioMolecular Atlas Program Azimuth": "https://minio.dev.maayanlab.cloud/g2sg/CFDE%20libraries/HubMAP_Azimuth_2023_Augmented.gmt",
 }
 
-@app.route('/api/cross_user_set')
+@app.route('/api/cross_user_set',  methods=['GET', 'POST'])
 def cross_user_set():
     if request.method == "POST":
         data = request.get_json()
-        input_genes = data['input_genes']
+        user_sets = data['user_sets']
         cfde_lib = data['cfde_lib']
         cfde_lib_txt = requests.get(CFDE_LIB_LINKS[cfde_lib]).text
         cfde_lib_gmt = {}
@@ -291,11 +291,23 @@ def cross_user_set():
             genes = split_line[2:]
             if len(genes) > 0:
                 cfde_lib_gmt[term] = set(genes)  
-        human_offical = set(ncbi_genes_lookup(species='Homo_sapiens').values())
-        human_converted = [input_g.upper() for input_g in input_genes if input_g.upper() in human_offical]
+        for k in user_sets:
+            user_sets[k] = set(user_sets[k])
+            
+        concat = []
         fisher = pye.enrichment.FastFisher(34000)
-        result = pye.enrichment.fisher(human_converted, cfde_lib_gmt, fisher=fisher)
-        return {'result': result.to_dict()}
+        for t in user_sets:
+            result = pye.enrichment.fisher(user_sets[t], cfde_lib_gmt, min_set_size=5, min_overlap=1, fisher=fisher)
+            result['geneset_1'] = [t]*len(result)
+            result['n_genes1'] = [len(user_sets[t])]*len(result)
+            concat.append(result[result['p-value'] < 0.05])
+
+        result = pd.concat(concat).sort_values('p-value').reset_index(drop=True)
+        result.rename(columns={'term': 'geneset_2', 'odds': 'odds_ratio', 'p-value': 'pvalue', 'overlap': 'n_overlap', 'gene-overlap': 'overlap', 'set-size': 'n_genes2' }, inplace=True)
+        result['lib_1'] = ['user_sets']*len(result)
+        result['lib_2'] = [cfde_lib]*len(result)
+        result['id'] = list(range(len(result)))
+        return {'cross_result': result[:500].to_dict(orient='records')}
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True, threading=True)

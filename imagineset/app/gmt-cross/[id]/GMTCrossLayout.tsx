@@ -4,7 +4,7 @@ import { CFDELibraryOptions, GMTSelect } from "./GMTSelect";
 import { GridColDef, GridRenderCellParams, GridTreeNodeWithRender } from "@mui/x-data-grid";
 import React from "react";
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import { fetchCrossPairs, generateHypothesis } from "@/app/gmt-cross/[id]/GMTCrossFunctions";
+import { fetchCrossPairs, generateHypothesis, fetchCrossUserSets } from "@/app/gmt-cross/[id]/GMTCrossFunctions";
 import CircularIndeterminate from "@/components/misc/Loading";
 import { copyToClipboard } from "@/components/assemble/DCCFetch/CFDEDataTable";
 import { CFDECrossPair } from "@prisma/client";
@@ -14,6 +14,8 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { RenderGeneSet1, RenderGeneSet2, RenderOverlapButton } from "./TableButtons";
 import { CrossingTable } from "./CrossingTable";
 import { DCCIcons } from "@/components/assemble/DCCFetch/DCCIconBtn";
+import { GeneSetSelect } from "../../report/[id]/GenesetSelect"
+import {Gene, GeneSet} from '@prisma/client'
 
 
 type hypothesisDisplay = {
@@ -124,7 +126,13 @@ const generateHypothesisTooltip = (hypothesisString: string, substringIndices: {
 }
 
 
-export function GMTCrossLayout() {
+export function GMTCrossLayout({ sessionInfo }: {
+    sessionInfo: {
+        gene_sets: ({
+            genes: Gene[];
+        } & GeneSet)[];
+    } | null,
+}) {
     // get query parameters
     const searchParams = useSearchParams()
     const library1 = searchParams.get('lib1')
@@ -137,6 +145,14 @@ export function GMTCrossLayout() {
     const [hypLoading, setHypLoading] = React.useState(false)
     const [hypothesis, setHypothesis] = React.useState<hypothesisDisplay | null>(null)
     const [headers, setHeaders] = React.useState<string[] | null>(null)
+    const [crossUserSets, setCrossUserSets] = React.useState(false)
+    const [checked, setChecked] = React.useState<number[]>([]);
+
+    const selectedSets = React.useMemo(() => {
+        const typedSets = sessionInfo ? sessionInfo.gene_sets : []
+        const checkedSets = typedSets.filter((set, index) => checked.includes(index))
+        return checkedSets
+    }, [checked, sessionInfo?.gene_sets])
 
 
     const params = useParams<{ id: string }>()
@@ -153,14 +169,22 @@ export function GMTCrossLayout() {
     React.useEffect(() => {
         if ((library1 !== null) && (library2 !== null)) {
             setSelectedLibs([library1, library2])
+            if (library1 == 'user_sets' && sessionInfo != null) {
+                setCrossUserSets(true)
+            }
             setSelectedDCCs([CFDELibraryOptions[library1], CFDELibraryOptions[library2]])
             setHypothesis(null)
-            setLoading(true)
-            fetchCrossPairs(library1, library2).then((result) => {
-                setLoading(false);
-                setRows(result);
-                setHeaders([CFDELibHeaders[result[0].lib_1], CFDELibHeaders[result[0].lib_2]])
-            }).catch((err) => setLoading(false))
+            if (library1 != 'user_sets') {
+                setLoading(true)
+                fetchCrossPairs(library1, library2).then((result) => {
+                    setLoading(false);
+                    if (result != null) {
+                        setRows(result);
+                        setHeaders([CFDELibHeaders[result[0].lib_1], CFDELibHeaders[result[0].lib_2]])
+                    }
+                    console.log(result)
+                }).catch((err) => setLoading(false))
+            }
         }
     }, [])
 
@@ -168,14 +192,30 @@ export function GMTCrossLayout() {
         router.push("/gmt-cross/" + params.id + "?" + createQueryString("lib1", selectedLibs[0]) + "&" + createQueryString("lib2", selectedLibs[1]));
         setHypothesis(null)
         setLoading(true)
-        if (selectedLibs.length === 2 && selectedLibs[0] !== '' && selectedLibs[1] !== '') {
+        if (selectedLibs.length === 2 && selectedLibs[0] == 'user_sets' && selectedLibs[1] != '' && sessionInfo != null) {       
+            const setsDict: Record<string, Array<string>> = {}
+            selectedSets.map(set => {
+                if (set.genes.length > 0) {
+                    const geneArray = set.genes.map(g => g.gene_symbol)
+                    setsDict[set.name] = geneArray
+                }
+            })
+            if (Object.entries(setsDict).length === 0) return
+            fetchCrossUserSets(setsDict, selectedLibs[1]).then((result) => {
+                setLoading(false)
+                console.log(result)
+                setRows(result)
+                setHeaders(["Selected Sets", CFDELibHeaders[selectedLibs[1]]])
+            })
+
+        } else if (selectedLibs.length === 2 && selectedLibs[0] !== '' && selectedLibs[1] !== '' && selectedLibs[0] != 'user_sets') {
             fetchCrossPairs(selectedLibs[0], selectedLibs[1]).then((result) => {
                 setLoading(false);
                 setRows(result);
                 setHeaders([CFDELibHeaders[result[0].lib_1], CFDELibHeaders[result[0].lib_2]])
             }).catch((err) => setLoading(false))
         }
-    }, [selectedLibs])
+    }, [selectedLibs, checked, sessionInfo, selectedSets])
 
     const RenderHypothesisButton = (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
         return (
@@ -305,11 +345,37 @@ export function GMTCrossLayout() {
     }, [hypothesis])
 
     return (
-        <Stack direction="column" spacing={3} sx={{ marginBottom: 3, justifyContent: 'center' }}>
+        <Stack direction="column" spacing={3} sx={{ marginBottom: 3, justifyContent: 'center', textAlign: 'center' }}>
+            <div className="flex justify-center">
+            <Button className="mx-auto justify-center" variant="contained" sx={{width: "170px"}} disabled={sessionInfo == null} 
+            onClick={() => {
+                
+                if (crossUserSets) {
+                    setSelectedLibs(['', selectedLibs[1]])
+                    setSelectedDCCs(['', selectedDCCs[1]])
+                } else {
+                    setSelectedLibs(['user_sets', selectedLibs[1]])
+                    setSelectedDCCs(['user', selectedLibs[1]])
+                }
+                
+                setCrossUserSets(!crossUserSets)
+                }}>{crossUserSets ? "Cross CFDE GMTs" : "Cross Session Sets"}
+            </Button>
+            </div>
             <DCCIcons selected={selectedDCCs} setSelected={setSelectedDCCs} selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} />
             <Stack direction='row' spacing={2}>
-                <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs} />
+                <div className="w-1/2 items-center">
+                { (crossUserSets && sessionInfo !== null) ? 
+                    <>
+                    <GeneSetSelect sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} selectedSets={selectedSets} />
+                    </> 
+                    : 
+                    <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={0} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs} />
+                }
+                </div>
+                <div className="flex w-1/2 items-center">
                 <GMTSelect selectedLibs={selectedLibs} setSelectedLibs={setSelectedLibs} index={1} selectedDCCs={selectedDCCs} setSelectedDCCs={setSelectedDCCs} />
+                </div>
             </Stack>
             <div className="flex justify-center">
                 <Button variant="contained" color="secondary" onClick={getCrossData}>

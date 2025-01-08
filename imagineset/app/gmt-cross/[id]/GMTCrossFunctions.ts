@@ -260,3 +260,24 @@ export async function generateHypothesis(row: any) {
         }
     }
 }
+
+export async function fetchCrossUserSets(user_sets: Record<string, Array<string>>, cfde_lib: string) {
+    
+    const API_BASE_URL = process.env.PYTHON_API_BASE
+    if (!API_BASE_URL) throw new Error('API_BASE_URL not found') 
+
+    const req = await fetch(API_BASE_URL + '/api/cross_user_set', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            'user_sets': user_sets,
+            'cfde_lib': cfde_lib
+         }),
+    })
+    if (req.ok) {
+        const reqJson = await req.json()
+        return reqJson['cross_result']
+    }
+}

@@ -48,9 +48,9 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
                                 <SessionChip sessionId={props.params.id} />
                             </div>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
-                                Cross Common Fund GMTs to explore their similarity for novel hypothesis generation. Each gene set pair is displayed with their Fisher exact test p-value, odds ratio and overlapping genes.
+                                Cross Common Fund GMTs to explore their similarity for novel hypothesis generation. Each gene set pair is displayed with their Fisher exact test p-value, odds ratio and overlapping genes. Add gene sets to your cart to cross your assembled sets with CFDE gene set libraries.
                             </Typography>
-                            <GMTCrossLayout />
+                            <GMTCrossLayout sessionInfo={null} />
                         </Container>
                     </Container>
                 </>
@@ -138,9 +138,9 @@ export default async function GMTCross(props: { params: { id: string }, searchPa
                         <SessionChip sessionId={props.params.id} />
                     </div>                    
                     <Typography variant="subtitle1" color="#666666" sx={{ mb: 3 }}>
-                        Cross Common Fund GMTs to explore their similarity for novel hypothesis generation. Each gene set pair is displayed with their Fisher exact test p-value, odds ratio and overlapping genes.
+                        Cross Common Fund GMTs to explore their similarity for novel hypothesis generation. Each gene set pair is displayed with their Fisher exact test p-value, odds ratio and overlapping genes. Alternatively, users can cross gene sets in their session with any CFDE gene set library.
                     </Typography>
-                    <GMTCrossLayout />
+                    <GMTCrossLayout sessionInfo={sessionInfo} />
                 </Container>
             </Container>
         </>

@@ -9,10 +9,10 @@ function CustomToolbar() {
       <GridToolbarContainer>
         <Stack sx={{justifyContent: 'space-between', width: '100%'}} direction={'row'}>
             <div>
-            <GridToolbarColumnsButton color="secondary" />
-        <GridToolbarFilterButton color="secondary" />
-        <GridToolbarDensitySelector color="secondary" />
-        <GridToolbarExport color="secondary" />
+                <GridToolbarColumnsButton color="secondary" />
+                <GridToolbarFilterButton color="secondary" />
+                <GridToolbarDensitySelector color="secondary" />
+                <GridToolbarExport color="secondary" />
             </div>
             <GridToolbarQuickFilter color="secondary"/>
         </Stack>
@@ -41,6 +41,11 @@ export function CrossingTable({ rows, columns }: { rows: CFDECrossPair[], column
                           quickFilterExcludeHiddenColumns: true,
                         },
                       },
+                    columns: {
+                        columnVisibilityModel: {
+                            hypothesis: rows[0].lib_1 != 'user_sets'
+                        }
+                    }
                 }}
                 slots={{ toolbar: CustomToolbar }}
                 slotProps={{

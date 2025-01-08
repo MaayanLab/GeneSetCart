@@ -45,7 +45,7 @@ export function GeneSetSelect({ sessionInfo, checked, setChecked, selectedSets}:
             '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }
         }}
         disablePadding>
-            <ListSubheader>
+            <ListSubheader className="border-b-2">
                 Selected Gene Sets ({checked.length})
                 <Stack direction='row' sx={{justifyContent:'center'}}>
                     <Button color='secondary' onClick={() => setChecked(sessionInfo ? sessionInfo.gene_sets.map((geneset, i) => i) : [])}>Select All</Button>

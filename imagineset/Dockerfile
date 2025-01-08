@@ -1,4 +1,5 @@
 FROM node:18-alpine AS builder
+RUN apk add --no-cache openssl
 WORKDIR /app
 ADD /package.json .
 ADD /package-lock.json .

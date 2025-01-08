@@ -15,6 +15,7 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 import { getPrivateSession } from "./getSessionPrivate";
+import { CircularIndeterminateSm } from "@/components/misc/Loading";
 
 export type addStatus = {
     success?: boolean,
@@ -70,6 +71,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     const [species, setSpecies] = React.useState('Mammalia/Homo_sapiens')
     const isHumanGenes = React.useMemo(() => species == 'Mammalia/Homo_sapiens', [species])
     const [privateSession, setPrivateSession] = React.useState(false)
+    const [genesLoading, setGenesLoading] = React.useState(false)
 
     const searchParams = useSearchParams();
     const urlParams = new URLSearchParams(searchParams);
@@ -156,10 +158,15 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
 
     useEffect(() => {
         if (genesetInfo && validGeneSymbols) {
-            setTimeout(() =>
-            convertGeneSpecies(genesetInfo.genes, species).then((response) => setConvertedSymbols(response)), 3000)
+            setGenesLoading(true)
+            console.log(genesetInfo.genes, species)
+            convertGeneSpecies(genesetInfo.genes, species).then((response) => {
+                console.log(response)
+                setConvertedSymbols(response)
+                setGenesLoading(false)
+            })
         }
-    }, [genesetInfo, validGeneSymbols, setConvertedSymbols, species])
+    }, [genesetInfo?.genes, validGeneSymbols, setConvertedSymbols, species])
 
     useEffect(() => {
         if (convertedSymbols.length > 0) {
@@ -322,7 +329,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                     <Grid item container gap={1} spacing={2} justifyContent={'center'} alignItems={'center'} direction='column'>
                         <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.genes.split('\n').filter((item) => item != '').length : 0} items found </Typography>
                         {validGeneSymbols &&
-                        <Button variant="contained" onClick={() => setGeneValidation(true)}><Typography variant='body1' color='secondary'> {convertedSymbols.filter((g) => g).length} valid genes found</Typography></Button>}
+                        <Button className="no-wrap" variant="contained" onClick={() => setGeneValidation(true)}><Typography variant='body1' color='secondary'> {genesLoading ? <CircularIndeterminateSm/> : convertedSymbols.filter((g) => g).length} valid genes found</Typography></Button>}
 
                         {geneValidation ? 
                             <div onClick={() => setGeneValidation(false)}

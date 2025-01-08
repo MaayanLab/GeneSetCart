@@ -18,3 +18,9 @@ export default function CircularIndeterminate() {
     </Box>
   );
 }
+
+export function CircularIndeterminateSm() {
+  return (
+      <CircularProgress size={15} color='secondary'/>
+  );
+}

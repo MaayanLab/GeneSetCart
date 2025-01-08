@@ -252,7 +252,6 @@ SPECIES_SET = set([
 )
     
 @app.route('/api/gene_lookup', methods=['GET', 'POST'])
-@lru_cache
 def gene_lookup():
     if request.method == "POST":
         data = request.get_json()

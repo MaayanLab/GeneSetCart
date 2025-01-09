@@ -157,7 +157,8 @@ export async function getSpecifiedAbstracts(term1: string, term2: string, abstra
         }
 
 
-    } catch {
+    } catch (error) {
+        console.log("Issue with OpenAI call", error)
         return {
             response: "The OpenAI endpoint is currently overloaded. Please try again in a few minutes",
             status: 1,

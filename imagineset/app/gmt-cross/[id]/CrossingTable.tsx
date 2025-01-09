@@ -23,6 +23,9 @@ function CustomToolbar() {
 export function CrossingTable({ rows, columns }: { rows: CFDECrossPair[], columns: GridColDef[] }) {
     // remove gene sets that are too large (> 3000 genes)
     rows = rows.filter((row) => row.n_genes1 < 1500 && row.n_genes2 < 1500)
+    if (rows.length > 0 && rows[0].lib_1 == 'user_sets') {
+        columns = columns.slice(0, -1)
+    }
     return (
             <DataGrid
                 getRowHeight={() => 'auto'}
@@ -40,12 +43,7 @@ export function CrossingTable({ rows, columns }: { rows: CFDECrossPair[], column
                           items: [],
                           quickFilterExcludeHiddenColumns: true,
                         },
-                      },
-                    columns: {
-                        columnVisibilityModel: {
-                            hypothesis: rows[0].lib_1 != 'user_sets'
-                        }
-                    }
+                      }
                 }}
                 slots={{ toolbar: CustomToolbar }}
                 slotProps={{

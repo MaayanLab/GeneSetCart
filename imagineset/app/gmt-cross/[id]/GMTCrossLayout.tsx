@@ -182,7 +182,6 @@ export function GMTCrossLayout({ sessionInfo }: {
                         setRows(result);
                         setHeaders([CFDELibHeaders[result[0].lib_1], CFDELibHeaders[result[0].lib_2]])
                     }
-                    console.log(result)
                 }).catch((err) => setLoading(false))
             }
         }
@@ -203,7 +202,6 @@ export function GMTCrossLayout({ sessionInfo }: {
             if (Object.entries(setsDict).length === 0) return
             fetchCrossUserSets(setsDict, selectedLibs[1]).then((result) => {
                 setLoading(false)
-                console.log(result)
                 setRows(result)
                 setHeaders(["Selected Sets", CFDELibHeaders[selectedLibs[1]]])
             })
@@ -386,7 +384,8 @@ export function GMTCrossLayout({ sessionInfo }: {
             {hypothesis !== null &&
                 <Paper elevation={1} sx={{
                     width: '100%',
-                    minHeight: '100px'
+                    minHeight: '100px',
+                    textAlign: "left"
                 }}>
                     <Stack direction='column' sx={{ padding: 2 }}>
                         <Box justifyContent={'flex-end'}>

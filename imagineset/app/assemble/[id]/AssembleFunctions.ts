@@ -50,10 +50,30 @@ export async function convertGeneSpecies(genes: string, species: string) {
     }
 }
 
-export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string, user: User, otherSymbols: string[], isHumanGenes: boolean) {
+export async function getGeneBackgrounds(type: string, species: string) {
+    const API_BASE_URL = process.env.PYTHON_API_BASE
+    if (!API_BASE_URL) throw new Error('API_BASE_URL not found') 
+    const req = await fetch(API_BASE_URL + '/api/get_background', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            'type': type,
+            'species': species
+         }),
+    })
+    if (req.ok) {
+        const reqJson = await req.json()
+        return reqJson['background']
+    }
+}
+
+export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: string, genesetName: string, description: string, user: User, otherSymbols: string[], isHumanGenes: boolean, background: string[] | null) {
     // get gene objects
     if (genesetName === '') throw new Error('Empty gene set name')
     const geneObjects = gene_list.filter((item) => item !== null)
+
     if (isHumanGenes) {
         if (geneObjects.length === 0) throw new Error('No valid genes in gene set')
         const geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
@@ -68,6 +88,26 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
             }
         })
 
+        var backgroundHash = null;
+
+        if (background != null && background.length > 0) {
+            const backgroundHash = await computeHash(background)
+            const existingBackground = await prisma.addedBackground.findFirst({
+                where: {
+                    hash: backgroundHash
+                }
+            })
+            if (!existingBackground) {
+                const newBackground = await prisma.addedBackground.create({
+                    data: {
+                        hash: backgroundHash,
+                        genes: background
+                    }
+                })
+                
+            }
+        }
+
         const oldSetsArray = sessionOldSets?.gene_sets ? sessionOldSets?.gene_sets : []
         const newGeneset = await prisma.geneSet.create({
             data: {
@@ -78,6 +118,7 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
                     connect: geneObjectIds.filter((geneObject) => geneObject.id !== undefined),
                 },
                 otherSymbols: otherSymbols,
+                background: backgroundHash
             }
         })
 
@@ -102,12 +143,12 @@ export async function addToSessionSetsGeneObj(gene_list: Gene[], sessionId: stri
         return 'success'
 
     } else {
-        addToSessionSets([], sessionId, genesetName, description, otherSymbols, isHumanGenes)
+        addToSessionSets([], sessionId, genesetName, description, otherSymbols, isHumanGenes, background)
     }
 }
 
 
-export async function addToSessionSets(gene_list: string[], sessionId: string, genesetName: string, description: string, otherSymbols: string[], isHumanGenes: boolean) {
+export async function addToSessionSets(gene_list: string[], sessionId: string, genesetName: string, description: string, otherSymbols: string[], isHumanGenes: boolean, background: string[] | null) {
     let geneObjectIds;
     if (gene_list.length > 0) {
         // get gene objects
@@ -125,8 +166,28 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
         geneObjectIds = geneObjects.map((geneObject) => { return ({ id: geneObject?.id }) })
     }
 
+    var backgroundHash = null;
+
+    if (background != null && background.length > 0) {
+        backgroundHash = await computeHash(background)
+        const existingBackground = await prisma.addedBackground.findFirst({
+            where: {
+                hash: backgroundHash
+            }
+        })
+        if (!existingBackground) {
+            const newBackground = await prisma.addedBackground.create({
+                data: {
+                    hash: backgroundHash,
+                    genes: background
+                }
+            })
+            
+        }
+    }
 
     // get sets that are already in session 
+    console.log(sessionId)
     const sessionOldSets = await prisma.pipelineSession.findUnique({
         where: {
             id: sessionId,
@@ -147,6 +208,7 @@ export async function addToSessionSets(gene_list: string[], sessionId: string, g
             },
             otherSymbols: otherSymbols,
             isHumanGenes: isHumanGenes,
+            background: backgroundHash
         }
     })
 
@@ -185,7 +247,33 @@ type selectedCrossRowType = {
 }
 
 
-export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string,  validGeneSymbols: boolean, species: string, isHumanGenes: boolean) {
+export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined)[], sessionId: string,  validGeneSymbols: boolean, species: string, isHumanGenes: boolean, background: string[] | null) {
+
+    var backgroundHash = null;
+    var backgroundConverted: string[] = []
+    console.log(background?.length)
+    if (background != null && background.length > 0) {
+        backgroundConverted = await convertGeneSpecies(background.join('\n'), species).then((response) => response.filter((g: any) => g))
+        backgroundHash = await computeHash(backgroundConverted)
+        console.log(backgroundConverted.slice(0, 10))
+        const existingBackground = await prisma.addedBackground.findFirst({
+            where: {
+                hash: backgroundHash
+            }
+        })
+        if (!existingBackground) {
+            const newBackground = await prisma.addedBackground.create({
+                data: {
+                    hash: backgroundHash,
+                    genes: backgroundConverted as string[]
+                }
+            })
+            
+        }
+    }
+
+    console.log(backgroundHash)
+
     for (const row of rows) {
         if (row) {
             const alreadyExists = await checkInSession(sessionId, row.genesetName)
@@ -194,15 +282,15 @@ export async function addMultipleSetsToSession(rows: (GMTGenesetInfo | undefined
             } else {
                 if (isHumanGenes) {
                     const validGenes = await checkValidGenes(row.genes.toString().replaceAll(',', '\n'))
-                    const added = await addToSessionSets(validGenes, sessionId, row.genesetName, '', [], true)
+                    const added = await addToSessionSets(validGenes, sessionId, row.genesetName, '', [], true, backgroundConverted)
                 } else if (validGeneSymbols) {
                     const validSymbols = row.genes.filter((item) => item != '')
                     const convertedSymbols = await convertGeneSpecies(validSymbols.join('\n'), species).then((response) => response.filter((g: any) => g))
                     const validHuman = await checkValidGenes(convertedSymbols.join('\n'))
-                    const added = await addToSessionSets(validHuman, sessionId, row.genesetName, '', convertedSymbols, false)
+                    const added = await addToSessionSets(validHuman, sessionId, row.genesetName, '', convertedSymbols, false, backgroundConverted)
                 } else {
                     const validSymbols = row.genes.filter((item) => item != '')
-                    const added = await addToSessionSets([], sessionId, row.genesetName, '', validSymbols, false)
+                    const added = await addToSessionSets([], sessionId, row.genesetName, '', validSymbols, false, backgroundConverted)
                 }
             }
         }
@@ -219,7 +307,7 @@ export async function addMultipleSetsToSessionCross(rows: (selectedCrossRowType 
                 return { code: 'error', message: `Gene set : ${row.geneset_1 + ' ∩ ' + row.geneset_2} already in cart` }
             } else {
                 const validGenes = await checkValidGenes(row.overlap.toString().replaceAll(',', '\n').replaceAll("'", ''))
-                const added = await addToSessionSets(validGenes, sessionId, row.geneset_1 + ' ∩ ' + row.geneset_2, '', [], true)
+                const added = await addToSessionSets(validGenes, sessionId, row.geneset_1 + ' ∩ ' + row.geneset_2, '', [], true, null)
             }
 
         }
@@ -237,7 +325,7 @@ export async function addMultipleSetsCFDE(rows: (searchResultsType | undefined)[
                 return { code: 'error', message: `Gene set : ${row.genesetName} + (${row.dcc}) already in cart` }
             } else {
                 const validGenes = row.genes.map((gene) => gene.gene_symbol)
-                const added = await addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '', [], true)
+                const added = await addToSessionSets(validGenes, sessionId, row.genesetName + ` (${row.dcc})`, '', [], true, null)
             }
         }
     }
@@ -263,6 +351,19 @@ export async function checkInSession(currentSessionId: string, newGeneSetName: s
     return false
 }
 
+export async function computeHash(genes: string[]) {
+    const sortedGenes = [...genes].sort();
+    const str = sortedGenes.join(',');
+    
+    let hash = 2166136261; // FNV offset basis
+    for (let i = 0; i < str.length; i++) {
+      hash ^= str.charCodeAt(i);
+      hash = (hash * 16777619) >>> 0; // FNV prime
+    }
+    
+    return hash.toString(16); // Return as a hexadecimal string
+}
+
 export async function addToSessionByGenesetId(sessionId: string, geneset: {
     genes: {
         id: string;
@@ -284,7 +385,7 @@ export async function addToSessionByGenesetId(sessionId: string, geneset: {
                 otherSymbols = geneset.otherSymbols
                 validGenes = []
             }
-            const result = await addToSessionSets(validGenes, sessionId, geneset.name, geneset.description ? geneset.description : '', otherSymbols, isHumanGenes)
+            const result = await addToSessionSets(validGenes, sessionId, geneset.name, geneset.description ? geneset.description : '', otherSymbols, isHumanGenes, null)
             return { success: "Added" }
         } catch (err: any) {
             if (err.message === 'No valid genes in gene set') {

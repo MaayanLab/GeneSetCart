@@ -7,7 +7,7 @@ import { Collapse, Grid, Stack, Table, TableBody, TableCell, TableRow, TextField
 import { Badge } from '@mui/material'
 import { Gene, type GeneSet } from '@prisma/client';
 import { copyToClipboard } from '../assemble/fileUpload/DataTable';
-import { deleteGenesetByID, getGenesets } from './Header';
+import { deleteGenesetByID, getBackgroundGenes, getGenesets } from './Header';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LaunchIcon from '@mui/icons-material/Launch';
 
@@ -32,6 +32,7 @@ const GenesetInfo = ({ geneset }: {
     } & GeneSet)
 }) => {
     const [open, setOpen] = React.useState(false)
+    const [backgroundGenes, setBackgroundGenes] = React.useState<string[]>([])
     const deleteGeneset = React.useCallback((geneset: ({
         genes: {
             id: string;
@@ -43,6 +44,12 @@ const GenesetInfo = ({ geneset }: {
         deleteGenesetByID(geneset.id).then((result) => console.log('deleted'))
     }, [])
     const displayedSymbols = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
+    React.useEffect(() => {
+        if (geneset.background != null) {
+            getBackgroundGenes(geneset.background).then((result) => setBackgroundGenes(result))
+        }
+    }, [])
+    
     return (
         <>
             <TableRow>
@@ -70,32 +77,51 @@ const GenesetInfo = ({ geneset }: {
                     </TableCell>
                 </>
             </TableRow>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-                <Table>
-                    <TableRow>
-                        <TableCell colSpan={2}>
-                            <Grid container sx={{ p: 2 }} justifyContent="center" direction='column' alignItems={'center'}>
-                                <Grid item>
-                                    <Typography variant='body1' color='secondary'> {displayedSymbols.length.toString()} {geneset.isHumanGenes ? 'genes' : 'items'}  found</Typography>
-                                </Grid>
-                                <Grid item>
-                                    <TextField
-                                        id="standard-multiline-static"
-                                        multiline
-                                        rows={10}
-                                        value={displayedSymbols.toString().replaceAll(',', '\n')}
-                                        disabled
-                                    />
-                                </Grid>
-                                <Grid item sx={{ mt: 2 }}>
-                                    <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(displayedSymbols.toString().replaceAll(',', '\n'))}>
-                                        COPY TO CLIPBOARD
-                                    </Button>
-                                </Grid>
+            <Collapse in={open} timeout="auto" unmountOnExit className='' sx={{ width: '300px' }}>
+               <div className='flex justify-center w-full ml-10'>
+                <div className='flex flex-row gap-5 mx-auto justify-center w-full'>
+                    <div className='flex flex-col'>
+                    <Grid item>
+                        <Typography variant='body1' color='secondary' fontSize={12}> {displayedSymbols.length.toString()} {geneset.isHumanGenes ? 'genes' : 'items'}</Typography>
+                    </Grid>
+                    <Grid item>
+                        <TextField
+                            id="standard-multiline-static"
+                            multiline
+                            rows={10}
+                            value={displayedSymbols.toString().replaceAll(',', '\n')}
+                            disabled
+                        />
+                    </Grid>
+                    <Grid item sx={{ mt: 2 }}>
+                        <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(displayedSymbols.toString().replaceAll(',', '\n'))}>
+                            COPY TO CLIPBOARD
+                        </Button>
+                    </Grid>
+                    </div>
+                    <div className='flex flex-col w-64'>
+                        {(geneset.background !== null && backgroundGenes.length > 0) && <>
+                            <Grid item>
+                                <Typography variant='body1' color='secondary' fontSize={12}> {backgroundGenes.length.toString()} background {geneset.isHumanGenes ? 'genes' : 'items'}</Typography>
                             </Grid>
-                        </TableCell>
-                    </TableRow>
-                </Table>
+                            <Grid item>
+                                <TextField
+                                    id="standard-multiline-static"
+                                    multiline
+                                    rows={10}
+                                    value={backgroundGenes.join('\n')}
+                                    disabled
+                                />
+                            </Grid>
+                            <Grid item sx={{ mt: 2 }}>
+                                <Button variant='contained' color='primary' onClick={(event) => copyToClipboard(backgroundGenes.join('\n').toString().replaceAll(',', '\n'))}>
+                                    COPY TO CLIPBOARD
+                                </Button>
+                            </Grid></>
+                            }
+                        </div>
+                    </div>
+                </div>
             </Collapse>
         </>
 

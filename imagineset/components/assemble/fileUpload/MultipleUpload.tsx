@@ -1,8 +1,11 @@
 'use client'
 import React from "react";
-import { Button, Container, Stack, Typography, useMediaQuery, useTheme, FormControlLabel, Checkbox, Tooltip, Chip, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Grid } from "@mui/material";
+import { Button, Container, Stack, Typography, useMediaQuery, useTheme, 
+        FormControlLabel, Checkbox, Tooltip, Chip, FormControl, InputLabel, 
+        Select, MenuItem, SelectChangeEvent, Grid, TextField } from "@mui/material";
 import DataTable from "./DataTable";
 import { getPrivateSession } from "./getSessionPrivate";
+import {getGeneBackgrounds} from "../../../app/assemble/[id]/AssembleFunctions";
 import { useParams } from "next/navigation";
 
 export type GMTGenesetInfo = {
@@ -49,6 +52,9 @@ export default function MultipleUpload() {
     const [validGeneSymbols, setValidGeneSymbols] = React.useState(true)
     const params = useParams<{ id: string }>()
     const [privateSession, setPrivateSession] = React.useState(false)
+    const [addBackground, setAddBackground] = React.useState(false)
+    const [backgroundGenes, setBackgroundGenes] = React.useState('')
+    const [precomputedBackground, setPrecomputedBackground] = React.useState('custom')
 
     React.useEffect(() => {
         getPrivateSession(params.id).then((response: boolean | null) => {
@@ -86,6 +92,17 @@ export default function MultipleUpload() {
         setSpecies(event.target.value as string);
     };
 
+    const handleChange2 = (event: SelectChangeEvent) => {
+        setPrecomputedBackground(event.target.value as string);
+        if (event.target.value === 'protein-coding' || event.target.value === 'all-genes') {
+            getGeneBackgrounds(event.target.value, species).then((response) => {
+                setBackgroundGenes(response.join('\n') || '')
+            })
+        } else if (event.target.value === 'custom') {
+            setBackgroundGenes('')
+        }
+    };
+
 
     return (
         <Container>
@@ -99,6 +116,7 @@ export default function MultipleUpload() {
                     Upload an XMT file containing your sets
                 </Typography>
             <div className="flex justify-center">
+                
                 <Stack direction="column" spacing={1} justifyContent="center" alignItems="center">
                 <Grid justifyItems='center' alignItems={'center'} justifyContent={'center'}>
                 <FormControlLabel control={<Checkbox checked={validGeneSymbols} onChange={(event) => {
@@ -106,7 +124,7 @@ export default function MultipleUpload() {
                     }} />} label="Only accept valid gene symbols"
                     />
                 {validGeneSymbols &&
-                
+                <>
                 <FormControl>
                     <InputLabel id="species-select-label" sx={{ fontSize: 16 }} color='secondary'>Species</InputLabel>
                     <Select
@@ -121,7 +139,40 @@ export default function MultipleUpload() {
                             return <MenuItem key={i} value={item[1]} sx={{width: 300, wordBreak: 'break-word', whiteSpace: 'normal'}}>{item[0]}</MenuItem>
                         })}
                     </Select>
-                </FormControl>}</Grid>
+                </FormControl>
+                <div className="mt-1.5 ml-2 inline-flex">
+                <Button variant="outlined" color="secondary" onClick={() => {
+                            setBackgroundGenes([])
+                            //setConvertedBackgroundSymbols([])
+                            setAddBackground(!addBackground)
+                        }}> {addBackground ? "Remove Background" : "Add Background"}</Button>
+                </div>
+                </>}
+                {addBackground && <div className="flex-col my-auto place-items-center mt-2">
+                        
+                        <TextField
+                            id="standard-multiline-static"
+                            sx={{ width: 150, "mx": "auto" }}
+                            multiline
+                            rows={7}
+                            placeholder={validGeneSymbols ? "Paste complete list of genes/proteins that were detected in the assay" : "Paste set identifiers here"}
+                            value={backgroundGenes}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setBackgroundGenes(event.target.value )
+                            }} /> 
+                        <Select
+                            sx={{ width: 150, mt: 1, zIndex: 1, fontSize: 12, mt: 10, ml: 1}}
+                            labelId="species-select-label"
+                            value={precomputedBackground}
+                            onChange={handleChange2}
+                            color='secondary'
+                            MenuProps={MenuProps}>
+                            <MenuItem value="custom">Custom</MenuItem>
+                            <MenuItem value="protein-coding">Protein-coding genes</MenuItem>
+                        </Select>
+                </div>}
+                
+                </Grid>
                     <Button
                         variant="outlined"
                         component="label"
@@ -139,7 +190,7 @@ export default function MultipleUpload() {
 
             </div>
             <div style={{ height: 600, width: '100%' }} className="mt-2">
-                <DataTable rows={gmtGenesets} species={species} validGeneSymbols={validGeneSymbols} isHumanGenes={isHumanGenes} />
+                <DataTable rows={gmtGenesets} species={species} validGeneSymbols={validGeneSymbols} isHumanGenes={isHumanGenes} backgroundGenes={backgroundGenes} />
             </div>
         </Container>
     )

@@ -262,6 +262,23 @@ def gene_lookup():
         lookup = ncbi_genes_lookup(organism=species).get
         converted = [lookup(gene) for gene in input_genes]
         return {'converted': converted }
+    
+@app.route('/api/get_background', methods=['GET', 'POST'])
+def get_background():
+    if request.method == "POST":
+        data = request.get_json()
+        genes_type = data['type']
+        species = data['species']
+        if species not in SPECIES_SET:
+            return {'error': f"Species {species} not supported"}
+        if genes_type == 'protein-coding':
+            filters = lambda ncbi: ncbi['type_of_gene']=='protein-coding'
+        else:
+            filters = None
+        background = list(set(ncbi_genes_lookup(organism=species, filters=filters).values()))
+        background.sort()
+        return {'background': background }
+
 
 CFDE_LIB_LINKS = {
     "Glygen Glycosylated Proteins": "https://cfde-drc.s3.amazonaws.com/GlyGen/XMT/2022-12-13/GlyGen_XMT_2022-12-13_GlyGen_Glycosylated_Proteins_2022.gmt",

@@ -98,7 +98,7 @@ function RenderDetailsButton({ params, species, validGeneSymbols }: { params: Gr
 
 
 
-export default function DataTable({ rows, species, validGeneSymbols, isHumanGenes }: { rows: GMTGenesetInfo[], species: string, validGeneSymbols: boolean, isHumanGenes: boolean }) {
+export default function DataTable({ rows, species, validGeneSymbols, isHumanGenes, backgroundGenes }: { rows: GMTGenesetInfo[], species: string, validGeneSymbols: boolean, isHumanGenes: boolean, backgroundGenes: string }) {
   const params = useParams<{ id: string }>()
   const [status, setStatus] = React.useState<addStatus>({})
   const [rowSelectionModel, setRowSelectionModel] =
@@ -116,11 +116,11 @@ export default function DataTable({ rows, species, validGeneSymbols, isHumanGene
       }
     }
   ];
-
+  
   const addSets = React.useCallback(() => {
     setStatus({ loading: true })
     //TODO: UPDATE FUNCTION FOR MULTIPLE SPECIES
-    addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id, validGeneSymbols, species, isHumanGenes)
+    addMultipleSetsToSession(selectedRows ? selectedRows : [], params.id, validGeneSymbols, species, isHumanGenes, backgroundGenes.split('\n'))
       .then((results: any) => {
         if (results.code === 'success') {
           setStatus({ success: true })
@@ -134,7 +134,7 @@ export default function DataTable({ rows, species, validGeneSymbols, isHumanGene
           setStatus({ error: { selected: true, message: "Error in adding gene set!" } })
         }
       })
-  }, [selectedRows, params.id, validGeneSymbols])
+  }, [selectedRows, params.id, validGeneSymbols, backgroundGenes])
 
 
 

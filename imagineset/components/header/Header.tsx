@@ -69,6 +69,18 @@ export async function getGenesets(sessionId: string) {
   }
 }
 
+export async function getBackgroundGenes(backgroundHash: string) {
+  const sessionGenesets = await prisma.addedBackground.findUnique({
+    where: {
+      hash: backgroundHash,
+    },
+    select: {
+      genes: true,
+    },
+  });
+  return sessionGenesets ? sessionGenesets.genes : [];
+}
+
 export async function deleteGenesetByID(genesetID: string) {
   const deleteGeneset = await prisma.geneSet.delete({
     where: {

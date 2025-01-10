@@ -82,6 +82,7 @@ model GeneSet {
   createdAt    DateTime        @default(now())
   isHumanGenes Boolean          @default(true)
   otherSymbols String[]         @default([])
+  background String?
 
   @@map("gene_lists")
 }
@@ -143,8 +144,16 @@ model addedGeneset {
   genes       Gene[]
   createdAt   DateTime @default(now())
   otherSymbols String[] @default([])
+  background String?
 
   @@map("added_genesets")
+}
+
+model addedBackground {
+  hash String @id @unique
+  genes String[]
+  
+  @@map("added_backgrounds")
 }
 
 model paperContacts {

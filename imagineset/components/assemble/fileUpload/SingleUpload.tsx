@@ -7,7 +7,14 @@ import {
     useTheme,
     SelectChangeEvent,
 } from "@mui/material";
-import { addToSessionByGenesetId, addToSessionSets, checkInSession, checkValidGenes, loadTxtExample, convertGeneSpecies } from "../../../app/assemble/[id]/AssembleFunctions";
+import { addToSessionByGenesetId, 
+        addToSessionSets, 
+        checkInSession, 
+        checkValidGenes, 
+        loadTxtExample, 
+        convertGeneSpecies, 
+        computeHash, 
+        getGeneBackgrounds} from "../../../app/assemble/[id]/AssembleFunctions";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import Status from "../Status";
 import { getGenesetInfo } from "@/app/shallowcopy";
@@ -56,7 +63,7 @@ const speciesMap: Record<string, string> = {
         'Zea mays': 'Plants/Zea_mays'
 }
 
-type genesetInfo = { name: string, genes: string, description: string | null }
+type genesetInfo = { name: string, genes: string, description: string | null, backgroundGenes: string }
 
 export default function SingleUpload({ queryParams }: { queryParams: Record<string, string | string[] | undefined> }) {
     const theme = useTheme();
@@ -72,6 +79,10 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     const isHumanGenes = React.useMemo(() => species == 'Mammalia/Homo_sapiens', [species])
     const [privateSession, setPrivateSession] = React.useState(false)
     const [genesLoading, setGenesLoading] = React.useState(false)
+    const [addBackground, setAddBackground] = React.useState(false)
+    const [backgroundGenesLoading, setBackgroundGenesLoading] = React.useState(false)
+    const [convertedBackgroundSymbols, setConvertedBackgroundSymbols] = React.useState<string[]>([])
+    const [precomputedBackground, setPrecomputedBackground] = React.useState("custom")
 
     const searchParams = useSearchParams();
     const urlParams = new URLSearchParams(searchParams);
@@ -86,9 +97,9 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             getGenesetInfo(genesetId).then((geneset) => {
                 if (geneset) {
                     if (geneset.genes.length > 0) {
-                        setGenesetInfo({ name: geneset.name, genes: geneset.genes.map((gene) => gene.gene_symbol).join('\n'), description: geneset.description })
+                        setGenesetInfo({ name: geneset.name, genes: geneset.genes.map((gene) => gene.gene_symbol).join('\n'), description: geneset.description, backgroundGenes: ''  })
                     } else {
-                        setGenesetInfo({ name: geneset.name, genes: geneset.otherSymbols.join('\n'), description: geneset.description })
+                        setGenesetInfo({ name: geneset.name, genes: geneset.otherSymbols.join('\n'), description: geneset.description, backgroundGenes: '' })
                     }
                     if (add === 'true') {
                         addToSessionByGenesetId(sessionId, geneset).then((response) => {
@@ -114,7 +125,9 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     }, [])
 
     const getExample = React.useCallback(() => {
-        loadTxtExample().then((response) => setGenesetInfo({ name: 'example gene set', genes: response, description: '' }));
+        loadTxtExample().then((response) => setGenesetInfo({ name: 'example gene set', genes: response, description: '', backgroundGenes: '' }));
+        setAddBackground(false)
+        setConvertedBackgroundSymbols([])
     }, [genesetInfo])
 
 
@@ -142,7 +155,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             setGenesetInfo({ ...genesetInfo, genes: reader.result.toString() })
                         }
                         else {
-                            setGenesetInfo({ name: '', genes: reader.result.toString(), description: '' })
+                            setGenesetInfo({ name: '', genes: reader.result.toString(), description: '', backgroundGenes: '' })
                         }
 
                     }
@@ -157,16 +170,24 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     }, [genesetInfo, isHumanGenes])
 
     useEffect(() => {
-        if (genesetInfo && validGeneSymbols) {
+        if (genesetInfo?.genes && validGeneSymbols) {
             setGenesLoading(true)
-            console.log(genesetInfo.genes, species)
             convertGeneSpecies(genesetInfo.genes, species).then((response) => {
-                console.log(response)
                 setConvertedSymbols(response)
                 setGenesLoading(false)
             })
         }
     }, [genesetInfo?.genes, validGeneSymbols, setConvertedSymbols, species])
+
+    useEffect(() => {
+        if (genesetInfo?.backgroundGenes && validGeneSymbols) {
+            setBackgroundGenesLoading(true)
+            convertGeneSpecies(genesetInfo.backgroundGenes, species).then((response) => {
+                setConvertedBackgroundSymbols(response)
+                setBackgroundGenesLoading(false)
+            })
+        }
+    }, [genesetInfo?.backgroundGenes, validGeneSymbols, setConvertedBackgroundSymbols, species])
 
     useEffect(() => {
         if (convertedSymbols.length > 0) {
@@ -183,13 +204,19 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             let description = genesetInfo?.description
             if (!genesetName) throw new Error('No gene set name')
             if (!description) description = ''
+            let background = null;
+            if (validGeneSymbols && convertedBackgroundSymbols.length > 0) {
+                background = convertedBackgroundSymbols.filter((g) => g)
+            } else if (genesetInfo && genesetInfo?.backgroundGenes.split('\n').length > 0) {
+                background = genesetInfo?.backgroundGenes.split('\n')
+            }
             const sessionId = params.id
             checkInSession(sessionId, genesetName).then((response) => {
                 if (response) {
                     setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
                 } else {
                     if (isHumanGenes) {
-                        addToSessionSets(validHumanGenes, sessionId, genesetName, description ? description : '', [], isHumanGenes)
+                        addToSessionSets(validHumanGenes, sessionId, genesetName, description ? description : '', [], isHumanGenes, background)
                             .then((result) => { setStatus({ success: true }) })
                             .catch((err) => {
                                 if (err.message === 'No valid genes in gene set') {
@@ -199,7 +226,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                                 }
                             })
                     } else if (validGeneSymbols) {
-                        addToSessionSets(validHumanGenes, sessionId, genesetName, description ? description : '', convertedSymbols, isHumanGenes)
+                        addToSessionSets(validHumanGenes, sessionId, genesetName, description ? description : '', convertedSymbols, isHumanGenes, background)
                             .then((result) => { setStatus({ success: true }) })
                             .catch((err) => {
                                 if (err.message === 'No valid genes in gene set') {
@@ -209,7 +236,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                                 }
                             })
                     } else {
-                        addToSessionSets([], sessionId, genesetName, description ? description : '', otherSymbolsArray, isHumanGenes)
+                        addToSessionSets([], sessionId, genesetName, description ? description : '', otherSymbolsArray, isHumanGenes, background)
                             .then((result) => { setStatus({ success: true }) })
                             .catch((err) => {
                                 if (err.message === 'No valid genes in gene set') {
@@ -232,6 +259,18 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
 
     const handleChange = (event: SelectChangeEvent) => {
         setSpecies(event.target.value as string);
+    };
+
+    const handleChange2 = (event: SelectChangeEvent) => {
+        setPrecomputedBackground(event.target.value as string);
+        if (event.target.value === 'protein-coding' || event.target.value === 'all-genes') {
+            getGeneBackgrounds(event.target.value, species).then((response) => {
+                setGenesetInfo(genesetInfo ? { ...genesetInfo, backgroundGenes: response.join('\n') } : { name: '', genes: '', description: '', backgroundGenes: response.join('\n') })
+            })
+        } else if (event.target.value === 'custom') {
+            setGenesetInfo(genesetInfo ? { ...genesetInfo, backgroundGenes: '' } : { name: '', genes: '', description: '', backgroundGenes: '' })
+            setConvertedBackgroundSymbols([])
+        }
     };
 
     return (
@@ -278,7 +317,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             value={genesetInfo ? genesetInfo?.name : ''}
                             focused={genesetInfo ? true : false}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setGenesetInfo(genesetInfo ? { ...genesetInfo, name: event.target.value } : { name: event.target.value, genes: '', description: '' })
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, name: event.target.value } : { name: event.target.value, genes: '', description: '', backgroundGenes: '' })
                             }}
                         />
                     </Grid>
@@ -293,7 +332,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             value={genesetInfo ? genesetInfo?.description : ''}
                             focused={genesetInfo ? true : false}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setGenesetInfo(genesetInfo ? { ...genesetInfo, description: event.target.value } : { name: '', genes: '', description: event.target.value })
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, description: event.target.value } : { name: '', genes: '', description: event.target.value, backgroundGenes: '' })
                             }}
                         />
                     </Grid>
@@ -327,10 +366,24 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                 </Grid>
                 <Grid direction='column' item container spacing={4} xs={isMobile ? 12 : 5}>
                     <Grid item container gap={1} spacing={2} justifyContent={'center'} alignItems={'center'} direction='column'>
-                        <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.genes.split('\n').filter((item) => item != '').length : 0} items found </Typography>
-                        {validGeneSymbols &&
-                        <Button className="no-wrap" variant="contained" onClick={() => setGeneValidation(true)}><Typography variant='body1' color='secondary'> {genesLoading ? <CircularIndeterminateSm/> : convertedSymbols.filter((g) => g).length} valid genes found</Typography></Button>}
-
+                        <div className="flex flex-row gap-5">
+                            <div className="flex-col text-center">
+                                <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.genes.split('\n').filter((item) => item != '').length : 0} items found </Typography>
+                                {validGeneSymbols &&
+                                <Button className="no-wrap" variant="contained" onClick={() => setGeneValidation(true)}><Typography variant='body1' color='secondary'> {genesLoading ? <CircularIndeterminateSm/> : convertedSymbols.filter((g) => g).length} valid genes</Typography></Button>}
+                            </div>
+                            {addBackground && 
+                            <div className="flex flex-col text-center my-auto">
+                                <Typography variant='body1' color='secondary'> {genesetInfo ? genesetInfo.backgroundGenes.split('\n').filter((item) => item != '').length : 0} items found </Typography>
+                                {validGeneSymbols &&
+                                    <Typography variant='body1' color='secondary'> 
+                                    {backgroundGenesLoading ? <CircularIndeterminateSm/> : convertedBackgroundSymbols.filter((g) => g).length} valid genes
+                                    </Typography>
+                                }
+                            </div>
+                            }
+                        </div>
+                        <div className="flex flex-row align-middle justify-center mx-auto ml-16">
                         {geneValidation ? 
                             <div onClick={() => setGeneValidation(false)}
                              style={{ overflow: 'scroll', height: '263px', width: '211px', padding: 10, border: '1px solid darkblue', borderRadius: '5px' }}>
@@ -344,15 +397,44 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                             : 
                             <TextField
                             id="standard-multiline-static"
+                            sx={{ width: 211 }}
                             multiline
                             rows={10}
                             placeholder={validGeneSymbols ? "Paste gene symbols here" : "Paste set identifiers here"}
                             value={genesetInfo ? genesetInfo.genes : ''}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: event.target.value, description: '' })
+                                setGenesetInfo(genesetInfo ? { ...genesetInfo, genes: event.target.value } : { name: '', genes: event.target.value, description: '', backgroundGenes: '' })
                             }}
                         />}
-
+                        {addBackground && <div className="flex-col my-auto">
+                        
+                            <TextField
+                                id="standard-multiline-static"
+                                sx={{ width: 150, "mx": "auto" }}
+                                multiline
+                                rows={7}
+                                placeholder={validGeneSymbols ? "Paste complete list of genes/proteins that were detected in the assay" : "Paste set identifiers here"}
+                                value={genesetInfo ? genesetInfo.backgroundGenes : ''}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                    setGenesetInfo(genesetInfo ? { ...genesetInfo, backgroundGenes: event.target.value } : { name: '', genes: '', description: '', backgroundGenes: event.target.value })
+                                }} /> 
+                            <Select
+                                sx={{ width: 150, mt: 1, zIndex: 1, fontSize: 12 }}
+                                labelId="species-select-label"
+                                value={precomputedBackground}
+                                onChange={handleChange2}
+                                color='secondary'
+                                MenuProps={MenuProps}>
+                                <MenuItem value="custom">Custom</MenuItem>
+                                <MenuItem value="protein-coding">Protein-coding genes</MenuItem>
+                            </Select>
+                            </div>}
+                        </div>
+                        <Button variant="outlined" color="secondary" onClick={() => {
+                            setGenesetInfo(genesetInfo ? { ...genesetInfo, backgroundGenes: ''} : { name: '', genes: '', description: '', backgroundGenes: '' })
+                            setConvertedBackgroundSymbols([])
+                            setAddBackground(!addBackground)
+                        }}> {addBackground ? "Remove Background" : "Add Background"}</Button>
                     </Grid>
                     <Grid container item spacing={2} sx={{ mt: 1 }} justifyContent={'center'}>
                         <Grid item>

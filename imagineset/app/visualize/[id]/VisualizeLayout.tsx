@@ -240,7 +240,7 @@ export function VisualizeLayout({ sessionInfo, sessionId }: {
     const [legendSelectedSets] = useDebounce(currentlegendSelectedSets, 800); // Debounce after 500ms
 
     const addSelectedToCart = React.useCallback(() => {
-            addToSessionSets(isHumanGenes ? validGenes : [], sessionId, formatSelectionName(overlap.name), '', isHumanGenes ? [] : overlap.overlapGenes, isHumanGenes)
+            addToSessionSets(isHumanGenes ? validGenes : [], sessionId, formatSelectionName(overlap.name), '', isHumanGenes ? [] : overlap.overlapGenes, isHumanGenes, null)
             .then((result) => setStatus({ success: true }))
             .catch((err) => {
                 if (err.message === 'No valid genes in gene set') {

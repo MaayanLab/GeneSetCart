@@ -1,9 +1,11 @@
 import { getL2S2Link, getPFOCRummageLink, getRummageneLink, getRummageoLink } from "@/app/analyze/[id]/AnalyzeFunctions";
 import { Gene, GeneSet } from "@prisma/client";
 import axios from "axios";
+import qs from 'qs'; 
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
 import { generateGPTSummary } from "./gptSummary";
 import { getPlaybookReportLink } from "./playbook";
+import { getBackgroundGenes } from "@/components/header/Header";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -15,7 +17,7 @@ export async function getAnalysisData(selectedSets: ({
         let genesetResults: { [key: string]: any } = {};
         const genes = geneset.isHumanGenes ? geneset.genes.map((gene) => gene.gene_symbol) : geneset.otherSymbols
         if (analysisOptions.enrichr) {
-            const enrichr = await getEnrichrResults(genes, geneset.name)
+            const enrichr = await getEnrichrResults(genes, geneset.name, geneset.background)
             genesetResults['enrichrResults'] = enrichr.libResults
             genesetResults['enrichrLink'] = enrichr.shortId
         }
@@ -67,7 +69,26 @@ export async function getAnalysisData(selectedSets: ({
     return analysisResults
 }
 
-async function getEnrichrResults(genes: string[], term: string) {
+async function getEnrichrResults(genes: string[], term: string, background: string | null) {
+    const SPEEDRICHR_URL = "https://maayanlab.cloud/speedrichr";
+    var backgroundGenes: string[] = []
+    var backgroundId: string = ''
+    if (background) {
+        backgroundGenes = await getBackgroundGenes(background)
+
+        if (backgroundGenes.length > 0) {
+            const backgroundString = backgroundGenes.join('\n')
+            const { data } = await axios.post(
+                `${SPEEDRICHR_URL}/api/addbackground`,
+                qs.stringify({ background: backgroundString }), // Form-encode the data
+                { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } } // Set appropriate headers
+            );
+            backgroundId = data.backgroundid
+            console.log('backgroundId', backgroundId)
+            await sleep(1000)
+        }
+    }
+
     const ENRICHR_URL = 'https://maayanlab.cloud/Enrichr/addList'
     const genesString = genes.toString().split(',').join('\n').replaceAll("'", '')
     await sleep(1000)
@@ -87,14 +108,14 @@ async function getEnrichrResults(genes: string[], term: string) {
     let libResults: { [key: string]: any[] } = {}
     for (let lib of libraries) {
         await sleep(1000)
-        const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}`)
+        const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}${backgroundId !== '' ? `&backgroundId=${backgroundId}` : ''}`)
         if (response.status === 200) {
             const enrichmentResults = await response.json()
             const topResults = enrichmentResults[lib].slice(0, 10)
             libResults[lib] = topResults
         } else {
             await sleep(5000)
-            const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}`)
+            const response = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${lib}${backgroundId !== '' ? `&backgroundId=${backgroundId}` : ''}`)
             const enrichmentResults = await response.json()
             const topResults = enrichmentResults[lib].slice(0, 10)
             libResults[lib] = topResults

@@ -24,6 +24,9 @@ import pyenrichr as pye
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
+with open('excel_corrections.json') as f:
+    EXCEL_CORRECTIONS = json.load(f)
+
 def geneset_umap(geneset_genes, umapOptions):
     geneset_strings = []
     for term, geneset in geneset_genes.items():
@@ -259,6 +262,7 @@ def gene_lookup():
         species = data['species']
         if species not in SPECIES_SET:
             return {'error': f"Species {species} not supported"}
+        input_genes = [EXCEL_CORRECTIONS[g] if g in EXCEL_CORRECTIONS else g for g in input_genes]
         lookup = ncbi_genes_lookup(organism=species).get
         converted = [lookup(gene) for gene in input_genes]
         return {'converted': converted }

@@ -142,7 +142,7 @@ export default function MultipleUpload() {
                 </FormControl>
                 <div className="mt-1.5 ml-2 inline-flex">
                 <Button variant="outlined" color="secondary" onClick={() => {
-                            setBackgroundGenes([])
+                            setBackgroundGenes('')
                             //setConvertedBackgroundSymbols([])
                             setAddBackground(!addBackground)
                         }}> {addBackground ? "Remove Background" : "Add Background"}</Button>
@@ -161,7 +161,7 @@ export default function MultipleUpload() {
                                 setBackgroundGenes(event.target.value )
                             }} /> 
                         <Select
-                            sx={{ width: 150, mt: 1, zIndex: 1, fontSize: 12, mt: 10, ml: 1}}
+                            sx={{ width: 150, zIndex: 1, fontSize: 12, mt: 10, ml: 1}}
                             labelId="species-select-label"
                             value={precomputedBackground}
                             onChange={handleChange2}

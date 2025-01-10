@@ -29,7 +29,7 @@ export async function POST(request: Request) {
             },
         })
 
-        await addToSessionSets(genes, newSession.id, genesetName, description, [], true)
+        await addToSessionSets(genes, newSession.id, genesetName, description, [], true, null)
         return NextResponse.json({ session_id: newSession.id }, {
             status: 200,
             headers: {

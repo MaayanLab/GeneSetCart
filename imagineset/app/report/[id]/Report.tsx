@@ -639,7 +639,7 @@ export default function Report({
               </Typography>
               <List sx={{ listStyle: "decimal", marginLeft: 5 }}>
                 {selectedSets.map((geneset, i) => (
-                  <ListItem sx={{ display: "list-item" }} key={i}>
+                  <ListItem sx={{ display: "list-item", borderBottom: 1 }} key={i}>
                     <Typography variant="h6" color="secondary.dark" id={geneset.name}>{geneset.name} ({geneset.genes.length})</Typography>
                     <Stack direction="column">
                       {geneset.id in analysisData &&

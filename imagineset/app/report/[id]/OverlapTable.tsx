@@ -21,7 +21,11 @@ export default function BasicTable({ rows }: { rows: overlapArray[] }) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row, i) => (
+                    {rows.map((row, i) => {
+                        if (row.overlapGenes.length === 0) {
+                            return null
+                        }
+                        return (
                         <TableRow
                             key={i}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -31,7 +35,7 @@ export default function BasicTable({ rows }: { rows: overlapArray[] }) {
                             <TableCell align="center">{row.overlapGenes.length}</TableCell>
                             <TableCell align="center">{row.overlapGenes.join(', ')}</TableCell>
                         </TableRow>
-                    ))}
+                    )})}
                 </TableBody>
             </Table>
         </TableContainer>

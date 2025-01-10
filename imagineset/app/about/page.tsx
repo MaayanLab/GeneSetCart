@@ -1,6 +1,7 @@
 import { Typography, Grid, Link } from "@mui/material";
 import Container from "@mui/material/Container";
 import Header from '@/components/header/Header';
+import TermsOfService from "@/components/misc/termsOfService";
 
 
 export default function About({ params }: { params: { id: string } }) {
@@ -40,6 +41,7 @@ export default function About({ params }: { params: { id: string } }) {
                 GeneSetCart is actively being developed by the <Link  href='https://labs.icahn.mssm.edu/maayanlab/' color='secondary' target="_blank"> Ma&apos;ayan Lab </Link>. 
                
                 </Typography>
+                <TermsOfService />
             </Container>
         </>
     )

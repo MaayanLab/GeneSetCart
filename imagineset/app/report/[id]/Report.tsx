@@ -193,7 +193,7 @@ export default function Report({
                 sx={{ padding: 1, paddingLeft: 5, textAlign: "left" }}
                 key={i}
               >
-                {set.name} ({set.genes.length > 0 ? set.genes.length : set.otherSymbols.length} genes)
+                {set.name} ({set.genes.length > set.otherSymbols.length ? set.genes.length : set.otherSymbols.length} genes)
               </Typography>
             );
           })}

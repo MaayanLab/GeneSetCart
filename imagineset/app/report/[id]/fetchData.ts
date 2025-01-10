@@ -223,6 +223,8 @@ async function getSigComLINCSResults(genes: string[], term: string) {
 export type overlapArray = {
     geneset1: string,
     geneset2: string,
+    geneset1N: number,
+    geneset2N: number,
     overlapGenes: string[]
 }
 
@@ -238,7 +240,7 @@ function getGMTOverlap(genesetsObject: { [key: string]: string[] }) {
                     const genes2 = genesetsObject[geneset2]
                     const overlap = genes1.filter(x => genes2.includes(x))
                     if (overlap.length <= 30) {
-                        overlapAll.push({ geneset1: geneset1, geneset2: geneset2, overlapGenes: overlap })
+                        overlapAll.push({ geneset1: geneset1, geneset2: geneset2, geneset1N: genes1.length, geneset2N: genes2.length, overlapGenes: overlap })
                         completedPairs.push([geneset1, geneset2].toString())
                     }
                 }

@@ -30,8 +30,8 @@ export default function BasicTable({ rows }: { rows: overlapArray[] }) {
                             key={i}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
-                            <TableCell align="center">{row.geneset1}</TableCell>
-                            <TableCell align="center">{row.geneset2}</TableCell>
+                            <TableCell align="center">{row.geneset1 + ` (${row.geneset1N})`}</TableCell>
+                            <TableCell align="center">{row.geneset2 + ` (${row.geneset2N})`}</TableCell>
                             <TableCell align="center">{row.overlapGenes.length}</TableCell>
                             <TableCell align="center">{row.overlapGenes.join(', ')}</TableCell>
                         </TableRow>

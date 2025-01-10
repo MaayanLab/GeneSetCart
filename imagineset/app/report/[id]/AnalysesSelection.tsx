@@ -11,6 +11,8 @@ import rummageoLogo from "@/public/img/otherLogos/rummageoLogo.webp"
 import kea3Logo from "@/public/img/otherLogos/KEA3Logo.png"
 import chea3logo from "@/public/img/otherLogos/chea3Logo.png"
 import SigcomLincsLogo from "@/public/img/otherLogos/sigcomlincs.png"
+import l2s2Logo from "@/public/img/otherLogos/LINCSearch_logo.png"
+import pfocrummageLogo from "@/public/img/otherLogos/PFOCRummageBlack.png"
 import playbookLogo from "@/public/img/otherLogos/playbook-workflow-builder.png"
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
 
@@ -102,7 +104,7 @@ export function VisualizationSelection({ visualizationOptions, setVisualizationO
 
 export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOptions, selectedSetsCount, errorMessage, setErrorMessage }: { analysisOptions: analysisOptions, setAnalysisOptions: React.Dispatch<React.SetStateAction<analysisOptions>>, selectedSetsCount: number, errorMessage: string, setErrorMessage: React.Dispatch<React.SetStateAction<string>> }) {
     return (
-        <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap">
+        <Stack direction='row' spacing={3} sx={{ justifyContent: 'center' }} useFlexGap flexWrap="wrap" maxWidth={700}>
             <Tooltip title={"Enrichment analysis results of the genes via Enrichr"} placement="top">
                 <div onClick={() => {
                             if (selectedSetsCount === 0) {
@@ -218,6 +220,48 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                     >
                         <Image
                             src={rummageoLogo}
+                            fill
+                            alt=""
+                            style={{ padding: "10%", objectFit: "contain" }}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                    </Button>
+                </div>
+            </Tooltip>
+            <Tooltip title={"Identify most similar signatures from LINCS L1000 perturbation signatures to your gene sets"} placement="top">
+                <div onClick={() => {
+                            if (selectedSetsCount === 0) {
+                                setErrorMessage('Select at least 1 set');
+                            } else if (selectedSetsCount > 5) {
+                                setErrorMessage('Select at most 5 sets');
+                            }
+                        }}>
+                    <Button variant='outlined' color={analysisOptions.l2s2 ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
+                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, l2s2: !analysisOptions.l2s2 })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 5)}
+                        
+                    >
+                        <Image
+                            src={l2s2Logo}
+                            fill
+                            alt=""
+                            style={{ padding: "10%", objectFit: "contain" }}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                    </Button>
+                </div>
+            </Tooltip>
+            <Tooltip title={"Identify most similar gene sets extracted from Pathway Figure Optical Character Recognition (PFOCR) database to your gene sets"} placement="top">
+                <div onClick={() => {
+                            if (selectedSetsCount === 0) {
+                                setErrorMessage('Select at least 1 set');
+                            } else if (selectedSetsCount > 5) {
+                                setErrorMessage('Select at most 5 sets');
+                            }
+                        }}>
+                    <Button variant='outlined' color={analysisOptions.pfocr ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
+                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, pfocr: !analysisOptions.pfocr })} disabled={(selectedSetsCount === 0) || (selectedSetsCount > 5)}
+                        
+                    >
+                        <Image
+                            src={pfocrummageLogo}
                             fill
                             alt=""
                             style={{ padding: "10%", objectFit: "contain" }}

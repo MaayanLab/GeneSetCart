@@ -1,4 +1,4 @@
-import { getRummageneLink, getRummageoLink } from "@/app/analyze/[id]/AnalyzeFunctions";
+import { getL2S2Link, getPFOCRummageLink, getRummageneLink, getRummageoLink } from "@/app/analyze/[id]/AnalyzeFunctions";
 import { Gene, GeneSet } from "@prisma/client";
 import axios from "axios";
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
@@ -42,6 +42,14 @@ export async function getAnalysisData(selectedSets: ({
         if (analysisOptions.rummageo) {
             const rummageoLink = await getRummageoLink(geneset.name, genes)
             genesetResults['rummageoLink'] = rummageoLink
+        }
+        if (analysisOptions.l2s2) {
+            const l2s2Link = await getL2S2Link(geneset.name, genes)
+            genesetResults['l2s2Link'] = l2s2Link
+        }
+        if (analysisOptions.pfocr) {
+            const pfocrLink = await getPFOCRummageLink(geneset.name, genes)
+            genesetResults['pfocrLink'] = pfocrLink
         }
         analysisResults[geneset.id] = genesetResults
     }
@@ -221,7 +229,7 @@ function getGMTOverlap(genesetsObject: { [key: string]: string[] }) {
 
 export function getNumbering(visualizationOptions: visualizationOptions, analysisOptions: analysisOptions, disabledOptions: visualizationOptions, selectedSetsCount: number) {
     const figureLegends : {[key: string]:  any }= { 'venn': 0, 'supervenn': 0, 'upset': 0, 'heatmap': 0, 'umap': 0, 'enrichr': [], 'kea': [], 'chea': [] }
-    const analysisLegends = {'enrichr': 0, 'kea': 0, 'chea': 0, 'sigcom': 0, 'rummagene': 0, 'rummageo': 0, 'playbook': 0 }
+    const analysisLegends = {'enrichr': 0, 'kea': 0, 'chea': 0, 'sigcom': 0, 'rummagene': 0, 'rummageo': 0, 'l2s2': 0, 'pfocr': 0, 'playbook': 0 }
     let current = 1
     let analysisCurrent = 1
     if (visualizationOptions.heatmap && !disabledOptions.heatmap) {
@@ -280,6 +288,14 @@ export function getNumbering(visualizationOptions: visualizationOptions, analysi
         }
         if (analysisOptions.rummageo && i === 0) {
             analysisLegends.rummageo = analysisCurrent
+            analysisCurrent += 1
+        }
+        if (analysisOptions.l2s2 && i === 0) {
+            analysisLegends.l2s2 = analysisCurrent
+            analysisCurrent += 1
+        }
+        if (analysisOptions.pfocr && i === 0) {
+            analysisLegends.pfocr = analysisCurrent
             analysisCurrent += 1
         }
         if (analysisOptions.playbook && i === 0) {

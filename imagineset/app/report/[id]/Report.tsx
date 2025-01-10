@@ -665,6 +665,54 @@ export default function Report({
                             </Link>
                           </ListItem>
                         )}
+                        {geneset.id in analysisData &&
+                        "l2s2Link" in analysisData[geneset.id] &&
+                        analysisOptions.l2s2 && (
+                          <ListItem sx={{ display: "list-item" }}>
+                            View results from querying L2S2, a search engine
+                            for finding matching gene sets from a database that
+                            contains over a million gene sets measuring response to pre-clinical compounds, drugs, and CRISPR KOs
+                            [{analysisLegends.l2s2}].
+                            <br />
+                            <Link
+                              color="secondary"
+                              href={
+                                analysisData[geneset.id]
+                                  ? analysisData[geneset.id]["l2s2Link"]
+                                  : ""
+                              }
+                              target="_blank"
+                            >
+                              {analysisData[geneset.id]
+                                ? analysisData[geneset.id]["l2s2Link"]
+                                : ""}
+                            </Link>
+                          </ListItem>
+                        )}
+                        {geneset.id in analysisData &&
+                        "pfocrLink" in analysisData[geneset.id] &&
+                        analysisOptions.pfocr && (
+                          <ListItem sx={{ display: "list-item" }}>
+                            View results from querying PFOCRummage, a search engine
+                            for finding matching gene sets from a database that
+                            contains over 50,000 gene sets extracted from the figures of PMC articles.
+                            [{analysisLegends.pfocr}].
+                            <br />
+                            <Link
+                              color="secondary"
+                              href={
+                                analysisData[geneset.id]
+                                  ? analysisData[geneset.id]["pfocrLink"]
+                                  : ""
+                              }
+                              target="_blank"
+                            >
+                              {analysisData[geneset.id]
+                                ? analysisData[geneset.id]["pfocrLink"]
+                                : ""}
+                            </Link>
+                          </ListItem>
+                        )}
                     </List>
                   </ListItem>
                 ))}
@@ -771,10 +819,23 @@ export default function Report({
           )}
           {analysisLegends.rummageo != 0 && (
             <Typography variant="body2" color="black" sx={{ marginLeft: 5 }}>
-              [{analysisLegends.rummageo}] Marino GB, Clarke DJB, Deng EZ,
-              Ma&apos;ayan A. RummaGEO: Automatic Mining of Human and Mouse Gene
-              Sets from GEO. bioRxiv [Preprint]. 2024 Apr 13:2024.04.09.588712.
-              doi: 10.1101/2024.04.09.588712.
+              [{analysisLegends.rummageo}] Marino GB, Clarke DJB, Lachmann A, Deng EZ, Ma&apos;ayan A. 
+              RummaGEO: Automatic mining of human and mouse gene sets from GEO. 
+              Patterns (N Y). 2024;5(10):101072. Published 2024 Oct 11. doi:10.1016/j.patter.2024.101072
+              </Typography>
+          )}
+          {analysisLegends.l2s2 != 0 && (
+            <Typography variant="body2" color="black" sx={{ marginLeft: 5 }}>
+              [{analysisLegends.l2s2}]Subramanian A, Narayan R, Corsello SM, et al. 
+              A Next Generation Connectivity Map: L1000 Platform and the First 1,000,000 Profiles. 
+              Cell. 2017;171(6):1437-1452.e17. doi:10.1016/j.cell.2017.10.049
+            </Typography>
+          )}
+          {analysisLegends.pfocr != 0 && (
+            <Typography variant="body2" color="black" sx={{ marginLeft: 5 }}>
+              [{analysisLegends.pfocr}] Hanspers K, Riutta A, Summer-Kutmon M, Pico AR. 
+              Pathway information extracted from 25 years of pathway figures. Genome Biol. 
+              2020;21(1):273. Published 2020 Nov 9. doi:10.1186/s13059-020-02181-2
             </Typography>
           )}
           {analysisLegends.playbook != 0 && (

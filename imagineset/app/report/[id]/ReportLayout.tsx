@@ -32,6 +32,8 @@ export type analysisOptions = {
     rummagene: boolean;
     rummageo: boolean;
     playbook: boolean;
+    l2s2: boolean;
+    pfocr: boolean;
 }
 
 export function ReportLayout({ sessionInfo, sessionId }: {
@@ -46,7 +48,7 @@ export function ReportLayout({ sessionInfo, sessionId }: {
     const [checked, setChecked] = React.useState<number[]>([]);
     const [displayReport, setDisplayReport] = React.useState(false)
     const [visualizationOptions, setVisualizationOptions] = React.useState({ venn: true, upset: true, supervenn: true, heatmap: true, umap: true })
-    const [analysisOptions, setAnalysisOptions] = React.useState({ enrichr: true, kea: true, chea: true, sigcom: true, rummagene: true, rummageo: true, playbook: true })
+    const [analysisOptions, setAnalysisOptions] = React.useState({ enrichr: true, kea: true, chea: true, sigcom: true, rummagene: true, rummageo: true, playbook: true, l2s2: true, pfocr: true })
     const [loading, setLoading] = React.useState(false)
     const [analysisData, setAnalysisData] = React.useState<JsonObject>({})
     const [errorMessage , setErrorMessage] = React.useState('')
@@ -60,7 +62,7 @@ export function ReportLayout({ sessionInfo, sessionId }: {
 
     const selectedSets = React.useMemo(() => {
         if (checked.length > 5) {
-            setAnalysisOptions({ enrichr: false, kea: false, chea: false, sigcom: false, rummagene: false, rummageo: false, playbook: true })
+            setAnalysisOptions({ enrichr: false, kea: false, chea: false, sigcom: false, rummagene: false, rummageo: false, playbook: false, l2s2: false, pfocr: false })
         }
         setAnalysisData({})
         setDisplayReport(false)

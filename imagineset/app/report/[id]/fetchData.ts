@@ -2,6 +2,7 @@ import { getL2S2Link, getPFOCRummageLink, getRummageneLink, getRummageoLink } fr
 import { Gene, GeneSet } from "@prisma/client";
 import axios from "axios";
 import qs from 'qs'; 
+import { cacheResult, getCachedResult } from "./cachedResults";
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
 import { generateGPTSummary } from "./gptSummary";
 import { getPlaybookReportLink } from "./playbook";
@@ -9,9 +10,67 @@ import { getBackgroundGenes } from "@/components/header/Header";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+async function serializeInputs(
+    selectedSets: ({ genes: Gene[] } & GeneSet)[],
+    analysisOptions: analysisOptions,
+    visualizationOptions: visualizationOptions
+) {
+    // Helper function to sort keys in an object
+    const sortObject = (obj: any): any => {
+        if (Array.isArray(obj)) {
+            return obj.map(sortObject);
+        } else if (obj && typeof obj === "object") {
+            return Object.keys(obj)
+                .sort()
+                .reduce((acc, key) => {
+                    acc[key] = sortObject(obj[key]);
+                    return acc;
+                }, {} as any);
+        }
+        return obj;
+    };
+
+    // Sort and stringify inputs
+    const sortedSelectedSets = sortObject(selectedSets);
+    const sortedAnalysisOptions = sortObject(analysisOptions);
+    const sortedVisualizationOptions = sortObject(visualizationOptions);
+
+    return JSON.stringify({
+        selectedSets: sortedSelectedSets,
+        analysisOptions: sortedAnalysisOptions,
+        visualizationOptions: sortedVisualizationOptions,
+    });
+}
+
+export async function computeStringHash(s: string) {
+    
+    let hash = 2166136261; // FNV offset basis
+    for (let i = 0; i < s.length; i++) {
+      hash ^= s.charCodeAt(i);
+      hash = (hash * 16777619) >>> 0; // FNV prime
+    }
+    
+    return hash.toString(16); // Return as a hexadecimal string
+}
+
+
+export async function getReportById(inputHash: string) {
+    const existingReport = await getCachedResult(inputHash)
+    return JSON.parse(existingReport?.analysisData?.toString() || '{}')
+}
+
 export async function getAnalysisData(selectedSets: ({
     genes: Gene[];
 } & GeneSet)[], analysisOptions: analysisOptions, visualizationOptions: visualizationOptions) {
+    const serializedInput = await serializeInputs(selectedSets, analysisOptions, visualizationOptions)
+    const inputHash = await computeStringHash(serializedInput)
+    
+    const existingReport = await getCachedResult(inputHash)
+    
+    if (existingReport) {
+        return {id: inputHash, results: JSON.parse(existingReport.analysisData?.toString() || '{}')}
+    }
+
     const analysisResults: { [key: string]: any } = {}
     for (const geneset of selectedSets) {
         let genesetResults: { [key: string]: any } = {};
@@ -66,7 +125,10 @@ export async function getAnalysisData(selectedSets: ({
         analysisResults['gptSummary'] = gptSummary.response
     }
     analysisResults['playbookLink'] = await getPlaybookReportLink(selectedSets, visualizationOptions)
-    return analysisResults
+
+    const added = await cacheResult(inputHash, {...analysisResults, 'analysisOptions': analysisOptions, 'visualizationOptions': visualizationOptions})
+
+    return {id: inputHash, results: analysisResults}
 }
 
 async function getEnrichrResults(genes: string[], term: string, background: string | null) {
@@ -84,7 +146,6 @@ async function getEnrichrResults(genes: string[], term: string, background: stri
                 { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } } // Set appropriate headers
             );
             backgroundId = data.backgroundid
-            console.log('backgroundId', backgroundId)
             await sleep(1000)
         }
     }

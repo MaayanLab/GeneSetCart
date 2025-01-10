@@ -2,19 +2,30 @@
 
 import { type Gene, type GeneSet } from "@prisma/client";
 import React from "react";
-import { Button, Fade, Stack, Typography } from "@mui/material";
+import { Button, Fade, Stack, Tooltip, Typography } from "@mui/material";
 import { GeneSetSelect } from "./GenesetSelect";
 import ArticleIcon from '@mui/icons-material/Article';
+import { useRouter } from 'next/navigation'
 
 import dynamic from "next/dynamic";
 import { EnrichmentAnalysisSelection, VisualizationSelection } from "./AnalysesSelection";
 import CircularIndeterminate from "@/components/misc/Loading";
-import { getAnalysisData } from "./fetchData";
+import { getAnalysisData, getReportById } from "./fetchData";
 import { JsonObject } from "@prisma/client/runtime/library";
+import ShareIcon from '@mui/icons-material/Share';
 
 const Report = dynamic(() => import("./Report"), {
     ssr: false,
 });
+
+async function copyToClipboard(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      console.log('Text copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  }
 
 export type visualizationOptions = {
     venn: boolean;
@@ -36,14 +47,17 @@ export type analysisOptions = {
     pfocr: boolean;
 }
 
-export function ReportLayout({ sessionInfo, sessionId }: {
+export function ReportLayout({ sessionInfo, sessionId, reportId }: {
     sessionInfo: {
         gene_sets: ({
             genes: Gene[];
         } & GeneSet)[];
     } | null,
-    sessionId: string
+    sessionId: string,
+    reportId: string | null
 }) {
+
+    const router = useRouter()
 
     const [checked, setChecked] = React.useState<number[]>([]);
     const [displayReport, setDisplayReport] = React.useState(false)
@@ -97,6 +111,36 @@ export function ReportLayout({ sessionInfo, sessionId }: {
         return disabledOptions
     }, [selectedSets])
 
+
+    React.useEffect(() => {
+        if (reportId) {
+            setLoading(true); 
+            getReportById(reportId).then((result) => {
+            if (result != null && typeof result === 'object') {
+                const computedSets = Object.keys(result)
+                const typedSets = sessionInfo ? sessionInfo.gene_sets : []
+                const updatedChecked = []
+                for (let i = 0; i < typedSets.length; i++) {
+                    if (computedSets.includes(typedSets[i].id)) {
+                        updatedChecked.push(i)
+                    }
+                }
+                setAnalysisOptions(result['analysisOptions'])
+                setVisualizationOptions(result['visualizationOptions'])
+                setChecked(updatedChecked)
+                setTimeout(() => { 
+                    setAnalysisData(result)
+                    setDisplayReport(true) 
+                }, 1000)
+                setLoading(false)
+            } else {
+                setErrorMessage("Error fetching report analyses. Please try again later")
+                setLoading(false)
+            }
+            
+        })
+    }}, [])
+
     return (
         <Stack direction='column' spacing={1} justifyContent="center" alignItems="center">
             <GeneSetSelect sessionInfo={sessionInfo} checked={checked} setChecked={setChecked} selectedSets={selectedSets} />
@@ -110,14 +154,19 @@ export function ReportLayout({ sessionInfo, sessionId }: {
                     className="mb-10"
                     disabled={selectedSets.length < 1}
                     onClick={() => { 
-                        setAnalysisData({}); 
-                        setDisplayReport(false)
-                        setLoading(true); 
-                        getAnalysisData(selectedSets, analysisOptions, visualizationOptions).then((result) => {
-                            setAnalysisData(result)
-                            setLoading(false)
-                            setDisplayReport(true)
-                        }) 
+                            setAnalysisData({}); 
+                            setDisplayReport(false)
+                            setLoading(true); 
+                            getAnalysisData(selectedSets, analysisOptions, visualizationOptions).then((result) => {
+                                if (result.results != null && typeof result === 'object') {
+                                    router.push(window.location.href.split('?')[0] + '?reportid=' + result.id, { scroll: false})
+                                    setAnalysisData(result.results)
+                                    setTimeout(() => { setDisplayReport(true) }, 1000)
+                                } else {
+                                    setErrorMessage("Error fetching report analyses. Please try again later")
+                                }
+                                setLoading(false)
+                            })
                         }}>
                     <ArticleIcon /> &nbsp; Generate Report
                 </Button>
@@ -132,13 +181,21 @@ export function ReportLayout({ sessionInfo, sessionId }: {
                 <CircularIndeterminate />
             </Stack>}
             {(!loading && displayReport) &&
+                <>
+                <Tooltip title="Copy Report Link" placement="right">
+                    <Button variant='outlined' color='secondary' onClick={() => {copyToClipboard(window.location.href)}}><ShareIcon /></Button>
+                </Tooltip>
                 <Report selectedSets={selectedSets}
                     checked={checked}
                     sessionId={sessionId}
                     visualizationOptions={visualizationOptions}
                     disabledOptions={disabledVisualizations}
                     analysisData={analysisData}
-                    analysisOptions={analysisOptions} />}
+                    analysisOptions={analysisOptions} />
+                
+                </>
+                }
+                
         </Stack>
     )
 }

@@ -75,6 +75,8 @@ export default function Report({
   analysisData: any;
   analysisOptions: analysisOptions;
 }) {
+
+  console.log(analysisData)
   const { figureLegends, analysisLegends } = getNumbering(
     visualizationOptions,
     analysisOptions,

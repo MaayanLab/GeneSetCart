@@ -1,5 +1,4 @@
 import { authOptions } from '@/lib/auth/authOptions'
-import { CombineLayout } from "@/app/combine/[id]/CombineLayout";
 import ColorToggleButton from "@/components/misc/SectionToggle";
 import prisma from "@/lib/prisma";
 import { Grid, TextField, Typography } from "@mui/material";
@@ -11,7 +10,7 @@ import { shallowCopy } from '@/app/shallowcopy';
 import { ReportLayout } from './ReportLayout';
 import { SessionChip } from '@/components/misc/SesssionChip';
 
-export default async function CombinePage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
+export default async function ReportPage(props: { params: { id: string }, searchParams: Record<string, string | string[] | undefined> }) {
     const qs = props.searchParams
     const session = await getServerSession(authOptions)
 
@@ -49,9 +48,9 @@ export default async function CombinePage(props: { params: { id: string }, searc
                             </div>
                             <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
                                 Generate a report of your selected gene sets which displays a downloadable .pdf containing a visualization of overlap between selected gene sets, overlapping genes,
-                                Enrichr, KEA, ChEA, SigCom LINCS links and plots for selected libraries and sets, Rummagene and RummaGEO links and a GPT generated text.
+                                Enrichr, KEA, ChEA, SigCom LINCS links and plots for selected libraries and sets, Rummagene, RummaGEO, L2S2, PCOCR, and Playbook links and a GPT generated text.
                             </Typography>
-                            <ReportLayout sessionInfo={anonymousUserSession} sessionId={props.params.id} />
+                            <ReportLayout sessionInfo={anonymousUserSession} sessionId={props.params.id} reportId={qs.reportid as string} />
                         </Container>
                     </Container>
                 </>
@@ -65,8 +64,8 @@ export default async function CombinePage(props: { params: { id: string }, searc
                     pipelineSessions: true
                 }
             })
-            if (user === null) return redirect(`/api/auth/signin?callbackUrl=/combine/${props.params.id}`)
-            await shallowCopy(user, anonymousUserSession, 'combine', false, qs)
+            if (user === null) return redirect(`/api/auth/signin?callbackUrl=/report/${props.params.id}`)
+            await shallowCopy(user, anonymousUserSession, 'report', false, qs)
         }
     }
 
@@ -101,7 +100,7 @@ export default async function CombinePage(props: { params: { id: string }, searc
                 name: 'Anonymous User',
             },
         })
-        await shallowCopy(anonymousUser, sessionInfo, 'combine', true, qs)
+        await shallowCopy(anonymousUser, sessionInfo, 'report', true, qs)
     } else { // if a public session but user is logged in then shallow copy to user's account
         const user = await prisma.user.findUnique({
             where: {
@@ -111,7 +110,7 @@ export default async function CombinePage(props: { params: { id: string }, searc
                 pipelineSessions: true
             }
         })
-        if (user === null) return redirect(`/api/auth/signin?callbackUrl=/combine/${props.params.id}`) // if user is not logged in redirect
+        if (user === null) return redirect(`/api/auth/signin?callbackUrl=/report/${props.params.id}`) // if user is not logged in redirect
         // get all users saved sessions
         const savedUserSessions = user.pipelineSessions.map((savedSession) => savedSession.id)
         // if session does not belong to currently logged in user then shallow copy session to user
@@ -141,7 +140,7 @@ export default async function CombinePage(props: { params: { id: string }, searc
                         Generate a report of your selected gene sets which displays a downloadable .pdf containing a visualization of overlap between selected gene sets, overlapping genes,
                         Enrichr, KEA, ChEA, SigCom LINCS links and plots for selected libraries and sets, Rummagene and RummaGEO links and a GPT generated text.
                     </Typography>
-                    <ReportLayout sessionInfo={sessionInfo} sessionId={props.params.id} />
+                    <ReportLayout sessionInfo={sessionInfo} sessionId={props.params.id} reportId={qs.reportid as string} />
                 </Container>
             </Container>
         </>

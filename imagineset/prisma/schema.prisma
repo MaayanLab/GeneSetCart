@@ -167,3 +167,10 @@ model paperContacts {
   @@unique([pmcid, email])
   @@map("paper_contacts")
 }
+
+model report {
+  hash String @id @unique
+  analysisData Json
+  
+  @@map("report")
+}

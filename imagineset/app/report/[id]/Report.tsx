@@ -30,6 +30,7 @@ const marginTop = "10px";
 const marginRight = "5px";
 const marginBottom = "10px";
 const marginLeft = "5px";
+
 const getPageMargins = () => {
   return `@media print {
   @page {
@@ -76,7 +77,6 @@ export default function Report({
   analysisOptions: analysisOptions;
 }) {
 
-  console.log(analysisData)
   const { figureLegends, analysisLegends } = getNumbering(
     visualizationOptions,
     analysisOptions,
@@ -120,6 +120,142 @@ export default function Report({
 
   const todayString = mm + "/" + dd + "/" + yyyy;
   const componentRef = React.useRef<HTMLDivElement>(null);
+
+  console.log(analysisData)
+  
+
+  const toc = React.useMemo(() => {
+    var num = 1;
+    const visToc = [];
+    if (visualizationOptions.heatmap && !disabledOptions.heatmap) {
+      visToc.push([1, "Heatmap", "#heatmap"])
+      num += 1;
+    }
+    if (visualizationOptions.venn && !disabledOptions.venn) {
+      visToc.push([num, "Venn Diagram", "#venn"])
+      num += 1;
+    }
+    if (visualizationOptions.supervenn && !disabledOptions.supervenn) {
+      visToc.push([num, "Supervenn Diagram", "#supervenn"])
+      num += 1;
+    }
+    if (visualizationOptions.upset && !disabledOptions.upset) {
+      visToc.push([num, "Upset Plot", "#upset"])
+      num += 1;
+    }
+    if (visualizationOptions.umap && !disabledOptions.umap) {
+      visToc.push([num, "UMAP Plot", "#umap"])
+      num += 1;
+    }
+
+    num = 1;
+    const analysisToc = [];
+    if ("overlappingGenes" in analysisData && analysisData["overlappingGenes"].length > 0) {
+      analysisToc.push([num, "Overlapping Genes", "#overlappingGenes"])
+      num += 1;
+    }
+
+    selectedSets.forEach((geneset, i) => {
+      const setAnalysis = [];
+      var j = 0;
+      if (geneset.id in analysisData) {
+        if ("enrichrResults" in analysisData[geneset.id] && analysisOptions.enrichr) {
+          setAnalysis.push([alphabet[j], "Enrichr", `#enrichr-${geneset.id}`])
+          j += 1;
+        }
+        if (geneset.id in analysisData && "keaResults" in analysisData[geneset.id] && analysisOptions.kea) {
+          setAnalysis.push([alphabet[j], "KEA", `#kea-${geneset.id}`])
+          j += 1;
+        }
+        if (geneset.id in analysisData && "cheaResults" in analysisData[geneset.id] && analysisOptions.chea) {
+          setAnalysis.push([alphabet[j], "ChEA", `#chea-${geneset.id}`])
+          j += 1;
+        }
+        if ("sigcomLink" in analysisData[geneset.id] && analysisOptions.sigcom) {
+          setAnalysis.push([alphabet[j], "SigComLINCS", `#sigcomlincs-${geneset.id}`])
+          j += 1;
+        }
+        if ("rummageneLink" in analysisData[geneset.id] && analysisOptions.rummagene) {
+          setAnalysis.push([alphabet[j], "Rummagene", `#rummagene-${geneset.id}`])
+          j += 1;
+        }
+        if ("rummageoLink" in analysisData[geneset.id] && analysisOptions.rummageo) {
+          setAnalysis.push([alphabet[j], "RummaGEO", `#rummageo-${geneset.id}`])
+          j += 1;
+        }
+        if ("l2s2Link" in analysisData[geneset.id] && analysisOptions.l2s2) {
+          setAnalysis.push([alphabet[j], "L2S2", `#l2s2-${geneset.id}`])
+          j += 1;
+        }
+        if ("pfocrLink" in analysisData[geneset.id] && analysisOptions.pfocr) {
+          setAnalysis.push([alphabet[j], "PFOCRummage", `#pfocr-${geneset.id}`])
+          j += 1;
+        }
+        analysisToc.push([num, geneset.name, setAnalysis]);
+        num += 1;
+      }
+    });
+
+    if ("playbookLink" in analysisData && analysisOptions.playbook) {
+      analysisToc.push([num, "Playbook", "#playbook"])
+      num += 1;
+    }
+
+    if ("gptSummary" in analysisData) {
+      analysisToc.push([num, "LLM Summary", "#llm-summary"])
+      num += 1;
+    }
+
+    analysisToc.push([num, "References", "#references"])
+
+    return (
+    <>
+    {visToc.length > 0 && 
+      <>
+      <Typography variant="h5" color="secondary.dark">Visualizations</Typography>
+      {visToc.map((item) => {
+        return (
+          <>
+          <Typography variant="subtitle1" color="secondary.dark">  
+            <>{item[0]}. </><Link color="secondary" href={item[2].toString() || ""}>{item[1]}</Link>
+          </Typography>
+          </>
+        )
+      })}
+      <Typography variant="h5" color="secondary.dark">Analyses</Typography>
+      {analysisToc.map((item) => {
+        if (typeof item[2] === "string") {
+          return (
+            <>
+            <Typography variant="subtitle1" color="secondary.dark">  
+              <>{item[0]}. </><Link color="secondary" href={item[2].toString() || ""}>{item[1]}</Link>
+            </Typography>
+            </>
+          )
+        } else if (typeof item[2] === "object") {
+          const subitem: string[][] = item[2];
+          return (
+            <>
+            <Typography variant="subtitle1" color="secondary.dark">  
+              <>{item[0]}. </><Link color="secondary" href={'#' + item[1].toString() || ""}>{item[1]}</Link>
+              {subitem.map((subitem) => {
+                return (
+                  <>
+                  <Typography variant="subtitle2" color="secondary.dark" marginLeft={2}>  
+                    <>{subitem[0]}. </><Link color="secondary" href={subitem[2].toString() || ""}>{subitem[1]}</Link>
+                  </Typography>
+                  </>
+                )
+              })}
+            </Typography>
+            </>
+          )}
+      })}
+      </>
+    }
+    </>
+    )
+  }, []);
 
   return (
     <>
@@ -200,6 +336,13 @@ export default function Report({
             );
           })}
 
+          <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>
+            TABLE OF CONTENTS
+          </Typography>
+           
+          <Typography variant="subtitle1" color="secondary.dark" sx={{ padding: 1, paddingLeft: 5, textAlign: "left" }}>
+            {toc}
+          </Typography> 
           <Typography
             variant="h5"
             color="secondary.dark"
@@ -210,6 +353,7 @@ export default function Report({
           {visualizationOptions.heatmap && !disabledOptions.heatmap && (
             <div
               className="flex justify-center"
+              id="heatmap"
               style={{
                 backgroundColor: "#FFFFFF",
                 position: "relative",
@@ -257,6 +401,7 @@ export default function Report({
           {visualizationOptions.venn && !disabledOptions.venn && (
             <div
               className="flex justify-center"
+              id="venn"
               style={{
                 backgroundColor: "#FFFFFF",
                 position: "relative",
@@ -299,6 +444,7 @@ export default function Report({
           {visualizationOptions.supervenn && !disabledOptions.supervenn && (
             <div
               className="flex justify-center"
+              id="supervenn"
               style={{
                 backgroundColor: "#FFFFFF",
                 position: "relative",
@@ -350,6 +496,7 @@ export default function Report({
           {visualizationOptions.upset && !disabledOptions.upset && (
             <div
               className="flex justify-center"
+              id="upset"
               style={{
                 backgroundColor: "#FFFFFF",
                 position: "relative",
@@ -403,6 +550,7 @@ export default function Report({
           {visualizationOptions.umap && !disabledOptions.umap && (
             <div
               className="flex justify-center"
+              id="umap"
               style={{
                 backgroundColor: "#FFFFFF",
                 position: "relative",
@@ -452,6 +600,7 @@ export default function Report({
             <>
               <Typography
                 variant="h5"
+                id="overlappingGenes"
                 color="secondary.dark"
                 sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}
               >
@@ -486,12 +635,12 @@ export default function Report({
                 color="secondary.dark"
                 sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}
               >
-                ANALYSIS LINKS
+                ANALYSIS
               </Typography>
               <List sx={{ listStyle: "decimal", marginLeft: 5 }}>
                 {selectedSets.map((geneset, i) => (
                   <ListItem sx={{ display: "list-item" }} key={i}>
-                    {geneset.name} ({geneset.genes.length})
+                    <Typography variant="h6" color="secondary.dark" id={geneset.name}>{geneset.name} ({geneset.genes.length})</Typography>
                     <Stack direction="column">
                       {geneset.id in analysisData &&
                         "enrichrResults" in analysisData[geneset.id] &&
@@ -500,7 +649,7 @@ export default function Report({
                             direction="column"
                             sx={{ marginLeft: 5, marginTop: 1 }}
                           >
-                            <Typography variant="h5" color="secondary.dark">
+                            <Typography variant="h5" color="secondary.dark" id={`enrichr-${geneset.id}`}>
                               Enrichr Analysis
                             </Typography>
                             <EnrichrResults
@@ -541,7 +690,7 @@ export default function Report({
                             sx={{ marginLeft: 5, marginTop: 1 }}
                             style={{ breakInside: "avoid" }}
                           >
-                            <Typography variant="h5" color="secondary.dark">
+                            <Typography variant="h5" color="secondary.dark" id={`kea-${geneset.id}`}>
                               Kinase Enrichment Analysis
                             </Typography>
                             <KEABarChart
@@ -568,7 +717,7 @@ export default function Report({
                             sx={{ marginLeft: 5, marginTop: 1 }}
                             style={{ breakInside: "avoid" }}
                           >
-                            <Typography variant="h5" color="secondary.dark">
+                            <Typography variant="h5" color="secondary.dark" id={`chea-${geneset.id}`}>
                               Transciption Factor Enrichment Analysis
                             </Typography>
                             <CHEABarChart
@@ -592,7 +741,7 @@ export default function Report({
                       {geneset.id in analysisData &&
                         "sigcomLink" in analysisData[geneset.id] &&
                         analysisOptions.sigcom && (
-                          <ListItem sx={{ display: "list-item" }}>
+                          <ListItem sx={{ display: "list-item" }} id={`sigcom-${geneset.id}`}>
                             View results from querying SigCom LINCS, a web-based
                             search engine that serves over 1.5 million gene
                             expression signatures processed, analyzed, and
@@ -620,7 +769,7 @@ export default function Report({
                       {geneset.id in analysisData &&
                         "rummageneLink" in analysisData[geneset.id] &&
                         analysisOptions.rummagene && (
-                          <ListItem sx={{ display: "list-item" }}>
+                          <ListItem sx={{ display: "list-item" }} id={`rummagene-${geneset.id}`}>
                             View results from querying Rummagene, an enrichment
                             analysis tool that can be used to query hundreds of
                             thousands of gene sets extracted from supporting
@@ -645,7 +794,7 @@ export default function Report({
                       {geneset.id in analysisData &&
                         "rummageoLink" in analysisData[geneset.id] &&
                         analysisOptions.rummageo && (
-                          <ListItem sx={{ display: "list-item" }}>
+                          <ListItem sx={{ display: "list-item" }} id={`rummageo-${geneset.id}`}>
                             View results from querying RummaGEO, a search engine
                             for finding matching gene sets from a database that
                             contains hundreds of thousands gene sets extracted
@@ -670,7 +819,7 @@ export default function Report({
                         {geneset.id in analysisData &&
                         "l2s2Link" in analysisData[geneset.id] &&
                         analysisOptions.l2s2 && (
-                          <ListItem sx={{ display: "list-item" }}>
+                          <ListItem sx={{ display: "list-item" }} id={`l2s2-${geneset.id}`}>
                             View results from querying L2S2, a search engine
                             for finding matching gene sets from a database that
                             contains over a million gene sets measuring response to pre-clinical compounds, drugs, and CRISPR KOs
@@ -694,7 +843,7 @@ export default function Report({
                         {geneset.id in analysisData &&
                         "pfocrLink" in analysisData[geneset.id] &&
                         analysisOptions.pfocr && (
-                          <ListItem sx={{ display: "list-item" }}>
+                          <ListItem sx={{ display: "list-item" }} id={`pfocr-${geneset.id}`}>
                             View results from querying PFOCRummage, a search engine
                             for finding matching gene sets from a database that
                             contains over 50,000 gene sets extracted from the figures of PMC articles.
@@ -729,6 +878,7 @@ export default function Report({
                 variant="h5"
                 color="secondary.dark"
                 sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}
+                id={`playbook`}
               >
                 VIEW IN PLAYBOOK WORKFLOW BUILDER
               </Typography>
@@ -751,6 +901,7 @@ export default function Report({
                 variant="h5"
                 color="secondary.dark"
                 sx={{ borderBottom: 1 }}
+                id="llm-summary"
               >
                 LLM GENERATED SUMMARY
               </Typography>
@@ -772,6 +923,7 @@ export default function Report({
               marginTop: 2,
               marginBottom: 2,
             }}
+            id={`references`}
           >
             REFERENCES
           </Typography>

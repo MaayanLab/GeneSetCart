@@ -33,6 +33,7 @@ export type visualizationOptions = {
     supervenn: boolean;
     heatmap: boolean;
     umap: boolean;
+    [key: string]: boolean;
 }
 
 export type analysisOptions = {
@@ -45,6 +46,7 @@ export type analysisOptions = {
     playbook: boolean;
     l2s2: boolean;
     pfocr: boolean;
+    [key: string]: boolean;
 }
 
 export function ReportLayout({ sessionInfo, sessionId, reportId }: {
@@ -66,6 +68,7 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
     const [loading, setLoading] = React.useState(false)
     const [analysisData, setAnalysisData] = React.useState<JsonObject>({})
     const [errorMessage , setErrorMessage] = React.useState('')
+    const [byGeneset, setByGeneset] = React.useState(false)
 
 
     React.useEffect(() => { 
@@ -78,17 +81,10 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
         if (checked.length > 5) {
             setAnalysisOptions({ enrichr: false, kea: false, chea: false, sigcom: false, rummagene: false, rummageo: false, playbook: false, l2s2: false, pfocr: false })
         }
-        setAnalysisData({})
-        setDisplayReport(false)
         const typedSets = sessionInfo ? sessionInfo.gene_sets : []
         const checkedSets = typedSets.filter((set, index) => checked.includes(index))
         return checkedSets
     }, [checked, sessionInfo?.gene_sets])
-
-    React.useEffect(() => {
-        setAnalysisData({})
-        setDisplayReport(false)
-    }, [analysisOptions, visualizationOptions])
 
     const disabledVisualizations = React.useMemo(() => {
         let disabledOptions = { venn: false, upset: false, supervenn: false, heatmap: false, umap: false }
@@ -137,7 +133,6 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
                 setErrorMessage("Error fetching report analyses. Please try again later")
                 setLoading(false)
             }
-            
         })
     }}, [])
 
@@ -154,14 +149,14 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
                     className="mb-10"
                     disabled={selectedSets.length < 1}
                     onClick={() => { 
-                            setAnalysisData({}); 
+                            //setAnalysisData({}); 
                             setDisplayReport(false)
                             setLoading(true); 
                             getAnalysisData(selectedSets, analysisOptions, visualizationOptions).then((result) => {
                                 if (result.results != null && typeof result === 'object') {
                                     router.push(window.location.href.split('?')[0] + '?reportid=' + result.id, { scroll: false})
                                     setAnalysisData(result.results)
-                                    setTimeout(() => { setDisplayReport(true) }, 1000)
+                                    setDisplayReport(true)
                                 } else {
                                     setErrorMessage("Error fetching report analyses. Please try again later")
                                 }
@@ -180,22 +175,29 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
                 <Typography variant="body2" color='secondary'>Generating Report...</Typography>
                 <CircularIndeterminate />
             </Stack>}
-            {(!loading && displayReport) &&
+            {(!loading && displayReport) && (
                 <>
+                <div className="flex flex-row gap-3">
                 <Tooltip title="Copy Report Link" placement="right">
                     <Button variant='outlined' color='secondary' onClick={() => {copyToClipboard(window.location.href)}}><ShareIcon /></Button>
                 </Tooltip>
-                <Report selectedSets={selectedSets}
+                <Tooltip title="Report order" placement="right">
+                    <Button variant='outlined' color='secondary' onClick={() => {setByGeneset(!byGeneset)}}>{!byGeneset ? 'By Geneset' : 'By Analysis Type'}</Button>
+                </Tooltip>
+                </div>
+                <Report
+                    selectedSets={selectedSets}
                     checked={checked}
                     sessionId={sessionId}
                     visualizationOptions={visualizationOptions}
                     disabledOptions={disabledVisualizations}
                     analysisData={analysisData}
-                    analysisOptions={analysisOptions} />
-                
+                    analysisOptions={analysisOptions}
+                    byGeneset={byGeneset}
+                    setByGeneset={setByGeneset}
+                />
                 </>
-                }
-                
+            )}
         </Stack>
     )
 }

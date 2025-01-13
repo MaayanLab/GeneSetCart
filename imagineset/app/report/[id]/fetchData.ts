@@ -310,82 +310,110 @@ function getGMTOverlap(genesetsObject: { [key: string]: string[] }) {
     }
     return overlapAll
 }
-
-export function getNumbering(visualizationOptions: visualizationOptions, analysisOptions: analysisOptions, disabledOptions: visualizationOptions, selectedSetsCount: number) {
-    const figureLegends : {[key: string]:  any }= { 'venn': 0, 'supervenn': 0, 'upset': 0, 'heatmap': 0, 'umap': 0, 'enrichr': [], 'kea': [], 'chea': [] }
-    const analysisLegends = {'enrichr': 0, 'kea': 0, 'chea': 0, 'sigcom': 0, 'rummagene': 0, 'rummageo': 0, 'l2s2': 0, 'pfocr': 0, 'playbook': 0 }
-    let current = 1
-    let analysisCurrent = 1
-    if (visualizationOptions.heatmap && !disabledOptions.heatmap) {
-        figureLegends.heatmap = current
-        current += 1
+export function getNumbering(
+    visualizationOptions: visualizationOptions,
+    analysisOptions: analysisOptions,
+    disabledOptions: visualizationOptions,
+    selectedSetsCount: number,
+    byGeneset: boolean
+  ) {
+    const figureLegends: { [key: string]: any } = {
+      venn: 0,
+      supervenn: 0,
+      upset: 0,
+      heatmap: 0,
+      umap: 0,
+      enrichr: [],
+      kea: [],
+      chea: [],
+    };
+  
+    const analysisLegends: { [key: string]: number } = {
+      enrichr: 0,
+      kea: 0,
+      chea: 0,
+      sigcom: 0,
+      rummagene: 0,
+      rummageo: 0,
+      l2s2: 0,
+      pfocr: 0,
+      playbook: 0,
+    };
+  
+    let current = 1;
+    let analysisCurrent = 1;
+  
+    // Handle visualization options
+    const visualizations = ["heatmap", "venn", "supervenn", "upset", "umap"];
+    for (const vis of visualizations) {
+      if (visualizationOptions[vis] && !disabledOptions[vis]) {
+        figureLegends[vis] = current;
+        current += 1;
+      }
     }
-    if (visualizationOptions.venn && !disabledOptions.venn) {
-        figureLegends.venn = current
-        current += 1
-    }
-    if (visualizationOptions.supervenn && !disabledOptions.supervenn) {
-        figureLegends.supervenn = current
-        current += 1
-    }
-    if (visualizationOptions.upset && !disabledOptions.upset) {
-        figureLegends.upset = current
-        current += 1
-    }
-
-    if (visualizationOptions.umap && !disabledOptions.umap) {
-        figureLegends.umap = current
-        current += 1
-    }
-    for (let i = 0; i < selectedSetsCount; i++) {
+  
+    if (byGeneset) {
+      // Numbering by geneset
+      for (let i = 0; i < selectedSetsCount; i++) {
         if (analysisOptions.enrichr) {
-            figureLegends.enrichr.push(current)
-            current += 1
-            if (i === 0 ){
-                analysisLegends.enrichr = analysisCurrent
-                analysisCurrent += 1
-            }
+          figureLegends.enrichr.push(current);
+          current += 1;
         }
         if (analysisOptions.kea) {
-            figureLegends.kea.push(current)
-            current += 1
-            if (i === 0 ){
-            analysisLegends.kea = analysisCurrent
-            analysisCurrent += 1
-            }
+          // Ensure `figureLegends.kea` is properly updated for each set
+          if (!figureLegends.kea) figureLegends.kea = [];
+          figureLegends.kea.push(current);
+          current += 1;
         }
         if (analysisOptions.chea) {
-            figureLegends.chea.push(current)
-            current += 1
-            if (i === 0 ){
-            analysisLegends.chea = analysisCurrent
-            analysisCurrent += 1
-            }
+          figureLegends.chea.push(current);
+          current += 1;
         }
-        if (analysisOptions.sigcom && i === 0) {
-            analysisLegends.sigcom = analysisCurrent
-            analysisCurrent += 1
+      }
+    } else {
+      // Numbering by analysis type
+      if (analysisOptions.enrichr) {
+        analysisLegends.enrichr = analysisCurrent;
+        analysisCurrent += 1;
+        for (let i = 0; i < selectedSetsCount; i++) {
+          figureLegends.enrichr.push(current);
+          current += 1;
         }
-        if (analysisOptions.rummagene && i === 0) {
-            analysisLegends.rummagene = analysisCurrent
-            analysisCurrent += 1
+      }
+      if (analysisOptions.kea) {
+        analysisLegends.kea = analysisCurrent;
+        analysisCurrent += 1;
+        for (let i = 0; i < selectedSetsCount; i++) {
+          figureLegends.kea.push(current);
+          current += 1;
         }
-        if (analysisOptions.rummageo && i === 0) {
-            analysisLegends.rummageo = analysisCurrent
-            analysisCurrent += 1
+      }
+      if (analysisOptions.chea) {
+        analysisLegends.chea = analysisCurrent;
+        analysisCurrent += 1;
+        for (let i = 0; i < selectedSetsCount; i++) {
+          figureLegends.chea.push(current);
+          current += 1;
         }
-        if (analysisOptions.l2s2 && i === 0) {
-            analysisLegends.l2s2 = analysisCurrent
-            analysisCurrent += 1
-        }
-        if (analysisOptions.pfocr && i === 0) {
-            analysisLegends.pfocr = analysisCurrent
-            analysisCurrent += 1
-        }
-        if (analysisOptions.playbook && i === 0) {
-            analysisLegends.playbook = analysisCurrent
-            analysisCurrent += 1
-        }
+      }
     }
-    return {figureLegends: figureLegends, analysisLegends: analysisLegends}
-}
+  
+    // Handle single-instance analysis options (applies only to the first set in `byGeneset`)
+    const singleAnalysisOptions = [
+      "sigcom",
+      "rummagene",
+      "rummageo",
+      "l2s2",
+      "pfocr",
+      "playbook",
+    ];
+    for (const option of singleAnalysisOptions) {
+      if (analysisOptions[option]) {
+        analysisLegends[option] = analysisCurrent;
+        analysisCurrent += 1;
+      }
+    }
+  
+    return { figureLegends, analysisLegends };
+  }
+  

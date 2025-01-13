@@ -26,6 +26,16 @@ import { analysisOptions, visualizationOptions } from "./ReportLayout";
 import BasicTable from "./OverlapTable";
 import { StaticVenn } from "@/components/visualize/PlotComponents/Venn/StaticVenn";
 
+type AnalysisType =
+| "enrichrResults"
+| "keaResults"
+| "cheaResults"
+| "sigcomLink"
+| "rummageneLink"
+| "rummageoLink"
+| "l2s2Link"
+| "pfocrLink";
+
 const marginTop = "10px";
 const marginRight = "5px";
 const marginBottom = "10px";
@@ -57,6 +67,9 @@ const getPageMargins = () => {
 }`;
 };
 
+
+
+
 export default function Report({
   selectedSets,
   checked,
@@ -65,6 +78,8 @@ export default function Report({
   disabledOptions,
   analysisData,
   analysisOptions,
+  byGeneset,
+  setByGeneset
 }: {
   selectedSets: ({
     genes: Gene[];
@@ -75,13 +90,16 @@ export default function Report({
   disabledOptions: visualizationOptions;
   analysisData: any;
   analysisOptions: analysisOptions;
+  byGeneset: boolean;
+  setByGeneset: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 
   const { figureLegends, analysisLegends } = getNumbering(
     visualizationOptions,
     analysisOptions,
     disabledOptions,
-    selectedSets.length
+    selectedSets.length,
+    byGeneset
   );
   const heatmapOptions = {
     diagonal: false,
@@ -121,9 +139,484 @@ export default function Report({
   const todayString = mm + "/" + dd + "/" + yyyy;
   const componentRef = React.useRef<HTMLDivElement>(null);
 
-  console.log(analysisData)
+
+  const renderGenesetAnalysis = React.useMemo(() => (geneset: any, index: number) => (
+    <>
+      {geneset.id in analysisData &&
+        "enrichrResults" in analysisData[geneset.id] &&
+        analysisOptions.enrichr && (
+          <Stack direction="column" sx={{ marginLeft: 5, marginTop: 1 }}>
+            <Typography variant="h5" color="secondary.dark" id={`enrichr-${geneset.id}`}>
+              Enrichr Analysis
+            </Typography>
+            <EnrichrResults data={analysisData[geneset.id]["enrichrResults"]} />
+            <Typography
+              variant="caption"
+              color="black"
+              sx={{ wordWrap: "break-word", padding: 2 }}
+            >
+              <strong>Figure {figureLegends.enrichr[index]}.</strong> Enrichment
+              analysis results of the {geneset.name} gene set showing top 5
+              enriched terms from the WikiPathway_2023_Human and GO Biological
+              Processes libraries. Open results in Enrichr [
+              {analysisLegends.enrichr}]:{" "}
+              <Link
+                color="secondary"
+                href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.id]["enrichrLink"]}`}
+                target="_blank"
+              >
+                https://maayanlab.cloud/Enrichr/enrich?dataset=
+                {analysisData[geneset.id]["enrichrLink"]}
+              </Link>
+            </Typography>
+          </Stack>
+        )}
+      {geneset.id in analysisData &&
+        "keaResults" in analysisData[geneset.id] &&
+        analysisOptions.kea && (
+          <Stack direction="column" sx={{ marginLeft: 5, marginTop: 1 }}>
+            <Typography variant="h5" color="secondary.dark" id={`kea-${geneset.id}`}>
+              Kinase Enrichment Analysis
+            </Typography>
+            <KEABarChart data={analysisData[geneset.id]["keaResults"]} />
+            <Typography
+              variant="caption"
+              color="black"
+              sx={{ wordWrap: "break-word", padding: 2 }}
+            >
+              <strong>Figure {figureLegends.kea[index]}.</strong> Kinase
+              enrichment analysis results of the {geneset.name} gene set.
+              Kinase enrichment analysis results of the{" "}
+              {geneset.name} gene set showing top 10 ranked
+              kinases across libraries based on a mean ranking
+              from KEA3 [{analysisLegends.kea}].
+            </Typography>
+          </Stack>
+        )}
+        {geneset.id in analysisData &&
+          "cheaResults" in analysisData[geneset.id] &&
+          analysisOptions.chea && (
+            <Stack
+              direction="column"
+              sx={{ marginLeft: 5, marginTop: 1 }}
+              style={{ breakInside: "avoid" }}
+            >
+              <Typography variant="h5" color="secondary.dark" id={`chea-${geneset.id}`}>
+                Transciption Factor Enrichment Analysis
+              </Typography>
+              <CHEABarChart
+                data={analysisData[geneset.id]["cheaResults"]}
+              />
+              <Typography
+                variant="caption"
+                color="black"
+                sx={{ wordWrap: "break-word", padding: 2 }}
+              >
+                <strong>Figure {figureLegends.chea[index]}.</strong>{" "}
+                Transcription factor enrichment analysis results
+                of the {geneset.name} gene set showing top 10
+                ranked TFs across libraries based on a mean
+                ranking from ChEA3 [{analysisLegends.chea}].
+              </Typography>
+            </Stack>
+          )}
+        <List sx={{ listStyleType: "disc", marginLeft: 5 }}>
+          {geneset.id in analysisData &&
+            "sigcomLink" in analysisData[geneset.id] &&
+            analysisOptions.sigcom && (
+              <ListItem sx={{ display: "list-item" }} id={`sigcom-${geneset.id}`}>
+                View results from querying SigCom LINCS, a web-based
+                search engine that serves over 1.5 million gene
+                expression signatures processed, analyzed, and
+                visualized from LINCS, GTEx, and GEO. SigCom LINCS
+                provides ranked compounds and other perturbations
+                that maximally up- or down-regulate the collective
+                expression of the genes in the set [
+                {analysisLegends.sigcom}].
+                <br />
+                <Link
+                  color="secondary"
+                  href={
+                    analysisData[geneset.id]
+                      ? analysisData[geneset.id]["sigcomLink"]
+                      : ""
+                  }
+                  target="_blank"
+                >
+                  {" "}{analysisData[geneset.id]
+                    ? analysisData[geneset.id]["sigcomLink"]
+                    : ""}
+                </Link>
+              </ListItem>
+            )}
+          {geneset.id in analysisData &&
+            "rummageneLink" in analysisData[geneset.id] &&
+            analysisOptions.rummagene && (
+              <ListItem sx={{ display: "list-item" }} id={`rummagene-${geneset.id}`}>
+                View results from querying Rummagene, an enrichment
+                analysis tool that can be used to query hundreds of
+                thousands of gene sets extracted from supporting
+                tables of PubMed Central articles [
+                {analysisLegends.rummagene}].
+                <br />
+                <Link
+                  color="secondary"
+                  href={
+                    analysisData[geneset.id]
+                      ? analysisData[geneset.id]["rummageneLink"]
+                      : ""
+                  }
+                  target="_blank"
+                >
+                  {" "}{analysisData[geneset.id]
+                    ? analysisData[geneset.id]["rummageneLink"]
+                    : ""}
+                </Link>
+              </ListItem>
+            )}
+          {geneset.id in analysisData &&
+            "rummageoLink" in analysisData[geneset.id] &&
+            analysisOptions.rummageo && (
+              <ListItem sx={{ display: "list-item" }} id={`rummageo-${geneset.id}`}>
+                View results from querying RummaGEO, a search engine
+                for finding matching gene sets from a database that
+                contains hundreds of thousands gene sets extracted
+                automatically from NCBI&apos;s GEO repository [
+                {analysisLegends.rummageo}].
+                <br />
+                <Link
+                  color="secondary"
+                  href={
+                    analysisData[geneset.id]
+                      ? analysisData[geneset.id]["rummageoLink"]
+                      : ""
+                  }
+                  target="_blank"
+                >
+                  {" "}{analysisData[geneset.id]
+                    ? analysisData[geneset.id]["rummageoLink"]
+                    : ""}
+                </Link>
+              </ListItem>
+            )}
+            {geneset.id in analysisData &&
+            "l2s2Link" in analysisData[geneset.id] &&
+            analysisOptions.l2s2 && (
+              <ListItem sx={{ display: "list-item" }} id={`l2s2-${geneset.id}`}>
+                View results from querying L2S2, a search engine
+                for finding matching gene sets from a database that
+                contains over a million gene sets measuring response to pre-clinical compounds, drugs, and CRISPR KOs
+                [{analysisLegends.l2s2}].
+                <br />
+                <Link
+                  color="secondary"
+                  href={
+                    analysisData[geneset.id]
+                      ? analysisData[geneset.id]["l2s2Link"]
+                      : ""
+                  }
+                  target="_blank"
+                >
+                  {" "}{analysisData[geneset.id]
+                    ? analysisData[geneset.id]["l2s2Link"]
+                    : ""}
+                </Link>
+              </ListItem>
+            )}
+            {geneset.id in analysisData &&
+            "pfocrLink" in analysisData[geneset.id] &&
+            analysisOptions.pfocr && (
+              <ListItem sx={{ display: "list-item" }} id={`pfocr-${geneset.id}`}>
+                View results from querying PFOCRummage, a search engine
+                for finding matching gene sets from a database that
+                contains over 50,000 gene sets extracted from the figures of PMC articles.
+                [{analysisLegends.pfocr}].
+                <br />
+                <Link
+                  color="secondary"
+                  href={
+                    analysisData[geneset.id]
+                      ? analysisData[geneset.id]["pfocrLink"]
+                      : ""
+                  }
+                  target="_blank"
+                >
+                  {" "}{analysisData[geneset.id]
+                    ? analysisData[geneset.id]["pfocrLink"]
+                    : ""}
+                </Link>
+              </ListItem>
+            )}
+        </List>
+    </>
+  ), [analysisData, analysisOptions, figureLegends])
+
+  const getAnalysisTypeDescription = (analysisType: AnalysisType): string => {
+    switch (analysisType) {
+      case "enrichrResults":
+        return "";
+      case "keaResults":
+        return (`Kinase enrichment analysis results of the selected gene sets showing top 10 ranked
+                kinases across libraries based on a mean ranking
+                from KEA3 [${analysisLegends.kea}].`)
+      case "cheaResults":
+        return (`Transcription factor enrichment analysis results
+                of the selected gene sets showing top 10
+                ranked TFs across libraries based on a mean
+                ranking from ChEA3 [${analysisLegends.chea}].`)
+      case "sigcomLink":
+        return (`View results from querying SigCom LINCS, a web-based
+                search engine that serves over 1.5 million gene
+                expression signatures processed, analyzed, and
+                visualized from LINCS, GTEx, and GEO. SigCom LINCS
+                provides ranked compounds and other perturbations
+                that maximally up- or down-regulate the collective
+                expression of the genes in the set [${analysisLegends.sigcom}].`)
+      case "rummageneLink":
+        return (`View results from querying Rummagene, an enrichment
+                analysis tool that can be used to query hundreds of
+                thousands of gene sets extracted from supporting
+                tables of PubMed Central articles [${analysisLegends.rummagene}].`)
+      case "rummageoLink":
+        return (`View results from querying RummaGEO, a search engine
+                for finding matching gene sets from a database that
+                contains hundreds of thousands gene sets extracted
+                automatically from NCBI&apos;s GEO repository [${analysisLegends.rummageo}].`)
+      case "l2s2Link":
+        return (`View results from querying L2S2, a search engine
+                for finding matching gene sets from a database that
+                contains over a million gene sets measuring response to pre-clinical compounds, drugs, and CRISPR KOs
+                [${analysisLegends.l2s2}].`)
+      case "pfocrLink":
+        return (`View results from querying PFOCRummage, a search engine
+                for finding matching gene sets from a database that
+                contains over 50,000 gene sets extracted from the figures of PMC articles.
+                [${analysisLegends.pfocr}].`)
+      default: 
+        return "";
+    }
+}
+
+
+  const analysisTypeLabels: Record<AnalysisType, string> = React.useMemo(
+    () => ({
+      enrichrResults: "Enrichr Analysis",
+      keaResults: "Kinase Enrichment Analysis",
+      cheaResults: "Transcription Factor Enrichment Analysis",
+      sigcomLink: "SigCom LINCS Results",
+      rummageneLink: "Rummagene Results",
+      rummageoLink: "RummaGEO Results",
+      l2s2Link: "L2S2 Results",
+      pfocrLink: "PFOCRummage Results",
+    }),
+    []
+  );
+
+  const analysisSectionNames = (section: string) => {
+    switch (section) {
+      case "enrichrResults":
+        return "Enrichr";
+      case "keaResults":
+        return "KEA";
+      case "cheaResults":
+        return "ChEA";
+      case "sigcomLink":
+        return "SigCom LINCS";
+      case "rummageneLink":
+        return "Rummagene";
+      case "rummageoLink":
+        return "RummaGEO";
+      case "l2s2Link":
+        return "L2S2";
+      case "pfocrLink":
+        return "PFOCRummage";
+      default: 
+        return "";
+    }
+  }
+  
+  const getAnalysisTypeLabel = (analysisType: AnalysisType): string => {
+    return analysisTypeLabels[analysisType] || "Unknown Analysis"; // The default fallback may no longer be necessary
+  };
   
 
+  const renderAnalysisContent = React.useMemo(
+    () =>
+      (data: any, geneset: GeneSet, analysisType: AnalysisType, index: number) => {
+        switch (analysisType) {
+          case "enrichrResults":
+            return (
+              <>
+                <Typography variant="h6" color="secondary.dark" id={`enrichr-${geneset.id}`}>
+                  {geneset.name}
+                </Typography>
+                <EnrichrResults data={data} />
+                <Typography
+                  variant="caption"
+                  color="black"
+                  sx={{ wordWrap: "break-word", padding: 2 }}
+                >
+                  <strong>Figure {figureLegends.enrichr[index]}.</strong> Enrichment
+                  analysis results of the {geneset.name} gene set showing top 5
+                  enriched terms from the WikiPathway_2023_Human and GO Biological
+                  Processes libraries. Open results in Enrichr [
+                  {analysisLegends.enrichr}]:{" "}
+                  <Link color="secondary" href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.id].enrichrLink}`} target="_blank">Enrichr Link</Link>
+                </Typography>
+              </>
+            );
+          case "keaResults":
+            return (
+              <>
+                <Typography variant="h6" color="secondary.dark" id={`kea-${geneset.id}`}>
+                  {geneset.name}
+                </Typography>
+                <KEABarChart data={data} />
+                <Typography
+                  variant="caption"
+                  color="black"
+                  sx={{ wordWrap: "break-word", padding: 2 }}
+                >
+                  <strong>Figure {figureLegends.kea[index]}.</strong> Kinase
+                  enrichment analysis results for {geneset.name}.
+                </Typography>
+              </>
+            );
+          case "cheaResults":
+            return (
+              <>
+                <Typography variant="h6" color="secondary.dark" id={`chea-${geneset.id}`}>
+                  {geneset.name}
+                </Typography>
+                <CHEABarChart data={data} />
+                <Typography
+                  variant="caption"
+                  color="black"
+                  sx={{ wordWrap: "break-word", padding: 2 }}
+                >
+                  <strong>Figure {figureLegends.chea[index]}.</strong> Transcription
+                  factor enrichment analysis results for {geneset.name}.
+                </Typography>
+              </>
+            );
+          case "sigcomLink":
+            return (
+              <>
+                <Typography variant="h6" color="secondary.dark" id={`sigcom-${geneset.id}`}>
+                  {geneset.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="black"
+                  sx={{ wordWrap: "break-word", padding: 2 }}
+                >
+                  View results from querying SigCom LINCS for {geneset.name}:{" "}
+                  <Link
+                    color="secondary"
+                    href={data}
+                    target="_blank"
+                  >
+                    {data}
+                  </Link>
+                </Typography>
+              </>
+            );
+          case "rummageneLink":
+            return (
+              <>
+                <Typography variant="h6" color="secondary.dark" id={`rummagene-${geneset.id}`}>
+                  {geneset.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="black"
+                  sx={{ wordWrap: "break-word", padding: 2 }}
+                >
+                  View results from querying Rummagene for {geneset.name}:{" "}
+                  <Link
+                    color="secondary"
+                    href={data}
+                    target="_blank"
+                  >
+                    {data}
+                  </Link>
+                </Typography>
+              </>
+            );
+          case "rummageoLink":
+            return (
+              <>
+                <Typography variant="h6" color="secondary.dark" id={`rummageo-${geneset.id}`}>
+                  {geneset.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="black"
+                  sx={{ wordWrap: "break-word", padding: 2 }}
+                >
+                  View results from querying RummaGEO for {geneset.name}:{" "}
+                  <Link
+                    color="secondary"
+                    href={data}
+                    target="_blank"
+                  >
+                    {data}
+                  </Link>
+                </Typography>
+              </>
+            );
+          case "l2s2Link":
+            return (
+              <>
+                <Typography variant="h6" color="secondary.dark" id={`l2s2-${geneset.id}`}>
+                  {geneset.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="black"
+                  sx={{ wordWrap: "break-word", padding: 2 }}
+                >
+                  View results from querying L2S2 for {geneset.name}:{" "}
+                  <Link
+                    color="secondary"
+                    href={data}
+                    target="_blank"
+                  >
+                    {data}
+                  </Link>
+                </Typography>
+              </>
+            );
+          case "pfocrLink":
+            return (
+              <>
+                <Typography variant="h6" color="secondary.dark" id={`pfocr-${geneset.id}`}>
+                  {geneset.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="black"
+                  sx={{ wordWrap: "break-word", padding: 2 }}
+                >
+                  View results from querying PFOCRummage for {geneset.name}:{" "}
+                  <Link
+                    color="secondary"
+                    href={data}
+                    target="_blank"
+                  >
+                    {data}
+                  </Link>
+                </Typography>
+              </>
+            );
+          default:
+            return null;
+        }
+      },
+    [figureLegends]
+  );
+  
+  
   const toc = React.useMemo(() => {
     var num = 1;
     const visToc = [];
@@ -154,47 +647,120 @@ export default function Report({
       analysisToc.push([num, "Overlapping Genes", "#overlappingGenes"])
       num += 1;
     }
-
-    selectedSets.forEach((geneset, i) => {
-      const setAnalysis = [];
-      var j = 0;
-      if (geneset.id in analysisData) {
-        if ("enrichrResults" in analysisData[geneset.id] && analysisOptions.enrichr) {
-          setAnalysis.push([alphabet[j], "Enrichr", `#enrichr-${geneset.id}`])
-          j += 1;
+    if (byGeneset) {
+      selectedSets.forEach((geneset, i) => {
+        const setAnalysis = [];
+        var j = 0;
+        if (geneset.id in analysisData) {
+          if ("enrichrResults" in analysisData[geneset.id] && analysisOptions.enrichr) {
+            setAnalysis.push([alphabet[j], "Enrichr", `#enrichr-${geneset.id}`])
+            j += 1;
+          }
+          if (geneset.id in analysisData && "keaResults" in analysisData[geneset.id] && analysisOptions.kea) {
+            setAnalysis.push([alphabet[j], "KEA", `#kea-${geneset.id}`])
+            j += 1;
+          }
+          if (geneset.id in analysisData && "cheaResults" in analysisData[geneset.id] && analysisOptions.chea) {
+            setAnalysis.push([alphabet[j], "ChEA", `#chea-${geneset.id}`])
+            j += 1;
+          }
+          if ("sigcomLink" in analysisData[geneset.id] && analysisOptions.sigcom) {
+            setAnalysis.push([alphabet[j], "SigComLINCS", `#sigcomlincs-${geneset.id}`])
+            j += 1;
+          }
+          if ("rummageneLink" in analysisData[geneset.id] && analysisOptions.rummagene) {
+            setAnalysis.push([alphabet[j], "Rummagene", `#rummagene-${geneset.id}`])
+            j += 1;
+          }
+          if ("rummageoLink" in analysisData[geneset.id] && analysisOptions.rummageo) {
+            setAnalysis.push([alphabet[j], "RummaGEO", `#rummageo-${geneset.id}`])
+            j += 1;
+          }
+          if ("l2s2Link" in analysisData[geneset.id] && analysisOptions.l2s2) {
+            setAnalysis.push([alphabet[j], "L2S2", `#l2s2-${geneset.id}`])
+            j += 1;
+          }
+          if ("pfocrLink" in analysisData[geneset.id] && analysisOptions.pfocr) {
+            setAnalysis.push([alphabet[j], "PFOCRummage", `#pfocr-${geneset.id}`])
+            j += 1;
+          }
+          analysisToc.push([num, geneset.name, setAnalysis]);
+          num += 1;
+        }})
+    } else {
+        if ("enrichrResults" in analysisData[selectedSets[0].id] && analysisOptions.enrichr) {
+          const setAnalysis: string[][] = [];
+          let j = 0;
+          selectedSets.forEach((geneset, i) => {
+            setAnalysis.push([alphabet[j], geneset.name, `#enrichr-${geneset.id}`])  
+            j += 1;
+          })
+          analysisToc.push([num, "Enrichr", setAnalysis]);
         }
-        if (geneset.id in analysisData && "keaResults" in analysisData[geneset.id] && analysisOptions.kea) {
-          setAnalysis.push([alphabet[j], "KEA", `#kea-${geneset.id}`])
-          j += 1;
+        if ("keaResults" in analysisData[selectedSets[0].id] && analysisOptions.kea) {
+          const setAnalysis: string[][] = [];
+          let j = 0;
+          selectedSets.forEach((geneset, i) => {
+            setAnalysis.push([alphabet[j], geneset.name, `#kea-${geneset.id}`])  
+            j += 1;
+          })
+          analysisToc.push([num, "KEA", setAnalysis]);
         }
-        if (geneset.id in analysisData && "cheaResults" in analysisData[geneset.id] && analysisOptions.chea) {
-          setAnalysis.push([alphabet[j], "ChEA", `#chea-${geneset.id}`])
-          j += 1;
+        if ("cheaResults" in analysisData[selectedSets[0].id] && analysisOptions.chea) {
+          const setAnalysis: string[][] = [];
+          let j = 0;
+          selectedSets.forEach((geneset, i) => {
+            setAnalysis.push([alphabet[j], geneset.name, `#chea-${geneset.id}`])  
+            j += 1;
+          })
+          analysisToc.push([num, "ChEA", setAnalysis]);
         }
-        if ("sigcomLink" in analysisData[geneset.id] && analysisOptions.sigcom) {
-          setAnalysis.push([alphabet[j], "SigComLINCS", `#sigcomlincs-${geneset.id}`])
-          j += 1;
+        if ("sigcomLink" in analysisData[selectedSets[0].id] && analysisOptions.sigcom) {
+          const setAnalysis: string[][] = [];
+          let j = 0;
+          selectedSets.forEach((geneset, i) => {
+            setAnalysis.push([alphabet[j], geneset.name, `#sigcomlincs-${geneset.id}`])  
+            j += 1;
+          })
+          analysisToc.push([num, "SigComLINCS", setAnalysis]);
         }
-        if ("rummageneLink" in analysisData[geneset.id] && analysisOptions.rummagene) {
-          setAnalysis.push([alphabet[j], "Rummagene", `#rummagene-${geneset.id}`])
-          j += 1;
+        if ("rummageneLink" in analysisData[selectedSets[0].id] && analysisOptions.rummagene) {
+          const setAnalysis: string[][] = [];
+          let j = 0;
+          selectedSets.forEach((geneset, i) => {
+            setAnalysis.push([alphabet[j], geneset.name, `#rummagene-${geneset.id}`])  
+            j += 1;
+          })  
+          analysisToc.push([num, "Rummagene", setAnalysis]);
         }
-        if ("rummageoLink" in analysisData[geneset.id] && analysisOptions.rummageo) {
-          setAnalysis.push([alphabet[j], "RummaGEO", `#rummageo-${geneset.id}`])
-          j += 1;
+        if ("rummageoLink" in analysisData[selectedSets[0].id] && analysisOptions.rummageo) {
+          const setAnalysis: string[][] = [];
+          let j = 0;
+          selectedSets.forEach((geneset, i) => {
+            setAnalysis.push([alphabet[j], geneset.name, `#rummageo-${geneset.id}`])  
+            j += 1;
+          })
+          analysisToc.push([num, "RummaGEO", setAnalysis]);
         }
-        if ("l2s2Link" in analysisData[geneset.id] && analysisOptions.l2s2) {
-          setAnalysis.push([alphabet[j], "L2S2", `#l2s2-${geneset.id}`])
-          j += 1;
+        if ("l2s2Link" in analysisData[selectedSets[0].id] && analysisOptions.l2s2) {
+          const setAnalysis: string[][] = [];
+          let j = 0;
+          selectedSets.forEach((geneset, i) => {
+            setAnalysis.push([alphabet[j], geneset.name, `#l2s2-${geneset.id}`])  
+            j += 1;
+          })
+          analysisToc.push([num, "L2S2", setAnalysis]);
         }
-        if ("pfocrLink" in analysisData[geneset.id] && analysisOptions.pfocr) {
-          setAnalysis.push([alphabet[j], "PFOCRummage", `#pfocr-${geneset.id}`])
-          j += 1;
+        if ("pfocrLink" in analysisData[selectedSets[0].id] && analysisOptions.pfocr) {
+          const setAnalysis: string[][] = [];
+          let j = 0;
+          selectedSets.forEach((geneset, i) => {
+            setAnalysis.push([alphabet[j], geneset.name, `#pfocr-${geneset.id}`])  
+            j += 1;
+          })
+          analysisToc.push([num, "PFOCRummage", setAnalysis]);
         }
-        analysisToc.push([num, geneset.name, setAnalysis]);
-        num += 1;
-      }
-    });
+    }
 
     if ("playbookLink" in analysisData && analysisOptions.playbook) {
       analysisToc.push([num, "Playbook", "#playbook"])
@@ -255,7 +821,7 @@ export default function Report({
     }
     </>
     )
-  }, []);
+  }, [byGeneset]);
 
   return (
     <>
@@ -628,250 +1194,62 @@ export default function Report({
             <></>
           )}
           {selectedSets[0].id in analysisData &&
-          Object.keys(analysisData[selectedSets[0].id]).length > 0 ? (
-            <>
-              <Typography
-                variant="h5"
-                color="secondary.dark"
-                sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}
-              >
-                ANALYSIS
-              </Typography>
-              <List sx={{ listStyle: "decimal", marginLeft: 5 }}>
-                {selectedSets.map((geneset, i) => (
-                  <ListItem sx={{ display: "list-item", borderBottom: 1 }} key={i}>
-                    <Typography variant="h6" color="secondary.dark" id={geneset.name}>{geneset.name} ({geneset.genes.length})</Typography>
-                    <Stack direction="column">
-                      {geneset.id in analysisData &&
-                        "enrichrResults" in analysisData[geneset.id] &&
-                        analysisOptions.enrichr && (
-                          <Stack
-                            direction="column"
-                            sx={{ marginLeft: 5, marginTop: 1 }}
-                          >
-                            <Typography variant="h5" color="secondary.dark" id={`enrichr-${geneset.id}`}>
-                              Enrichr Analysis
-                            </Typography>
-                            <EnrichrResults
-                              data={analysisData[geneset.id]["enrichrResults"]}
-                            />
-                            <Typography
-                              variant="caption"
-                              color="black"
-                              sx={{ wordWrap: "break-word", padding: 2 }}
-                              style={{ breakInside: "avoid" }}
-                            >
-                              <strong>
-                                Figure {figureLegends.enrichr[i]}.
-                              </strong>{" "}
-                              Enrichment analysis results of the {geneset.name}{" "}
-                              gene set showing top 5 enriched terms from the (A)
-                              WikiPathway_2023_Human and (B) GO Biological
-                              Processes libraries. Open results in Enrichr [
-                              {analysisLegends.enrichr}]:{" "}
-                              <Link
-                                color="secondary"
-                                href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${
-                                  analysisData[geneset.id]["enrichrLink"]
-                                }`}
-                                target="_blank"
-                              >
-                                https://maayanlab.cloud/Enrichr/enrich?dataset=
-                                {analysisData[geneset.id]["enrichrLink"]}
-                              </Link>
-                            </Typography>
-                          </Stack>
-                        )}
-                      {geneset.id in analysisData &&
-                        "keaResults" in analysisData[geneset.id] &&
-                        analysisOptions.kea && (
-                          <Stack
-                            direction="column"
-                            sx={{ marginLeft: 5, marginTop: 1 }}
-                            style={{ breakInside: "avoid" }}
-                          >
-                            <Typography variant="h5" color="secondary.dark" id={`kea-${geneset.id}`}>
-                              Kinase Enrichment Analysis
-                            </Typography>
-                            <KEABarChart
-                              data={analysisData[geneset.id]["keaResults"]}
-                            />
-                            <Typography
-                              variant="caption"
-                              color="black"
-                              sx={{ wordWrap: "break-word", padding: 2 }}
-                            >
-                              <strong>Figure {figureLegends.kea[i]}.</strong>{" "}
-                              Kinase enrichment analysis results of the{" "}
-                              {geneset.name} gene set showing top 10 ranked
-                              kinases across libraries based on a mean ranking
-                              from KEA3 [{analysisLegends.kea}].
-                            </Typography>
-                          </Stack>
-                        )}
-                      {geneset.id in analysisData &&
-                        "cheaResults" in analysisData[geneset.id] &&
-                        analysisOptions.chea && (
-                          <Stack
-                            direction="column"
-                            sx={{ marginLeft: 5, marginTop: 1 }}
-                            style={{ breakInside: "avoid" }}
-                          >
-                            <Typography variant="h5" color="secondary.dark" id={`chea-${geneset.id}`}>
-                              Transciption Factor Enrichment Analysis
-                            </Typography>
-                            <CHEABarChart
-                              data={analysisData[geneset.id]["cheaResults"]}
-                            />
-                            <Typography
-                              variant="caption"
-                              color="black"
-                              sx={{ wordWrap: "break-word", padding: 2 }}
-                            >
-                              <strong>Figure {figureLegends.chea[i]}.</strong>{" "}
-                              Transcription factor enrichment analysis results
-                              of the {geneset.name} gene set showing top 10
-                              ranked TFs across libraries based on a mean
-                              ranking from ChEA3 [{analysisLegends.chea}].
-                            </Typography>
-                          </Stack>
-                        )}
-                    </Stack>
-                    <List sx={{ listStyleType: "disc", marginLeft: 5 }}>
-                      {geneset.id in analysisData &&
-                        "sigcomLink" in analysisData[geneset.id] &&
-                        analysisOptions.sigcom && (
-                          <ListItem sx={{ display: "list-item" }} id={`sigcom-${geneset.id}`}>
-                            View results from querying SigCom LINCS, a web-based
-                            search engine that serves over 1.5 million gene
-                            expression signatures processed, analyzed, and
-                            visualized from LINCS, GTEx, and GEO. SigCom LINCS
-                            provides ranked compounds and other perturbations
-                            that maximally up- or down-regulate the collective
-                            expression of the genes in the set [
-                            {analysisLegends.sigcom}].
-                            <br />
-                            <Link
-                              color="secondary"
-                              href={
-                                analysisData[geneset.id]
-                                  ? analysisData[geneset.id]["sigcomLink"]
-                                  : ""
-                              }
-                              target="_blank"
-                            >
-                              {analysisData[geneset.id]
-                                ? analysisData[geneset.id]["sigcomLink"]
-                                : ""}
-                            </Link>
-                          </ListItem>
-                        )}
-                      {geneset.id in analysisData &&
-                        "rummageneLink" in analysisData[geneset.id] &&
-                        analysisOptions.rummagene && (
-                          <ListItem sx={{ display: "list-item" }} id={`rummagene-${geneset.id}`}>
-                            View results from querying Rummagene, an enrichment
-                            analysis tool that can be used to query hundreds of
-                            thousands of gene sets extracted from supporting
-                            tables of PubMed Central articles [
-                            {analysisLegends.rummagene}].
-                            <br />
-                            <Link
-                              color="secondary"
-                              href={
-                                analysisData[geneset.id]
-                                  ? analysisData[geneset.id]["rummageneLink"]
-                                  : ""
-                              }
-                              target="_blank"
-                            >
-                              {analysisData[geneset.id]
-                                ? analysisData[geneset.id]["rummageneLink"]
-                                : ""}
-                            </Link>
-                          </ListItem>
-                        )}
-                      {geneset.id in analysisData &&
-                        "rummageoLink" in analysisData[geneset.id] &&
-                        analysisOptions.rummageo && (
-                          <ListItem sx={{ display: "list-item" }} id={`rummageo-${geneset.id}`}>
-                            View results from querying RummaGEO, a search engine
-                            for finding matching gene sets from a database that
-                            contains hundreds of thousands gene sets extracted
-                            automatically from NCBI&apos;s GEO repository [
-                            {analysisLegends.rummageo}].
-                            <br />
-                            <Link
-                              color="secondary"
-                              href={
-                                analysisData[geneset.id]
-                                  ? analysisData[geneset.id]["rummageoLink"]
-                                  : ""
-                              }
-                              target="_blank"
-                            >
-                              {analysisData[geneset.id]
-                                ? analysisData[geneset.id]["rummageoLink"]
-                                : ""}
-                            </Link>
-                          </ListItem>
-                        )}
-                        {geneset.id in analysisData &&
-                        "l2s2Link" in analysisData[geneset.id] &&
-                        analysisOptions.l2s2 && (
-                          <ListItem sx={{ display: "list-item" }} id={`l2s2-${geneset.id}`}>
-                            View results from querying L2S2, a search engine
-                            for finding matching gene sets from a database that
-                            contains over a million gene sets measuring response to pre-clinical compounds, drugs, and CRISPR KOs
-                            [{analysisLegends.l2s2}].
-                            <br />
-                            <Link
-                              color="secondary"
-                              href={
-                                analysisData[geneset.id]
-                                  ? analysisData[geneset.id]["l2s2Link"]
-                                  : ""
-                              }
-                              target="_blank"
-                            >
-                              {analysisData[geneset.id]
-                                ? analysisData[geneset.id]["l2s2Link"]
-                                : ""}
-                            </Link>
-                          </ListItem>
-                        )}
-                        {geneset.id in analysisData &&
-                        "pfocrLink" in analysisData[geneset.id] &&
-                        analysisOptions.pfocr && (
-                          <ListItem sx={{ display: "list-item" }} id={`pfocr-${geneset.id}`}>
-                            View results from querying PFOCRummage, a search engine
-                            for finding matching gene sets from a database that
-                            contains over 50,000 gene sets extracted from the figures of PMC articles.
-                            [{analysisLegends.pfocr}].
-                            <br />
-                            <Link
-                              color="secondary"
-                              href={
-                                analysisData[geneset.id]
-                                  ? analysisData[geneset.id]["pfocrLink"]
-                                  : ""
-                              }
-                              target="_blank"
-                            >
-                              {analysisData[geneset.id]
-                                ? analysisData[geneset.id]["pfocrLink"]
-                                : ""}
-                            </Link>
-                          </ListItem>
-                        )}
-                    </List>
-                  </ListItem>
-                ))}
-              </List>
-            </>
-          ) : (
-            <></>
-          )}
+            Object.keys(analysisData[selectedSets[0].id]).length > 0 ? (
+              <>
+                <Typography
+                  variant="h5"
+                  color="secondary.dark"
+                  sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}
+                >
+                  ANALYSIS
+                </Typography>
+
+              {byGeneset ? (
+                <List sx={{ listStyle: "decimal", marginLeft: 5 }}>
+                  {selectedSets.map((geneset, i) => (
+                    <ListItem sx={{ display: "list-item", borderBottom: 1 }} key={i}>
+                      <Typography variant="h6" color="secondary.dark" id={geneset.name}>
+                        {geneset.name} ({geneset.genes.length})
+                      </Typography>
+                      <Stack direction="column">
+                        {renderGenesetAnalysis(geneset, i)}
+                      </Stack>
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <List sx={{ listStyle: "decimal", marginLeft: 5 }}>
+                  {Object.keys(analysisData[selectedSets[0].id]).map((analysisType: string, i: number) => { 
+                    if (analysisType == "enrichrLink") return <></>
+                    return (
+                      <ListItem sx={{ display: "list-item", borderBottom: 1 }} key={i}>
+                        <Typography variant="h6" color="secondary.dark" id={`${analysisSectionNames(analysisType)}`}>
+                          {getAnalysisTypeLabel(analysisType as AnalysisType)}
+                        </Typography>
+                        <Typography variant="body2" color="black">
+                          <br/>
+                          {getAnalysisTypeDescription(analysisType as AnalysisType)}
+                        </Typography>
+                        <Stack direction="column">
+                          {selectedSets.map((geneset, j) => (
+                            geneset.id in analysisData &&
+                            analysisType in analysisData[geneset.id] && (
+                              <Stack key={j} sx={{ marginLeft: 5, marginTop: 1 }}>
+                                {renderAnalysisContent(analysisData[geneset.id][analysisType], geneset, analysisType as AnalysisType, j)}
+                              </Stack>
+                            )
+                          ))}
+                        </Stack>
+                      </ListItem>
+                    )
+                  }
+                  )}
+                </List>
+              )}
+              </>
+              ) : (
+              <></>
+              )}
           {"playbookLink" in analysisData && analysisOptions.playbook && (
             <>
               <Typography

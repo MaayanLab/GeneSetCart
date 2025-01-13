@@ -12,35 +12,35 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const getAnalysisTypeDescription = (analysisType: string): string => {
     switch (analysisType) {
-      case "enrichrResults":
-        return "A resource that contains numerous annotated gene set libraries used for enrichment analysis of the provided sets";
-      case "keaResults":
+      case "enrichr":
+        return "Enrichr is a resource that contains numerous annotated gene set libraries used for enrichment analysis of the provided sets";
+      case "kea":
         return (`KEA3 (Kinase Enrichment Analysis 3)  infers upstream kinases whose putative substrates are overrepresented in a user-inputted list of proteins or differentially phosphorylated proteins.`)
-      case "cheaResults":
+      case "chea":
         return (`The ChEA3 (ChIP-X Enrichment Analysis 3) predicts transcription factors (TFs) associated with user-input sets of genes. Discrete query gene sets are compared to ChEA3 libraries of \TF target gene sets assembled from multiple orthogonal 'omics' datasets.`)
-      case "sigcomLink":
+      case "sigcom":
         return (`SigCom LINCS is a web-basedc search engine that serves over 
                 1.5 million gene expression signatures processed, analyzed, and visualized 
                 from LINCS, GTEx, and GEO. SigCom LINCS
                 provides ranked compounds and other perturbations
                 that maximally up- or down-regulate the collective
                 expression of the genes in the set`)
-      case "rummageneLink":
+      case "rummagene":
         return (`Rummagene is an enrichment
                 analysis tool that can be used to query hundreds of
                 thousands of gene sets extracted from supporting
                 tables of PubMed Central articles`)
-      case "rummageoLink":
+      case "rummageo":
         return (`RummaGEO is a search engine
                 for finding matching gene sets from a database that
                 contains hundreds of thousands gene sets extracted
                 automatically from NCBI&apos;s GEO repository`)
-      case "l2s2Link":
+      case "l2s2":
         return (`L2S2 is a search engine
                 for finding matching gene sets from a database that
                 contains over a million gene sets measuring response to 
                 pre-clinical compounds, drugs, and CRISPR KOs`)
-      case "pfocrLink":
+      case "pfocr":
         return (`PFOCRummage is a search engine
                 for finding matching gene sets from a database that
                 contains over 50,000 gene sets extracted from the figures of PMC articles.`)
@@ -175,7 +175,7 @@ export async function getAnalysisData(selectedSets: ({
     abstractPrompt += '\n Analysis resources:'
     Object.keys(analysisOptions).map((key) => {
         if (analysisOptions[key]) {
-            abstractPrompt += `\n${key}: ${getAnalysisTypeDescription(key)}`
+            abstractPrompt += `\n${getAnalysisTypeDescription(key)}`
         }
     })
 

@@ -151,7 +151,7 @@ export async function getAnalysisData(selectedSets: ({
             const pfocrLink = await getPFOCRummageLink(geneset.name, genes)
             genesetResults['pfocrLink'] = pfocrLink
         }
-        analysisResults[geneset.id] = genesetResults
+        analysisResults[geneset.name] = genesetResults
     }
 
     let genesetDict: { [key: string]: string[] } = {}

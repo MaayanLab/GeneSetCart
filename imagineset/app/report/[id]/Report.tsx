@@ -142,14 +142,14 @@ export default function Report({
 
   const renderGenesetAnalysis = React.useMemo(() => (geneset: any, index: number) => (
     <>
-      {geneset.id in analysisData &&
-        "enrichrResults" in analysisData[geneset.id] &&
+      {geneset.name in analysisData &&
+        "enrichrResults" in analysisData[geneset.name] &&
         analysisOptions.enrichr && (
           <Stack direction="column" sx={{ marginLeft: 5, marginTop: 1 }}>
-            <Typography variant="h5" color="secondary.dark" id={`enrichr-${geneset.id}`}>
+            <Typography variant="h5" color="secondary.dark" id={`enrichr-${geneset.name}`}>
               Enrichr Analysis
             </Typography>
-            <EnrichrResults data={analysisData[geneset.id]["enrichrResults"]} />
+            <EnrichrResults data={analysisData[geneset.name]["enrichrResults"]} />
             <Typography
               variant="caption"
               color="black"
@@ -162,23 +162,23 @@ export default function Report({
               {analysisLegends.enrichr}]:{" "}
               <Link
                 color="secondary"
-                href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.id]["enrichrLink"]}`}
+                href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.name]["enrichrLink"]}`}
                 target="_blank"
               >
                 https://maayanlab.cloud/Enrichr/enrich?dataset=
-                {analysisData[geneset.id]["enrichrLink"]}
+                {analysisData[geneset.name]["enrichrLink"]}
               </Link>
             </Typography>
           </Stack>
         )}
-      {geneset.id in analysisData &&
-        "keaResults" in analysisData[geneset.id] &&
+      {geneset.name in analysisData &&
+        "keaResults" in analysisData[geneset.name] &&
         analysisOptions.kea && (
           <Stack direction="column" sx={{ marginLeft: 5, marginTop: 1 }}>
-            <Typography variant="h5" color="secondary.dark" id={`kea-${geneset.id}`}>
+            <Typography variant="h5" color="secondary.dark" id={`kea-${geneset.name}`}>
               Kinase Enrichment Analysis
             </Typography>
-            <KEABarChart data={analysisData[geneset.id]["keaResults"]} />
+            <KEABarChart data={analysisData[geneset.name]["keaResults"]} />
             <Typography
               variant="caption"
               color="black"
@@ -193,19 +193,19 @@ export default function Report({
             </Typography>
           </Stack>
         )}
-        {geneset.id in analysisData &&
-          "cheaResults" in analysisData[geneset.id] &&
+        {geneset.name in analysisData &&
+          "cheaResults" in analysisData[geneset.name] &&
           analysisOptions.chea && (
             <Stack
               direction="column"
               sx={{ marginLeft: 5, marginTop: 1 }}
               style={{ breakInside: "avoid" }}
             >
-              <Typography variant="h5" color="secondary.dark" id={`chea-${geneset.id}`}>
+              <Typography variant="h5" color="secondary.dark" id={`chea-${geneset.name}`}>
                 Transciption Factor Enrichment Analysis
               </Typography>
               <CHEABarChart
-                data={analysisData[geneset.id]["cheaResults"]}
+                data={analysisData[geneset.name]["cheaResults"]}
               />
               <Typography
                 variant="caption"
@@ -221,10 +221,10 @@ export default function Report({
             </Stack>
           )}
         <List sx={{ listStyleType: "disc", marginLeft: 5 }}>
-          {geneset.id in analysisData &&
-            "sigcomLink" in analysisData[geneset.id] &&
+          {geneset.name in analysisData &&
+            "sigcomLink" in analysisData[geneset.name] &&
             analysisOptions.sigcom && (
-              <ListItem sx={{ display: "list-item" }} id={`sigcom-${geneset.id}`}>
+              <ListItem sx={{ display: "list-item" }} id={`sigcom-${geneset.name}`}>
                 View results from querying SigCom LINCS, a web-based
                 search engine that serves over 1.5 million gene
                 expression signatures processed, analyzed, and
@@ -237,22 +237,22 @@ export default function Report({
                 <Link
                   color="secondary"
                   href={
-                    analysisData[geneset.id]
-                      ? analysisData[geneset.id]["sigcomLink"]
+                    analysisData[geneset.name]
+                      ? analysisData[geneset.name]["sigcomLink"]
                       : ""
                   }
                   target="_blank"
                 >
-                  {" "}{analysisData[geneset.id]
-                    ? analysisData[geneset.id]["sigcomLink"]
+                  {" "}{analysisData[geneset.name]
+                    ? analysisData[geneset.name]["sigcomLink"]
                     : ""}
                 </Link>
               </ListItem>
             )}
-          {geneset.id in analysisData &&
-            "rummageneLink" in analysisData[geneset.id] &&
+          {geneset.name in analysisData &&
+            "rummageneLink" in analysisData[geneset.name] &&
             analysisOptions.rummagene && (
-              <ListItem sx={{ display: "list-item" }} id={`rummagene-${geneset.id}`}>
+              <ListItem sx={{ display: "list-item" }} id={`rummagene-${geneset.name}`}>
                 View results from querying Rummagene, an enrichment
                 analysis tool that can be used to query hundreds of
                 thousands of gene sets extracted from supporting
@@ -262,22 +262,22 @@ export default function Report({
                 <Link
                   color="secondary"
                   href={
-                    analysisData[geneset.id]
-                      ? analysisData[geneset.id]["rummageneLink"]
+                    analysisData[geneset.name]
+                      ? analysisData[geneset.name]["rummageneLink"]
                       : ""
                   }
                   target="_blank"
                 >
-                  {" "}{analysisData[geneset.id]
-                    ? analysisData[geneset.id]["rummageneLink"]
+                  {" "}{analysisData[geneset.name]
+                    ? analysisData[geneset.name]["rummageneLink"]
                     : ""}
                 </Link>
               </ListItem>
             )}
-          {geneset.id in analysisData &&
-            "rummageoLink" in analysisData[geneset.id] &&
+          {geneset.name in analysisData &&
+            "rummageoLink" in analysisData[geneset.name] &&
             analysisOptions.rummageo && (
-              <ListItem sx={{ display: "list-item" }} id={`rummageo-${geneset.id}`}>
+              <ListItem sx={{ display: "list-item" }} id={`rummageo-${geneset.name}`}>
                 View results from querying RummaGEO, a search engine
                 for finding matching gene sets from a database that
                 contains hundreds of thousands gene sets extracted
@@ -287,22 +287,22 @@ export default function Report({
                 <Link
                   color="secondary"
                   href={
-                    analysisData[geneset.id]
-                      ? analysisData[geneset.id]["rummageoLink"]
+                    analysisData[geneset.name]
+                      ? analysisData[geneset.name]["rummageoLink"]
                       : ""
                   }
                   target="_blank"
                 >
-                  {" "}{analysisData[geneset.id]
-                    ? analysisData[geneset.id]["rummageoLink"]
+                  {" "}{analysisData[geneset.name]
+                    ? analysisData[geneset.name]["rummageoLink"]
                     : ""}
                 </Link>
               </ListItem>
             )}
-            {geneset.id in analysisData &&
-            "l2s2Link" in analysisData[geneset.id] &&
+            {geneset.name in analysisData &&
+            "l2s2Link" in analysisData[geneset.name] &&
             analysisOptions.l2s2 && (
-              <ListItem sx={{ display: "list-item" }} id={`l2s2-${geneset.id}`}>
+              <ListItem sx={{ display: "list-item" }} id={`l2s2-${geneset.name}`}>
                 View results from querying L2S2, a search engine
                 for finding matching gene sets from a database that
                 contains over a million gene sets measuring response to pre-clinical compounds, drugs, and CRISPR KOs
@@ -311,22 +311,22 @@ export default function Report({
                 <Link
                   color="secondary"
                   href={
-                    analysisData[geneset.id]
-                      ? analysisData[geneset.id]["l2s2Link"]
+                    analysisData[geneset.name]
+                      ? analysisData[geneset.name]["l2s2Link"]
                       : ""
                   }
                   target="_blank"
                 >
-                  {" "}{analysisData[geneset.id]
-                    ? analysisData[geneset.id]["l2s2Link"]
+                  {" "}{analysisData[geneset.name]
+                    ? analysisData[geneset.name]["l2s2Link"]
                     : ""}
                 </Link>
               </ListItem>
             )}
-            {geneset.id in analysisData &&
-            "pfocrLink" in analysisData[geneset.id] &&
+            {geneset.name in analysisData &&
+            "pfocrLink" in analysisData[geneset.name] &&
             analysisOptions.pfocr && (
-              <ListItem sx={{ display: "list-item" }} id={`pfocr-${geneset.id}`}>
+              <ListItem sx={{ display: "list-item" }} id={`pfocr-${geneset.name}`}>
                 View results from querying PFOCRummage, a search engine
                 for finding matching gene sets from a database that
                 contains over 50,000 gene sets extracted from the figures of PMC articles.
@@ -335,14 +335,14 @@ export default function Report({
                 <Link
                   color="secondary"
                   href={
-                    analysisData[geneset.id]
-                      ? analysisData[geneset.id]["pfocrLink"]
+                    analysisData[geneset.name]
+                      ? analysisData[geneset.name]["pfocrLink"]
                       : ""
                   }
                   target="_blank"
                 >
-                  {" "}{analysisData[geneset.id]
-                    ? analysisData[geneset.id]["pfocrLink"]
+                  {" "}{analysisData[geneset.name]
+                    ? analysisData[geneset.name]["pfocrLink"]
                     : ""}
                 </Link>
               </ListItem>
@@ -446,7 +446,7 @@ export default function Report({
           case "enrichrResults":
             return (
               <>
-                <Typography variant="h6" color="secondary.dark" id={`enrichr-${geneset.id}`}>
+                <Typography variant="h6" color="secondary.dark" id={`enrichr-${geneset.name}`}>
                   {geneset.name}
                 </Typography>
                 <EnrichrResults data={data} />
@@ -460,14 +460,14 @@ export default function Report({
                   enriched terms from the WikiPathway_2023_Human and GO Biological
                   Processes libraries. Open results in Enrichr [
                   {analysisLegends.enrichr}]:{" "}
-                  <Link color="secondary" href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.id].enrichrLink}`} target="_blank">Enrichr Link</Link>
+                  <Link color="secondary" href={`https://maayanlab.cloud/Enrichr/enrich?dataset=${analysisData[geneset.name].enrichrLink}`} target="_blank">Enrichr Link</Link>
                 </Typography>
               </>
             );
           case "keaResults":
             return (
               <>
-                <Typography variant="h6" color="secondary.dark" id={`kea-${geneset.id}`}>
+                <Typography variant="h6" color="secondary.dark" id={`kea-${geneset.name}`}>
                   {geneset.name}
                 </Typography>
                 <KEABarChart data={data} />
@@ -484,7 +484,7 @@ export default function Report({
           case "cheaResults":
             return (
               <>
-                <Typography variant="h6" color="secondary.dark" id={`chea-${geneset.id}`}>
+                <Typography variant="h6" color="secondary.dark" id={`chea-${geneset.name}`}>
                   {geneset.name}
                 </Typography>
                 <CHEABarChart data={data} />
@@ -501,7 +501,7 @@ export default function Report({
           case "sigcomLink":
             return (
               <>
-                <Typography variant="h6" color="secondary.dark" id={`sigcom-${geneset.id}`}>
+                <Typography variant="h6" color="secondary.dark" id={`sigcom-${geneset.name}`}>
                   {geneset.name}
                 </Typography>
                 <Typography
@@ -523,7 +523,7 @@ export default function Report({
           case "rummageneLink":
             return (
               <>
-                <Typography variant="h6" color="secondary.dark" id={`rummagene-${geneset.id}`}>
+                <Typography variant="h6" color="secondary.dark" id={`rummagene-${geneset.name}`}>
                   {geneset.name}
                 </Typography>
                 <Typography
@@ -545,7 +545,7 @@ export default function Report({
           case "rummageoLink":
             return (
               <>
-                <Typography variant="h6" color="secondary.dark" id={`rummageo-${geneset.id}`}>
+                <Typography variant="h6" color="secondary.dark" id={`rummageo-${geneset.name}`}>
                   {geneset.name}
                 </Typography>
                 <Typography
@@ -567,7 +567,7 @@ export default function Report({
           case "l2s2Link":
             return (
               <>
-                <Typography variant="h6" color="secondary.dark" id={`l2s2-${geneset.id}`}>
+                <Typography variant="h6" color="secondary.dark" id={`l2s2-${geneset.name}`}>
                   {geneset.name}
                 </Typography>
                 <Typography
@@ -589,7 +589,7 @@ export default function Report({
           case "pfocrLink":
             return (
               <>
-                <Typography variant="h6" color="secondary.dark" id={`pfocr-${geneset.id}`}>
+                <Typography variant="h6" color="secondary.dark" id={`pfocr-${geneset.name}`}>
                   {geneset.name}
                 </Typography>
                 <Typography
@@ -650,111 +650,111 @@ export default function Report({
       selectedSets.forEach((geneset, i) => {
         const setAnalysis = [];
         var j = 0;
-        if (geneset.id in analysisData) {
-          if ("enrichrResults" in analysisData[geneset.id] && analysisOptions.enrichr) {
-            setAnalysis.push([alphabet[j], "Enrichr", `#enrichr-${geneset.id}`])
+        if (geneset.name in analysisData) {
+          if ("enrichrResults" in analysisData[geneset.name] && analysisOptions.enrichr) {
+            setAnalysis.push([alphabet[j], "Enrichr", `#enrichr-${geneset.name}`])
             j += 1;
           }
-          if (geneset.id in analysisData && "keaResults" in analysisData[geneset.id] && analysisOptions.kea) {
-            setAnalysis.push([alphabet[j], "KEA", `#kea-${geneset.id}`])
+          if (geneset.name in analysisData && "keaResults" in analysisData[geneset.name] && analysisOptions.kea) {
+            setAnalysis.push([alphabet[j], "KEA", `#kea-${geneset.name}`])
             j += 1;
           }
-          if (geneset.id in analysisData && "cheaResults" in analysisData[geneset.id] && analysisOptions.chea) {
-            setAnalysis.push([alphabet[j], "ChEA", `#chea-${geneset.id}`])
+          if (geneset.name in analysisData && "cheaResults" in analysisData[geneset.name] && analysisOptions.chea) {
+            setAnalysis.push([alphabet[j], "ChEA", `#chea-${geneset.name}`])
             j += 1;
           }
-          if ("sigcomLink" in analysisData[geneset.id] && analysisOptions.sigcom) {
-            setAnalysis.push([alphabet[j], "SigComLINCS", `#sigcomlincs-${geneset.id}`])
+          if ("sigcomLink" in analysisData[geneset.name] && analysisOptions.sigcom) {
+            setAnalysis.push([alphabet[j], "SigComLINCS", `#sigcomlincs-${geneset.name}`])
             j += 1;
           }
-          if ("rummageneLink" in analysisData[geneset.id] && analysisOptions.rummagene) {
-            setAnalysis.push([alphabet[j], "Rummagene", `#rummagene-${geneset.id}`])
+          if ("rummageneLink" in analysisData[geneset.name] && analysisOptions.rummagene) {
+            setAnalysis.push([alphabet[j], "Rummagene", `#rummagene-${geneset.name}`])
             j += 1;
           }
-          if ("rummageoLink" in analysisData[geneset.id] && analysisOptions.rummageo) {
-            setAnalysis.push([alphabet[j], "RummaGEO", `#rummageo-${geneset.id}`])
+          if ("rummageoLink" in analysisData[geneset.name] && analysisOptions.rummageo) {
+            setAnalysis.push([alphabet[j], "RummaGEO", `#rummageo-${geneset.name}`])
             j += 1;
           }
-          if ("l2s2Link" in analysisData[geneset.id] && analysisOptions.l2s2) {
-            setAnalysis.push([alphabet[j], "L2S2", `#l2s2-${geneset.id}`])
+          if ("l2s2Link" in analysisData[geneset.name] && analysisOptions.l2s2) {
+            setAnalysis.push([alphabet[j], "L2S2", `#l2s2-${geneset.name}`])
             j += 1;
           }
-          if ("pfocrLink" in analysisData[geneset.id] && analysisOptions.pfocr) {
-            setAnalysis.push([alphabet[j], "PFOCRummage", `#pfocr-${geneset.id}`])
+          if ("pfocrLink" in analysisData[geneset.name] && analysisOptions.pfocr) {
+            setAnalysis.push([alphabet[j], "PFOCRummage", `#pfocr-${geneset.name}`])
             j += 1;
           }
           analysisToc.push([num, geneset.name, setAnalysis]);
           num += 1;
         }})
     } else {
-        if ("enrichrResults" in analysisData[selectedSets[0].id] && analysisOptions.enrichr) {
+        if ("enrichrResults" in analysisData[selectedSets[0].name] && analysisOptions.enrichr) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
-            setAnalysis.push([alphabet[j], geneset.name, `#enrichr-${geneset.id}`])  
+            setAnalysis.push([alphabet[j], geneset.name, `#enrichr-${geneset.name}`])  
             j += 1;
           })
           analysisToc.push([num, "Enrichr", setAnalysis]);
         }
-        if ("keaResults" in analysisData[selectedSets[0].id] && analysisOptions.kea) {
+        if ("keaResults" in analysisData[selectedSets[0].name] && analysisOptions.kea) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
-            setAnalysis.push([alphabet[j], geneset.name, `#kea-${geneset.id}`])  
+            setAnalysis.push([alphabet[j], geneset.name, `#kea-${geneset.name}`])  
             j += 1;
           })
           analysisToc.push([num, "KEA", setAnalysis]);
         }
-        if ("cheaResults" in analysisData[selectedSets[0].id] && analysisOptions.chea) {
+        if ("cheaResults" in analysisData[selectedSets[0].name] && analysisOptions.chea) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
-            setAnalysis.push([alphabet[j], geneset.name, `#chea-${geneset.id}`])  
+            setAnalysis.push([alphabet[j], geneset.name, `#chea-${geneset.name}`])  
             j += 1;
           })
           analysisToc.push([num, "ChEA", setAnalysis]);
         }
-        if ("sigcomLink" in analysisData[selectedSets[0].id] && analysisOptions.sigcom) {
+        if ("sigcomLink" in analysisData[selectedSets[0].name] && analysisOptions.sigcom) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
-            setAnalysis.push([alphabet[j], geneset.name, `#sigcomlincs-${geneset.id}`])  
+            setAnalysis.push([alphabet[j], geneset.name, `#sigcomlincs-${geneset.name}`])  
             j += 1;
           })
           analysisToc.push([num, "SigComLINCS", setAnalysis]);
         }
-        if ("rummageneLink" in analysisData[selectedSets[0].id] && analysisOptions.rummagene) {
+        if ("rummageneLink" in analysisData[selectedSets[0].name] && analysisOptions.rummagene) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
-            setAnalysis.push([alphabet[j], geneset.name, `#rummagene-${geneset.id}`])  
+            setAnalysis.push([alphabet[j], geneset.name, `#rummagene-${geneset.name}`])  
             j += 1;
           })  
           analysisToc.push([num, "Rummagene", setAnalysis]);
         }
-        if ("rummageoLink" in analysisData[selectedSets[0].id] && analysisOptions.rummageo) {
+        if ("rummageoLink" in analysisData[selectedSets[0].name] && analysisOptions.rummageo) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
-            setAnalysis.push([alphabet[j], geneset.name, `#rummageo-${geneset.id}`])  
+            setAnalysis.push([alphabet[j], geneset.name, `#rummageo-${geneset.name}`])  
             j += 1;
           })
           analysisToc.push([num, "RummaGEO", setAnalysis]);
         }
-        if ("l2s2Link" in analysisData[selectedSets[0].id] && analysisOptions.l2s2) {
+        if ("l2s2Link" in analysisData[selectedSets[0].name] && analysisOptions.l2s2) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
-            setAnalysis.push([alphabet[j], geneset.name, `#l2s2-${geneset.id}`])  
+            setAnalysis.push([alphabet[j], geneset.name, `#l2s2-${geneset.name}`])  
             j += 1;
           })
           analysisToc.push([num, "L2S2", setAnalysis]);
         }
-        if ("pfocrLink" in analysisData[selectedSets[0].id] && analysisOptions.pfocr) {
+        if ("pfocrLink" in analysisData[selectedSets[0].name] && analysisOptions.pfocr) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
-            setAnalysis.push([alphabet[j], geneset.name, `#pfocr-${geneset.id}`])  
+            setAnalysis.push([alphabet[j], geneset.name, `#pfocr-${geneset.name}`])  
             j += 1;
           })
           analysisToc.push([num, "PFOCRummage", setAnalysis]);
@@ -1206,8 +1206,8 @@ export default function Report({
           ) : (
             <></>
           )}
-          {selectedSets[0].id in analysisData &&
-            Object.keys(analysisData[selectedSets[0].id]).length > 0 ? (
+          {selectedSets[0].name in analysisData &&
+            Object.keys(analysisData[selectedSets[0].name]).length > 0 ? (
               <>
                 <Typography
                   variant="h5"
@@ -1232,7 +1232,7 @@ export default function Report({
                 </List>
               ) : (
                 <List sx={{ listStyle: "decimal", marginLeft: 5 }}>
-                  {Object.keys(analysisData[selectedSets[0].id]).map((analysisType: string, i: number) => { 
+                  {Object.keys(analysisData[selectedSets[0].name]).map((analysisType: string, i: number) => { 
                     if (analysisType == "enrichrLink") return <></>
                     return (
                       <ListItem sx={{ display: "list-item", borderBottom: 1 }} key={i}>
@@ -1245,10 +1245,10 @@ export default function Report({
                         </Typography>
                         <Stack direction="column">
                           {selectedSets.map((geneset, j) => (
-                            geneset.id in analysisData &&
-                            analysisType in analysisData[geneset.id] && (
+                            geneset.name in analysisData &&
+                            analysisType in analysisData[geneset.name] && (
                               <Stack key={j} sx={{ marginLeft: 5, marginTop: 1 }}>
-                                {renderAnalysisContent(analysisData[geneset.id][analysisType], geneset, analysisType as AnalysisType, j)}
+                                {renderAnalysisContent(analysisData[geneset.name][analysisType], geneset, analysisType as AnalysisType, j)}
                               </Stack>
                             )
                           ))}

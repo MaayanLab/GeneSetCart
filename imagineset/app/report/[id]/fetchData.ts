@@ -353,23 +353,32 @@ export function getNumbering(
     }
   
     if (byGeneset) {
-      // Numbering by geneset
-      for (let i = 0; i < selectedSetsCount; i++) {
-        if (analysisOptions.enrichr) {
-          figureLegends.enrichr.push(current);
-          current += 1;
+        for (let i = 0; i < selectedSetsCount; i++) {
+            if (analysisOptions.enrichr) {
+                figureLegends.enrichr.push(current)
+                current += 1
+                if (i === 0 ){
+                    analysisLegends.enrichr = analysisCurrent
+                    analysisCurrent += 1
+                }
+            }
+            if (analysisOptions.kea) {
+                figureLegends.kea.push(current)
+                current += 1
+                if (i === 0 ){
+                analysisLegends.kea = analysisCurrent
+                analysisCurrent += 1
+                }
+            }
+            if (analysisOptions.chea) {
+                figureLegends.chea.push(current)
+                current += 1
+                if (i === 0 ){
+                analysisLegends.chea = analysisCurrent
+                analysisCurrent += 1
+                }
+            }
         }
-        if (analysisOptions.kea) {
-          // Ensure `figureLegends.kea` is properly updated for each set
-          if (!figureLegends.kea) figureLegends.kea = [];
-          figureLegends.kea.push(current);
-          current += 1;
-        }
-        if (analysisOptions.chea) {
-          figureLegends.chea.push(current);
-          current += 1;
-        }
-      }
     } else {
       // Numbering by analysis type
       if (analysisOptions.enrichr) {
@@ -416,4 +425,5 @@ export function getNumbering(
   
     return { figureLegends, analysisLegends };
   }
+  
   

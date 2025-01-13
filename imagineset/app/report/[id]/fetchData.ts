@@ -4,11 +4,50 @@ import axios from "axios";
 import qs from 'qs'; 
 import { cacheResult, getCachedResult } from "./cachedResults";
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
-import { generateGPTSummary } from "./gptSummary";
+import { generateGPTSummary, createGPTAbstract } from "./gptSummary";
 import { getPlaybookReportLink } from "./playbook";
 import { getBackgroundGenes } from "@/components/header/Header";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+const getAnalysisTypeDescription = (analysisType: string): string => {
+    switch (analysisType) {
+      case "enrichrResults":
+        return "A resource that contains numerous annotated gene set libraries used for enrichment analysis of the provided sets";
+      case "keaResults":
+        return (`KEA3 (Kinase Enrichment Analysis 3)  infers upstream kinases whose putative substrates are overrepresented in a user-inputted list of proteins or differentially phosphorylated proteins.`)
+      case "cheaResults":
+        return (`The ChEA3 (ChIP-X Enrichment Analysis 3) predicts transcription factors (TFs) associated with user-input sets of genes. Discrete query gene sets are compared to ChEA3 libraries of \TF target gene sets assembled from multiple orthogonal 'omics' datasets.`)
+      case "sigcomLink":
+        return (`SigCom LINCS is a web-basedc search engine that serves over 
+                1.5 million gene expression signatures processed, analyzed, and visualized 
+                from LINCS, GTEx, and GEO. SigCom LINCS
+                provides ranked compounds and other perturbations
+                that maximally up- or down-regulate the collective
+                expression of the genes in the set`)
+      case "rummageneLink":
+        return (`Rummagene is an enrichment
+                analysis tool that can be used to query hundreds of
+                thousands of gene sets extracted from supporting
+                tables of PubMed Central articles`)
+      case "rummageoLink":
+        return (`RummaGEO is a search engine
+                for finding matching gene sets from a database that
+                contains hundreds of thousands gene sets extracted
+                automatically from NCBI&apos;s GEO repository`)
+      case "l2s2Link":
+        return (`L2S2 is a search engine
+                for finding matching gene sets from a database that
+                contains over a million gene sets measuring response to 
+                pre-clinical compounds, drugs, and CRISPR KOs`)
+      case "pfocrLink":
+        return (`PFOCRummage is a search engine
+                for finding matching gene sets from a database that
+                contains over 50,000 gene sets extracted from the figures of PMC articles.`)
+      default: 
+        return "";
+    }
+  }
 
 async function serializeInputs(
     selectedSets: ({ genes: Gene[] } & GeneSet)[],
@@ -61,10 +100,10 @@ export async function getReportById(inputHash: string) {
 
 export async function getAnalysisData(selectedSets: ({
     genes: Gene[];
-} & GeneSet)[], analysisOptions: analysisOptions, visualizationOptions: visualizationOptions) {
+} & GeneSet)[], analysisOptions: analysisOptions, visualizationOptions: visualizationOptions, disabledOptions: visualizationOptions) {
     const serializedInput = await serializeInputs(selectedSets, analysisOptions, visualizationOptions)
     const inputHash = await computeStringHash(serializedInput)
-    
+
     const existingReport = await getCachedResult(inputHash)
     
     if (existingReport) {
@@ -124,6 +163,25 @@ export async function getAnalysisData(selectedSets: ({
         const gptSummary = await generateGPTSummary(analysisResults['overlappingGenes'])
         analysisResults['gptSummary'] = gptSummary.response
     }
+    
+    var abstractPrompt = `Selected genesets: ${selectedSets.map((set) => set.name).join(', ')}`
+    abstractPrompt += '\n Visualization options:'
+    Object.keys(visualizationOptions).map((key) => {
+        if (visualizationOptions[key] == true && !disabledOptions[key]) {
+            abstractPrompt += `${key},`
+        }
+    })
+    console.log(analysisOptions)
+    abstractPrompt += '\n Analysis resources:'
+    Object.keys(analysisOptions).map((key) => {
+        if (analysisOptions[key]) {
+            abstractPrompt += `\n${key}: ${getAnalysisTypeDescription(key)}`
+        }
+    })
+
+    const abstract = await createGPTAbstract(abstractPrompt)
+    analysisResults['abstract'] = abstract.response
+
     analysisResults['playbookLink'] = await getPlaybookReportLink(selectedSets, visualizationOptions)
 
     const added = await cacheResult(inputHash, {...analysisResults, 'analysisOptions': analysisOptions, 'visualizationOptions': visualizationOptions})

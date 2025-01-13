@@ -53,3 +53,42 @@ export async function generateGPTSummary(overlapInfo: overlapArray[]) {
         }
     }
 }
+
+
+export async function createGPTAbstract(analysisDescriptions: string) {
+    const input = `Based on the following descriptions of the gene sets analyzed, selected visualizations,
+    and the resources used to analyze them generate a paragraph abstract describing the analysis briefly. 
+    You should strictly adhere to the provided descriptions and not assume any information. Adhere to the resource names capitalization and format:
+    ${analysisDescriptions}
+    `
+    try {
+        const openaiKey = process.env.OPENAI_API_KEY
+        if (!openaiKey) throw new Error('no OPENAI_API_KEY')
+        const tagLine = await fetch(`https://api.openai.com/v1/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${openaiKey}`,
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o',
+                messages: [
+                    { "role": "system", "content": "You are a biologist who attempts to create a hypothesis about why two gene sets, which are lists of genes, may have a high overlap" },
+                    { "role": "user", "content": input }
+                ],
+                temperature: 0
+            })
+        })
+        const tagLineParsed = await tagLine.json()
+        const abstract: string = tagLineParsed.choices[0].message.content
+        return {
+            response: abstract,
+            status: 200
+        }
+    } catch {
+        return {
+            response: "The OpenAI endpoint is currently overloaded. Please try again in a few minutes",
+            status: 1
+        }
+    }
+}

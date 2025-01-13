@@ -395,8 +395,7 @@ export default function Report({
       default: 
         return "";
     }
-}
-
+  }
 
   const analysisTypeLabels: Record<AnalysisType, string> = React.useMemo(
     () => ({
@@ -901,6 +900,20 @@ export default function Report({
               </Typography>
             );
           })}
+          <Typography
+            variant="h5"
+            color="secondary.dark"
+            sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}
+          >
+            ABSTRACT
+          </Typography>
+          <Typography variant="body2" color="black" sx={{ padding: 3, paddingLeft: 5, textAlign: "justify" }}>
+            {analysisData['abstract']}
+          </Typography>
+          <Typography variant="subtitle2"  sx={{ paddingLeft: 5, textAlign: "justify" }}>
+                * This abstract was generated automatically by an LLM (GPT-4o).
+                Interpret this abstract with caution *
+            </Typography>
 
           <Typography variant="h5" color="secondary.dark" sx={{ borderBottom: 1, marginLeft: 3, marginTop: 2 }}>
             TABLE OF CONTENTS

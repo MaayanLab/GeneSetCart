@@ -152,7 +152,7 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
                             //setAnalysisData({}); 
                             setDisplayReport(false)
                             setLoading(true); 
-                            getAnalysisData(selectedSets, analysisOptions, visualizationOptions).then((result) => {
+                            getAnalysisData(selectedSets, analysisOptions, visualizationOptions, disabledVisualizations).then((result) => {
                                 if (result.results != null && typeof result === 'object') {
                                     router.push(window.location.href.split('?')[0] + '?reportid=' + result.id, { scroll: false})
                                     setAnalysisData(result.results)

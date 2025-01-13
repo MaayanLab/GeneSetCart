@@ -114,6 +114,7 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
             getReportById(reportId).then((result) => {
             if (result != null && typeof result === 'object') {
                 const computedSets = Object.keys(result)
+
                 const typedSets = sessionInfo ? sessionInfo.gene_sets : []
                 const updatedChecked = []
                 for (let i = 0; i < typedSets.length; i++) {
@@ -121,8 +122,8 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
                         updatedChecked.push(i)
                     }
                 }
-                if (updatedChecked.length === 0 || (!computedSets.includes('analysisOptions') || 
-                (!computedSets.includes('analysisData')) || (!computedSets.includes('visualizationOptions')))) {
+                
+                if (updatedChecked.length === 0 || (!computedSets.includes('analysisOptions') || (!computedSets.includes('visualizationOptions')))) {
                     setErrorMessage("Error fetching report analyses. Please ensure the shared report is public.")
                     setLoading(false)
                     return

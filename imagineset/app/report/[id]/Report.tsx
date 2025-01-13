@@ -67,9 +67,6 @@ const getPageMargins = () => {
 }`;
 };
 
-
-
-
 export default function Report({
   selectedSets,
   checked,
@@ -139,7 +136,7 @@ export default function Report({
   const todayString = mm + "/" + dd + "/" + yyyy;
   const componentRef = React.useRef<HTMLDivElement>(null);
 
-
+  // eslint-disable-next-line react/display-name
   const renderGenesetAnalysis = React.useMemo(() => (geneset: any, index: number) => (
     <>
       {geneset.name in analysisData &&
@@ -438,9 +435,10 @@ export default function Report({
     return analysisTypeLabels[analysisType] || "Unknown Analysis"; // The default fallback may no longer be necessary
   };
   
-
+// eslint-disable-next-line react/display-name
   const renderAnalysisContent = React.useMemo(
-    () =>
+    () => 
+      // eslint-disable-next-line react/display-name
       (data: any, geneset: GeneSet, analysisType: AnalysisType, index: number) => {
         switch (analysisType) {
           case "enrichrResults":
@@ -614,6 +612,7 @@ export default function Report({
       },
     [figureLegends]
   );
+
   
   
   const toc = React.useMemo(() => {
@@ -1404,3 +1403,8 @@ export default function Report({
     </>
   );
 }
+
+
+Report.displayName = 'Report';
+
+  

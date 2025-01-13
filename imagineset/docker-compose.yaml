@@ -5,7 +5,7 @@ x-kubernetes:
 services:
   g2sg-app:
     build: .
-    image: maayanlab/g2sg-app:0.8.05
+    image: maayanlab/g2sg-app:0.8.06
     platform: linux/amd64
     x-kubernetes:
       imagePullPolicy: IfNotPresent

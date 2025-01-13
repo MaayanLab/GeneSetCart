@@ -22,6 +22,7 @@ type GeneSetGenes = {
     isHumanGenes: boolean;
     otherSymbols: string[];
     genes: Gene[];
+    background: string | null;
 }
 
 export function SessionRow({ session }: { session: PipelineSession & { gene_sets: GeneSetGenes[] }}) {

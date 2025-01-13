@@ -13,6 +13,7 @@ type GeneSetGenes = {
     isHumanGenes: boolean;
     otherSymbols: string[];
     genes: Gene[];
+    background: string | null;
 }
 
 export default function SessionTable({sessions}: { sessions: (PipelineSession & { gene_sets: GeneSetGenes[] })[]}){

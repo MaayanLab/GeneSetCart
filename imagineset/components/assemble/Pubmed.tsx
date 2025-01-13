@@ -178,7 +178,7 @@ export default function GeneshotSearch() {
             if (response) {
               setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
             } else {
-              addToSessionSets(isHumanGenes ? validGenes : [], sessionId, genesetName, description ? description : '', isHumanGenes ? [] : foundGenes, isHumanGenes)
+              addToSessionSets(isHumanGenes ? validGenes : [], sessionId, genesetName, description ? description : '', isHumanGenes ? [] : foundGenes, isHumanGenes, null)
                 .then((result) => { setStatus({ success: true }) })
                 .catch((err) => {
                   if (err.message === 'No valid genes in gene set') {

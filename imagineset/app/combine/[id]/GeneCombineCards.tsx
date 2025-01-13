@@ -125,7 +125,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
             if (response) {
                 setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
             } else {
-                addToSessionSets(isHumanGenes ? validGenes : [], sessionId, generatedSetName, '', isHumanGenes ? [] : displayedGenes, isHumanGenes)
+                addToSessionSets(isHumanGenes ? validGenes : [], sessionId, generatedSetName, '', isHumanGenes ? [] : displayedGenes, isHumanGenes, null)
                     .then((response) => setStatus({ success: true }))
                     .catch((err) => {
                         if (err.message === 'No valid genes in gene set') {

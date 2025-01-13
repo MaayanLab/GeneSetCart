@@ -26,7 +26,7 @@ export async function shallowCopy(user: User,
 
                 },
             })
-            await Promise.all(sessionSets.map(async (sessionGeneset) => sessionGeneset.isHumanGenes ? await addToSessionSetsGeneObj(sessionGeneset.genes, newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : '', user, [], true) : await addToSessionSetsGeneObj([], newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : '', user, sessionGeneset.otherSymbols, false)))
+            await Promise.all(sessionSets.map(async (sessionGeneset) => sessionGeneset.isHumanGenes ? await addToSessionSetsGeneObj(sessionGeneset.genes, newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : '', user, [], true, null) : await addToSessionSetsGeneObj([], newSession.id, sessionGeneset.name, sessionGeneset.description ? sessionGeneset.description : '', user, sessionGeneset.otherSymbols, false, null)))
             const queryParamString = Object.keys(searchParams).map((key) => `${key}=${searchParams[key]}`).join('&')
             const inOneDay = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
             Cookies.set('session_id', newSession.id, { secure: true, expires: inOneDay, sameSite: 'None' })

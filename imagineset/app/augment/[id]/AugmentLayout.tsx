@@ -83,7 +83,7 @@ export function AugmentLayout({ sessionGenesets, sessionId }: {
             if (response) {
                 setStatus({error:{selected:true, message:"Gene set already exists in this session!"}})
             } else {
-                addToSessionSets(textAreaGenes, sessionId, genesetName, '', [], true)
+                addToSessionSets(textAreaGenes, sessionId, genesetName, '', [], true, null)
                 .then((response) => setStatus({success:true}))
                 .catch((err) => {
                     if (err.message === 'No valid genes in gene set') {

@@ -39,15 +39,12 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
     const [status, setStatus] = React.useState<addStatus>({})
     const [isHumanGenes, setIsHumanGenes] = React.useState(true)
     const [validGenes, setValidGenes] = React.useState<string[]>([])
-    React.useEffect(() => {
-        checkValidGenes(displayedGenes.join('\n')).then((result) => setValidGenes(result))
-    }, [displayedGenes])
 
     const unionAction = () => {
         let genes: string[] = []
         let genesetNames: string[] = []
         selectedSets.forEach((set) => {
-            const setGenes = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
+            const setGenes = set.otherSymbols.length === 0 ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             for (let geneSymbol of setGenes) {
                 if (!genes.includes(geneSymbol)) {
                     genes.push(geneSymbol)
@@ -57,6 +54,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         })
         setDisplayedGenes(genes)
         setGeneratedSetName(genesetNames.join(' ∪ '))
+        checkValidGenes(genes.join('\n')).then((result) => setValidGenes(result))
     }
 
     const intersectionAction = () => {
@@ -64,7 +62,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         let genesetNames: string[] = []
         const selectedSetsCount = selectedSets.length
         selectedSets.forEach((set) => {
-            const setGenes = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
+            const setGenes = set.otherSymbols.length === 0 ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             allGenes.push(setGenes)
             genesetNames.push(set.name)
         })
@@ -78,13 +76,16 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         const genes = Object.keys(occurrences).filter((gene) => occurrences[gene] === selectedSetsCount)
         setDisplayedGenes(genes)
         setGeneratedSetName(genesetNames.join(' ∩ '))
+        checkValidGenes(genes.join('\n')).then((result) => setValidGenes(result))
+
+        console.log(validGenes, displayedGenes)
     }
 
     const subtractAction = () => {
         let toSubtractGenes: string[] = []
         let toSubtractGenesetNames: string[] = []
         selectedSets.slice(1).forEach((set) => {
-            const setGenes = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
+            const setGenes = set.otherSymbols.length === 0 ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             for (let geneSymbol of setGenes) {
                 if (!toSubtractGenes.includes(geneSymbol)) {
                     toSubtractGenes.push(geneSymbol)
@@ -96,6 +97,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         const subtractedGenes = firstSelectedSet.genes.filter((gene) => !(toSubtractGenes.includes(gene.gene_symbol))).map((gene) => gene.gene_symbol)
         setDisplayedGenes(subtractedGenes)
         setGeneratedSetName(firstSelectedSet.name + '- (' + toSubtractGenesetNames.join(' ∪ ') + ')')
+        checkValidGenes(subtractedGenes.join('\n')).then((result) => setValidGenes(result))
     }
 
 
@@ -103,7 +105,7 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         let allGenes: string[][] = []
         let genesetNames: string[] = []
         selectedSets.forEach((set) => {
-            const setGenes = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
+            const setGenes = set.otherSymbols.length === 0 ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             allGenes.push(setGenes)
             genesetNames.push(set.name)
         })
@@ -118,9 +120,11 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
 
         setDisplayedGenes(genes)
         setGeneratedSetName('Consensus n=' + consensusNum + ' (' + genesetNames.join(' ∩ ') + ')')
+        checkValidGenes(genes.join('\n')).then((result) => setValidGenes(result))
     }
 
     const handleAddToSets = React.useCallback(() => {
+        checkValidGenes(displayedGenes.join('\n')).then((result) => setValidGenes(result))
         checkInSession(sessionId, generatedSetName).then((response) => {
             if (response) {
                 setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
@@ -140,7 +144,8 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
                     })
             }
         })
-    }, [displayedGenes, generatedSetName, sessionId, isHumanGenes])
+    }, [displayedGenes, validGenes, generatedSetName, sessionId, isHumanGenes])
+
     return (
         <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} justifyContent={'center'} useFlexGap flexWrap="wrap">
             <SelectGenesetsCard sessionGeneSets={sessionInfo ? sessionInfo?.gene_sets : []} selectedSets={selectedSets} setSelectedSets={setSelectedSets} />

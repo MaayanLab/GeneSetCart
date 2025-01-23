@@ -46,6 +46,7 @@ export type analysisOptions = {
     playbook: boolean;
     l2s2: boolean;
     pfocr: boolean;
+    hypothesis: boolean;
     [key: string]: boolean;
 }
 
@@ -64,7 +65,7 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
     const [checked, setChecked] = React.useState<number[]>([]);
     const [displayReport, setDisplayReport] = React.useState(false)
     const [visualizationOptions, setVisualizationOptions] = React.useState({ venn: true, upset: true, supervenn: true, heatmap: true, umap: true })
-    const [analysisOptions, setAnalysisOptions] = React.useState({ enrichr: true, kea: true, chea: true, sigcom: true, rummagene: true, rummageo: true, playbook: true, l2s2: true, pfocr: true })
+    const [analysisOptions, setAnalysisOptions] = React.useState({ enrichr: true, kea: true, chea: true, sigcom: true, rummagene: true, rummageo: true, playbook: true, l2s2: true, pfocr: true, hypothesis: true })
     const [loading, setLoading] = React.useState(false)
     const [analysisData, setAnalysisData] = React.useState<JsonObject>({})
     const [errorMessage , setErrorMessage] = React.useState('')
@@ -79,7 +80,9 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
 
     const selectedSets = React.useMemo(() => {
         if (checked.length > 5) {
-            setAnalysisOptions({ enrichr: false, kea: false, chea: false, sigcom: false, rummagene: false, rummageo: false, playbook: false, l2s2: false, pfocr: false })
+            setAnalysisOptions({ enrichr: false, kea: false, chea: false, sigcom: false, rummagene: false, rummageo: false, playbook: false, l2s2: false, pfocr: false, hypothesis: false })
+        } else if (checked.length !== 2 && checked.length > 0) {
+            setAnalysisOptions({ enrichr: true, kea: true, chea: true, sigcom: true, rummagene: true, rummageo: true, playbook: true, l2s2: true, pfocr: true, hypothesis: false })
         }
         const typedSets = sessionInfo ? sessionInfo.gene_sets : []
         const checkedSets = typedSets.filter((set, index) => checked.includes(index))
@@ -201,7 +204,6 @@ export function ReportLayout({ sessionInfo, sessionId, reportId }: {
                     analysisData={analysisData}
                     analysisOptions={analysisOptions}
                     byGeneset={byGeneset}
-                    setByGeneset={setByGeneset}
                 />
                 </>
             )}

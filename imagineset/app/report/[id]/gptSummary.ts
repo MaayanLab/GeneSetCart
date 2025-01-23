@@ -1,6 +1,7 @@
 "use server"
 
 import { overlapArray } from "./fetchData"
+import { getEnrichmentTerms } from "../../gmt-cross/[id]/GMTCrossFunctions"
 
 export async function generateGPTSummary(overlapInfo: overlapArray[]) {
     const input = `
@@ -88,6 +89,66 @@ export async function createGPTAbstract(analysisDescriptions: string) {
     } catch {
         return {
             response: "The OpenAI endpoint is currently overloaded. Please try again in a few minutes",
+            status: 1
+        }
+    }
+}
+
+export async function generateUserSetsHypothesis(geneset1: string, geneset2: string, overlap: string[]) {
+    console.log(overlap)
+    const enrichedResults = await getEnrichmentTerms(overlap)
+    const enrichedTerms = enrichedResults.enrichedTerms
+    const topEnrichmentResults = enrichedResults.topEnrichmentResults
+
+    const input = `
+    There are two gene sets that highly overlap. Performing enrichment 
+    analysis on the overlapping genes shows that many of them are related to 
+    the following biological pathways: ${enrichedTerms.toString()}. 
+     Hypothesize why a high overlap between the gene sets exists
+    based on specified abstracts of each gene set that explains 
+    how each gene set was created, the overlapping genes between 
+    both gene sets, and the biological pathways that the overlapping 
+    genes are related to based on the gene set enrichment analysis results.
+    Make sure to incorporate the enrichment analysis results in 
+    your response in a meaningful way. For each enrichment term 
+    that appears in your response, the term should appear in the 
+    exact form it was given to you (do not exclude any words or 
+    characters from a term. For example, Complement And Coagulation 
+    Cascades WP558 should appear as Complement And Coagulation 
+    Cascades WP558, not Complement And Coagulation Cascades).
+    Set names: ${geneset1}, ${geneset2}
+    The overlapping genes are ${overlap.toString().replaceAll("'", '')}
+    Do not include 'Hypothesis: ' at the beginning of your response and please
+    mesh the enrichment analysis results seamlessly into the explanation in a 
+    paragraph like format. Limit your response to about 12 sentences.
+    `
+    try {
+        const openaiKey = process.env.OPENAI_API_KEY
+        if (!openaiKey) throw new Error('no OPENAI_API_KEY')
+        const tagLine = await fetch(`https://api.openai.com/v1/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${openaiKey}`,
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o',
+                messages: [
+                    { "role": "system", "content": "You are a biologist who attempts to create a hypothesis about why two gene sets, which are lists of genes, may have a high overlap" },
+                    { "role": "user", "content": input }
+                ],
+                temperature: 0
+            })
+        })
+        const tagLineParsed = await tagLine.json()
+        const hypothesis: string = tagLineParsed.choices[0].message.content
+        return {
+            response: {hypothesis: hypothesis, geneset1: geneset1, geneset2: geneset2, enrichedTerms: enrichedTerms, topEnrichmentResults: topEnrichmentResults},
+            status: 200
+        }
+    } catch {
+        return {
+            response: {hypothesis: "The OpenAI endpoint is currently overloaded. Please try again in a few minutes", eneset1: geneset1, geneset2: geneset2, enrichedTerms: [], topEnrichmentResults: null},
             status: 1
         }
     }

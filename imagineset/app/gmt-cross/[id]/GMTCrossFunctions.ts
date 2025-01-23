@@ -65,7 +65,7 @@ export async function fetchGenes(term: string) {
 
 }
 
-async function getEnrichmentTerms(overlapGenes: string[]) {
+export async function getEnrichmentTerms(overlapGenes: string[]) {
     const ENRICHR_URL = 'https://maayanlab.cloud/Enrichr/addList'
     const genesString = overlapGenes.toString().split(',').join('\n').replaceAll("'", '')
     const { data } = await axios.post(ENRICHR_URL, {

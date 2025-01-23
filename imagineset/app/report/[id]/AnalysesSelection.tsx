@@ -14,6 +14,7 @@ import SigcomLincsLogo from "@/public/img/otherLogos/sigcomlincs.png"
 import l2s2Logo from "@/public/img/otherLogos/LINCSearch_logo.png"
 import pfocrummageLogo from "@/public/img/otherLogos/PFOCRummageBlack.png"
 import playbookLogo from "@/public/img/otherLogos/playbook-workflow-builder.png"
+import hypothesisLogo from "@/public/img/otherLogos/hypothesisLogo.png"
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
 
 
@@ -280,6 +281,24 @@ export function EnrichmentAnalysisSelection({ analysisOptions, setAnalysisOption
                     >
                         <Image
                             src={playbookLogo}
+                            fill
+                            alt=""
+                            style={{ padding: "10%", objectFit: "contain" }}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                    </Button>
+                </div>
+            </Tooltip>
+            <Tooltip title={"Generate a hypothesis with GPT-4o for the overlap of two intersecting gene sets"} placement="top">
+                <div onClick={() => {
+                            if (selectedSetsCount !== 2) {
+                                setErrorMessage('Please select exactly 2 sets.');
+                            }
+                        }}>
+                    <Button variant='outlined' color={analysisOptions.hypothesis ? 'success' : 'primary'} sx={{ height: 100, width: 100, border: 3, borderRadius: 2 }}
+                        onClick={(event) => setAnalysisOptions({ ...analysisOptions, hypothesis: !analysisOptions.hypothesis })} disabled={(selectedSetsCount !== 2)}
+                    >
+                        <Image
+                            src={hypothesisLogo}
                             fill
                             alt=""
                             style={{ padding: "10%", objectFit: "contain" }}

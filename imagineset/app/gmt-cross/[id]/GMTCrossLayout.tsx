@@ -85,7 +85,7 @@ const sortDict = (dict: { [key: string]: number[][] }) => {
 }
 
 
-const generateHypothesisTooltip = (hypothesisString: string, substringIndices: { [key: string]: number[][] }, topEnrichmentResults: { [key: string]: any[] }) => {
+export const generateHypothesisTooltip = (hypothesisString: string, substringIndices: { [key: string]: number[][] }, topEnrichmentResults: { [key: string]: any[] }) => {
     let prevStart = 0;
     const splittedStrings = [];
     for (let term of sortDict(substringIndices)) {

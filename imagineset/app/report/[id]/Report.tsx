@@ -25,6 +25,7 @@ import { CHEABarChart, EnrichrResults, KEABarChart } from "./AnalysisFigures";
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
 import BasicTable from "./OverlapTable";
 import { StaticVenn } from "@/components/visualize/PlotComponents/Venn/StaticVenn";
+import { generateHypothesisTooltip } from "../../gmt-cross/[id]/GMTCrossLayout";
 
 type AnalysisType =
 | "enrichrResults"
@@ -34,7 +35,8 @@ type AnalysisType =
 | "rummageneLink"
 | "rummageoLink"
 | "l2s2Link"
-| "pfocrLink";
+| "pfocrLink"
+| "hypothesis";
 
 const marginTop = "10px";
 const marginRight = "5px";
@@ -76,7 +78,6 @@ export default function Report({
   analysisData,
   analysisOptions,
   byGeneset,
-  setByGeneset
 }: {
   selectedSets: ({
     genes: Gene[];
@@ -88,7 +89,6 @@ export default function Report({
   analysisData: any;
   analysisOptions: analysisOptions;
   byGeneset: boolean;
-  setByGeneset: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 
   const { figureLegends, analysisLegends } = getNumbering(
@@ -135,6 +135,7 @@ export default function Report({
 
   const todayString = mm + "/" + dd + "/" + yyyy;
   const componentRef = React.useRef<HTMLDivElement>(null);
+  console.log(analysisData.hypothesis)
 
   // eslint-disable-next-line react/display-name
   const renderGenesetAnalysis = React.useMemo(() => (geneset: any, index: number) => (
@@ -404,6 +405,7 @@ export default function Report({
       rummageoLink: "RummaGEO Results",
       l2s2Link: "L2S2 Results",
       pfocrLink: "PFOCRummage Results",
+      hypothesis: "Overlap Hypothesis"
     }),
     []
   );
@@ -686,7 +688,7 @@ export default function Report({
           num += 1;
         }})
     } else {
-        if ("enrichrResults" in analysisData[selectedSets[0].name] && analysisOptions.enrichr) {
+        if ("enrichrResults" in analysisData[selectedSets[0]?.name] && analysisOptions.enrichr) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
@@ -695,7 +697,7 @@ export default function Report({
           })
           analysisToc.push([num, "Enrichr", setAnalysis]);
         }
-        if ("keaResults" in analysisData[selectedSets[0].name] && analysisOptions.kea) {
+        if ("keaResults" in analysisData[selectedSets[0]?.name] && analysisOptions.kea) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
@@ -704,7 +706,7 @@ export default function Report({
           })
           analysisToc.push([num, "KEA", setAnalysis]);
         }
-        if ("cheaResults" in analysisData[selectedSets[0].name] && analysisOptions.chea) {
+        if ("cheaResults" in analysisData[selectedSets[0]?.name] && analysisOptions.chea) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
@@ -713,7 +715,7 @@ export default function Report({
           })
           analysisToc.push([num, "ChEA", setAnalysis]);
         }
-        if ("sigcomLink" in analysisData[selectedSets[0].name] && analysisOptions.sigcom) {
+        if ("sigcomLink" in analysisData[selectedSets[0]?.name] && analysisOptions.sigcom) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
@@ -722,7 +724,7 @@ export default function Report({
           })
           analysisToc.push([num, "SigComLINCS", setAnalysis]);
         }
-        if ("rummageneLink" in analysisData[selectedSets[0].name] && analysisOptions.rummagene) {
+        if ("rummageneLink" in analysisData[selectedSets[0]?.name] && analysisOptions.rummagene) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
@@ -731,7 +733,7 @@ export default function Report({
           })  
           analysisToc.push([num, "Rummagene", setAnalysis]);
         }
-        if ("rummageoLink" in analysisData[selectedSets[0].name] && analysisOptions.rummageo) {
+        if ("rummageoLink" in analysisData[selectedSets[0]?.name] && analysisOptions.rummageo) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
@@ -740,7 +742,7 @@ export default function Report({
           })
           analysisToc.push([num, "RummaGEO", setAnalysis]);
         }
-        if ("l2s2Link" in analysisData[selectedSets[0].name] && analysisOptions.l2s2) {
+        if ("l2s2Link" in analysisData[selectedSets[0]?.name] && analysisOptions.l2s2) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
@@ -749,7 +751,7 @@ export default function Report({
           })
           analysisToc.push([num, "L2S2", setAnalysis]);
         }
-        if ("pfocrLink" in analysisData[selectedSets[0].name] && analysisOptions.pfocr) {
+        if ("pfocrLink" in analysisData[selectedSets[0]?.name] && analysisOptions.pfocr) {
           const setAnalysis: string[][] = [];
           let j = 0;
           selectedSets.forEach((geneset, i) => {
@@ -762,6 +764,11 @@ export default function Report({
 
     if ("playbookLink" in analysisData && analysisOptions.playbook) {
       analysisToc.push([num, "Playbook", "#playbook"])
+      num += 1;
+    }
+
+    if ("hypothesis" in analysisData) {
+      analysisToc.push([num, "Overlap Hypothesis", "#hypothesis"])
       num += 1;
     }
 
@@ -820,6 +827,24 @@ export default function Report({
     </>
     )
   }, [byGeneset]);
+
+  const enrichedTermsIndices = React.useMemo(() => {
+    if (analysisData.hypothesis) {
+        let indices: { [key: string]: number[][] } = {}
+        for (let term of analysisData.hypothesis.enrichedTerms) {
+            let startIndex = 0
+            while ((analysisData.hypothesis.hypothesis.indexOf(term, startIndex)) > -1) {
+                let index = analysisData.hypothesis.hypothesis.indexOf(term, startIndex)
+                let oldTermValues: number[][];
+                (term in indices) ? oldTermValues = indices[term] : oldTermValues = []
+                indices[term] = [...oldTermValues, [index, index + term.length]];
+                startIndex = index + term.length;
+            }
+        }
+        return indices
+    }
+    return null
+}, [analysisData.hypothesis])
 
   return (
     <>
@@ -1205,7 +1230,7 @@ export default function Report({
           ) : (
             <></>
           )}
-          {selectedSets[0].name in analysisData &&
+          {selectedSets[0]?.name in analysisData &&
             Object.keys(analysisData[selectedSets[0].name]).length > 0 ? (
               <>
                 <Typography
@@ -1231,7 +1256,7 @@ export default function Report({
                 </List>
               ) : (
                 <List sx={{ listStyle: "decimal", marginLeft: 5 }}>
-                  {Object.keys(analysisData[selectedSets[0].name]).map((analysisType: string, i: number) => { 
+                  {Object.keys(analysisData[selectedSets[0]?.name]).map((analysisType: string, i: number) => { 
                     if (analysisType == "enrichrLink") return <></>
                     return (
                       <ListItem sx={{ display: "list-item", borderBottom: 1 }} key={i}>
@@ -1284,6 +1309,43 @@ export default function Report({
                 </Link>
               </Typography>
             </>
+          )}
+          {analysisData.hypothesis && (
+            <Box sx={{ marginLeft: 3, marginTop: 2 }}>
+              <Typography
+                variant="h5"
+                color="secondary.dark"
+                sx={{ borderBottom: 1 }}
+                id="hypothesis"
+              >
+                Overlap Hypothesis
+              </Typography>
+              <Typography variant="body2" color="black" sx={{ padding: 3, textAlign: "left" }}>
+                    <Stack direction='column' sx={{ padding: 2 }}>
+                        <Box>
+                            <Typography>
+                                <strong>GENE SET 1: </strong> {analysisData.hypothesis.geneset1} 
+                            </Typography>
+                        </Box>
+                        <Box>
+                          <Typography>
+                                <strong>GENE SET 2: </strong> {analysisData.hypothesis.geneset2} 
+                            </Typography>
+                           
+                        </Box>
+                        <Box>
+                            <Typography>
+                                <strong>HYPOTHESIS: </strong>
+                            </Typography>
+                            {enrichedTermsIndices && analysisData.hypothesis.topEnrichmentResults && generateHypothesisTooltip(analysisData.hypothesis.hypothesis, enrichedTermsIndices, analysisData.hypothesis.topEnrichmentResults)}
+                        </Box>
+                    </Stack>
+              </Typography>
+              <Typography variant="subtitle2">
+                * This hypothesis was generated automatically by an LLM (GPT-4o).
+                Interpret this summary with caution *
+              </Typography>
+            </Box>
           )}
           {analysisData.gptSummary && (
             <Box sx={{ marginLeft: 3, marginTop: 2 }}>

@@ -4,7 +4,7 @@ import axios from "axios";
 import qs from 'qs'; 
 import { cacheResult, getCachedResult } from "./cachedResults";
 import { analysisOptions, visualizationOptions } from "./ReportLayout";
-import { generateGPTSummary, createGPTAbstract } from "./gptSummary";
+import { generateGPTSummary, createGPTAbstract, generateUserSetsHypothesis } from "./gptSummary";
 import { getPlaybookReportLink } from "./playbook";
 import { getBackgroundGenes } from "@/components/header/Header";
 
@@ -158,10 +158,21 @@ export async function getAnalysisData(selectedSets: ({
     selectedSets.forEach((set) => {
         genesetDict[set.name] = set.isHumanGenes ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
     })
-    analysisResults['overlappingGenes'] = getGMTOverlap(genesetDict)
+
+    /* analysisResults['overlappingGenes'] = getGMTOverlap(genesetDict)
     if (analysisResults['overlappingGenes'].length > 0) {
         const gptSummary = await generateGPTSummary(analysisResults['overlappingGenes'])
         analysisResults['gptSummary'] = gptSummary.response
+    } */
+    if (analysisOptions.hypothesis) {
+        console.log(genesetDict)
+        analysisResults['overlappingGenes'] = getGMTOverlap(genesetDict)
+        const setNames = selectedSets.map((set) => set.name)
+        console.log(analysisResults['overlappingGenes'])
+        if (analysisResults['overlappingGenes'].length > 0 && setNames.length == 2) {
+            const gptHypothesis = await generateUserSetsHypothesis(setNames[0], setNames[1], analysisResults['overlappingGenes'][0]?.overlapGenes)
+            analysisResults['hypothesis'] = gptHypothesis.response
+        }
     }
     
     var abstractPrompt = `Selected genesets: ${selectedSets.map((set) => set.name).join(', ')}`

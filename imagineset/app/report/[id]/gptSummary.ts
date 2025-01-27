@@ -95,7 +95,10 @@ export async function createGPTAbstract(analysisDescriptions: string) {
 }
 
 export async function generateUserSetsHypothesis(geneset1: string, geneset2: string, overlap: string[]) {
-    console.log(overlap)
+    if (overlap.length === 0) return {
+        response: {hypothesis: "The selected gene sets do not overlap.", geneset1: geneset1, geneset2: geneset2, enrichedTerms: [], topEnrichmentResults: null},
+        status: 200
+    }
     const enrichedResults = await getEnrichmentTerms(overlap)
     const enrichedTerms = enrichedResults.enrichedTerms
     const topEnrichmentResults = enrichedResults.topEnrichmentResults

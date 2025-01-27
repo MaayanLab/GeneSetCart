@@ -1338,6 +1338,7 @@ export default function Report({
                                 <strong>HYPOTHESIS: </strong>
                             </Typography>
                             {enrichedTermsIndices && analysisData.hypothesis.topEnrichmentResults && generateHypothesisTooltip(analysisData.hypothesis.hypothesis, enrichedTermsIndices, analysisData.hypothesis.topEnrichmentResults)}
+                            {analysisData.hypothesis.topEnrichmentResults === null ? analysisData.hypothesis.hypothesis : <></>}
                         </Box>
                     </Stack>
               </Typography>

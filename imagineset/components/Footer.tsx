@@ -72,8 +72,7 @@ export default async function Footer() {
                     </Grid>
                     <Grid item>
                         <Stack spacing={2}>
-                            <Link href="https://labs.icahn.mssm.edu/maayanlab/" target='_blank'><Image src={maayanLabLogo} alt="" width='100' height={'100'}></Image></Link>
-                            <Link href={"https://creativecommons.org/licenses/by-sa/4.0/"} target='_blank'><Image src={ccLogo} alt="" width='100' height={'100'}/></Link>
+                            <Link href="https://labs.icahn.mssm.edu/maayanlab/" target='_blank'><Image src={maayanLabLogo} alt="" width='100' height={'100'}></Image></Link>  
                         </Stack>
 
                     </Grid>

@@ -9,7 +9,7 @@ const TermsOfService: React.FC = () => {
         Use
       </Typography>
       <Typography variant="subtitle1" color="#666666" sx={{ mb: 3, ml: 2 }}>
-        Our gene sorting web-based tools and services are free for academic and non-profit research purposes. For any commercial use, please contact Mount Sinai Innovation Partners (MSIPInfo@mssm.edu) to obtain a license.
+        GeneSetCart is protected GNU GENERAL PUBLIC LICENSE Version 3.
       </Typography>
 
       <Typography variant="h4" color="secondary.dark" className='p-5'>

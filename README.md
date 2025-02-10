@@ -1,5 +1,5 @@
 # GeneSetCart
-This is an application for assembling, augmenting, combining, visualizing and analyzing gene sets: [genesetcart.cfde.cloud](genesetcart.cfde.cloud)
+GeneSetCart is a platform for assembling, augmenting, combining, visualizing and analyzing gene sets: [https://genesetcart.cfde.cloud](https://genesetcart.cfde.cloud)
 
 ## Getting Started
 ```bash

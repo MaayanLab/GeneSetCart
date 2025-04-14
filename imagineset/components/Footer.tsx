@@ -98,17 +98,22 @@ export default async function Footer() {
               </Link>
              
             </div>
-            <div className="flex mt-5">
-            <Link href="https://pubmed.ncbi.nlm.nih.gov/40208796/" target='_blank'>
-                <Typography
-                    variant='footer'
-                    sx={{ maxWidth: 300, fontSize: '0.75rem', lineHeight: 1.4 }}
-                >
-                    Marino GB, Olaiya S, Evangelista JE, Clarke DJB, Ma&apos;ayan A. <i>GeneSetCart: assembling, augmenting, combining, visualizing, and analyzing gene sets.</i> Gigascience. 2025 Jan 6;14:giaf025. doi: 10.1093/gigascience/giaf025.
-                </Typography>
-            </Link>
+            <div className="flex flex-col mt-5 space-y-2">
+                    <Typography variant="footer" 
+                    sx={{ fontSize: '.9rem', lineHeight: 1.4 }}>
+                        Please acknowledge GeneSetCart in your publications by citing the following reference:
+                    </Typography>
+               
+                    <Link href="https://pubmed.ncbi.nlm.nih.gov/40208796/" target='_blank'>
+                    
+                        <Typography
+                            variant='footer'
+                            sx={{ maxWidth: 300, fontSize: '0.75rem', lineHeight: 1.4 }}
+                        >
+                            Marino GB, Olaiya S, Evangelista JE, Clarke DJB, Ma&apos;ayan A. <i>GeneSetCart: assembling, augmenting, combining, visualizing, and analyzing gene sets.</i> Gigascience. 2025 Jan 6;14:giaf025. doi: 10.1093/gigascience/giaf025.
+                        </Typography>
+                    </Link>
             </div>
-
           </Grid>
           <Grid item>
             

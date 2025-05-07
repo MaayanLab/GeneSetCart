@@ -76,7 +76,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
     const [status, setStatus] = React.useState<addStatus>({})
     const [genesetInfo, setGenesetInfo] = React.useState<genesetInfo>()
     const [species, setSpecies] = React.useState('Mammalia/Homo_sapiens')
-    const isHumanGenes = React.useMemo(() => species == 'Mammalia/Homo_sapiens', [species])
+    const isHumanGenes = React.useMemo(() => species == 'Mammalia/Homo_sapiens' && validGeneSymbols, [species, validGeneSymbols])
     const [privateSession, setPrivateSession] = React.useState(false)
     const [genesLoading, setGenesLoading] = React.useState(false)
     const [addBackground, setAddBackground] = React.useState(false)
@@ -206,11 +206,12 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
             if (!description) description = ''
             let background = null;
             if (validGeneSymbols && convertedBackgroundSymbols.length > 0) {
-                background = convertedBackgroundSymbols.filter((g) => g)
+                background = convertedBackgroundSymbols.filter((g) => g && g != '')
             } else if (genesetInfo && genesetInfo?.backgroundGenes.split('\n').length > 0) {
-                background = genesetInfo?.backgroundGenes.split('\n')
+                background = genesetInfo?.backgroundGenes.split('\n').filter((g) => g != '')
             }
             const sessionId = params.id
+            console.log(isHumanGenes, validGeneSymbols, validHumanGenes, background, otherSymbolsArray)
             checkInSession(sessionId, genesetName).then((response) => {
                 if (response) {
                     setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
@@ -236,6 +237,7 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                                 }
                             })
                     } else {
+                        console.log('here', otherSymbolsArray)
                         addToSessionSets([], sessionId, genesetName, description ? description : '', otherSymbolsArray, isHumanGenes, background)
                             .then((result) => { setStatus({ success: true }) })
                             .catch((err) => {

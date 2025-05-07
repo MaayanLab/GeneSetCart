@@ -211,7 +211,6 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                 background = genesetInfo?.backgroundGenes.split('\n').filter((g) => g != '')
             }
             const sessionId = params.id
-            console.log(isHumanGenes, validGeneSymbols, validHumanGenes, background, otherSymbolsArray)
             checkInSession(sessionId, genesetName).then((response) => {
                 if (response) {
                     setStatus({ error: { selected: true, message: "Gene set already exists in this session!" } })
@@ -237,7 +236,6 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                                 }
                             })
                     } else {
-                        console.log('here', otherSymbolsArray)
                         addToSessionSets([], sessionId, genesetName, description ? description : '', otherSymbolsArray, isHumanGenes, background)
                             .then((result) => { setStatus({ success: true }) })
                             .catch((err) => {

@@ -38,7 +38,9 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
     const [generatedSetName, setGeneratedSetName] = React.useState('')
     const [status, setStatus] = React.useState<addStatus>({})
     const [isHumanGenes, setIsHumanGenes] = React.useState(true)
+    const [normalizeCasing, setNormalizeCasing] = React.useState(false)
     const [validGenes, setValidGenes] = React.useState<string[]>([])
+
 
     const unionAction = () => {
         let genes: string[] = []
@@ -47,7 +49,8 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
             const setGenes = set.otherSymbols.length === 0 ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             for (let geneSymbol of setGenes) {
                 if (!genes.includes(geneSymbol)) {
-                    genes.push(geneSymbol)
+                    if (normalizeCasing)  genes.push(geneSymbol.toUpperCase())
+                    else genes.push(geneSymbol)
                 }
             }
             genesetNames.push(set.name)
@@ -70,7 +73,8 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         let countArray: { [key: string]: number } = {}
 
         const occurrences = allGenesFlat.reduce(function (previousValue, currentvalue) {
-            return previousValue[currentvalue] ? ++previousValue[currentvalue] : previousValue[currentvalue] = 1, previousValue
+            if (normalizeCasing) return previousValue[currentvalue.toUpperCase()] ? ++previousValue[currentvalue.toUpperCase()] : previousValue[currentvalue.toUpperCase()] = 1, previousValue
+            else  return previousValue[currentvalue] ? ++previousValue[currentvalue] : previousValue[currentvalue] = 1, previousValue
         }, countArray);
 
         const genes = Object.keys(occurrences).filter((gene) => occurrences[gene] === selectedSetsCount)
@@ -88,13 +92,17 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
             const setGenes = set.otherSymbols.length === 0 ? set.genes.map((gene) => gene.gene_symbol) : set.otherSymbols
             for (let geneSymbol of setGenes) {
                 if (!toSubtractGenes.includes(geneSymbol)) {
-                    toSubtractGenes.push(geneSymbol)
+                    if (normalizeCasing) toSubtractGenes.push(geneSymbol.toUpperCase())
+                    else toSubtractGenes.push(geneSymbol)
                 }
             }
             toSubtractGenesetNames.push(set.name)
         })
         const firstSelectedSet = selectedSets[0]
-        const subtractedGenes = firstSelectedSet.genes.filter((gene) => !(toSubtractGenes.includes(gene.gene_symbol))).map((gene) => gene.gene_symbol)
+        const subtractedGenes = firstSelectedSet.genes.filter((gene) => {
+            if (normalizeCasing) return !(toSubtractGenes.includes(gene.gene_symbol.toUpperCase()))
+            else return !(toSubtractGenes.includes(gene.gene_symbol))
+        }).map((gene) => gene.gene_symbol)
         setDisplayedGenes(subtractedGenes)
         setGeneratedSetName(firstSelectedSet.name + '- (' + toSubtractGenesetNames.join(' ∪ ') + ')')
         checkValidGenes(subtractedGenes.join('\n')).then((result) => setValidGenes(result))
@@ -113,7 +121,8 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
         let countArray: { [key: string]: number } = {}
 
         const occurrences = allGenesFlat.reduce(function (previousValue, currentvalue) {
-            return previousValue[currentvalue] ? ++previousValue[currentvalue] : previousValue[currentvalue] = 1, previousValue
+            if (normalizeCasing) return previousValue[currentvalue.toUpperCase()] ? ++previousValue[currentvalue.toUpperCase()] : previousValue[currentvalue.toUpperCase()] = 1, previousValue
+            else  return previousValue[currentvalue] ? ++previousValue[currentvalue] : previousValue[currentvalue] = 1, previousValue
         }, countArray);
 
         const genes = Object.keys(occurrences).filter((gene) => occurrences[gene] >= consensusNum)
@@ -200,14 +209,15 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
                     minHeight: 400, height: '100%', overflowY: 'scroll',
                     '&::-webkit-scrollbar': { ...scrollbarStyles },
                     '&::-webkit-scrollbar-thumb': { ...scrollbarThumb }
-                }}>
+                }}
+                >
                     <CardHeader
                         title="Generated Set"
                         titleTypographyProps={{ color: 'secondary.dark', fontSize: 18 }}
                         style={{ textAlign: 'center' }}
                     />
                     <CardContent>
-                        <Stack direction={'column'} spacing={2}>
+                        <Stack direction={'column'} spacing={1}>
                             <TextField color='secondary'
                                 variant='outlined'
                                 size='small'
@@ -222,8 +232,12 @@ export function GeneCombineCards({ sessionId, sessionInfo }: {
                                 setIsHumanGenes(event.target.checked);
                             }} />} label="Only accept valid human gene symbols"
                             />
+                            <FormControlLabel className="" control={<Checkbox checked={normalizeCasing} onChange={(event) => {
+                                setNormalizeCasing(event.target.checked);
+                            }} />} label="Normalize casing"
+                            />
                             <Typography variant='body1' color='secondary' style={{ textAlign: 'center' }}> {displayedGenes.length} items</Typography>
-                            <Typography variant='body1' color='secondary' style={{ textAlign: 'center' }}> {validGenes.length} valid genes found</Typography>
+                            {isHumanGenes && <Typography variant='body1' color='secondary' style={{ textAlign: 'center' }}> {validGenes.length} valid genes found</Typography>}
                             <TextField
                                 id="standard-multiline-static"
                                 multiline

@@ -236,7 +236,8 @@ export default function SingleUpload({ queryParams }: { queryParams: Record<stri
                                 }
                             })
                     } else {
-                        addToSessionSets([], sessionId, genesetName, description ? description : '', otherSymbolsArray, isHumanGenes, background)
+                        const otherSymbolsArrayUnique = otherSymbolsArray.filter((value, index, self) => self.indexOf(value) === index);
+                        addToSessionSets([], sessionId, genesetName, description ? description : '', otherSymbolsArrayUnique, isHumanGenes, background)
                             .then((result) => { setStatus({ success: true }) })
                             .catch((err) => {
                                 if (err.message === 'No valid genes in gene set') {
